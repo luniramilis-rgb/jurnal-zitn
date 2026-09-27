@@ -6,7 +6,7 @@
 // shown as plain text inside a <pre>. Error results render clear, non-alarming
 // copy (REQ-14.4) instead of the raw payload.
 
-import type { ToolResultPart } from '@tradr/shared/schemas/advisor';
+import type { ToolResultPart } from '@jurnal-zitn/shared/schemas/advisor';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 

@@ -1,6 +1,6 @@
 import { fromZonedTime } from 'date-fns-tz';
 
-import type { Granularity, PerformanceCurrency } from '@tradr/shared';
+import type { Granularity, PerformanceCurrency } from '@jurnal-zitn/shared';
 
 /**
  * Six preset ids the timeframe selector exposes (Design §Component 6.2):

@@ -1,4 +1,4 @@
-import { encodeOccCompact, parseOccSymbol, type ParseResult } from '@tradr/shared';
+import { encodeOccCompact, parseOccSymbol, type ParseResult } from '@jurnal-zitn/shared';
 
 /** Raw, editable contract inputs as they live in the create/edit form. */
 export interface OptionContractInputs {

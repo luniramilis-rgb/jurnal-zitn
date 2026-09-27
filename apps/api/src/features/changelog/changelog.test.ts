@@ -35,7 +35,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import { ChangelogReleasesResponseSchema, type ChangelogRelease } from '@tradr/shared';
+import { ChangelogReleasesResponseSchema, type ChangelogRelease } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db } from '@/db';

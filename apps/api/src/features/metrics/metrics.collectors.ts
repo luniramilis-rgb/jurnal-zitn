@@ -14,7 +14,7 @@ import { dbConnections, dbProbeDuration, dbUp } from './metrics.registry';
  * `prom-client` `collect()` hooks interleaving unpredictably.
  *
  * It NEVER throws. Every failure — a rejection, a dead socket, a database that
- * simply stops answering — lands on the same path: `tradr_db_up 0`, the elapsed
+ * simply stops answering — lands on the same path: `jurnal_zitn_db_up 0`, the elapsed
  * time, and a reset connection gauge.
  */
 
@@ -139,29 +139,29 @@ function startProbe(): Promise<ProbeResult> {
       if (inFlight === probe) inFlight = null;
     })
     .catch(() => {
-      /* published as tradr_db_up 0 by whichever caller was racing it */
+      /* published as jurnal_zitn_db_up 0 by whichever caller was racing it */
     });
 
   return probe;
 }
 
 /**
- * Sample the database into `tradr_db_up`, `tradr_db_probe_duration_seconds` and
- * `tradr_db_connections`. Never throws.
+ * Sample the database into `jurnal_zitn_db_up`, `jurnal_zitn_db_probe_duration_seconds` and
+ * `jurnal_zitn_db_connections`. Never throws.
  *
  * A caller that finds a probe already in flight JOINS it — it never opens a
  * second transaction — and on success publishes THAT probe's result, including
  * the duration that probe measured. Joining and returning silently would leave
  * the previous scrape's values in place for an unbounded number of scrapes and,
  * on the very first concurrent pair, republish the constructor's zero-seeded
- * `tradr_db_up 0` for a perfectly healthy database.
+ * `jurnal_zitn_db_up 0` for a perfectly healthy database.
  *
  * Every gauge write happens from the race's RESULT, never inside the
  * transaction callback. A callback that writes gauges would, when its
  * transaction is abandoned and finally answers minutes later, set
- * `tradr_db_up 1` against a database that is down — and could land between a
- * later scrape's `reset()` and serialization, producing `tradr_db_up 1` with no
- * `tradr_db_connections` samples at all, a combination REQ-4.7's doctrine does
+ * `jurnal_zitn_db_up 1` against a database that is down — and could land between a
+ * later scrape's `reset()` and serialization, producing `jurnal_zitn_db_up 1` with no
+ * `jurnal_zitn_db_connections` samples at all, a combination REQ-4.7's doctrine does
  * not define.
  */
 export async function refreshDbMetrics(): Promise<void> {
@@ -198,7 +198,7 @@ export async function refreshDbMetrics(): Promise<void> {
       dbConnections.set({ state }, counts.get(state) ?? 0);
     }
   } catch {
-    // REQ-4.6: omit rather than report stale. With `tradr_db_up 0` still
+    // REQ-4.6: omit rather than report stale. With `jurnal_zitn_db_up 0` still
     // present, the absent connection series reads as "database down" —
     // REQ-4.7's disambiguation doctrine.
     dbUp.set(0);

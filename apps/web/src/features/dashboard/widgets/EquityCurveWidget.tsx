@@ -5,6 +5,7 @@ import { useDisplayCurrencyQuery } from '@/features/accounting/hooks/useDisplayC
 import { CHART_MIN_HEIGHT_PX } from '@/features/performance/chart.constants';
 import EquityCurveChart from '@/features/performance/components/EquityCurveChart';
 import { usePresetPerformance } from '@/features/performance/hooks/usePresetPerformance';
+import { useT } from '@/hooks/useLocale';
 import { useUserTimezone } from '@/hooks/useUserTimezone';
 
 /**
@@ -26,6 +27,7 @@ import { useUserTimezone } from '@/hooks/useUserTimezone';
  *      (§A — array form, NOT record indexing) and read `.equityCurve`.
  */
 function EquityCurveWidget() {
+  const t = useT();
   const { data: displayCurrencyData } = useDisplayCurrencyQuery();
   const displayCurrency = displayCurrencyData?.currency ?? null;
 
@@ -52,10 +54,10 @@ function EquityCurveWidget() {
   }
 
   if (isError) {
-    const message = error instanceof Error ? error.message : 'Failed to load equity curve';
+    const message = error instanceof Error ? error.message : t('w.equity.failed');
     return (
       <EmptyState
-        title="Couldn't load equity curve"
+        title={t('w.equity.errorTitle')}
         description={message}
         action={
           <Button
@@ -66,7 +68,7 @@ function EquityCurveWidget() {
               void refetch();
             }}
           >
-            Retry
+            {t('common.retry')}
           </Button>
         }
       />
@@ -74,7 +76,7 @@ function EquityCurveWidget() {
   }
 
   if (currencyData == null) {
-    return <EmptyState title="Close a position in this currency to see your equity curve." />;
+    return <EmptyState title={t('w.equity.empty')} />;
   }
 
   // `h-full` + a `flex-1` chart: the notice takes the height it needs and the

@@ -1,6 +1,6 @@
 import { createHash } from 'node:crypto';
 
-import type { ProviderModel } from '@tradr/shared';
+import type { ProviderModel } from '@jurnal-zitn/shared';
 
 type ProviderId = 'claude' | 'openai' | 'gemini' | 'openrouter';
 

@@ -5,7 +5,7 @@ import type {
   Granularity,
   PerformanceQueryInput,
   PerformanceResponse,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary';
 import { Skeleton } from '@/components/ui/skeleton';

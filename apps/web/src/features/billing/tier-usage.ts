@@ -3,7 +3,7 @@
 // import so presentational components (the advisor Composer) can consume them
 // without pulling in the query client or api layer.
 
-import type { TierState } from '@tradr/shared';
+import type { TierState } from '@jurnal-zitn/shared';
 
 /**
  * True when the user has free platform-turn headroom this month (REQ-8.9).

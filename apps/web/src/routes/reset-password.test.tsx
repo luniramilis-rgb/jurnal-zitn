@@ -7,11 +7,17 @@ import {
   RouterProvider,
 } from '@tanstack/react-router';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi, type MockInstance } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
+
+import { setAppLocale } from '@/lib/locale';
 
 import { Route as ResetPasswordRoute } from './reset-password';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
+// Uji ini mengunci salinan berbahasa Inggris (default produk = id).
+beforeEach(() => setAppLocale('en'));
+afterEach(() => setAppLocale('id'));
 
 // SF-3 teeth: the page is rendered logged-out (no auth mocks, no QueryClient
 // warm cache) — if it ever mounted useAuth's ['auth','me'] query, a fetch to

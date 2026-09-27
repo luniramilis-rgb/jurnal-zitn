@@ -1,6 +1,6 @@
 import { useNavigate } from '@tanstack/react-router';
 
-import { BREAKDOWN_DIMENSIONS, type BreakdownDimension } from '@tradr/shared';
+import { BREAKDOWN_DIMENSIONS, type BreakdownDimension } from '@jurnal-zitn/shared';
 
 import { cn } from '@/lib/utils';
 

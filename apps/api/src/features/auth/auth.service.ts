@@ -2,8 +2,13 @@ import crypto from 'node:crypto';
 
 import bcrypt from 'bcrypt';
 
-import { DEFAULT_REPORTING_TIMEZONE, OnboardingStateSchema } from '@tradr/shared';
-import type { OnboardingPatch, OnboardingState } from '@tradr/shared';
+import {
+  DEFAULT_REPORTING_TIMEZONE,
+  DEFAULT_SIGNUP_TIMEZONE,
+  OnboardingStateSchema,
+} from '@jurnal-zitn/shared';
+import { DEFAULT_LOCALE, resolveLocale, type AppLocale } from '@jurnal-zitn/shared';
+import type { OnboardingPatch, OnboardingState } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { isEmailConfigured } from '@/lib/config';
@@ -22,6 +27,8 @@ import {
   deleteOldestSession,
   selectUserTimezone,
   updateUserTimezone,
+  selectUserLocale,
+  updateUserLocale,
   selectUserOnboarding,
   updateUserOnboarding,
 } from './auth.query';
@@ -36,6 +43,22 @@ function generateSessionToken(): { token: string; tokenHash: string } {
   const token = crypto.randomBytes(32).toString('hex');
   const tokenHash = crypto.createHash('sha256').update(token).digest('hex');
   return { token, tokenHash };
+}
+
+/**
+ * Create a session for an already-authenticated user, enforcing the 5-session cap.
+ * Shared by password login, registration and the ZITN SSO exchange so the cap and
+ * TTL live in exactly one place.
+ */
+export async function createSessionForUser(userId: string): Promise<string> {
+  const sessionCount = await countUserSessions(db, userId);
+  if (sessionCount >= MAX_SESSIONS) {
+    await deleteOldestSession(db, userId);
+  }
+  const { token, tokenHash } = generateSessionToken();
+  const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
+  await insertSession(db, { userId, tokenHash, expiresAt });
+  return token;
 }
 
 export async function hashPassword(plain: string) {
@@ -59,7 +82,7 @@ export async function registerUser(email: string, password: string, timezone?: s
       email,
       passwordHash,
       emailVerified: !isEmailConfigured(),
-      timezone: timezone ?? DEFAULT_REPORTING_TIMEZONE,
+      timezone: timezone ?? DEFAULT_SIGNUP_TIMEZONE,
     });
   } catch (error: unknown) {
     if (error instanceof Error && 'code' in error && (error as { code: string }).code === '23505') {
@@ -68,9 +91,7 @@ export async function registerUser(email: string, password: string, timezone?: s
     throw error;
   }
 
-  const { token, tokenHash } = generateSessionToken();
-  const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
-  await insertSession(db, { userId: user.id, tokenHash, expiresAt });
+  const token = await createSessionForUser(user.id);
 
   // Post-commit verification issuance (REQ-5.2; all writes above are committed
   // — registerUser has no wrapping transaction). The whole block swallows
@@ -82,7 +103,7 @@ export async function registerUser(email: string, password: string, timezone?: s
   if (isEmailConfigured()) {
     try {
       const raw = await issueEmailToken(user.id, 'email_verification', VERIFY_TOKEN_TTL_MS);
-      dispatchEmail('email_verification', email, raw);
+      dispatchEmail('email_verification', email, raw, user.locale);
     } catch (error: unknown) {
       logger.warn('email_verification_issuance_failed', {
         userId: user.id,
@@ -128,14 +149,7 @@ export async function loginUser(email: string, password: string) {
     throw new UnauthorizedError('Invalid email or password');
   }
 
-  const sessionCount = await countUserSessions(db, user.id);
-  if (sessionCount >= MAX_SESSIONS) {
-    await deleteOldestSession(db, user.id);
-  }
-
-  const { token, tokenHash } = generateSessionToken();
-  const expiresAt = new Date(Date.now() + SESSION_TTL_MS);
-  await insertSession(db, { userId: user.id, tokenHash, expiresAt });
+  const token = await createSessionForUser(user.id);
 
   // Refresh the person profile on each login and capture the sign-in event
   // (fire-and-forget). email_verified can change between logins (verify flow).
@@ -178,6 +192,24 @@ export async function getReportingTimezone(
 /** Persist the reporting timezone. Zone validity is the route's Zod duty. */
 export async function setReportingTimezone(userId: string, timezone: string): Promise<void> {
   await updateUserTimezone(db, userId, timezone);
+}
+
+/**
+ * Preferensi bahasa UI (ZITN-TECH-017 A0). `null`/tak didukung → `DEFAULT_LOCALE` ('id');
+ * `stored` membedakan pilihan eksplisit dari fallback (klien boleh menyemai sekali).
+ */
+export async function getUserLocale(
+  userId: string,
+): Promise<{ locale: AppLocale; stored: boolean }> {
+  const stored = await selectUserLocale(db, userId);
+  return stored == null
+    ? { locale: DEFAULT_LOCALE, stored: false }
+    : { locale: resolveLocale(stored), stored: true };
+}
+
+/** Persist the UI-language preference. Validity is the route's Zod duty. */
+export async function setUserLocale(userId: string, locale: AppLocale): Promise<void> {
+  await updateUserLocale(db, userId, locale);
 }
 
 /**

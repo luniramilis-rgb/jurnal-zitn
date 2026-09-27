@@ -18,9 +18,9 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { PerformanceResponse } from '@tradr/shared';
-import { DEFAULT_WIDGETS } from '@tradr/shared/constants/dashboard-defaults';
-import { PerWidgetMinSize } from '@tradr/shared/schemas/dashboard';
+import type { PerformanceResponse } from '@jurnal-zitn/shared';
+import { DEFAULT_WIDGETS } from '@jurnal-zitn/shared/constants/dashboard-defaults';
+import { PerWidgetMinSize } from '@jurnal-zitn/shared/schemas/dashboard';
 
 import { useDisplayCurrencyQuery } from '@/features/accounting/hooks/useDisplayCurrency';
 import { usePerformance } from '@/features/performance/hooks/usePerformance';

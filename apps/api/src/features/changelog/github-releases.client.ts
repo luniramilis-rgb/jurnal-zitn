@@ -15,7 +15,7 @@
 
 import { z } from 'zod';
 
-import type { ChangelogRelease } from '@tradr/shared';
+import type { ChangelogRelease } from '@jurnal-zitn/shared';
 
 import { config } from '@/lib/config';
 
@@ -105,7 +105,7 @@ export async function fetchReleases(deps: FetchReleasesDeps = {}): Promise<Chang
         // (identify-yourself guideline — undici already sends a default UA,
         // so this is not 403 avoidance). NO authorization header, ever:
         // unauthenticated-only scope.
-        'user-agent': 'tradr-api',
+        'user-agent': 'jurnal-zitn-api',
       },
       signal: controller.signal,
     });

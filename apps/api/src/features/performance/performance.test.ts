@@ -2,7 +2,7 @@ import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { BreakdownResponseSchema, PerformanceQuerySchema } from '@tradr/shared';
+import { BreakdownResponseSchema, PerformanceQuerySchema } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db } from '@/db';

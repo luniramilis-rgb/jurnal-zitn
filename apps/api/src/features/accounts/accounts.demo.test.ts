@@ -2,7 +2,7 @@ import Decimal from 'decimal.js';
 import { asc, eq, inArray } from 'drizzle-orm';
 import { describe, it, expect, beforeAll, afterAll, afterEach, beforeEach, vi } from 'vitest';
 
-import { STARTER_TAGS } from '@tradr/shared/constants/tags';
+import { STARTER_TAGS } from '@jurnal-zitn/shared/constants/tags';
 
 import app from '@/app';
 import { db } from '@/db';

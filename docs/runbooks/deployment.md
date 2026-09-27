@@ -29,12 +29,12 @@ curl -fsS http://localhost:${WEB_PORT:-8080}/api/health
 Migration status (read-only; uses a separate connection, not the app pool):
 
 ```bash
-docker compose exec api tradr migrate --status
+docker compose exec api jurnal-zitn migrate --status
 ```
 
 Exit codes: `0` schema current, `1` pending migrations, `2` cannot connect.
-The `tradr` CLI ships five subcommands, all runnable with
-`docker compose exec api tradr <subcommand>`:
+The `jurnal-zitn` CLI ships five subcommands, all runnable with
+`docker compose exec api jurnal-zitn <subcommand>`:
 
 | Subcommand                                    | Does                                                                                                                                         |
 | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -70,14 +70,14 @@ Or copy the volume while the stack is stopped (volume copy):
 
 ```bash
 docker compose down
-docker run --rm -v tradr_pgdata:/data -v "$PWD":/backup alpine \
+docker run --rm -v jurnal_zitn_pgdata:/data -v "$PWD":/backup alpine \
   tar czf /backup/pgdata-$(date +%F).tar.gz -C /data .
 docker compose up -d
 ```
 
 The volume is named `pgdata` in the compose file; Docker prefixes it with the
 project name (the compose directory), so it resolves to e.g.
-`tradr_pgdata`. Confirm with `docker volume ls`.
+`jurnal_zitn_pgdata`. Confirm with `docker volume ls`.
 
 ### `start_period` note
 
@@ -107,7 +107,7 @@ Two pairs of settings must be kept consistent or requests fail:
 
 The app derives the client IP from `x-forwarded-for`, trusting only the proxies
 listed in `TRUSTED_PROXIES` (default `172.28.0.0/24`, the compose subnet
-`TRADR_SUBNET`). Per-IP rate limiting is best-effort, not turnkey.
+`JURNAL_ZITN_SUBNET`). Per-IP rate limiting is best-effort, not turnkey.
 
 If you run **your own TLS edge** in front of the `web` container, you MUST add
 that edge's address to `TRUSTED_PROXIES` (and keep it in sync with the compose
@@ -163,7 +163,7 @@ A slow migration still inside the 180s `start_period` looks identical at first
 (`api` `health: starting`, SPA 502ing). Discriminate before reading logs:
 
 ```bash
-docker compose exec api tradr migrate --status
+docker compose exec api jurnal-zitn migrate --status
 ```
 
 - **Exit 0 + schema current while the SPA still 502s ⇒ the database is fine and
@@ -177,7 +177,7 @@ docker compose logs api | grep encryption_fingerprint_mismatch
 The fingerprint mismatch logs the distinct `encryption_fingerprint_mismatch`
 event at error level, then exits non-zero.
 
-(If `tradr migrate --status` shows pending migrations or hangs, you're likely
+(If `jurnal-zitn migrate --status` shows pending migrations or hangs, you're likely
 looking at an in-progress migration inside `start_period`, not a key problem —
 wait it out.)
 

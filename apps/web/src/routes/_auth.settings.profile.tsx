@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { ReportingTimezoneSelect } from '@/components/ReportingTimezoneSelect';
+import { UILanguageSelect } from '@/components/UILanguageSelect';
 import { DisplayCurrencySelect } from '@/features/accounting/components/DisplayCurrencySelect';
 import { ExchangeRatesPage } from '@/features/accounting/components/ExchangeRatesPage';
 import { BuyingPowerBasisSelect } from '@/features/calculator/components/BuyingPowerBasisSelect';
@@ -16,6 +17,7 @@ function SettingsProfile() {
   const { base, quote } = Route.useSearch();
   return (
     <div className="space-y-8">
+      <UILanguageSelect />
       <DisplayCurrencySelect />
       <BuyingPowerBasisSelect />
       {/* Reporting timezone — viewable and changeable here whether or not the

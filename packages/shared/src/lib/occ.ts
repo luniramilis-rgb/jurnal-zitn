@@ -7,7 +7,7 @@ import { parseOccSymbol } from '../options';
  * parse succeeds, returns the canonical `underlying` field. Otherwise falls
  * back to the legacy leading-alpha regex against `symbol.trim().toUpperCase()`.
  *
- * Tradr v1 stores option symbols in compact display form only — see design
+ * Jurnal ZITN v1 stores option symbols in compact display form only — see design
  * Component 2 (spec: expenses-tax) for the storage rationale.
  *
  * Returns:

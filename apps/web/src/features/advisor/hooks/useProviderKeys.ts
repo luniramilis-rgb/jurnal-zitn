@@ -9,7 +9,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type { ProviderId, ProviderKeyInput, ProviderKeyListItem } from '@tradr/shared';
+import type { ProviderId, ProviderKeyInput, ProviderKeyListItem } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

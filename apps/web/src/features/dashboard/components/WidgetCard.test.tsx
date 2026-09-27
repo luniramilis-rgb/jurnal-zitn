@@ -3,11 +3,14 @@ import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { describe, expect, it } from 'vitest';
 
-import type { WidgetPlacement } from '@tradr/shared';
+import type { WidgetPlacement } from '@jurnal-zitn/shared';
+
+import { setAppLocale } from '@/lib/locale';
 
 import { WidgetCard, WIDGET_DRAG_CANCEL_CLASS, WIDGET_DRAG_HANDLE_CLASS } from './WidgetCard';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+setAppLocale('en');
 
 function makeWidget(over: Partial<WidgetPlacement> = {}): WidgetPlacement {
   return {

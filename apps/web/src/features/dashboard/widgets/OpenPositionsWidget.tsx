@@ -14,6 +14,7 @@ import {
 import { PositionRowActions } from '@/features/positions/components/PositionRowActions';
 import { usePositions } from '@/features/positions/hooks/usePositions';
 import { shouldNavigateFromRowClick } from '@/features/positions/utils/rowNavigation';
+import { useT } from '@/hooks/useLocale';
 
 export const OPEN_POSITIONS_ROW_CAP = 5;
 
@@ -26,6 +27,7 @@ export const OPEN_POSITIONS_ROW_CAP = 5;
  * the `ibkr-integration` spec.
  */
 function OpenPositionsWidget() {
+  const t = useT();
   const navigate = useNavigate();
   const { data: positions, isLoading } = usePositions({ status: 'open' });
 
@@ -42,10 +44,10 @@ function OpenPositionsWidget() {
   if (!positions || positions.length === 0) {
     return (
       <EmptyState
-        title="No open positions. Create one to get started."
+        title={t('w.positions.empty')}
         action={
           <Link to="/positions" className="text-sm font-medium underline">
-            New position
+            {t('w.positions.new')}
           </Link>
         }
       />
@@ -61,12 +63,12 @@ function OpenPositionsWidget() {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Symbol</TableHead>
-            <TableHead>Side</TableHead>
-            <TableHead>Asset</TableHead>
-            <TableHead className="text-right">Quantity</TableHead>
-            <TableHead>Opened</TableHead>
-            <TableHead className="w-24 text-right">Actions</TableHead>
+            <TableHead>{t('w.positions.symbol')}</TableHead>
+            <TableHead>{t('w.positions.side')}</TableHead>
+            <TableHead>{t('w.positions.asset')}</TableHead>
+            <TableHead className="text-right">{t('w.positions.quantity')}</TableHead>
+            <TableHead>{t('w.positions.opened')}</TableHead>
+            <TableHead className="w-24 text-right">{t('w.positions.actions')}</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>

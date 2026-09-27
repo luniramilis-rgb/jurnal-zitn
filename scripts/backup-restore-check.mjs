@@ -8,7 +8,7 @@
 // pending migration, an FK orphan, a row-count mismatch, or an unreachable object.
 //
 // Assertions:
-//   (a) `tradr migrate --status` (the pooler-safe Task-18 status) reports NO pending
+//   (a) `jurnal-zitn migrate --status` (the pooler-safe Task-18 status) reports NO pending
 //       migrations on the restored DB (REQ-10.2a).
 //   (b) A FIXED set of FK-orphan checks (advisor_messages.conversation_id,
 //       positions.account_id, ledger_entries.position_id) find zero orphans, plus a
@@ -30,8 +30,8 @@
 //
 // This checker is intentionally dependency-free (Node builtins only) so it runs from
 // the repo root without workspace module resolution. All DB reads go through `psql`
-// (the drill already depends on the Postgres client tools); `tradr` and the
-// object-storage adapter are invoked through the `@tradr/api` workspace.
+// (the drill already depends on the Postgres client tools); `jurnal-zitn` and the
+// object-storage adapter are invoked through the `@jurnal-zitn/api` workspace.
 
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
@@ -229,11 +229,11 @@ function psqlScalar(dbUrl, sqlText) {
   return res.stdout;
 }
 
-/** Run `tradr migrate --status` against the restored DB; return its exit code. */
+/** Run `jurnal-zitn migrate --status` against the restored DB; return its exit code. */
 function migrateStatusExitCode(restoreDbUrl) {
   const res = spawnSync(
     'pnpm',
-    ['--filter', '@tradr/api', 'exec', 'tsx', 'src/cli/tradr.ts', 'migrate', '--status'],
+    ['--filter', '@jurnal-zitn/api', 'exec', 'tsx', 'src/cli/jurnal-zitn.ts', 'migrate', '--status'],
     {
       cwd: REPO_ROOT,
       encoding: 'utf8',
@@ -255,7 +255,7 @@ function makeAdapterProbe() {
     'await s.get(process.env.__PROBE_KEY);';
   return (key) =>
     new Promise((resolveProbe) => {
-      const res = spawnSync('pnpm', ['--filter', '@tradr/api', 'exec', 'tsx', '-e', evalScript], {
+      const res = spawnSync('pnpm', ['--filter', '@jurnal-zitn/api', 'exec', 'tsx', '-e', evalScript], {
         cwd: REPO_ROOT,
         encoding: 'utf8',
         env: { ...process.env, __PROBE_MODULE: ADAPTER_MODULE, __PROBE_KEY: key },
@@ -282,7 +282,7 @@ export async function runChecks(opts) {
 
   // (a) migration status
   const statusCode = migrateStatus();
-  if (statusCode !== 0) failures.push(`tradr migrate --status reported pending/unavailable (exit ${statusCode})`);
+  if (statusCode !== 0) failures.push(`jurnal-zitn migrate --status reported pending/unavailable (exit ${statusCode})`);
 
   // (b) FK orphans
   const orphanResults = RELATIONSHIPS.map((rel) => ({

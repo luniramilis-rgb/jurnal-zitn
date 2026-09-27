@@ -2,7 +2,7 @@
  * Safe-disable + reclamation for the object-storage backend (hosted-platform
  * Task 13; design §Component 9; REQ-3.1/3.2/3.3/3.4, REQ-2.4).
  *
- * Two operator maintenance operations, both backing `tradr storage …`:
+ * Two operator maintenance operations, both backing `jurnal-zitn storage …`:
  *   - `migrateToInline` — REQ-3 branch (b): pull every object-pointer image row
  *     back to inline base64-in-JSONB so the backend can be turned off without
  *     stranding any conversation. Idempotent, resumable, report-and-continue.
@@ -16,7 +16,7 @@
  */
 import postgres from 'postgres';
 
-import type { StoredContentPart } from '@tradr/shared';
+import type { StoredContentPart } from '@jurnal-zitn/shared';
 
 import { config } from '@/lib/config';
 import { logger } from '@/lib/logger';
@@ -337,13 +337,13 @@ function openMaintenanceConnection(): postgres.Sql {
   });
 }
 
-/** Entrypoint for `tradr storage migrate-to-inline`. Returns a process exit code. */
+/** Entrypoint for `jurnal-zitn storage migrate-to-inline`. Returns a process exit code. */
 export async function runStorageMigrateToInline(): Promise<number> {
   const storage = getObjectStorage();
   if (!storage) {
     console.error(
       'Object storage is not configured — nothing to migrate. Configure OBJECT_STORAGE_* and ' +
-        'keep it reachable, then run `tradr storage migrate-to-inline` to pull pointer rows back ' +
+        'keep it reachable, then run `jurnal-zitn storage migrate-to-inline` to pull pointer rows back ' +
         'to inline BEFORE disabling the backend.',
     );
     return 2;
@@ -367,7 +367,7 @@ export async function runStorageMigrateToInline(): Promise<number> {
   }
 }
 
-/** Entrypoint for `tradr storage gc`. Returns a process exit code. */
+/** Entrypoint for `jurnal-zitn storage gc`. Returns a process exit code. */
 export async function runStorageGc(): Promise<number> {
   const storage = getObjectStorage();
   if (!storage) {

@@ -10,7 +10,7 @@ import { act, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { CreateCashMovementInput } from '@tradr/shared/schemas/accounting';
+import type { CreateCashMovementInput } from '@jurnal-zitn/shared/schemas/accounting';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

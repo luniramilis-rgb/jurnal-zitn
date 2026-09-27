@@ -9,7 +9,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { OnboardingState, OnboardingStatus } from '@tradr/shared';
+import type { OnboardingState, OnboardingStatus } from '@jurnal-zitn/shared';
 
 import { useOnboarding, type UseOnboardingResult } from '../hooks/useOnboarding';
 import { deriveChecklist, type ChecklistItemId } from '../lib/derive-checklist';

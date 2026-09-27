@@ -55,7 +55,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo } from 'react';
 import { toast } from 'sonner';
 
-import type { OnboardingPatch, OnboardingState, OnboardingStatus } from '@tradr/shared';
+import type { OnboardingPatch, OnboardingState, OnboardingStatus } from '@jurnal-zitn/shared';
 
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { usePositions } from '@/features/positions/hooks/usePositions';

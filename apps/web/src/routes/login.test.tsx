@@ -11,6 +11,8 @@ import {
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 
+import { setAppLocale } from '@/lib/locale';
+
 import { Route as LoginRoute } from './login';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -46,6 +48,8 @@ function buildRouter() {
 let fetchSpy: MockInstance;
 
 beforeEach(() => {
+  // Uji ini mengunci salinan berbahasa Inggris (A0: default produk = id).
+  setAppLocale('en');
   // useRegistrationEnabled reads /config on mount; answer it so nothing throws.
   fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
     new Response(JSON.stringify({ registrationEnabled: true, advisorEnabled: false }), {
@@ -57,6 +61,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  setAppLocale('id');
   fetchSpy.mockRestore();
   window.history.replaceState(null, '', '/');
 });
@@ -93,5 +98,15 @@ describe('login page — deleted-account notice', () => {
       await screen.findByText('Log in', { selector: '[data-slot="card-title"]' }),
     ).toBeTruthy();
     expect(screen.queryByText(NOTICE)).toBeNull();
+  });
+
+  it('renders the Indonesian copy by default (A0/A1)', async () => {
+    setAppLocale('id');
+    window.history.replaceState(null, '', '/login');
+    renderLogin();
+
+    expect(await screen.findByText('Masuk', { selector: '[data-slot="card-title"]' })).toBeTruthy();
+    expect(screen.getByLabelText('Kata sandi')).toBeTruthy();
+    expect(screen.getByText('Lupa kata sandi?')).toBeTruthy();
   });
 });

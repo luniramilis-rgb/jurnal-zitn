@@ -7,7 +7,7 @@ import {
   type UpdateExpenseInput,
   ExpenseListResponseSchema,
   ExpenseSchema,
-} from '@tradr/shared/schemas/expense';
+} from '@jurnal-zitn/shared/schemas/expense';
 
 import { api } from '@/lib/api';
 

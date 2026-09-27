@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import type { CsvPreviewRequest, Mapping } from '@tradr/shared';
+import type { CsvPreviewRequest, Mapping } from '@jurnal-zitn/shared';
 
 import { parseCsv, type ParsedCsv } from './csv-parse';
 import { runPipeline } from './csv-pipeline';

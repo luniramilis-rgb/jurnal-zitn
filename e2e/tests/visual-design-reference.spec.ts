@@ -18,13 +18,13 @@ import { promoteToAdmin } from '../support/db';
  * ── Why this is NOT a CI gate ──────────────────────────────────────────────
  *
  * The whole describe is guarded behind `VISUAL_REFERENCE_CAPTURE=1`. With the
- * flag UNSET (the normal `pnpm --filter @tradr/e2e test` run the CI e2e job
+ * flag UNSET (the normal `pnpm --filter @jurnal-zitn/e2e test` run the CI e2e job
  * executes) every case is `test.skip`'d, so the e2e job stays green and this
  * spec never gates a build. To (re)capture the reference, run the full stack
  * and:
  *
  *   VISUAL_REFERENCE_CAPTURE=1 CI=1 \
- *     pnpm --filter @tradr/e2e exec playwright test \
+ *     pnpm --filter @jurnal-zitn/e2e exec playwright test \
  *     visual-design-reference.spec.ts --project=chromium --update-snapshots
  *
  * `CI=1` pins the chromium rendering Playwright uses in CI so the committed

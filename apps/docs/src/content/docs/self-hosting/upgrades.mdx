@@ -1,11 +1,11 @@
 ---
 title: Upgrade an instance
-description: Move a self-hosted Tradr instance to a newer version — the rebuild and pinned-image paths, what migrations do on restart, how to verify the upgrade, and when a rollback is still available.
+description: Move a self-hosted Jurnal ZITN instance to a newer version — the rebuild and pinned-image paths, what migrations do on restart, how to verify the upgrade, and when a rollback is still available.
 ---
 
 import HostedOnly from '@/components/HostedOnly.astro';
 
-An upgrade is a restart with newer code. Tradr keeps all its state in Postgres, so
+An upgrade is a restart with newer code. Jurnal ZITN keeps all its state in Postgres, so
 the containers are replaceable and the volume is not. Migrations run by themselves
 when the api boots.
 
@@ -58,12 +58,12 @@ A running tab does not need a manual reload after an upgrade. On an image that
 carries `APP_VERSION`, each tab checks the served version about every five
 minutes while it is visible. It also checks again as soon as you return to the
 tab. When the served version differs from the version the tab started with,
-Tradr shows an update prompt. Select **Reload** to move to the new version. You
+Jurnal ZITN shows an update prompt. Select **Reload** to move to the new version. You
 lose anything unsaved on the page.
 
 A part of a page can fail to load after an upgrade, because its code file no
-longer exists on the new version. Tradr reloads the tab one time by itself to
-recover. If the reload does not recover the page, Tradr shows a prompt with a
+longer exists on the new version. Jurnal ZITN reloads the tab one time by itself to
+recover. If the reload does not recover the page, Jurnal ZITN shows a prompt with a
 **Reload** button instead.
 
 A locally built image has no `APP_VERSION` and reports no version (see the note
@@ -76,7 +76,7 @@ cache policy for the hosted deployment only. The container does not serve the
 file, and a self-hosted stack does not use it. You can ignore it.
 
 :::caution[A proxy in front of the container must obey the cache headers]
-Tradr sets `no-store` on `/config.js` and `no-cache` on `index.html`, so the
+Jurnal ZITN sets `no-store` on `/config.js` and `no-cache` on `index.html`, so the
 container is correct on its own. A reverse proxy or CDN in front of the
 container must obey these two directives. If the proxy keeps an old copy of
 `index.html`, the tab holds the version it started with, while `/config.js`
@@ -88,7 +88,7 @@ configuration of the proxy. For a proxy in front of the stack, see
 
 ### Which version bump matters
 
-Tradr is pre-1.0, so the usual semver reading is inverted:
+Jurnal ZITN is pre-1.0, so the usual semver reading is inverted:
 
 | Bump      | Example           | What it means today                                         |
 | --------- | ----------------- | ----------------------------------------------------------- |
@@ -111,8 +111,8 @@ docker compose up -d --build
 Compose rebuilds `api` and `web`, then recreates the two containers. `postgres`
 keeps running, and the `pgdata` volume is untouched.
 
-**Expected result:** Compose reports `Container tradr-api-1 Started` and
-`Container tradr-web-1 Started`. With a warm build cache this takes seconds.
+**Expected result:** Compose reports `Container jurnal-zitn-api-1 Started` and
+`Container jurnal-zitn-web-1 Started`. With a warm build cache this takes seconds.
 
 This path tracks whatever is on `main`. Check out a release tag first if you want
 a specific version:
@@ -210,7 +210,7 @@ moved to. A `503` with `{"status":"error"}` means the api is up but cannot
 reach the database.
 
 ```bash
-docker compose exec api tradr migrate --status
+docker compose exec api jurnal-zitn migrate --status
 ```
 
 **Expected result:** exit code 0, and output ending in `Schema is up to date.`
@@ -286,7 +286,7 @@ setting exists for operators who run migrations out of band from a source checko
 - **`api` restarts in a loop, naming the encryption key** — `ENCRYPTION_KEY`
   changed, or `ENCRYPTION_KEY_FINGERPRINT` no longer matches it. Restore the
   original value.
-- **`tradr migrate --status` exits 1 after an upgrade** — the api has not finished
+- **`jurnal-zitn migrate --status` exits 1 after an upgrade** — the api has not finished
   booting, or it crashed before migrating. Read `docker compose logs api`.
 - **`docker compose pull` reports there is nothing to pull** — the services still
   carry `build:` blocks. Use path 1, or pin images as in path 2.

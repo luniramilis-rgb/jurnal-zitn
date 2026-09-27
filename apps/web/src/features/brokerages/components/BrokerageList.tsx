@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { Brokerage } from '@tradr/shared';
+import type { Brokerage } from '@jurnal-zitn/shared';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/badge';

@@ -1,6 +1,6 @@
 import { useState, type ReactElement, type ReactNode } from 'react';
 
-import type { WidgetPlacement, WidgetType } from '@tradr/shared';
+import type { WidgetPlacement, WidgetType } from '@jurnal-zitn/shared';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import {
@@ -14,6 +14,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
+import { useT } from '@/hooks/useLocale';
 
 import { AddWidgetPopover } from './AddWidgetPopover';
 
@@ -74,6 +75,7 @@ export function DashboardHeader({
   resetBusy,
   coachMark,
 }: DashboardHeaderProps): ReactElement {
+  const t = useT();
   const [confirmingReset, setConfirmingReset] = useState(false);
 
   return (
@@ -81,7 +83,7 @@ export function DashboardHeader({
     // dashboard tests anchor on.
     <div data-slot="dashboard-header">
       <PageHeader
-        page="Dashboard"
+        page={t('page.dashboard')}
         chips={coachMark}
         right={
           <div className="flex items-center gap-2">
@@ -95,7 +97,7 @@ export function DashboardHeader({
                 disabled={resetBusy}
                 onClick={() => setConfirmingReset(true)}
               >
-                Reset layout
+                {t('dashboard.resetLayout')}
               </Button>
             ) : null}
           </div>
@@ -105,14 +107,11 @@ export function DashboardHeader({
         <AlertDialog open={confirmingReset} onOpenChange={setConfirmingReset}>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>Reset dashboard layout</AlertDialogTitle>
-              <AlertDialogDescription>
-                Every widget goes back to its default position and size, and any widget you removed
-                comes back. Your trading data is not affected.
-              </AlertDialogDescription>
+              <AlertDialogTitle>{t('dashboard.resetTitle')}</AlertDialogTitle>
+              <AlertDialogDescription>{t('dashboard.resetBody')}</AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
               <AlertDialogAction
                 className="cursor-pointer"
                 data-slot="dashboard-reset-confirm"
@@ -121,7 +120,7 @@ export function DashboardHeader({
                   onResetLayout();
                 }}
               >
-                Reset layout
+                {t('dashboard.resetLayout')}
               </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>

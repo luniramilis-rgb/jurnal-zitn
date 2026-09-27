@@ -1,6 +1,6 @@
 import { eq } from 'drizzle-orm';
 
-import type { BuyingPowerBasis } from '@tradr/shared';
+import type { BuyingPowerBasis } from '@jurnal-zitn/shared';
 
 import type { Database, Transaction } from '@/db';
 import { users } from '@/db/schema';

@@ -11,12 +11,12 @@ import type { Config } from './config';
 // (transporter singleton, in-flight Set) survives.
 
 const CONFIGURED: Partial<Config> = {
-  SMTP_HOST: 'smtp.tradr.test',
+  SMTP_HOST: 'smtp.jurnal-zitn.test',
   SMTP_PORT: 587,
   SMTP_TLS_MODE: 'starttls',
-  EMAIL_FROM: 'no-reply@tradr.test',
-  EMAIL_FROM_NAME: 'Tradr',
-  WEB_BASE_URL: 'https://app.tradr.test',
+  EMAIL_FROM: 'no-reply@jurnal-zitn.test',
+  EMAIL_FROM_NAME: 'Jurnal ZITN',
+  WEB_BASE_URL: 'https://app.jurnal-zitn.test',
 };
 
 async function load(overrides: Partial<Config> = {}) {
@@ -59,7 +59,7 @@ afterEach(() => {
 // seam bypasses createTransport, so the mapping MUST be tested here) ─────────
 describe('buildTransportOptions', () => {
   const base = {
-    SMTP_HOST: 'smtp.tradr.test',
+    SMTP_HOST: 'smtp.jurnal-zitn.test',
     SMTP_PORT: 2525,
     SMTP_USER: undefined,
     SMTP_PASS: undefined,
@@ -92,7 +92,7 @@ describe('buildTransportOptions', () => {
   it('pins host/port pass-through, pool: false, and the 10/10/20 s timeouts', async () => {
     const { mailer } = await load();
     const opts = mailer.buildTransportOptions({ ...base, SMTP_TLS_MODE: 'starttls' });
-    expect(opts.host).toBe('smtp.tradr.test');
+    expect(opts.host).toBe('smtp.jurnal-zitn.test');
     expect(opts.port).toBe(2525);
     expect(opts.pool).toBe(false);
     expect(opts.connectionTimeout).toBe(10_000);
@@ -150,7 +150,7 @@ describe('dispatchEmail', () => {
     // Exact-object match: from MUST be the { name, address } object form
     // (never a formatted string — MN-4), and no extra fields ride along.
     expect(sendMail).toHaveBeenCalledWith({
-      from: { name: 'Tradr', address: 'no-reply@tradr.test' },
+      from: { name: 'Jurnal ZITN', address: 'no-reply@jurnal-zitn.test' },
       to: 'user@example.com',
       subject: expected.subject,
       text: expected.text,
@@ -167,7 +167,7 @@ describe('dispatchEmail', () => {
     mailer.dispatchEmail('email_verification', 'user@example.com', 'tok');
 
     const message = sendMail.mock.calls[0][0] as { from: unknown };
-    expect(message.from).toEqual({ name: '', address: 'no-reply@tradr.test' });
+    expect(message.from).toEqual({ name: '', address: 'no-reply@jurnal-zitn.test' });
     await mailer.drainMailer();
   });
 

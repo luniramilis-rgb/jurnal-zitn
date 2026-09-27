@@ -7,7 +7,7 @@ import {
   type LocatedError,
   type LocatedWarning,
   type ProposedPosition,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import type { Database, Transaction } from '@/db';
 import {
@@ -729,7 +729,7 @@ function neutralizeLocatedError(e: LocatedError): LocatedError {
   return {
     rowNumber: e.rowNumber,
     csvColumn: e.csvColumn !== undefined ? neutralizeCsvCell(e.csvColumn) : undefined,
-    tradrField: e.tradrField,
+    journalField: e.journalField,
     code: e.code,
     message: neutralizeCsvCell(e.message),
   };

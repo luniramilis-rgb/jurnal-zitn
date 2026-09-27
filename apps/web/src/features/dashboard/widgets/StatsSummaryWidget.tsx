@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { useDisplayCurrencyQuery } from '@/features/accounting/hooks/useDisplayCurrency';
 import { usePresetPerformance } from '@/features/performance/hooks/usePresetPerformance';
 import { formatProfitFactor } from '@/features/performance/utils/formatPerformance';
+import { useT } from '@/hooks/useLocale';
 import { useUserTimezone } from '@/hooks/useUserTimezone';
 
 interface StatTile {
@@ -33,6 +34,7 @@ interface StatTile {
  *      (§A — array form, NOT record indexing) and read `.stats`.
  */
 function StatsSummaryWidget() {
+  const t = useT();
   const { data: displayCurrencyData } = useDisplayCurrencyQuery();
   const displayCurrency = displayCurrencyData?.currency ?? null;
 
@@ -66,10 +68,10 @@ function StatsSummaryWidget() {
   }
 
   if (isError) {
-    const message = error instanceof Error ? error.message : 'Failed to load stats';
+    const message = error instanceof Error ? error.message : t('w.stats.failed');
     return (
       <EmptyState
-        title="Couldn't load stats"
+        title={t('w.stats.errorTitle')}
         description={message}
         action={
           <Button
@@ -80,7 +82,7 @@ function StatsSummaryWidget() {
               void refetch();
             }}
           >
-            Retry
+            {t('common.retry')}
           </Button>
         }
       />
@@ -90,31 +92,31 @@ function StatsSummaryWidget() {
   const stats = currencyData?.stats ?? null;
 
   if (currencyData == null || stats == null || (!stats.hasWins && !stats.hasLosses)) {
-    return <EmptyState title="Close a position to see stats." />;
+    return <EmptyState title={t('w.stats.empty')} />;
   }
 
   const code = currencyData.code;
   const tiles: StatTile[] = [
     {
-      label: 'Total Net P&L',
+      label: t('w.stats.totalNetPnl'),
       render: () => (
         <Numeric value={stats.totalNetPnl} kind="money" currency={code} direction="auto" />
       ),
     },
     {
-      label: 'Win Rate',
+      label: t('w.stats.winRate'),
       render: () => <Numeric value={stats.winRate} kind="percent" direction="none" />,
     },
     {
-      label: 'Avg Win',
+      label: t('w.stats.avgWin'),
       render: () => <Numeric value={stats.avgWin} kind="money" currency={code} direction="auto" />,
     },
     {
-      label: 'Avg Loss',
+      label: t('w.stats.avgLoss'),
       render: () => <Numeric value={stats.avgLoss} kind="money" currency={code} direction="auto" />,
     },
     {
-      label: 'Profit Factor',
+      label: t('w.stats.profitFactor'),
       // Finite profit factor routes through the primitive (neutral decimal); the
       // ∞ / em-dash branches the primitive does not model stay on formatProfitFactor.
       render: () =>

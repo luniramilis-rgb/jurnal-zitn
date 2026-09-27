@@ -68,7 +68,7 @@ export const BlackScholesOutputSchema = z.object({
 // and does NOT re-export the inferred aliases below. Consumers that need the
 // schema-inferred form can either `z.infer<typeof BlackScholesInputSchema>` at
 // the call site or import these aliases directly from
-// `@tradr/shared/schemas/options`.
+// `@jurnal-zitn/shared/schemas/options`.
 export type OccParseInput = z.infer<typeof OccParseInputSchema>;
 export type OccParseOutput = z.infer<typeof OccParseOutputSchema>;
 export type OccEncodeInput = z.infer<typeof OccEncodeInputSchema>;

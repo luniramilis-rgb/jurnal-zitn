@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import { TierStateSchema } from '@tradr/shared';
+import { TierStateSchema } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db } from '@/db';

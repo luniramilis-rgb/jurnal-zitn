@@ -1,6 +1,6 @@
 # Product analytics (PostHog)
 
-Tradr can **optionally** send product-analytics events to
+Jurnal ZITN can **optionally** send product-analytics events to
 [PostHog](https://posthog.com). It is **off by default** — a fresh clone with no
 PostHog keys set constructs no client, makes no outbound calls, and behaves
 identically to an instance that has never heard of PostHog. You opt **in** by

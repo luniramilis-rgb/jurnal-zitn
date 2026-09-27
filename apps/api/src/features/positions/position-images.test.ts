@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { describe, it, expect } from 'vitest';
 
-import { POSITION_IMAGE_MAX_BYTES, POSITION_IMAGE_MAX_COUNT } from '@tradr/shared';
+import { POSITION_IMAGE_MAX_BYTES, POSITION_IMAGE_MAX_COUNT } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db } from '@/db';

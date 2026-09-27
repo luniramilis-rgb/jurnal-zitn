@@ -33,7 +33,7 @@ async function seedUndecryptableRow(): Promise<void> {
   const ciphertext = encrypt('sk-correct-key-secret');
 
   const databaseUrl =
-    process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/tradr_test';
+    process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test';
   const sql = postgres(databaseUrl, { max: 1 });
   const db = drizzle(sql);
   const { users } = await import('@/db/schema');

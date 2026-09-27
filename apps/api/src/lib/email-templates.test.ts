@@ -34,7 +34,7 @@ type Pin = {
 const PINS: Pin[] = [
   {
     kind: 'password_reset',
-    subject: 'Reset your Tradr password',
+    subject: 'Reset your Jurnal ZITN password',
     link: `${BASE}/reset-password#token=${TOKEN}`,
     expiry: 'This link expires in 60 minutes.',
     notice: "If you didn't request this, you can ignore this email — your password is unchanged.",
@@ -50,11 +50,11 @@ const PINS: Pin[] = [
 
 describe.each(PINS)('buildEmail($kind)', ({ kind, subject, link, expiry, notice }) => {
   it('uses the pinned subject', () => {
-    expect(buildEmail(kind, TOKEN).subject).toBe(subject);
+    expect(buildEmail(kind, TOKEN, 'en').subject).toBe(subject);
   });
 
   it('text carries the fragment-carry link (#token=), the expiry statement, and the didn’t-request notice (REQ-3.1, D6)', () => {
-    const { text } = buildEmail(kind, TOKEN);
+    const { text } = buildEmail(kind, TOKEN, 'en');
     expect(text).toContain(link);
     expect(link).toContain('#token=');
     expect(text).toContain(expiry);
@@ -62,21 +62,21 @@ describe.each(PINS)('buildEmail($kind)', ({ kind, subject, link, expiry, notice 
   });
 
   it('html carries the same link (as the href), expiry statement, and notice', () => {
-    const { html } = buildEmail(kind, TOKEN);
+    const { html } = buildEmail(kind, TOKEN, 'en');
     expect(html).toContain(`href="${link}"`);
     expect(html).toContain(expiry);
     expect(html).toContain(notice);
   });
 
   it('raw token appears nowhere but the link (REQ-3.9)', () => {
-    const { subject: subj, text, html } = buildEmail(kind, TOKEN);
+    const { subject: subj, text, html } = buildEmail(kind, TOKEN, 'en');
     expect(subj).not.toContain(TOKEN);
     expect(text.split(link).join('')).not.toContain(TOKEN);
     expect(html.split(link).join('')).not.toContain(TOKEN);
   });
 
   it('html has no images, no tracking, no URL other than the link', () => {
-    const { html } = buildEmail(kind, TOKEN);
+    const { html } = buildEmail(kind, TOKEN, 'en');
     expect(html).not.toContain('<img');
     expect(html).not.toContain('<script');
     // Strip the link (href + visible text) — no other http(s) reference may remain.
@@ -85,18 +85,18 @@ describe.each(PINS)('buildEmail($kind)', ({ kind, subject, link, expiry, notice 
 });
 
 it('footer shows the instance host, never a hardcoded hosted domain (self-host de-brand)', () => {
-  const { html } = buildEmail('password_reset', TOKEN);
+  const { html } = buildEmail('password_reset', TOKEN, 'en');
   expect(html).not.toContain('tradr.cloud');
   expect(html).toContain(new URL(BASE).host); // e.g. app.example.com
 });
 
 it('reads config.WEB_BASE_URL at call time, never captured at module load (Task 1 no-capture rule)', () => {
   config.WEB_BASE_URL = 'https://first.example.com';
-  expect(buildEmail('password_reset', TOKEN).text).toContain(
+  expect(buildEmail('password_reset', TOKEN, 'en').text).toContain(
     `https://first.example.com/reset-password#token=${TOKEN}`,
   );
   config.WEB_BASE_URL = 'https://second.example.com';
-  expect(buildEmail('password_reset', TOKEN).text).toContain(
+  expect(buildEmail('password_reset', TOKEN, 'en').text).toContain(
     `https://second.example.com/reset-password#token=${TOKEN}`,
   );
 });

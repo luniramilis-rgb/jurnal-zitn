@@ -1,9 +1,9 @@
 ---
 title: Database & migrations
-description: How Tradr applies schema changes — forward-only Drizzle migrations on api startup, the advisory lock that serializes them, post-migrations for concurrent index builds, and why an upgrade is reversible at all.
+description: How Jurnal ZITN applies schema changes — forward-only Drizzle migrations on api startup, the advisory lock that serializes them, post-migrations for concurrent index builds, and why an upgrade is reversible at all.
 ---
 
-Tradr applies its own schema changes. There is no migration step for an operator
+Jurnal ZITN applies its own schema changes. There is no migration step for an operator
 to run and no window in which the code and the schema disagree. This page explains
 what happens and why it is built that way.
 
@@ -25,7 +25,7 @@ before Docker calls the container unhealthy.
 
 ## Two tracks
 
-Tradr keeps two sets of SQL files, applied in order, each with its own journal and
+Jurnal ZITN keeps two sets of SQL files, applied in order, each with its own journal and
 its own lock.
 
 | Track        | Where                              | Runs in a transaction | Journal                        |
@@ -38,7 +38,7 @@ by Drizzle's migrator. Each runs inside a transaction, so a failure leaves nothi
 half-applied.
 
 Post-migrations exist for statements PostgreSQL refuses to run inside a
-transaction. `CREATE INDEX CONCURRENTLY` is the one Tradr uses. It builds an index
+transaction. `CREATE INDEX CONCURRENTLY` is the one Jurnal ZITN uses. It builds an index
 without locking writes, which matters on a `positions` table with real history in
 it. PostgreSQL will not run it inside a transaction, so it lives in its own
 directory and runs outside one.
@@ -60,7 +60,7 @@ other exists.
 You can see the locks in the status command:
 
 ```bash
-docker compose exec api tradr migrate --status
+docker compose exec api jurnal-zitn migrate --status
 ```
 
 **Expected result:** exit code 0, and `held: false` against both keys on an idle
@@ -71,14 +71,14 @@ The lock is held by a _session_, so it only works on a direct connection. A
 transaction-mode pooler can route the next statement to a different backend, which
 would leave the lock holder and the migration in separate sessions.
 
-Tradr refuses to guess. Setting `DB_TRANSACTION_POOLER=true` without
+Jurnal ZITN refuses to guess. Setting `DB_TRANSACTION_POOLER=true` without
 `DIRECT_DATABASE_URL` fails the boot with a message naming both variables. See
 [Bring your own Postgres](/self-hosting/external-postgres/).
 :::
 
 ## Forward-only, and what that buys
 
-Drizzle has no down-migrations, and Tradr does not write them. Migrations only go
+Drizzle has no down-migrations, and Jurnal ZITN does not write them. Migrations only go
 forward.
 
 That sounds like it removes an escape route. It adds one, because of the rule it
@@ -110,7 +110,7 @@ stay slow.
 
 ## Checking the state
 
-`tradr migrate --status` reads both journals and reports what is applied and what
+`jurnal-zitn migrate --status` reads both journals and reports what is applied and what
 is pending. It opens its own read-only connection, and never takes the migration
 lock, so it is safe to run against a live instance.
 

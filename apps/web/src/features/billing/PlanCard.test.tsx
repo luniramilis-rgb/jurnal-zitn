@@ -11,7 +11,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { TierLimits, TierState } from '@tradr/shared';
+import type { TierLimits, TierState } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 import { captureClientEvent } from '@/lib/telemetry/posthog';

@@ -1,6 +1,6 @@
 import { useNavigate } from '@tanstack/react-router';
 
-import type { PerformanceQueryInput } from '@tradr/shared';
+import type { PerformanceQueryInput } from '@jurnal-zitn/shared';
 
 import { cn } from '@/lib/utils';
 

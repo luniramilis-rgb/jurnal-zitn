@@ -6,7 +6,7 @@
 // The map is keyed by `PerformanceStats` fields (minus the two booleans that
 // have no row). The host is not written here — `statDocsUrl` composes the URL
 // through `docsUrl`, so `docs.ts` stays the one place the host appears (2.3).
-import type { PerformanceStats } from '@tradr/shared';
+import type { PerformanceStats } from '@jurnal-zitn/shared';
 
 import { docsUrl } from '@/lib/docs';
 

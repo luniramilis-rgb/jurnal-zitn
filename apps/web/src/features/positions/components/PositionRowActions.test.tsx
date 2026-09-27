@@ -3,7 +3,7 @@ import { render, screen, cleanup, fireEvent, within } from '@testing-library/rea
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { PositionListItem } from '@tradr/shared';
+import type { PositionListItem } from '@jurnal-zitn/shared';
 
 import { makePosition } from '@/features/positions/__fixtures__/position-fixtures';
 

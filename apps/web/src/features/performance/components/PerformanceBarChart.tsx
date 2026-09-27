@@ -12,7 +12,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import type { SeriesBucket } from '@tradr/shared';
+import type { SeriesBucket } from '@jurnal-zitn/shared';
 
 import { CHART_MIN_HEIGHT_PX } from '@/features/performance/chart.constants';
 import { formatSigned, moneyDirection } from '@/lib/format';

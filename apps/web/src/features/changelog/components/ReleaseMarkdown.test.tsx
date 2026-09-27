@@ -2,7 +2,7 @@
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { ChangelogRelease } from '@tradr/shared';
+import type { ChangelogRelease } from '@jurnal-zitn/shared';
 
 import { ReleaseCard } from './ReleaseCard';
 import { ReleaseMarkdown } from './ReleaseMarkdown';

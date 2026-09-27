@@ -7,7 +7,7 @@
 // bookkeeping. A fresh instance gets zero-value cards from the API, never an
 // error state here.
 
-import type { AdminStats } from '@tradr/shared/schemas/admin';
+import type { AdminStats } from '@jurnal-zitn/shared/schemas/admin';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';

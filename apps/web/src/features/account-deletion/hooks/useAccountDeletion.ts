@@ -8,7 +8,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useRouter } from '@tanstack/react-router';
 
-import type { AccountDeletionResult, AccountDeletionStatus } from '@tradr/shared';
+import type { AccountDeletionResult, AccountDeletionStatus } from '@jurnal-zitn/shared';
 
 import { billingKeys } from '@/features/billing/useWalletBalance';
 import { api, markSessionEnded, setIsLoggingOut } from '@/lib/api';

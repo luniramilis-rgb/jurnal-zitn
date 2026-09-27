@@ -4,7 +4,7 @@
 # (regenerate, then `git diff --exit-code`). Prettier collapses short arrays that
 # the generator writes expanded, so formatting this file makes the gate fail on
 # every pull request.
-apps/docs/src/openapi/tradr-api.json
+apps/docs/src/openapi/jurnal-zitn-api.json
 
 # Astro-generated content-collection types
 **/.astro/**

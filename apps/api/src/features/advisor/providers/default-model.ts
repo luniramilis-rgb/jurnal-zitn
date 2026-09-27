@@ -6,7 +6,7 @@
 // owns its hardcoded preference list (providers/claude.ts, providers/openai.ts)
 // and calls this shared matcher.
 
-import type { ProviderModel } from '@tradr/shared';
+import type { ProviderModel } from '@jurnal-zitn/shared';
 
 /**
  * Pick a model id from `models` using the REQ-6.4 rule:

@@ -51,7 +51,7 @@ describe('parseAppVersion (REQ-3.3, REQ-3.4, REQ-3.6)', () => {
     // always SETS the variable, and config's APP_VERSION is a bare
     // z.string().optional() with no ''→undefined preprocess — so an image built
     // without a build-arg delivers ''. Anything but the fallback emits
-    // version="" and breaks the REQ-3.6 join with tradr_web_build_info.
+    // version="" and breaks the REQ-3.6 join with jurnal_zitn_web_build_info.
     expect(parseAppVersion('')).toEqual({ version: 'unknown', commit: 'unknown' });
   });
 });
@@ -105,7 +105,7 @@ describe('initMetrics (armed)', () => {
   // initMetrics() returns at line 1 when !isMetricsConfigured(), and
   // vitest.workspace.ts pins METRICS_ENABLED off — so under the default pin a
   // build with NO idempotency guard at all would still satisfy "called twice
-  // does not throw", and tradr_build_info would have no samples to assert on.
+  // does not throw", and jurnal_zitn_build_info would have no samples to assert on.
   // `config` is a plain mutable object read live by isMetricsConfigured().
   //
   // APP_VERSION is pinned for the same reason, one step further: it is NOT in
@@ -131,7 +131,7 @@ describe('initMetrics (armed)', () => {
     expect(() => initMetrics()).not.toThrow();
   });
 
-  it('emits tradr_build_info exactly once, as a constant 1 (REQ-3.1, REQ-3.5)', async () => {
+  it('emits jurnal_zitn_build_info exactly once, as a constant 1 (REQ-3.1, REQ-3.5)', async () => {
     const metric = await buildInfo.get();
 
     expect(metric.values).toHaveLength(1);
@@ -143,7 +143,7 @@ describe('initMetrics (armed)', () => {
     expect(metric.values[0]?.labels).toEqual({ version: 'unknown', commit: 'unknown' });
   });
 
-  it('seeds tradr_db_pool_max from DB_POOL_SIZE (REQ-4.4)', async () => {
+  it('seeds jurnal_zitn_db_pool_max from DB_POOL_SIZE (REQ-4.4)', async () => {
     // Label-free gauges are seeded to 0 by prom-client's constructor, so this
     // assertion is only evidence while DB_POOL_SIZE is non-zero.
     expect(config.DB_POOL_SIZE).toBeGreaterThan(0);
@@ -155,7 +155,7 @@ describe('initMetrics (armed)', () => {
   it('collects the default process and Node runtime metrics (REQ-6.1, REQ-6.3)', async () => {
     const names = (await registry.getMetricsAsJSON()).map((m) => m.name);
 
-    // Conventional names, deliberately NOT renamed under the tradr_ prefix.
+    // Conventional names, deliberately NOT renamed under the jurnal_zitn_ prefix.
     expect(names.some((n) => n.startsWith('process_') || n.startsWith('nodejs_'))).toBe(true);
   });
 });

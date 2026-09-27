@@ -9,11 +9,13 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { PositionListItem } from '@tradr/shared';
+import type { PositionListItem } from '@jurnal-zitn/shared';
 
 import { usePositions } from '@/features/positions/hooks/usePositions';
+import { setAppLocale } from '@/lib/locale';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+setAppLocale('en');
 
 vi.mock('@/features/positions/hooks/usePositions', () => ({
   usePositions: vi.fn(),

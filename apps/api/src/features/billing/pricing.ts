@@ -1,4 +1,4 @@
-import type { ProviderId } from '@tradr/shared';
+import type { ProviderId } from '@jurnal-zitn/shared';
 
 import { config } from '@/lib/config';
 
@@ -6,7 +6,7 @@ import { config } from '@/lib/config';
  * Pure pricing module (design Component 3, REQ-1.3/5.1/5.6/6.1).
  *
  * Credit unit: 1 credit = 1 micro-USD ($0.000001). All money arithmetic is
- * integer/bigint — never JS float — and rounds UP (ceil) so Tradr never
+ * integer/bigint — never JS float — and rounds UP (ceil) so Jurnal ZITN never
  * under-charges itself on rounding.
  *
  * No I/O, no DB. The only external read is `config.PRICING_MARKUP` (a decimal
@@ -139,7 +139,7 @@ export interface TurnPriceParts {
  *
  * Identical validation and rate lookup as `priceTurnUsage` — which delegates
  * here, so every charged amount stays byte-identical. Pure integer/bigint
- * math throughout, ceil-rounded so Tradr never under-charges (REQ-5.1).
+ * math throughout, ceil-rounded so Jurnal ZITN never under-charges (REQ-5.1).
  * Throws `UnpricedModelError` for an unpriced model; callers gate via
  * `isModelPriced` first (REQ-5.6).
  */

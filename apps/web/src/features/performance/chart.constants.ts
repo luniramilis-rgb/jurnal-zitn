@@ -14,7 +14,7 @@
  *      chrome. A floor without that bound only converts a squashed chart into a
  *      silently scrolled-away one.
  *
- * See `@tradr/shared/constants/dashboard-geometry` for why 240 and what the
+ * See `@jurnal-zitn/shared/constants/dashboard-geometry` for why 240 and what the
  * bound is made of.
  */
-export { CHART_MIN_HEIGHT_PX } from '@tradr/shared/constants/dashboard-geometry';
+export { CHART_MIN_HEIGHT_PX } from '@jurnal-zitn/shared/constants/dashboard-geometry';

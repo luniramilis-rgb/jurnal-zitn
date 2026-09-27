@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 
-import { IANA_TIMEZONES, UserTimezoneSchema } from '@tradr/shared';
+import { IANA_TIMEZONES, UserTimezoneSchema } from '@jurnal-zitn/shared';
 
 import { Label } from '@/components/ui/label';
 import {
@@ -68,7 +68,7 @@ export function ReportingTimezoneSelect() {
         <p className="mt-1 text-sm text-muted-foreground">
           The zone your P&amp;L is bucketed into by day, week and month on your dashboard,
           performance page and position drawer. It follows you, so those figures stay the same
-          wherever you open Tradr. Updating it re-cuts them.
+          wherever you open Jurnal ZITN. Updating it re-cuts them.
         </p>
       </div>
       <div className="space-y-2">

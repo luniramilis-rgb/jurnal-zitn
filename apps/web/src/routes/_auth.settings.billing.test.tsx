@@ -14,7 +14,7 @@ import {
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { TierState } from '@tradr/shared';
+import type { TierState } from '@jurnal-zitn/shared';
 
 import { billingKeys } from '@/features/billing/useWalletBalance';
 import { api } from '@/lib/api';

@@ -11,6 +11,8 @@ const FEE_FIELDS = [
   'stockPerShareCommission',
   'stockMinPerFill',
   'stockMaxPerFill',
+  'stockPercentBuy',
+  'stockPercentSell',
   'optionsPerContractCommission',
   'optionsPerContractExchangeFee',
   'optionsMinPerFill',
@@ -89,6 +91,8 @@ export function updateFeeSchedule(
     stockPerShareCommission: string;
     stockMinPerFill: string;
     stockMaxPerFill: string;
+    stockPercentBuy: string;
+    stockPercentSell: string;
     optionsPerContractCommission: string;
     optionsPerContractExchangeFee: string;
     optionsMinPerFill: string;

@@ -1,7 +1,7 @@
-// Production bundle for @tradr/api.
+// Production bundle for @jurnal-zitn/api.
 //
-// Bundles the server entry (src/index.ts) and the CLI (src/cli/tradr.ts) into
-// flat ESM files under dist/. Everything is inlined — @tradr/* workspace code,
+// Bundles the server entry (src/index.ts) and the CLI (src/cli/jurnal-zitn.ts) into
+// flat ESM files under dist/. Everything is inlined — @jurnal-zitn/* workspace code,
 // relative source, and all pure-JS dependencies — EXCEPT:
 //   - Node builtins (always external)
 //   - bcrypt   (native .node addon)
@@ -52,7 +52,7 @@ function topLevelPackage(name) {
 
 /**
  * onResolve plugin: mark a bare import external iff it is a Node builtin OR one
- * of the native packages. Everything else (@tradr/*, relative paths, pure-JS
+ * of the native packages. Everything else (@jurnal-zitn/*, relative paths, pure-JS
  * deps) is left to esbuild to inline.
  */
 const externalNativesPlugin = {
@@ -69,7 +69,7 @@ const externalNativesPlugin = {
       }
       if (NATIVE_EXTERNALS.has(pkg)) return { path, external: true };
       if (injectFake && pkg === 'decimal.js') return { path, external: true };
-      // Everything else (incl. @tradr/*) is inlined.
+      // Everything else (incl. @jurnal-zitn/*) is inlined.
       return null;
     });
     build.onLoad({ filter: /.*/, namespace: 'optional-absent' }, () => ({
@@ -107,7 +107,7 @@ const common = {
   plugins: [externalNativesPlugin],
 };
 
-// Two separate builds so the CLI gets exactly one shebang. src/cli/tradr.ts
+// Two separate builds so the CLI gets exactly one shebang. src/cli/jurnal-zitn.ts
 // already starts with `#!/usr/bin/env node`, which esbuild preserves on line 1
 // — so the CLI needs no banner (a banner would prepend a SECOND, invalid one).
 // The server entry has no shebang in source; it is launched via
@@ -120,7 +120,7 @@ const results = await Promise.all([
   }),
   esbuild.build({
     ...common,
-    entryPoints: { tradr: resolve(apiRoot, 'src/cli/tradr.ts') },
+    entryPoints: { jurnal-zitn: resolve(apiRoot, 'src/cli/jurnal-zitn.ts') },
     outdir: resolve(apiRoot, 'dist'),
   }),
 ]);
@@ -160,7 +160,7 @@ if (unexpected.length > 0 || missing.length > 0) {
 }
 
 console.log(
-  `build:prod OK — dist/index.js + dist/tradr.js; native externals: ${[
+  `build:prod OK — dist/index.js + dist/jurnal-zitn.js; native externals: ${[
     ...nonBuiltinExternals,
   ]
     .sort()

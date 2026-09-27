@@ -22,6 +22,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { CoachMark } from '@/features/onboarding/components/CoachMark';
 import { TagChipList } from '@/features/tags/components/TagChip';
 import { TagPicker } from '@/features/tags/components/TagPicker';
+import { useT } from '@/hooks/useLocale';
 import { formatCurrency } from '@/lib/format';
 
 import {
@@ -45,6 +46,7 @@ interface Props {
 }
 
 export function PositionDetailView({ positionId }: Props) {
+  const t = useT();
   const navigate = useNavigate();
   const { data: position, isLoading } = usePosition(positionId);
   const deletePosition = useDeletePosition(positionId);
@@ -68,7 +70,9 @@ export function PositionDetailView({ positionId }: Props) {
   }
 
   if (!position) {
-    return <div className="py-12 text-center text-muted-foreground">Position not found</div>;
+    return (
+      <div className="py-12 text-center text-muted-foreground">{t('pos.detail.notFound')}</div>
+    );
   }
 
   const isDraft = position.status === 'draft';
@@ -174,7 +178,7 @@ export function PositionDetailView({ positionId }: Props) {
                   </Button>
                 </span>
               </TooltipTrigger>
-              {!canOpen && <TooltipContent>Add an entry fill first</TooltipContent>}
+              {!canOpen && <TooltipContent>{t('pos.detail.addEntryFirst')}</TooltipContent>}
             </Tooltip>
           )}
           {isOpen && (
@@ -187,11 +191,11 @@ export function PositionDetailView({ positionId }: Props) {
                     onClick={() => closePosition.mutate({})}
                     disabled={closePosition.isPending || !canClose}
                   >
-                    {closePosition.isPending ? 'Closing...' : 'Close Position'}
+                    {closePosition.isPending ? t('pos.action.closing') : t('pos.action.close')}
                   </Button>
                 </span>
               </TooltipTrigger>
-              {!canClose && <TooltipContent>Exit the full quantity first</TooltipContent>}
+              {!canClose && <TooltipContent>{t('pos.detail.exitFullFirst')}</TooltipContent>}
             </Tooltip>
           )}
           {canReopen && (
@@ -200,7 +204,7 @@ export function PositionDetailView({ positionId }: Props) {
               onClick={() => reopenPosition.mutate({})}
               disabled={reopenPosition.isPending}
             >
-              {reopenPosition.isPending ? 'Reopening...' : 'Reopen'}
+              {reopenPosition.isPending ? t('pos.action.reopening') : t('pos.action.reopen')}
             </Button>
           )}
           <Button
@@ -208,7 +212,7 @@ export function PositionDetailView({ positionId }: Props) {
             className="cursor-pointer"
             onClick={() => setDeleteOpen(true)}
           >
-            Delete
+            {t('pos.action.delete')}
           </Button>
           {/* The app-wide drawer opener — detail pages have no PageHeader, so
               their own header row carries the slot. */}
@@ -220,7 +224,9 @@ export function PositionDetailView({ positionId }: Props) {
       <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Avg Entry</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              {t('pos.detail.avgEntry')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-lg font-semibold">
@@ -230,7 +236,9 @@ export function PositionDetailView({ positionId }: Props) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Avg Exit</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              {t('pos.detail.avgExit')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-lg font-semibold">
@@ -240,7 +248,9 @@ export function PositionDetailView({ positionId }: Props) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Target Price</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              {t('pos.detail.targetPrice')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Numeric
@@ -254,7 +264,9 @@ export function PositionDetailView({ positionId }: Props) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Target R/R</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              {t('pos.detail.targetRR')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Numeric
@@ -267,7 +279,9 @@ export function PositionDetailView({ positionId }: Props) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Actual R/R</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              {t('pos.detail.actualRR')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Numeric
@@ -280,7 +294,9 @@ export function PositionDetailView({ positionId }: Props) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Gross P&L</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              {t('pos.detail.grossPnl')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Numeric
@@ -294,12 +310,12 @@ export function PositionDetailView({ positionId }: Props) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Brokerage Fees</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('pos.detail.fees')}</CardTitle>
           </CardHeader>
           <CardContent>
             {position.brokerageName === null ? (
               <p className="text-lg font-semibold">
-                <span aria-label="No brokerage assigned">—</span>
+                <span aria-label={t('pos.detail.noBrokerage')}>—</span>
               </p>
             ) : (
               <>
@@ -315,7 +331,9 @@ export function PositionDetailView({ positionId }: Props) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Net P&L</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              {t('pos.detail.netPnl')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Numeric
@@ -329,7 +347,9 @@ export function PositionDetailView({ positionId }: Props) {
         </Card>
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm text-muted-foreground">Return %</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">
+              {t('pos.detail.returnPct')}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Numeric
@@ -354,7 +374,7 @@ export function PositionDetailView({ positionId }: Props) {
       {position.notes && (
         <Card>
           <CardHeader>
-            <CardTitle className="text-sm text-muted-foreground">Notes</CardTitle>
+            <CardTitle className="text-sm text-muted-foreground">{t('pos.field.notes')}</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="whitespace-pre-wrap">{position.notes}</p>
@@ -373,7 +393,7 @@ export function PositionDetailView({ positionId }: Props) {
       <div>
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-semibold">Fills</h2>
+            <h2 className="text-lg font-semibold">{t('pos.detail.fills')}</h2>
             {/* A closed position has no Add Fill button, so there is nothing
                 for the mark to introduce; it waits for an open or draft one
                 rather than describing a control that is not on screen. */}
@@ -415,18 +435,18 @@ export function PositionDetailView({ positionId }: Props) {
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete position</AlertDialogTitle>
+            <AlertDialogTitle>{t('pos.delete.title')}</AlertDialogTitle>
             {/* R4 amendment: the dialog SHALL name the position. */}
             <AlertDialogDescription>
               {isClosed
-                ? `Deleting the closed position "${position.symbol}" removes its realized P&L from the account balance and from tax and performance summaries — including prior tax years — and may change other positions' wash-sale classification. This cannot be undone.`
-                : `Are you sure you want to delete "${position.symbol}"? This cannot be undone.`}
+                ? t('pos.delete.closedBody', { symbol: position.symbol })
+                : t('pos.delete.body', { symbol: position.symbol })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
             <AlertDialogAction className="cursor-pointer" onClick={handleDelete}>
-              Delete
+              {t('pos.action.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

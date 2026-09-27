@@ -372,7 +372,7 @@ test.describe.serial('drawer', () => {
       const w = window as { __drawerStorageEvents?: number };
       w.__drawerStorageEvents = 0;
       window.addEventListener('storage', (e) => {
-        if (e.key === 'tradr_drawer_state') {
+        if (e.key === 'jurnal_zitn_drawer_state') {
           w.__drawerStorageEvents = (w.__drawerStorageEvents ?? 0) + 1;
         }
       });
@@ -382,7 +382,7 @@ test.describe.serial('drawer', () => {
 
     // Per v4-10: post-logout URL is /login (verified in useAuth.ts:40).
     await expect(pageA).toHaveURL(/\/login$/);
-    expect(await pageA.evaluate(() => localStorage.getItem('tradr_drawer_state'))).toBeNull();
+    expect(await pageA.evaluate(() => localStorage.getItem('jurnal_zitn_drawer_state'))).toBeNull();
 
     // Page B should see at least one storage event from the localStorage
     // clear (v2-18: Safari batches storage events, so use >= 1). The listener
@@ -404,7 +404,7 @@ test.describe.serial('drawer', () => {
     // drawer is closed and no persisted state from user A.
     await pageA.context().clearCookies();
     await loginAs(pageA, { email: userB.email, password: PASSWORD });
-    expect(await pageA.evaluate(() => localStorage.getItem('tradr_drawer_state'))).toBeNull();
+    expect(await pageA.evaluate(() => localStorage.getItem('jurnal_zitn_drawer_state'))).toBeNull();
     await expect(pageA.getByTestId('side-drawer')).toHaveAttribute('data-state', 'closed');
   });
 });

@@ -10,7 +10,7 @@ import { appVersion, LOCALDEV } from '@/lib/api';
 export const CHECK_INTERVAL_MS = 5 * 60_000; // visible-tab poll
 export const MIN_CHECK_SPACING_MS = 30_000; // collapses focus + visibility + route bursts
 export const FETCH_TIMEOUT_MS = 10_000;
-export const UPDATE_CHANNEL = 'tradr-update';
+export const UPDATE_CHANNEL = 'jurnal-zitn-update';
 export const VERSION_SHAPE = /^[A-Za-z0-9.+-]{1,64}$/; // charset+length gate
 
 // Minimal structural router type — only the subscription the monitor uses.

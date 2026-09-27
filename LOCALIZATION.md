@@ -1,0 +1,180 @@
+# Lokalisasi Indonesia — Jurnal ZITN
+
+Fork `ZITN-TECH-017` (runtime A). Produk menyasar pengguna Indonesia; basis upstream
+berbahasa Inggris. Dokumen ini menetapkan pendekatan dan tahapan sebelum kode diterapkan.
+
+## Keadaan saat ini (2026-09-26)
+
+- **Tidak ada framework i18n** (tidak ada `i18next`/`react-intl`/`@lingui` di dependensi).
+- Salinan UI **hardcoded Inggris** di ratusan komponen `apps/web/src/**`.
+- Pemformatan angka/tanggal memakai `Intl.*(undefined, …)` (`apps/web/src/lib/format.ts`),
+  jadi **ikut locale browser** — peramban `id-ID` sudah menghasilkan format Indonesia, tapi
+  tidak dipaksa.
+- Email transaksional (`apps/api/src/lib/email-templates.ts`) berbahasa Inggris.
+- `taxJurisdiction` hanya `US | CA | other` (`users.schema.ts`) — belum ada `ID`.
+
+## Keputusan (pemilik, 2026-09-26)
+
+1. **Locale default**: **paksa `id-ID`** (`apps/web/src/lib/locale.ts` → `APP_LOCALE`).
+2. **Mesin terjemahan**: **kamus TS ringan** (`apps/web/src/lib/i18n.ts`), tanpa dependensi baru.
+3. **Zona reporting pengguna baru**: **`Asia/Jakarta`** (`DEFAULT_SIGNUP_TIMEZONE`); fallback baris
+   pra-migrasi tetap `DEFAULT_REPORTING_TIMEZONE = 'UTC'` agar riwayat lama tidak ter-rebucket.
+
+## Rencana bertahap
+
+| Tahap | Isi                                                                  | Status                                         |
+| ----- | -------------------------------------------------------------------- | ---------------------------------------------- |
+| L0    | `<html lang="id">`, meta description ID                              | ✅ selesai                                     |
+| L1    | Locale pemformatan `id-ID` (`format.ts`, `Numeric.tsx`) + uji format | ✅ selesai                                     |
+| L2    | Mesin i18n ringan + ekstraksi string pertama (waktu relatif)         | ✅ fondasi selesai                             |
+| L3    | Terjemahkan UI + email + pesan galat ke kamus                        | ⏳ sebagian (chunk fallback + prompt update)   |
+| L4    | Disclaimer pajak ID (`taxJurisdiction` kini punya `ID`)              | ✅ selesai                                     |
+| L5    | Uji locale (`id-ID`) di CI + tinjauan istilah keuangan ID            | ⏳ penjaga locale (`locale.test.ts`) sudah ada |
+
+## A5 — Lokalisasi UI: Pesan galat + email (sebagian) — 2026-09-27
+
+- Kamus `email.*` dan `web.*` (ID + EN).
+- **Email transaksional** (`email-templates.ts`): semua salinan (subject, preheader, heading, intro,
+  CTA, expiry, notice), baris “tempel tautan”, footer (tagline + “pesan transaksional otomatis”),
+  dan atribut `<html lang>` kini mengikuti locale. `buildEmail(kind, token, locale)` dan
+  `dispatchEmail(kind, to, token, locale)` menerima locale; ketiga pemanggil
+  (`auth.service` registrasi, `verification.service` resend, `password-reset.service`) meneruskan
+  `users.locale` (fallback `id`).
+- **Root error/404** (`__root.tsx`): “Terjadi kesalahan” + Coba lagi, “Halaman tidak ditemukan” +
+  deskripsi + tautan **Masuk**, dan status memuat.
+- **Verifikasi:** `check-types` 0 error; `eslint` bersih; **29 uji rute** (`routes/__tests__`) hijau;
+  uji runtime murni email (tsx) memverifikasi ID dan EN (`lang`, subject, expiry, tautan).
+  Uji harness `apps/api` butuh Postgres test di `:5433` (tidak tersedia) → dijalankan di CI.
+- **Tambahan A5-sisa (2026-09-27):**
+  - **Disclaimer pajak (server)**: seluruh paragraf (preamble, klausa per yurisdiksi US/CA/ID/lainnya,
+    rekonsiliasi, heuristik, stabilitas kurs, year-bucketing, filing) kini dari kamus `tax.disc.*`
+    dan dipilih per `users.locale` (query `selectUserLocaleById`); smoke lokal memverifikasi ID & EN.
+  - **Copy galat Changelog** (`changelog.error`, `changelog.empty`) dan **dialog admin**
+    (`adm.delete.*`, `adm.error.*`, termasuk peta kode galat → kunci kamus).
+  - **Format admin locale-aware**: `features/admin/lib/format.ts` memakai `getAppLocale()` (bukan
+    locale peramban yang tertangkap saat modul dimuat) → menghapus 7 kegagalan uji pra-eksisting.
+- **Sisa A5 — selesai (2026-09-27):** pemetaan **kode galat API → salinan lokal** di `apps/web/src/lib/api-error.ts`
+  (`UNAUTHORIZED`, `FORBIDDEN`, `VALIDATION_ERROR`, `NOT_FOUND`, `INVALID_OR_EXPIRED_TOKEN`,
+  `ALREADY_VERIFIED`, `EMAIL_NOT_CONFIGURED`, `REGISTRATION_DISABLED`, `INVALID_TIMEZONE`,
+  `RATE_LIMITED`); kode tak dikenal → pesan generik lokal (bukan `error.message` Inggris). Dipakai di
+  `login`/`register`. Uji unit `api-error.test.ts` (4 kasus).
+- **Verifikasi A5:** `check-types` 0 error; `eslint` bersih; **188+4 uji** hijau (rute/changelog/admin/api-error);
+  tsx email ID+EN; smoke disclaimer ID/EN. (Dua kegagalan tersisa di `src/lib` — `api.test.ts`
+  pemisah path Windows dan `theme-bootstrap.test.ts` drift guard — **pra-eksisting**, bukan dari A5.)
+
+## A4 — Lokalisasi UI: Kalkulator & Pajak — ✅ selesai 2026-09-27
+
+- Kamus `calc.*`, `tax.*`, `expense.cat.*` (ID + EN).
+- **Kalkulator**: judul halaman, label (Akun, Arah, Mode, Simbol, Kontrak, Harga masuk, Stop loss,
+  Harga target, Risiko, Nilai risiko, Saldo, Persen risiko, Biaya, Biaya manual), placeholder
+  (memuat/gagal/pilih), galat kutipan (4 kode + fallback), “Pilih broker untuk melihat estimasi biaya”,
+  tombol **Ambil harga terakhir/Mengambil…**, kartu hasil (Nilai Risiko Terhitung, Ukuran Posisi,
+  Daya beli, Risiko/Imbalan, Dampak Biaya, Setelah biaya) dan **pesan sizing** (4 kasus),
+  serta **BuyingPowerBasisSelect** (Judul, Batasi ukuran berdasarkan, Kas/Saldo).
+- **TaxSummaryPage**: judul, subjudul, filter Tahun/Yurisdiksi (termasuk “Lainnya”), trigger disclaimer,
+  banner kurs hilang + Masukkan kurs, galat muat, empty state, rates-as-of/excluded, **P&L Realisasi**
+  (per mata uang, Jangka pendek/panjang), **Pengeluaran Tercatat** (per kategori), **PPh Final**
+  (Penjualan/Catatan/kosong), **Wash sales/Superficial losses**; label kategori pengeluaran dari kamus.
+- **Catatan:** badan **disclaimer** masih dari server (Inggris) → diterjemahkan di A5 (galat + email).
+- **Verifikasi:** `check-types` 0 error, `eslint` bersih, **176 uji** (kalkulator + akuntansi + rute) hijau.
+  Uji kalkulator disetel `en` dan helper uangnya memakai `getAppLocale()` agar konsisten dengan aplikasi.
+- **Tambahan A4-sisa:** **FeeRollupPage** (judul, filter tahun, banner kurs, tabel per-akun/per-mata uang,
+  empty, galat), **ExpensesPage** (judul, filter tahun + “Semua tahun”, Total, kolom, tambah/ubah/hapus,
+  empty, dialog hapus), **ExpenseFormDialog** (judul, label, placeholder, Simpan perubahan/Menyimpan),
+  **AccountingSubNav** (Pengeluaran/Rekap Biaya/Ringkasan Pajak), **WashSaleFlagsTable** (kolom + alasan
+  diterjemahkan + “+n lagi”).
+
+## A3 — Lokalisasi UI: Posisi & Fills — ✅ selesai 2026-09-27
+
+- Kamus `pos.*`, `page.positions` (ID + EN) — mencakup daftar, detail, fill, dialog, filter, OCC, lightbox.
+- **PositionList**: judul, tombol **Posisi Baru** (+ tooltip “Buat akun dulu”), empty state + **Hapus filter**,
+  seluruh header kolom (termasuk **Tanggal**).
+- **PositionStatusChip**: Draf/Terbuka/Tertutup. **BreakevenBadge**: label + aria (Impas).
+- **PositionDetail**: not-found, tooltip, kartu metrik (Harga Masuk/Keluar Rata-rata, Harga Target,
+  R/R Target/Aktual, P&L Kotor/Bersih, Biaya Broker, Return %), **Catatan**, **Fill**, tombol
+  **Tutup posisi/Buka kembali** + status pending, dan dialog hapus (judul + dua varian isi).
+- **FillDialog/FillTable**: label & header, **Hapus fill**, tombol **Batal/Simpan/Tambah**.
+- **PositionRowActions**: aria aksi, menu (Tambah/Kurangi/Buka/Buka kembali/Hapus) + dialog hapus.
+- **CreatePositionDialog/PositionEditDialog**: judul, label (Simbol/Sisi/Jenis Aset/Akun/Catatan/Target/Stop Loss),
+  SelectItem (Long/Short/Saham/Opsi), placeholder, tombol **Batal/Buat/Menyimpan**.
+- **ClassificationFilter**: label **Hasil** + opsi Semua/Untung/Rugi/Impas.
+- **PositionScreenshots + PositionImageLightbox**: judul, tambah, batas, kosong, aria buka/hapus, dialog hapus,
+  judul/deskripsi lightbox, gambar tidak tersedia.
+- **OptionContractFields**: Aset Dasar/Kedaluwarsa/Tipe/Strike + Call/Put.
+- **Verifikasi:** `check-types` 0 error, `eslint` bersih, **221 uji posisi** hijau.
+
+## A2 — Lokalisasi UI: Navigasi + Dashboard — ✅ selesai 2026-09-27
+
+- Kamus `nav.*`, `page.*`, `widget.*`, `dashboard.*`, `w.*` (tubuh widget), `common.retry` (ID + EN).
+- **Sidebar**: seluruh label item + label grup + aria-label + Keluar + sr-only pembaruan.
+- **Header dashboard**: judul + tombol/dialog **Atur ulang tata letak**.
+- **Judul widget**: `registry.ts` (`displayNameKey`) dipakai `WidgetCard`/`AddWidgetPopover`.
+- **Tubuh widget**: StatsSummary (5 tile + empty/error), EquityCurve & PerformanceChart (empty/error +
+  Retry), OpenPositions (tabel + empty), AccountBalances (empty, banner kurs hilang, total, link
+  terhitung, CTA mata uang tampilan), CrossCurrencyTotal (judul, tooltip kurs hilang, Enter rate).
+- Uji dipin ke `en` via `setAppLocale('en')` di module scope.
+- **Verifikasi:** `check-types` 0 error, `eslint` bersih, **129 uji** navigasi/dashboard/widget hijau.
+
+## A1 — Lokalisasi UI: Auth & Akun — ✅ selesai 2026-09-27
+
+- Kamus `auth.*`, `settings.*`, `retention.*` (ID + EN) di `packages/shared/src/i18n.ts`.
+- **Auth:** `login`, `register` (termasuk notice pendaftaran ditutup/peluncuran & status “periksa email”),
+  `forgot-password`, `reset-password`, `verify-email`.
+- **Akun:** `_auth.settings.account` (judul, badge terverifikasi, kirim ulang, keluar) +
+  **alur hapus akun**: `DeleteAccountSection`, `DeleteAccountDialog` (peta galat per kode → kunci kamus,
+  baris waktu dengan `{date}`), `RetentionSummary` (termasuk baris kredit dompet dengan `Numeric`).
+- Pesan mismatch sandi (register/reset) mengikuti bahasa via `useMemo`.
+- `useT()` jatuh ke locale modul tanpa `LocaleProvider`, sehingga uji mengunci bahasa dengan
+  `setAppLocale('en')` + `afterEach` reset ke `id`.
+- **Verifikasi:** `check-types` 0 error, `eslint` bersih; **56 uji** rute/komponen A1 hijau
+  (termasuk uji salinan ID default pada login).
+
+## A0 — Infrastruktur dua bahasa (ID/EN + toggle) — ✅ selesai 2026-09-27
+
+- **Kamus bersama** `packages/shared/src/i18n.ts`: `SUPPORTED_LOCALES=['id','en']`, `DEFAULT_LOCALE='id'`,
+  `AppLocaleEnum` (zod), `MESSAGES`, `translate(locale,key,vars)`, `resolveLocale`, `catalogsComplete()`.
+- **Preferensi pengguna**: kolom `users.locale` (migrasi `0041`), endpoint
+  `GET/PUT /api/users/me/locale` (`{locale, stored}`), mengikuti pola preferensi lain.
+- **Web**: `lib/locale.ts` menyimpan locale aktif; `lib/i18n.ts` adapter; `hooks/useLocale.tsx`
+  (`LocaleProvider`, `useLocale`, `useT`) — sumber: server → localStorage → default `id`;
+  menyetel `document.documentElement.lang`.
+- **Formatter**: `format.ts` + `Numeric.tsx` memakai `getAppLocale()` (bukan locale peramban);
+  `format.test.ts` (id-ID) + `locale.test.ts` (beralih en) hijau.
+- **UI**: pemilih bahasa di **Settings → Profile** (`UILanguageSelect`).
+- **Verifikasi**: `check-types` 0 error, `eslint` bersih, uji shared+web A0 hijau (42+11),
+  smoke lokal: `GET {locale:'id',stored:false}` → `PUT en` → `GET {locale:'en',stored:true}`.
+- **Perbaikan reaktivitas (2026-09-27)**: `LocaleProvider` menyetel locale modul **secara sinkron saat
+  render** (bukan di `useEffect`, yang tertinggal satu render) dan me-`key={locale}` subtree agar
+  React merender ulang. Uji `useLocale.test.tsx` membuktikan format berubah seketika
+  (`US$1.234,50` → `$1,234.50`) tanpa reload.
+
+## Fase IDX (pasar Indonesia) — ZITN-TECH-017
+
+Basis Tradr berorientasi AS (USD, NYSE, fee per saham, opsi OCC, wash-sale). Rencana adaptasi IDX:
+
+| Fase     | Isi                                                                                                                                                                                                                                                                                                                                                                        | Status                                    |
+| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| **1**    | **IDR** ditambahkan ke `SUPPORTED_CURRENCIES`; default akun **IDR**; default zona akun **`Asia/Jakarta`** (konstanta + kolom `accounts.timezone`, migrasi `0039`); yurisdiksi pajak `ID` (migrasi `0038`)                                                                                                                                                                  | ✅ selesai                                |
+| **2a**   | **Fee persentase IDX**: `stockPercentBuy`/`stockPercentSell` di `FeeScheduleSchema` + `fee_schedules` (migrasi `0040`); `calculateFees` memakai persen bila > 0 (min/max tetap), jatuh ke per-saham bila 0; field UI di `FeeScheduleFields`; uji shared + web                                                                                                              | ✅ selesai                                |
+| **2b-1** | **PPh final IDX**: `pphFinal` (0,1% nilai penjualan) di `TaxSummaryResponseSchema`; query `listIdxSellProceedsByCurrency`; komputasi di service + kartu di `TaxSummaryPage`; wash-sale/superficial-loss dibatasi US/CA (tidak lagi bocor ke ID); skema respons jurisdiksi memakai enum bersama (ID diterima); uji shared + smoke test lokal (1.000.000 IDR → PPh 1.000,00) | ✅ selesai                                |
+| **2b-2** | **Lot (1 = 100 saham) + tick size**: helper murni `packages/shared/src/idx.ts` + uji; **disambungkan ke `FillDialog`** — toggle “Lot (100)” (lot→saham saat submit) dan pembulatan harga ke tick IDX saat blur, aktif saat jadwal fee memakai persentase; uji `FillDialog`                                                                                                 | ✅ selesai (impor CSV menyusul di Fase 3) |
+| 3        | Pencarian/kutipan IDX (mis. `.JK`) menggantikan vendor AS; preset impor CSV broker ID                                                                                                                                                                                                                                                                                      | ⏳ opsional                               |
+| 4        | Sembunyikan/disable fitur opsi gaya AS untuk konteks IDX                                                                                                                                                                                                                                                                                                                   | ⏳                                        |
+
+**Catatan Fase 1:** preset broker ID **belum** ditambahkan karena `fee_schedules` masih model per-saham/per-kontrak; menambah preset dengan model itu akan menghasilkan fee yang salah untuk broker IDX — ikut Fase 2.
+
+**Verifikasi Fase 1:** `pnpm -r check-types` + `eslint` bersih; `idx-defaults.test.ts` + `AccountDialog.test.tsx` hijau; DB lokal menerapkan `0039` (default `Asia/Jakarta`, check `expenses_currency_chk` memuat `IDR`).
+
+## Catatan uji
+
+- `format.test.ts` + `i18n.test.ts` **hijau** dengan `id-ID`.
+- Suite web lain masih memuat ekspektasi format lama (mis. `$1,234.50`) dan sebagian gagal
+  **pra-eksisting** di lingkungan ini (mis. `tour-engine`, `OptionsChainViewer`). Memindahkan
+  suite web ke `id-ID` perlu pembaruan ekspektasi bertahap di CI ber-baseline bersih.
+
+## Prinsip
+
+- Istilah keuangan tetap presisi (mis. "posisi", "fill", "realized P&L"); jangan mengarang
+  padanan yang menyesatkan.
+- Angka/harga tetap dari sumber kanonik; lokalisasi hanya format tampilan.
+- Tidak menambah klaim; disclaimer tetap.

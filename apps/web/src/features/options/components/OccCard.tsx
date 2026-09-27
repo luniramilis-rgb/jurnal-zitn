@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { encodeOccSymbol, parseOccSymbol } from '@tradr/shared';
+import { encodeOccSymbol, parseOccSymbol } from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

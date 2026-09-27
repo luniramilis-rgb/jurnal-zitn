@@ -1,4 +1,4 @@
-import { parseOccSymbol } from '@tradr/shared';
+import { parseOccSymbol } from '@jurnal-zitn/shared';
 
 export interface OptionContract {
   underlying: string;

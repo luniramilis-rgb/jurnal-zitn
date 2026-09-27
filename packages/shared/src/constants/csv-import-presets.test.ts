@@ -18,7 +18,7 @@ const SAMPLES_DIR = path.resolve(__dirname, '__fixtures__/csv-import-samples');
 
 /**
  * Per-shape required-field set (REQ-2.2 / design Component 2). These are the
- * Tradr fields a mapping of each shape carries; the row-shape grounding test
+ * Jurnal ZITN fields a mapping of each shape carries; the row-shape grounding test
  * checks that a preset's mapping keys are consistent with the declared shape
  * (the guard against d-b394aea7 — a wrong row-shape classification shipping
  * green).

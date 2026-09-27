@@ -28,7 +28,7 @@ import {
 } from '../../../../scripts/backup-restore-check.mjs';
 
 const DATABASE_URL =
-  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/tradr_test';
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test';
 
 let sql: ReturnType<typeof postgres>;
 

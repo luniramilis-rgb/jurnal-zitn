@@ -2,7 +2,7 @@
 import { render, screen, cleanup, fireEvent, waitFor } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { FeeSchedule } from '@tradr/shared';
+import type { FeeSchedule } from '@jurnal-zitn/shared';
 
 import { useAccountFeeSchedule } from '../hooks/useAccountFeeSchedule';
 
@@ -25,6 +25,8 @@ const schedule: FeeSchedule = {
   stockPerShareCommission: '0.005',
   stockMinPerFill: '1',
   stockMaxPerFill: '0',
+  stockPercentBuy: '0',
+  stockPercentSell: '0',
   optionsPerContractCommission: '0.65',
   optionsPerContractExchangeFee: '0',
   optionsMinPerFill: '0',
@@ -233,5 +235,38 @@ describe('FillDialog — single-purpose type', () => {
     renderDialog({});
     expect(screen.getByText('Type')).toBeTruthy();
     expect(screen.getByText('Add Fill')).toBeTruthy();
+  });
+});
+
+describe('FillDialog — mode IDX (lot & tick, Fase 2b-2)', () => {
+  const idxSchedule = { ...schedule, stockPercentBuy: '0.15', stockPercentSell: '0.25' };
+
+  it('mengubah lot → saham (1 lot = 100) saat submit', async () => {
+    vi.mocked(useAccountFeeSchedule).mockReturnValue(idxSchedule);
+    renderDialog({ defaultType: 'entry' });
+
+    fireEvent.change(field('Price'), { target: { value: '1000' } });
+    fireEvent.click(screen.getByRole('switch', { name: 'Lot (100)' }));
+    fireEvent.change(field('Quantity (lot)'), { target: { value: '10' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+
+    await waitFor(() => expect(addFillMutate).toHaveBeenCalled());
+    expect(addFillMutate.mock.calls[0][0]).toMatchObject({ quantity: '1000' });
+  });
+
+  it('membulatkan harga ke tick IDX saat blur', () => {
+    vi.mocked(useAccountFeeSchedule).mockReturnValue(idxSchedule);
+    renderDialog({ defaultType: 'entry' });
+
+    fireEvent.change(field('Price'), { target: { value: '503' } });
+    fireEvent.blur(field('Price'));
+    expect(field('Price').value).toBe('505');
+  });
+
+  it('tanpa jadwal persentase (broker AS) tidak ada toggle lot', () => {
+    vi.mocked(useAccountFeeSchedule).mockReturnValue(schedule);
+    renderDialog({ defaultType: 'entry' });
+    expect(screen.queryByRole('switch', { name: 'Lot (100)' })).toBeNull();
+    expect(screen.getByLabelText('Quantity')).toBeTruthy();
   });
 });

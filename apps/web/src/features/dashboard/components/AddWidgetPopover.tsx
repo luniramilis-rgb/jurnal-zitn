@@ -1,8 +1,9 @@
 import { Popover as PopoverPrimitive } from 'radix-ui';
 import { type ReactElement } from 'react';
 
-import type { WidgetPlacement, WidgetType } from '@tradr/shared';
+import type { WidgetPlacement, WidgetType } from '@jurnal-zitn/shared';
 
+import { useT } from '@/hooks/useLocale';
 import { newWidgetId } from '@/lib/uuid-fallback';
 
 import { findFirstSlot } from '../layout';
@@ -22,6 +23,7 @@ export function AddWidgetPopover({
   onAdd,
   defaultOpen,
 }: AddWidgetPopoverProps): ReactElement {
+  const t = useT();
   const placedSet = new Set<WidgetType>(placedTypes);
   const available = Object.values(widgetRegistry)
     .filter((def) => !placedSet.has(def.type))
@@ -77,7 +79,7 @@ export function AddWidgetPopover({
                     onClick={() => handleSelect(def.type)}
                     className="w-full cursor-pointer rounded px-2 py-1.5 text-left text-sm hover:bg-accent"
                   >
-                    {def.displayName}
+                    {t(def.displayNameKey)}
                   </button>
                 </li>
               ))}

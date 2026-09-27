@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { describe, it, expect } from 'vitest';
 
-import { BODY_LIMIT_BYTES } from '@tradr/shared';
+import { BODY_LIMIT_BYTES } from '@jurnal-zitn/shared';
 
 function makeApp() {
   return new Hono().put(

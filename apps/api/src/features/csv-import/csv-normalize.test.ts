@@ -227,18 +227,18 @@ describe('normalizeRow — expiry (REQ-2.2)', () => {
   it('a value not matching the declared format is DATE_FORMAT_MISMATCH naming the format', () => {
     const result = normalizeRow(row({ expiry: '28 Oct 22' }), { ...US, expiryFormat: 'iso' });
     expect(Array.isArray(result)).toBe(true);
-    const err = (result as { code: string; tradrField?: string; message: string }[])[0];
+    const err = (result as { code: string; journalField?: string; message: string }[])[0];
     expect(err.code).toBe('DATE_FORMAT_MISMATCH');
-    expect(err.tradrField).toBe('expiry');
+    expect(err.journalField).toBe('expiry');
     expect(err.message).toContain('YYYY-MM-DD');
   });
 
   it('a matching-but-impossible calendar date is DATE_INVALID', () => {
     const result = normalizeRow(row({ expiry: '20260230' }), { ...US, expiryFormat: 'yyyymmdd' });
     expect(Array.isArray(result)).toBe(true);
-    const err = (result as { code: string; tradrField?: string }[])[0];
+    const err = (result as { code: string; journalField?: string }[])[0];
     expect(err.code).toBe('DATE_INVALID');
-    expect(err.tradrField).toBe('expiry');
+    expect(err.journalField).toBe('expiry');
   });
 });
 
@@ -263,12 +263,12 @@ describe('normalizeRow — strike/multiplier plain decimal (REQ-4.1)', () => {
     expect(r.warnings).toEqual([]);
   });
 
-  it('a non-numeric strike is a located NUMBER_UNPARSEABLE with tradrField set', () => {
+  it('a non-numeric strike is a located NUMBER_UNPARSEABLE with journalField set', () => {
     const result = normalizeRow(row({ strike: 'abc' }), US);
     expect(Array.isArray(result)).toBe(true);
-    const err = (result as { code: string; tradrField?: string }[])[0];
+    const err = (result as { code: string; journalField?: string }[])[0];
     expect(err.code).toBe('NUMBER_UNPARSEABLE');
-    expect(err.tradrField).toBe('strike');
+    expect(err.journalField).toBe('strike');
   });
 });
 
@@ -293,9 +293,9 @@ describe('normalizeRow — sign conventions (seam 1, REQ-3.2, REQ-1.7)', () => {
       signedQuantity: true,
     });
     expect(Array.isArray(result)).toBe(true);
-    const err = (result as { code: string; tradrField?: string; message: string }[])[0];
+    const err = (result as { code: string; journalField?: string; message: string }[])[0];
     expect(err.code).toBe('QUANTITY_SIGN_CONTRADICTION');
-    expect(err.tradrField).toBe('quantity');
+    expect(err.journalField).toBe('quantity');
     expect(err.message).toContain('-100');
   });
 

@@ -62,3 +62,6 @@ graphify-out/
 
 # lychee response cache (.github/workflows/link-check.yml)
 .lycheecache
+
+# TanStack Router generated caches
+.tanstack/

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_WIDGETS, PerWidgetMinSize, type WidgetPlacement } from '@tradr/shared';
+import { DEFAULT_WIDGETS, PerWidgetMinSize, type WidgetPlacement } from '@jurnal-zitn/shared';
 
 import { findFirstSlot, keepStoredGeometry, reserveTopRightSlot, sortByYThenX } from './layout';
 

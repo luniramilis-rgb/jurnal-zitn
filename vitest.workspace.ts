@@ -27,7 +27,7 @@ export default defineWorkspace([
       env: {
         // csv-import-options / d-7c9626bb: pin TZ so offset-less Flex datetimes parse to deterministic instants in CI (the pin buys CI determinism, not a seam fix).
         TZ: 'UTC',
-        DATABASE_URL: 'postgresql://postgres:postgres@localhost:5433/tradr_test',
+        DATABASE_URL: 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test',
         SESSION_SECRET: 'test-secret-that-is-at-least-32-characters-long',
         NODE_ENV: 'test',
         PORT: '3001',
@@ -117,7 +117,7 @@ export default defineWorkspace([
       env: {
         DATABASE_URL:
           process.env.MIGRATE_TEST_DATABASE_URL ||
-          'postgresql://postgres:postgres@localhost:5433/tradr_test_migrate',
+          'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test_migrate',
         SESSION_SECRET: 'test-secret-that-is-at-least-32-characters-long',
         NODE_ENV: 'test',
         PORT: '3102',

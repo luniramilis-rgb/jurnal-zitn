@@ -9,7 +9,11 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type { Conversation, ConversationListItem, Message } from '@tradr/shared/schemas/advisor';
+import type {
+  Conversation,
+  ConversationListItem,
+  Message,
+} from '@jurnal-zitn/shared/schemas/advisor';
 
 import { api } from '@/lib/api';
 

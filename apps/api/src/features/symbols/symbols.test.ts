@@ -33,7 +33,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { Hono } from 'hono';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { SymbolSearchResponseSchema } from '@tradr/shared';
+import { SymbolSearchResponseSchema } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { sessions, symbols, users } from '@/db/schema';

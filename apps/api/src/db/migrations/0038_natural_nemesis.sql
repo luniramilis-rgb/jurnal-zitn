@@ -1,0 +1,2 @@
+ALTER TABLE "users" DROP CONSTRAINT "users_tax_jurisdiction_chk";--> statement-breakpoint
+ALTER TABLE "users" ADD CONSTRAINT "users_tax_jurisdiction_chk" CHECK ("users"."tax_jurisdiction" IS NULL OR "users"."tax_jurisdiction" IN ('US', 'CA', 'ID', 'other'));

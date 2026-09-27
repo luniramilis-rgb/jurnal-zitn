@@ -15,12 +15,12 @@ import { expect, test, type APIRequestContext, type Page } from '@playwright/tes
  * ── Not a CI gate ──────────────────────────────────────────────────────────
  *
  * The whole describe is guarded behind `DOCS_SCREENSHOT_CAPTURE`. With the flag
- * UNSET — the normal `pnpm --filter @tradr/e2e test` run the CI e2e job
+ * UNSET — the normal `pnpm --filter @jurnal-zitn/e2e test` run the CI e2e job
  * executes — every case skips, so the job pays nothing for it. To regenerate,
  * run the full stack and:
  *
  *   DOCS_SCREENSHOT_CAPTURE=1 CI=1 \
- *     pnpm --filter @tradr/e2e exec playwright test \
+ *     pnpm --filter @jurnal-zitn/e2e exec playwright test \
  *     docs-screenshots.spec.ts --project=chromium
  *
  * `CI=1` pins the chromium rendering to what a CI re-run would produce, so two

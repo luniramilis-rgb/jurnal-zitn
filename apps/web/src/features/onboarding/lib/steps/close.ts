@@ -95,7 +95,7 @@ export const closeSteps: readonly WalkthroughStepSource[] = [
     advanceOnAction: true,
     title: 'It closes itself',
     body:
-      'Exit the whole quantity you entered and Tradr closes the position for you, timed to that ' +
+      'Exit the whole quantity you entered and Jurnal ZITN closes the position for you, timed to that ' +
       'last fill — Close Position is here for the ones it cannot, such as a trade you finish by ' +
       'correcting an earlier fill. Your realised P&amp;L reached the account with each exit fill ' +
       'as you recorded it, not at the end, so the balance has already moved. Exited only part of ' +

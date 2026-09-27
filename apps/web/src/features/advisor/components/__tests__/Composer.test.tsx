@@ -3,8 +3,8 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { TierState } from '@tradr/shared';
-import type { Persona } from '@tradr/shared/schemas/advisor';
+import type { TierState } from '@jurnal-zitn/shared';
+import type { Persona } from '@jurnal-zitn/shared/schemas/advisor';
 
 import { captureClientEvent } from '@/lib/telemetry/posthog';
 
@@ -296,7 +296,7 @@ describe('Composer', () => {
   it('rejects an image over the client pre-upload cap and accepts one within it (REQ-4.6)', async () => {
     // A tiny operator cap from the runtime-config seam; the encoded base64 of the
     // big file exceeds it, the small file does not.
-    window.__TRADR_CONFIG__ = { advisorImageMaxBytes: 8 };
+    window.__JURNAL_ZITN_CONFIG__ = { advisorImageMaxBytes: 8 };
     mount(<Composer personas={PERSONAS} visionEnabled onSubmit={vi.fn()} />);
 
     const input = document.querySelector('[data-testid="file-input"]') as HTMLInputElement;
@@ -315,7 +315,7 @@ describe('Composer', () => {
     const previews = document.querySelectorAll('[data-testid="attachment-previews"] li');
     expect(previews.length).toBe(1);
 
-    delete window.__TRADR_CONFIG__;
+    delete window.__JURNAL_ZITN_CONFIG__;
   });
 
   it('renders NO banner for the retired TIER_LIMIT_EXCEEDED code (plan-tiers Task 13)', () => {

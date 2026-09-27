@@ -1,10 +1,12 @@
 import type { ReactNode } from 'react';
 
-import type { CalculatorOutput } from '@tradr/shared';
+import type { CalculatorOutput } from '@jurnal-zitn/shared';
+import type { MessageKey } from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useT } from '@/hooks/useLocale';
 
 interface Props {
   result: CalculatorOutput | null;
@@ -59,20 +61,23 @@ function Money({ value, currency }: { value: string; currency: string }) {
  * half-filled form — the caller only computes a result once the trade prices and
  * exactly one risk basis are complete.
  */
-function nonSizingMessage(status: CalculatorOutput['sizingStatus']): string {
+function nonSizingMessage(
+  status: CalculatorOutput['sizingStatus'],
+  t: (k: MessageKey, v?: Record<string, string | number>) => string,
+): string {
   switch (status) {
     case 'nothing-to-size-against':
-      return 'The account balance is zero or negative — there is nothing to size against.';
+      return t('calc.sizing.nothing');
     case 'exceeds-maximum':
-      return "The derived dollar risk exceeds the calculator's maximum.";
+      return t('calc.sizing.exceedsMax');
     case 'buying-power-zero':
       // Deliberately says "buying power", not "balance": under the default
       // preference the cap is the account's CASH, so an account with a healthy
       // balance but everything already deployed lands here. Blaming the balance
       // would read as a bug.
-      return 'Available buying power cannot fund one share/contract at this entry price.';
+      return t('calc.sizing.buyingPowerZero');
     default:
-      return 'The amount at risk does not cover one share/contract at this stop distance, so the size rounds down to zero. Size moves only with the stop distance and the amount at risk.';
+      return t('calc.sizing.roundsToZero');
   }
 }
 
@@ -84,6 +89,7 @@ export function CalculatorResults({
   balance,
   riskPercent,
 }: Props) {
+  const t = useT();
   const isZeroPosition = result !== null && result.positionSize === 0;
   const hasRiskReward =
     result !== null && result.riskRewardRatio !== undefined && result.perUnitReward !== undefined;
@@ -112,11 +118,11 @@ export function CalculatorResults({
       {result !== null && result.derivedDollarRisk !== undefined && (
         <Card>
           <CardHeader className="pb-2">
-            <CardTitle className="text-sm">Derived Dollar Risk</CardTitle>
+            <CardTitle className="text-sm">{t('calc.result.derivedRisk')}</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between text-sm">
-              <span className="text-muted-foreground">Risk basis</span>
+              <span className="text-muted-foreground">{t('calc.result.riskBasis')}</span>
               <span className="font-medium">
                 <Money value={result.derivedDollarRisk} currency={currency} />
                 {balance !== undefined && riskPercent !== undefined && (
@@ -148,7 +154,9 @@ export function CalculatorResults({
       ) : isZeroPosition ? (
         <Card>
           <CardContent className="flex min-h-[24rem] items-center justify-center py-12">
-            <p className="text-sm text-muted-foreground">{nonSizingMessage(result.sizingStatus)}</p>
+            <p className="text-sm text-muted-foreground">
+              {nonSizingMessage(result.sizingStatus, t)}
+            </p>
           </CardContent>
         </Card>
       ) : (
@@ -162,7 +170,7 @@ export function CalculatorResults({
           )}
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm">Position Sizing</CardTitle>
+              <CardTitle className="text-sm">{t('calc.result.positionSizing')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-2">
               <Row
@@ -183,7 +191,7 @@ export function CalculatorResults({
               />
               {result.buyingPowerLimited === true && (
                 <div className="flex items-center gap-2 pt-1 text-sm">
-                  <Badge variant="secondary">Buying power</Badge>
+                  <Badge variant="secondary">{t('calc.result.buyingPower')}</Badge>
                   <span className="text-muted-foreground">
                     Position size limited by account buying power
                   </span>
@@ -195,7 +203,7 @@ export function CalculatorResults({
           {hasRiskReward && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Risk / Reward</CardTitle>
+                <CardTitle className="text-sm">{t('calc.result.riskReward')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Row
@@ -203,7 +211,7 @@ export function CalculatorResults({
                   value={<Money value={result.perUnitReward!} currency={currency} />}
                 />
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-muted-foreground">Risk/Reward ratio</span>
+                  <span className="text-muted-foreground">{t('calc.result.rrRatio')}</span>
                   <Badge variant="secondary">
                     1:
                     <Numeric value={result.riskRewardRatio!} kind="decimal" direction="none" />
@@ -216,7 +224,7 @@ export function CalculatorResults({
           {hasFees && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Fee Impact</CardTitle>
+                <CardTitle className="text-sm">{t('calc.result.feeImpact')}</CardTitle>
               </CardHeader>
               <CardContent className="space-y-2">
                 <Row
@@ -244,12 +252,12 @@ export function CalculatorResults({
           {hasAdjustedRR && (
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-sm">Adjusted Risk / Reward</CardTitle>
+                <CardTitle className="text-sm">{t('calc.result.adjustedRR')}</CardTitle>
               </CardHeader>
               <CardContent>
                 {result.adjustedRiskRewardRatio!.startsWith('-') ? (
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">After fees</span>
+                    <span className="text-muted-foreground">{t('calc.result.afterFees')}</span>
                     {/* Net-loss ratio: the leading `-` is load-bearing status text
                         and the figure is wrapped in `text-destructive`, so it is
                         rendered verbatim (not via the neutral primitive, which
@@ -260,7 +268,7 @@ export function CalculatorResults({
                   </div>
                 ) : (
                   <div className="flex items-center justify-between text-sm">
-                    <span className="text-muted-foreground">After fees</span>
+                    <span className="text-muted-foreground">{t('calc.result.afterFees')}</span>
                     <Badge variant="secondary">
                       1:
                       <Numeric

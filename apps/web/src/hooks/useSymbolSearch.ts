@@ -8,7 +8,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import type { SymbolSearchResponse } from '@tradr/shared';
+import type { SymbolSearchResponse } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

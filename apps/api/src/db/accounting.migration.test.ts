@@ -4,7 +4,7 @@
  * an Index Only Scan with Heap Fetches: 0 (see ledger-balances/design.md
  * §Data Models > index verification).
  *
- * Runs in the `migrations` vitest project against `tradr_test_migrate`
+ * Runs in the `migrations` vitest project against `jurnal_zitn_test_migrate`
  * (migrations applied, no SAVEPOINT wrapping). Connects directly like
  * `migrate.test.ts` — does NOT use `apps/api/src/test-setup.ts`.
  */
@@ -16,7 +16,7 @@ import { runMigrations, runPostMigrations } from './migrate';
 const DATABASE_URL =
   process.env.MIGRATE_TEST_DATABASE_URL ||
   process.env.DATABASE_URL ||
-  'postgresql://postgres:postgres@localhost:5433/tradr_test_migrate';
+  'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test_migrate';
 
 const INDEX_NAME = 'ledger_user_account_direction_amount_pnl_idx';
 const OCCURRED_INDEX_NAME = 'ledger_user_account_occurred_pnl_idx';

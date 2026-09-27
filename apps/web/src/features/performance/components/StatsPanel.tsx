@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 
-import type { PerformanceStats } from '@tradr/shared';
+import type { PerformanceStats } from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

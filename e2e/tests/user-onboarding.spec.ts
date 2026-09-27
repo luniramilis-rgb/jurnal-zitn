@@ -112,7 +112,7 @@ const popoverTitle = (page: Page): Locator => page.locator('.driver-popover-titl
 const popoverNext = (page: Page): Locator => page.locator('.driver-popover-next-btn');
 const popoverProgress = (page: Page): Locator => page.locator('.driver-popover-progress-text');
 /** The instruction a held step shows in place of a working "Next". */
-const popoverHint = (page: Page): Locator => page.locator('.tradr-tour-action-hint');
+const popoverHint = (page: Page): Locator => page.locator('.jurnal-zitn-tour-action-hint');
 
 /**
  * The account set's nine step titles, in order, from
@@ -1006,7 +1006,7 @@ test.describe('user onboarding', () => {
       await expect(page.getByText(label, { exact: false })).toBeVisible();
     }
     const docsLink = page.getByTestId('zero-state-docs-link');
-    await expect(docsLink).toHaveAttribute('href', /docs\.tradr\.cloud/);
+    await expect(docsLink).toHaveAttribute('href', /docs\.jurnal-zitn\.cloud/);
     await expect(docsLink).toHaveAttribute('target', '_blank');
 
     // Take the unguided fork: create the account directly, no tour anywhere.

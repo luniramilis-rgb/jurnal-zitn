@@ -9,7 +9,7 @@ import type {
   DashboardLayoutResponse,
   PutDashboardLayoutRequest,
   WidgetPlacement,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 
@@ -101,9 +101,7 @@ describe('useDashboardLayout', () => {
 
     const optimisticWidgets: WidgetPlacement[] = [{ ...sampleWidget, x: 8 }];
     await act(async () => {
-      await result.current
-        .mutateAsync({ widgets: optimisticWidgets })
-        .catch(() => undefined);
+      await result.current.mutateAsync({ widgets: optimisticWidgets }).catch(() => undefined);
     });
 
     await waitFor(() =>
@@ -131,9 +129,7 @@ describe('useDashboardLayout', () => {
     const { result } = renderHook(() => useDashboardLayout(), { wrapper: makeWrapper(qc) });
 
     await act(async () => {
-      await result.current
-        .mutateAsync({ widgets: [sampleWidget] })
-        .catch(() => undefined);
+      await result.current.mutateAsync({ widgets: [sampleWidget] }).catch(() => undefined);
     });
 
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['dashboard', 'layout'] });

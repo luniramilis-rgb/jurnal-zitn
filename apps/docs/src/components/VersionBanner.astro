@@ -1,5 +1,5 @@
 ---
-// Says which version of Tradr these pages describe.
+// Says which version of Jurnal ZITN these pages describe.
 //
 // There is ONE copy of the docs and it tracks `main`, so a reader on an older
 // release has no way to tell what these pages assume. Versioned documentation is
@@ -19,13 +19,13 @@
 // Vite define by astro.config.mjs. Reading it here with a relative path does NOT
 // work: a component's `import.meta.url` points at its bundled location during
 // the build, so the path resolves somewhere that does not exist.
-declare const __TRADR_VERSION__: string;
-const version = __TRADR_VERSION__;
+declare const __JURNAL_ZITN_VERSION__: string;
+const version = __JURNAL_ZITN_VERSION__;
 ---
 
 {/* "the <a" must stay on one line: Astro drops the newline between them. */}
 <div class="version-banner">
-  These docs describe Tradr <strong>v{version}</strong>. Running an older release? Check
+  These docs describe Jurnal ZITN <strong>v{version}</strong>. Running an older release? Check
   the <a href="https://github.com/madmatt112/tradr/releases">release notes</a> for what changed.
 </div>
 

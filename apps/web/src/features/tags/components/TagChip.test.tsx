@@ -5,7 +5,7 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { Tag } from '@tradr/shared';
+import type { Tag } from '@jurnal-zitn/shared';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 

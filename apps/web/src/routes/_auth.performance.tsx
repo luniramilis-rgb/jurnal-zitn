@@ -2,8 +2,11 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 import { z } from 'zod';
 
-import type { PerformanceQueryInput, PerformanceResponse } from '@tradr/shared';
-import { BreakdownDimensionSchema, GranularitySchema } from '@tradr/shared/schemas/performance';
+import type { PerformanceQueryInput, PerformanceResponse } from '@jurnal-zitn/shared';
+import {
+  BreakdownDimensionSchema,
+  GranularitySchema,
+} from '@jurnal-zitn/shared/schemas/performance';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Skeleton } from '@/components/ui/skeleton';

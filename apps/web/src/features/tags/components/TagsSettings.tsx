@@ -1,6 +1,11 @@
 import { useState } from 'react';
 
-import { TAG_CATEGORY_LABELS, TAG_LIMITS, type TagColor, type TagWithCount } from '@tradr/shared';
+import {
+  TAG_CATEGORY_LABELS,
+  TAG_LIMITS,
+  type TagColor,
+  type TagWithCount,
+} from '@jurnal-zitn/shared';
 
 import { EmptyState } from '@/components/EmptyState';
 import { Button } from '@/components/ui/button';

@@ -3,7 +3,7 @@ import { readFile } from 'node:fs/promises';
 import { eq } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_REPORTING_TIMEZONE } from '@tradr/shared';
+import { DEFAULT_REPORTING_TIMEZONE, DEFAULT_SIGNUP_TIMEZONE } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db } from '@/db';
@@ -93,12 +93,12 @@ describe('registration seeds the reporting timezone', () => {
     expect(await getTimezone(cookie)).toBe('Europe/London');
   });
 
-  it('falls back to the default when no zone is supplied', async () => {
-    // Absent ⇒ a defined default is STORED, not left null to be guessed at
+  it('stores the signup default when no zone is supplied', async () => {
+    // Absent ⇒ the ID signup default is STORED, not left null to be guessed at
     // later. The stored value, not just the read, is asserted.
     const { cookie, email } = await registerAndGetCookie();
-    expect(await storedTimezone(email)).toBe(DEFAULT_REPORTING_TIMEZONE);
-    expect(await getTimezone(cookie)).toBe(DEFAULT_REPORTING_TIMEZONE);
+    expect(await storedTimezone(email)).toBe(DEFAULT_SIGNUP_TIMEZONE);
+    expect(await getTimezone(cookie)).toBe(DEFAULT_SIGNUP_TIMEZONE);
   });
 
   it('rejects an invalid zone at registration without creating the user', async () => {

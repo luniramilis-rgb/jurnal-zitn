@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import Stripe from 'stripe';
 
-import { ProviderIdSchema, type BillingModel, CheckoutRequestSchema } from '@tradr/shared';
+import { ProviderIdSchema, type BillingModel, CheckoutRequestSchema } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import {

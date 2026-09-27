@@ -1,4 +1,4 @@
-import { calculateFees, type FeeSchedule } from '@tradr/shared';
+import { calculateFees, type FeeSchedule } from '@jurnal-zitn/shared';
 
 /**
  * A fill's buy/sell side, which is the position side crossed with the fill

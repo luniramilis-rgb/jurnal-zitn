@@ -1,3 +1,6 @@
+﻿import { t } from './i18n';
+import { getAppLocale } from './locale';
+
 /** U+2014 EM DASH. The canonical "absent value" marker across formatters. */
 export const EM_DASH = '—';
 
@@ -10,14 +13,14 @@ export const NULL_PLACEHOLDER = EM_DASH;
  * (P&L surfaces, expenses, fees, tax, billing) renders one canonical way.
  */
 export function formatCurrency(amount: number, currencyCode: string): string {
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(getAppLocale(), {
     style: 'currency',
     currency: currencyCode,
   }).format(amount);
 }
 
 export function formatMoney(decimalString: string, currencyCode: string): string {
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(getAppLocale(), {
     style: 'currency',
     currency: currencyCode,
   }).format(Number(decimalString));
@@ -30,7 +33,7 @@ export function formatMoney(decimalString: string, currencyCode: string): string
  * to `Intl.NumberFormat` (e.g. `style: 'currency'`, `minimumFractionDigits`).
  */
 export function formatSigned(value: number, opts: Intl.NumberFormatOptions = {}): string {
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(getAppLocale(), {
     ...opts,
     signDisplay: 'exceptZero',
   }).format(value);
@@ -46,7 +49,7 @@ export function formatSigned(value: number, opts: Intl.NumberFormatOptions = {})
  * DEFERRED (d-cc56d2ab). Do NOT bind it to any surface here.
  */
 export function formatAccounting(value: number, currency: string): string {
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(getAppLocale(), {
     style: 'currency',
     currency,
     currencySign: 'accounting',
@@ -108,10 +111,10 @@ export function formatRelativeTime(iso: string, now: Date = new Date()): string 
 
   const diffSec = Math.max(0, Math.floor((now.getTime() - then.getTime()) / 1000));
 
-  if (diffSec < 60) return 'just now';
-  if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
-  if (diffSec < 86_400) return `${Math.floor(diffSec / 3600)}h ago`;
-  if (diffSec < 172_800) return 'yesterday';
-  if (diffSec < 604_800) return `${Math.floor(diffSec / 86_400)}d ago`;
-  return then.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  if (diffSec < 60) return t('time.justNow');
+  if (diffSec < 3600) return t('time.minutesAgo', { n: Math.floor(diffSec / 60) });
+  if (diffSec < 86_400) return t('time.hoursAgo', { n: Math.floor(diffSec / 3600) });
+  if (diffSec < 172_800) return t('time.yesterday');
+  if (diffSec < 604_800) return t('time.daysAgo', { n: Math.floor(diffSec / 86_400) });
+  return then.toLocaleDateString(getAppLocale(), { month: 'short', day: 'numeric' });
 }

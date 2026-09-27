@@ -1,5 +1,5 @@
 {
-  "name": "tradr",
+  "name": "jurnal-zitn",
   "private": true,
   "license": "Apache-2.0",
   "type": "module",
@@ -14,7 +14,7 @@
     "eslint:deps": "depcruise --config .dependency-cruiser.cjs apps packages",
     "check:migrations": "bash scripts/check-post-migration-consistency.sh",
     "drill:backup-restore": "bash scripts/backup-restore-drill.sh",
-    "seed": "pnpm --filter @tradr/api seed",
+    "seed": "pnpm --filter @jurnal-zitn/api seed",
     "check-types": "pnpm -r check-types",
     "test": "vitest",
     "prepare": "husky"

@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import type { PositionDetail, PositionImage, UploadPositionImage } from '@tradr/shared';
+import type { PositionDetail, PositionImage, UploadPositionImage } from '@jurnal-zitn/shared';
 
 import { api, resolveApiUrl } from '@/lib/api';
 

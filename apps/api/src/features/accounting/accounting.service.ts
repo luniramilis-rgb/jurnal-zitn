@@ -4,11 +4,11 @@ import type {
   CreateExchangeRateInput,
   PreviewRateChangeInput,
   PreviewRateChangeResponse,
-} from '@tradr/shared';
-import { getCurrencyMinorUnits } from '@tradr/shared';
+} from '@jurnal-zitn/shared';
+import { getCurrencyMinorUnits } from '@jurnal-zitn/shared';
 // Imported by subpath — the cash-movement schemas stay out of the shared
 // barrel (design D25), matching how the reconcile schemas are consumed today.
-import type { CreateCashMovementInput } from '@tradr/shared/schemas/accounting';
+import type { CreateCashMovementInput } from '@jurnal-zitn/shared/schemas/accounting';
 
 import type { Database } from '@/db';
 import { findAccountById, findAccountsByUser } from '@/features/accounts/accounts.query';
@@ -434,8 +434,8 @@ function computeExceedsThreshold(before: Decimal | null, after: Decimal | null):
  * inside the same transaction and behind the same row lock as the INSERT, makes
  * `newBalance === targetBalance` a guarantee rather than a hope.
  *
- * What is being reconciled: the account's cash balance as Tradr models it —
- * `starting_balance + realized P&L`. Tradr holds no mark-to-market, so this
+ * What is being reconciled: the account's cash balance as Jurnal ZITN models it —
+ * `starting_balance + realized P&L`. Jurnal ZITN holds no mark-to-market, so this
  * figure excludes the market value of open positions. That is a product
  * decision (Req 8, "What is being reconciled"), and the obligation it creates
  * is disclosure in the UI (Req 8.11), not a guard here: open positions do NOT
@@ -516,7 +516,7 @@ export async function reconcileAccountBalance(
  * `amount` — exactly as position P&L and balance adjustments do.
  *
  * There is NO balance guard (Req 2.6): a withdrawal may overdraw the account
- * into a negative balance. Tradr models cash as `starting_balance + ledger
+ * into a negative balance. Jurnal ZITN models cash as `starting_balance + ledger
  * aggregate` and holds no mark-to-market, so it has no notion of "available
  * funds" to enforce here; the resulting negative balance is surfaced in the UI,
  * not blocked at this layer.

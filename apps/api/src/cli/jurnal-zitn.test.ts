@@ -1,15 +1,15 @@
 /**
- * Unit tests for the pure CLI helpers in `tradr.ts` (no DB / no IO).
+ * Unit tests for the pure CLI helpers in `jurnal-zitn.ts` (no DB / no IO).
  *
  * Covers: standard-track diff (drizzle timestamp semantics), post-track diff
  * (by filename), the `pg_locks` split-key decode builder, and exit-code
  * selection. The real-Postgres behaviours (read-only never-migrated, migrated
  * exit 0, SKIP_POST_MIGRATIONS, cross-session lock detection) live in
- * `tradr.integration.test.ts`.
+ * `jurnal-zitn.integration.test.ts`.
  */
 import { describe, it, expect } from 'vitest';
 
-import { LoginSchema, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '@tradr/shared';
+import { LoginSchema, PASSWORD_MAX_LENGTH, PASSWORD_MIN_LENGTH } from '@jurnal-zitn/shared';
 
 import {
   diffStandard,
@@ -21,7 +21,7 @@ import {
   generatePassword,
   validatePassword,
   type JournalEntry,
-} from './tradr';
+} from './jurnal-zitn';
 
 describe('diffStandard', () => {
   const entries: JournalEntry[] = [

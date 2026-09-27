@@ -26,7 +26,7 @@ vi.mock('@/hooks/useAuth', () => ({
   }),
 }));
 
-const TOMBSTONE_KEY = 'tradr_theme_pending';
+const TOMBSTONE_KEY = 'jurnal_zitn_theme_pending';
 
 function makeQueryClient(): QueryClient {
   return new QueryClient({

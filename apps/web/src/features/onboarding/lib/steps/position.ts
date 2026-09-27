@@ -65,7 +65,7 @@ export const positionSteps: readonly WalkthroughStepSource[] = [
     advanceOnAction: true,
     title: 'Log the position',
     body:
-      'A position in Tradr is one trade and every fill that belongs to it. Choose New Position ' +
+      'A position in Jurnal ZITN is one trade and every fill that belongs to it. Choose New Position ' +
       'to start the one you just sized.',
   },
   {

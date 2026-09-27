@@ -1,11 +1,11 @@
 ---
 title: Self-host with Docker Compose
-description: Stand up the full Tradr stack — web, api, and Postgres — on your own server with Docker Compose.
+description: Stand up the full Jurnal ZITN stack — web, api, and Postgres — on your own server with Docker Compose.
 ---
 
 import HostedOnly from '@/components/HostedOnly.astro';
 
-This guide takes you from a fresh server to a running Tradr instance with Docker
+This guide takes you from a fresh server to a running Jurnal ZITN instance with Docker
 Compose, then covers verifying health, updating, and backing up. Self-hosting is
 a first-class path: the self-hosted build is the real product, and it runs as a
 complete manual trading journal with **no optional keys configured** — every
@@ -13,7 +13,7 @@ external integration is opt-in.
 
 ## The three-container model
 
-Tradr ships as three services on one private bridge network:
+Jurnal ZITN ships as three services on one private bridge network:
 
 | Service    | Image                              | Role                                                                      | Published port                        |
 | ---------- | ---------------------------------- | ------------------------------------------------------------------------- | ------------------------------------- |
@@ -45,7 +45,7 @@ default.
 
 ```bash
 git clone https://github.com/madmatt112/tradr.git
-cd tradr
+cd jurnal-zitn
 ```
 
 ## Step 2 — Create your `.env`
@@ -64,15 +64,15 @@ your `POSTGRES_*` values in `api.environment` at render time — do **not** rely
 
 ## Step 3 — Set the required secrets
 
-These are the only values Tradr cannot run without. Generate each and paste it
+These are the only values Jurnal ZITN cannot run without. Generate each and paste it
 into `.env`.
 
 ### Database credentials
 
 ```
-POSTGRES_USER=tradr
+POSTGRES_USER=jurnal-zitn
 POSTGRES_PASSWORD=      # generate below
-POSTGRES_DB=tradr
+POSTGRES_DB=jurnal-zitn
 ```
 
 Generate a URL-safe password (hex avoids URL-reserved characters like `@ : / ?`):
@@ -174,7 +174,7 @@ POSTHOG_PUBLIC_HOST=      # optional; default https://us.i.posthog.com
 Self-service password reset and email verification turn on **only when all three
 of** `SMTP_HOST`, `EMAIL_FROM`, and `WEB_BASE_URL` are set (all-or-nothing). A
 partial set fails loudly at startup naming the missing var. Without email, users
-who forget a password rely on the operator CLI (`tradr reset-password <email>`),
+who forget a password rely on the operator CLI (`jurnal-zitn reset-password <email>`),
 and verification is not required.
 
 ```
@@ -184,7 +184,7 @@ and verification is not required.
 # SMTP_USER=                    # optional pair — set both or neither
 # SMTP_PASS=
 # EMAIL_FROM=
-# WEB_BASE_URL=https://tradr.example.com   # your instance's public origin
+# WEB_BASE_URL=https://jurnal-zitn.example.com   # your instance's public origin
 ```
 
 ### Interactive Brokers (IBKR) — roadmap, not yet shipped
@@ -222,8 +222,8 @@ service's `build:` block with a pinned image — this is documented inline in th
 compose file:
 
 ```
-image: ghcr.io/<owner>/tradr-api:1.2.3
-image: ghcr.io/<owner>/tradr-web:1.2.3
+image: ghcr.io/<owner>/jurnal-zitn-api:1.2.3
+image: ghcr.io/<owner>/jurnal-zitn-web:1.2.3
 ```
 
 ### First run: migrations apply automatically
@@ -259,7 +259,7 @@ started](/user-guide/getting-started/).
 Check migration state at any time (read-only, uses its own connection):
 
 ```bash
-docker compose exec api tradr migrate --status
+docker compose exec api jurnal-zitn migrate --status
 # exit 0 = schema current, 1 = pending migrations, 2 = cannot connect
 ```
 
@@ -298,7 +298,7 @@ one edit that releases through v0.5.3 need are all in
 
 All persistent data lives in the **`pgdata` named volume** mounted at
 `/var/lib/postgresql/data` in the `postgres` container. Docker prefixes the
-volume with the compose project name, so it resolves to e.g. `tradr_pgdata`
+volume with the compose project name, so it resolves to e.g. `jurnal_zitn_pgdata`
 (confirm with `docker volume ls`). There is no proprietary format — a plain
 `pg_dump` is a complete, portable backup.
 
@@ -346,7 +346,7 @@ All three restart `unless-stopped`.
 
 ### Network and volume
 
-One bridge network, `tradr`, on a fixed subnet — `${TRADR_SUBNET:-172.28.0.0/24}`.
+One bridge network, `jurnal-zitn`, on a fixed subnet — `${JURNAL_ZITN_SUBNET:-172.28.0.0/24}`.
 Keep it in sync with `TRUSTED_PROXIES` in `.env`; the API uses that range to
 decide which forwarded client IPs to trust.
 

@@ -9,7 +9,7 @@ import type {
   UpdateFillInput,
   Fill,
   Position,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { api, isUnauthorized } from '@/lib/api';
 import { eventBus } from '@/stores/event-bus.store';

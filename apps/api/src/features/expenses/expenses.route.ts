@@ -7,10 +7,11 @@ import {
   ExpenseListResponseSchema,
   ExpenseSchema,
   FeeRollupResponseSchema,
+  TaxJurisdictionEnum,
   TaxSummaryResponseSchema,
   UpdateExpenseInputSchema,
   UpdateTaxJurisdictionInputSchema,
-} from '@tradr/shared/schemas/expense';
+} from '@jurnal-zitn/shared/schemas/expense';
 
 import { db } from '@/db';
 import { InvariantViolationError } from '@/lib/errors';
@@ -71,7 +72,7 @@ const YearQuerySchema = z.object({
 });
 
 const TaxJurisdictionResponseSchema = z
-  .object({ taxJurisdiction: z.enum(['US', 'CA', 'other']).nullable() })
+  .object({ taxJurisdiction: TaxJurisdictionEnum.nullable() })
   .strict();
 
 // ---------------------------------------------------------------------------
@@ -342,7 +343,7 @@ expensesRouter.get('/expenses/fee-rollup', validate('query', YearQuerySchema), a
  *       category, and wash-sale or superficial-loss flags for the user's
  *       jurisdiction. Deliberately reports no single net taxable figure: fees
  *       are already inside realised P&L, and combining the numbers correctly
- *       depends on rules Tradr does not model.
+ *       depends on rules Jurnal ZITN does not model.
  *
  *
  *       This is a reporting aid, not tax advice, and it is not a filing.
@@ -361,7 +362,7 @@ expensesRouter.get('/expenses/fee-rollup', validate('query', YearQuerySchema), a
  *               type: object
  *               properties:
  *                 year: { type: integer }
- *                 jurisdiction: { type: string, enum: [US, CA, other], nullable: true }
+ *                 jurisdiction: { type: string, enum: [US, CA, ID, other], nullable: true }
  *                 displayCurrency: { type: string, nullable: true }
  *                 realisedPnl: { type: object }
  *                 trackedExpenses: { type: object }
@@ -399,7 +400,7 @@ expensesRouter.get('/expenses/tax-summary', validate('query', YearQuerySchema), 
  *             schema:
  *               type: object
  *               properties:
- *                 taxJurisdiction: { type: string, enum: [US, CA, other], nullable: true }
+ *                 taxJurisdiction: { type: string, enum: [US, CA, ID, other], nullable: true }
  */
 expensesRouter.get('/users/me/tax-jurisdiction', async (c) => {
   const userId = c.get('userId');
@@ -430,7 +431,7 @@ expensesRouter.get('/users/me/tax-jurisdiction', async (c) => {
  *             type: object
  *             required: [taxJurisdiction]
  *             properties:
- *               taxJurisdiction: { type: string, enum: [US, CA, other], nullable: true }
+ *               taxJurisdiction: { type: string, enum: [US, CA, ID, other], nullable: true }
  *     responses:
  *       200: { description: The stored jurisdiction. }
  *       400: { description: Validation error. }

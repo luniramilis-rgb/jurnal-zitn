@@ -2,7 +2,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import type { Granularity, SeriesBucket } from '@tradr/shared';
+import type { Granularity, SeriesBucket } from '@jurnal-zitn/shared';
 
 import { BreakdownTable } from './BreakdownTable';
 

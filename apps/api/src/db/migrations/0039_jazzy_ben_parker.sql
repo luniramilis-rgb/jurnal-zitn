@@ -1,0 +1,3 @@
+ALTER TABLE "expenses" DROP CONSTRAINT "expenses_currency_chk";--> statement-breakpoint
+ALTER TABLE "accounts" ALTER COLUMN "timezone" SET DEFAULT 'Asia/Jakarta';--> statement-breakpoint
+ALTER TABLE "expenses" ADD CONSTRAINT "expenses_currency_chk" CHECK (currency IN ('IDR', 'USD', 'EUR', 'GBP', 'CAD', 'AUD', 'JPY', 'CHF', 'HKD', 'SGD', 'NZD', 'SEK', 'NOK', 'DKK', 'MXN', 'BRL', 'INR', 'KRW', 'TWD', 'ZAR'));

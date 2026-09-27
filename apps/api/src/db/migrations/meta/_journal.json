@@ -260,6 +260,41 @@
       "when": 1790296202136,
       "tag": "0036_account_deletion_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1790412841605,
+      "tag": "0037_flowery_morgan_stark",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1790414852084,
+      "tag": "0038_natural_nemesis",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1790422585189,
+      "tag": "0039_jazzy_ben_parker",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1790423423566,
+      "tag": "0040_tearful_angel",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1790468067888,
+      "tag": "0041_loud_titanium_man",
+      "breakpoints": true
     }
   ]
 }

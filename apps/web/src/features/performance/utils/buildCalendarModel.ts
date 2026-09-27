@@ -1,4 +1,4 @@
-import type { SeriesBucket } from '@tradr/shared';
+import type { SeriesBucket } from '@jurnal-zitn/shared';
 
 import { sumDecimalStrings } from './decimalSum';
 

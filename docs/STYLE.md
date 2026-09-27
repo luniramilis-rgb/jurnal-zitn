@@ -1,6 +1,6 @@
 # Documentation style
 
-Tradr's procedural and reference documentation follows a **simplified-English**
+Jurnal ZITN's procedural and reference documentation follows a **simplified-English**
 house standard derived from ASD-STE100, the controlled-language specification used
 in aerospace maintenance manuals. The goal is documentation that is unambiguous on
 first reading, uniform between authors, and mechanically checkable.
@@ -34,7 +34,7 @@ STE overrides it only on procedural sentence construction.
 
 The split is **who reads it**, not which Diátaxis mode it sits in. A security or
 architecture page is exposition, but it is read by someone deciding whether to trust
-Tradr with their trading history, and it should be the most precise prose we write.
+Jurnal ZITN with their trading history, and it should be the most precise prose we write.
 
 **In scope — anything an operator or contributor reads to do something:**
 

@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
 
-import { PositionListItemSchema } from '@tradr/shared';
+import { PositionListItemSchema } from '@jurnal-zitn/shared';
 
 import { makePosition } from '@/features/positions/__fixtures__/position-fixtures';
 

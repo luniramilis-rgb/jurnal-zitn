@@ -24,7 +24,7 @@ import { PanelLeft, Sparkles } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
-import type { BillingModel } from '@tradr/shared';
+import type { BillingModel } from '@jurnal-zitn/shared';
 
 import { EmptyState } from '@/components/EmptyState';
 import { DrawerToggle } from '@/components/layout/DrawerToggle';
@@ -327,7 +327,7 @@ export function AdvisorPage({ conversationId, isNew = false }: AdvisorPageProps)
                 <EmptyState
                   title={
                     isNew || !hasConversations
-                      ? 'Start a conversation with the Tradr Advisor.'
+                      ? 'Start a conversation with the Jurnal ZITN Advisor.'
                       : 'Select a conversation'
                   }
                   icon={<Sparkles className="size-6" />}

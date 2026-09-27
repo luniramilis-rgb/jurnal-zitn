@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { z } from 'zod';
 
-import { ClassificationSchema } from '@tradr/shared';
+import { ClassificationSchema } from '@jurnal-zitn/shared';
 
 import { PositionList } from '@/features/positions/components/PositionList';
 

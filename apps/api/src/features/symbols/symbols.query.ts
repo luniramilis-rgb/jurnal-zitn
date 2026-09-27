@@ -6,7 +6,7 @@
 
 import { eq, lt, sql } from 'drizzle-orm';
 
-import type { SymbolSearchItem } from '@tradr/shared';
+import type { SymbolSearchItem } from '@jurnal-zitn/shared';
 
 import type { Database, Transaction } from '@/db';
 import { symbols, symbolSyncState } from '@/db/schema';

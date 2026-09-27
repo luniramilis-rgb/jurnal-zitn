@@ -1,4 +1,4 @@
-<!-- Thanks for contributing to Tradr! Please keep PRs focused — one logical change. -->
+<!-- Thanks for contributing to Jurnal ZITN! Please keep PRs focused — one logical change. -->
 
 ## What & why
 

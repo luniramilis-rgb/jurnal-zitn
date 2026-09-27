@@ -1,12 +1,12 @@
-# Contributing to Tradr
+# Contributing to Jurnal ZITN
 
-Thanks for your interest in improving Tradr — the open-source trading journal and analysis platform.
+Thanks for your interest in improving Jurnal ZITN — the open-source trading journal and analysis platform.
 This guide covers how to propose changes and the one legal formality we ask of every contributor
 (the DCO sign-off).
 
 ## License of contributions
 
-Tradr is licensed under the **Apache License, Version 2.0** (see `LICENSE`). By contributing, you agree
+Jurnal ZITN is licensed under the **Apache License, Version 2.0** (see `LICENSE`). By contributing, you agree
 that your contributions are licensed under the same Apache-2.0 terms — "inbound = outbound." You retain
 copyright in your contributions; there is **no Contributor License Agreement (CLA)** and no copyright
 assignment. We ask only that you sign off on the Developer Certificate of Origin (below).
@@ -104,7 +104,7 @@ workflow.
 
 ## Code style
 
-Tradr favors **simple, boring, readable code over clever abstractions.** A few guidelines:
+Jurnal ZITN favors **simple, boring, readable code over clever abstractions.** A few guidelines:
 
 - **Don't over-engineer.** Implement what the issue asks for — no speculative features or configuration.
 - **Match the surrounding code** — its naming, structure, and patterns (vertical feature slices;
@@ -125,7 +125,7 @@ references live in [`docs/`](docs/) — changes to how the app is built, configu
 land alongside the code that changes them.
 
 The documentation site at [docs.tradr.cloud](https://docs.tradr.cloud/) is built from
-[`apps/docs`](apps/docs) in this repository. Preview it with `pnpm --filter @tradr/docs dev`, and note
+[`apps/docs`](apps/docs) in this repository. Preview it with `pnpm --filter @jurnal-zitn/docs dev`, and note
 that the build fails on a broken internal link.
 
 Documentation has a house style: [`docs/STYLE.md`](docs/STYLE.md), with the declared vocabulary in
@@ -167,7 +167,7 @@ Please do **not** open a public issue for security vulnerabilities. Instead, rep
 
 ## Trademark
 
-The Apache-2.0 license covers the **code**, not the **name**. "Tradr" and the Tradr logo are trademarks —
+The Apache-2.0 license covers the **code**, not the **name**. "Jurnal ZITN" and the Jurnal ZITN logo are trademarks —
 see `TRADEMARK.md` before using them in a fork, product, service, or domain name.
 
 ---

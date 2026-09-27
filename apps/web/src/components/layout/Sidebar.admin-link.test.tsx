@@ -7,7 +7,10 @@
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import { setAppLocale } from '@/lib/locale';
+
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+setAppLocale('en');
 
 // Stub TanStack Router's <Link> with a plain anchor (Sidebar.test.tsx pattern).
 vi.mock('@tanstack/react-router', () => ({

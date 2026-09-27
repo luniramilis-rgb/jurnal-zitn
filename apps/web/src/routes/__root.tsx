@@ -14,9 +14,11 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { UpdatePrompt } from '@/components/UpdatePrompt';
 import { VersionBadge } from '@/components/VersionBadge';
 import { useSessionPresence } from '@/hooks/useAuth';
+import { useT } from '@/hooks/useLocale';
 import { captureClientException } from '@/lib/telemetry/posthog';
 
 function ErrorComponent({ error }: ErrorComponentProps) {
+  const t = useT();
   const router = useRouter();
 
   // Report the caught render/loader error to PostHog error tracking. A render
@@ -32,9 +34,9 @@ function ErrorComponent({ error }: ErrorComponentProps) {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="text-center">
-        <h1 className="mb-4 text-2xl font-bold">Something went wrong</h1>
+        <h1 className="mb-4 text-2xl font-bold">{t('web.error.title')}</h1>
         <Button className="cursor-pointer" onClick={() => router.invalidate()}>
-          Try again
+          {t('common.retry')}
         </Button>
       </div>
     </div>
@@ -61,11 +63,12 @@ function ErrorComponent({ error }: ErrorComponentProps) {
  */
 function NotFoundComponent() {
   const { isLoading, isAuthenticated } = useSessionPresence();
+  const t = useT();
 
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
-        <div className="text-muted-foreground">Loading...</div>
+        <div className="text-muted-foreground">{t('web.loading')}</div>
       </div>
     );
   }
@@ -77,13 +80,10 @@ function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center">
       <div className="max-w-sm text-center">
-        <h1 className="mb-2 text-2xl font-bold">Page not found</h1>
-        <p className="text-muted-foreground mb-6 text-sm">
-          We couldn&apos;t find that page. Check the address, or sign in to pick up where you left
-          off.
-        </p>
+        <h1 className="mb-2 text-2xl font-bold">{t('web.notFound.title')}</h1>
+        <p className="text-muted-foreground mb-6 text-sm">{t('web.notFound.desc')}</p>
         <Button asChild className="cursor-pointer">
-          <Link to="/login">Sign in</Link>
+          <Link to="/login">{t('web.notFound.signIn')}</Link>
         </Button>
       </div>
     </div>

@@ -27,7 +27,7 @@ const CONTENT_TYPE = 'text/plain; version=0.0.4; charset=utf-8';
 /**
  * APP_VERSION is the one telemetry-relevant variable `vitest.workspace.ts` does
  * NOT pin, so without this it is whatever the ambient environment holds and the
- * emitted `tradr_build_info` labels are unknowable. Pinned to the established
+ * emitted `jurnal_zitn_build_info` labels are unknowable. Pinned to the established
  * `v<semver>-<sha>` shape, and the assertion below states the resulting labels as
  * LITERALS rather than re-deriving them with `parseAppVersion` — comparing the
  * emitted labels against the function that produced them passes for any parse
@@ -99,7 +99,7 @@ const METRIC_TYPES = new Set(['counter', 'gauge', 'histogram', 'summary', 'untyp
  * `X_count` samples while `# HELP` and `# TYPE` are emitted under the base name
  * `X` only. A naive "every sample name has a HELP and a TYPE" check therefore
  * reds on every histogram in the registry — including this spec's own
- * `tradr_http_request_duration_seconds`, and nondeterministically on
+ * `jurnal_zitn_http_request_duration_seconds`, and nondeterministically on
  * `nodejs_gc_duration_seconds` once a GC has fired.
  *
  * The strip is applied only when the stripped base actually names a family whose
@@ -107,7 +107,7 @@ const METRIC_TYPES = new Set(['counter', 'gauge', 'histogram', 'summary', 'untyp
  * to END in one of these words keeps its full name.
  *
  * `_total` is NEVER stripped: seven real families here are *named* with it —
- * `tradr_http_requests_total`, `process_cpu_seconds_total`,
+ * `jurnal_zitn_http_requests_total`, `process_cpu_seconds_total`,
  * `nodejs_active_resources_total` and friends — and stripping it would look up
  * families that do not exist.
  */
@@ -151,15 +151,15 @@ function typeLines(body: string): Array<{ name: string; type: string }> {
     });
 }
 
-/** Sample lines for `tradr_db_connections`, which is labelled and so never zero-seeded. */
+/** Sample lines for `jurnal_zitn_db_connections`, which is labelled and so never zero-seeded. */
 function connectionSamples(body: string): string[] {
-  return sampleLines(body).filter((line) => line.startsWith('tradr_db_connections{'));
+  return sampleLines(body).filter((line) => line.startsWith('jurnal_zitn_db_connections{'));
 }
 
 // ── Arming the surface ───────────────────────────────────────────────────────
 // WITHOUT THIS EVERY ASSERTION BELOW IS VACUOUS. `initMetrics()` returns at its
 // first line when `!isMetricsConfigured()`, and `vitest.workspace.ts` pins
-// METRICS_ENABLED off — so `tradr_build_info` would have no sample and no
+// METRICS_ENABLED off — so `jurnal_zitn_build_info` would have no sample and no
 // `process_*`/`nodejs_*` series would exist at all. `config` is a plain mutable
 // object read live by `isMetricsConfigured()` (the `app.split-origin.test.ts`
 // mutate-and-restore precedent).
@@ -224,11 +224,11 @@ describe('GET /metrics (REQ-2.1, REQ-2.2, REQ-9.1)', () => {
     // rule above cannot pass merely because the body lacked them. A histogram
     // whose components resolve to their base, and a counter NAMED with `_total`
     // whose name must survive intact.
-    expect(families.has('tradr_http_request_duration_seconds')).toBe(true);
-    expect(families.has('tradr_http_requests_total')).toBe(true);
+    expect(families.has('jurnal_zitn_http_request_duration_seconds')).toBe(true);
+    expect(families.has('jurnal_zitn_http_requests_total')).toBe(true);
     expect(
       sampleLines(body).some((line) =>
-        line.startsWith('tradr_http_request_duration_seconds_bucket{'),
+        line.startsWith('jurnal_zitn_http_request_duration_seconds_bucket{'),
       ),
     ).toBe(true);
   });
@@ -248,12 +248,14 @@ describe('GET /metrics (REQ-2.1, REQ-2.2, REQ-9.1)', () => {
     }
   });
 
-  it('emits the tradr_build_info sample with the pinned version/commit labels (REQ-3.1)', () => {
+  it('emits the jurnal_zitn_build_info sample with the pinned version/commit labels (REQ-3.1)', () => {
     // The assertion that actually proves initMetrics() RAN. prom-client emits
     // `# HELP`/`# TYPE` for every registered metric whether or not it holds a
     // value, so the structural rules above pass unchanged on a build that
-    // silently lost tradr_build_info, tradr_db_pool_max and all of REQ-6.
-    const [line, ...rest] = sampleLines(body).filter((l) => l.startsWith('tradr_build_info{'));
+    // silently lost jurnal_zitn_build_info, jurnal_zitn_db_pool_max and all of REQ-6.
+    const [line, ...rest] = sampleLines(body).filter((l) =>
+      l.startsWith('jurnal_zitn_build_info{'),
+    );
 
     expect(line).toBeDefined();
     expect(rest).toEqual([]);
@@ -290,10 +292,10 @@ describe('the 404 is structural (REQ-2.7, REQ-9.2)', () => {
 });
 
 describe('a database failure degrades the exposition, never the scrape (REQ-4.6, REQ-9.4)', () => {
-  it('takes tradr_db_up 1 → 0 and drops the connection samples, still answering 200', async () => {
+  it('takes jurnal_zitn_db_up 1 → 0 and drops the connection samples, still answering 200', async () => {
     // THE TRANSITION IS THE EVIDENCE. prom-client seeds a label-free gauge to 0
-    // at construction and a labelled one to no values at all, so "tradr_db_up 0
-    // with no tradr_db_connections samples" is EXACTLY the state of a registry
+    // at construction and a labelled one to no values at all, so "jurnal_zitn_db_up 0
+    // with no jurnal_zitn_db_connections samples" is EXACTLY the state of a registry
     // the collector has never run against — a one-scrape assertion passes on a
     // build with metrics.collectors.ts deleted outright.
     stubHealthyTransaction();
@@ -301,7 +303,7 @@ describe('a database failure degrades the exposition, never the scrape (REQ-4.6,
     const healthyBody = await healthy.text();
 
     expect(healthy.status).toBe(200);
-    expect(sampleLines(healthyBody)).toContain('tradr_db_up 1');
+    expect(sampleLines(healthyBody)).toContain('jurnal_zitn_db_up 1');
     expect(connectionSamples(healthyBody).length).toBeGreaterThan(0);
 
     withTransactionMock.mockReset();
@@ -312,16 +314,18 @@ describe('a database failure degrades the exposition, never the scrape (REQ-4.6,
 
     expect(down.status).toBe(200);
     expect(down.headers.get('Content-Type')).toBe(CONTENT_TYPE);
-    expect(sampleLines(downBody)).toContain('tradr_db_up 0');
+    expect(sampleLines(downBody)).toContain('jurnal_zitn_db_up 0');
     expect(connectionSamples(downBody)).toEqual([]);
     // PARTIAL, not empty: everything unrelated to the database is still served.
-    expect(sampleLines(downBody).some((line) => line.startsWith('tradr_build_info{'))).toBe(true);
+    expect(sampleLines(downBody).some((line) => line.startsWith('jurnal_zitn_build_info{'))).toBe(
+      true,
+    );
   });
 });
 
 describe('a serialization failure degrades the exposition, never the scrape (REQ-4.6)', () => {
   /** Test-only, removed in the `finally` below — it must never reach a real exposition. */
-  const EXPLOSIVE = 'tradr_test_explosive_collect';
+  const EXPLOSIVE = 'jurnal_zitn_test_explosive_collect';
 
   it('answers 200 when a registered collect() hook throws during serialization', async () => {
     // THE FAILURE THE COLLECTOR SEAM CANNOT REACH. `refreshDbMetrics()` swallows
@@ -364,6 +368,6 @@ describe('a serialization failure degrades the exposition, never the scrape (REQ
 
     // The registry is whole again, so nothing here leaks into a later case or a
     // repeat run of this file.
-    await expect(registry.metrics()).resolves.toContain('tradr_build_info{');
+    await expect(registry.metrics()).resolves.toContain('jurnal_zitn_build_info{');
   });
 });

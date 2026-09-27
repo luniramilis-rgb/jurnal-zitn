@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 
-import { CsvCommitRequestSchema } from '@tradr/shared';
+import { CsvCommitRequestSchema } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { AppError, ValidationError } from '@/lib/errors';

@@ -3,7 +3,7 @@ import path from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
-import { blackScholes, encodeOccSymbol, parseOccSymbol } from '@tradr/shared';
+import { blackScholes, encodeOccSymbol, parseOccSymbol } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 

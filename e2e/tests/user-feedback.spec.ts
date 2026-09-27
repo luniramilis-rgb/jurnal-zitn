@@ -65,7 +65,7 @@ const TEXT_RESPONSE_KEY = `$survey_response_${TEXT_QID}`;
 
 const TAB = '[data-testid="feedback-tab"]';
 const POPOVER = '[data-testid="feedback-popover"]';
-const DRAWER_STORAGE_KEY = 'tradr_drawer_state';
+const DRAWER_STORAGE_KEY = 'jurnal_zitn_drawer_state';
 
 // The drawer's five header controls — the popover-clearance named set (REQ-3.6).
 const DRAWER_NAMED_CONTROLS = [
@@ -307,7 +307,7 @@ async function installFeedbackHarness(page: Page): Promise<Harness> {
       status: 200,
       contentType: 'application/javascript',
       body:
-        'window.__TRADR_CONFIG__ = {' +
+        'window.__JURNAL_ZITN_CONFIG__ = {' +
         ' posthogPublicKey: "phc_e2e_feedback",' +
         // Local origin + a path the SPA never routes: every SDK endpoint resolves
         // here, so no vendor hostname is named in this file.

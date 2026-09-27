@@ -43,7 +43,11 @@ import { createHash, randomUUID } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { AdminStatsSchema, AdminUsageSchema, AdminUserListResponseSchema } from '@tradr/shared';
+import {
+  AdminStatsSchema,
+  AdminUsageSchema,
+  AdminUserListResponseSchema,
+} from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db } from '@/db';
@@ -80,7 +84,7 @@ const MINUTE = 60_000;
 const HOUR = 60 * MINUTE;
 const DAY = 24 * HOUR;
 
-// The shared tradr_test DB carries COMMITTED leftovers from older runs of
+// The shared jurnal_zitn_test DB carries COMMITTED leftovers from older runs of
 // other suites (the documented DB-state baseline — users/sessions/positions
 // rows that escaped their transactions). The admin surface aggregates
 // platform-wide, so every test first wipes user-rooted state INSIDE its own

@@ -36,7 +36,7 @@ import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ProviderModel } from '@tradr/shared';
+import type { ProviderModel } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import {

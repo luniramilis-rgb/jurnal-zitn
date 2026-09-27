@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { Account } from '@tradr/shared';
+import type { Account } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

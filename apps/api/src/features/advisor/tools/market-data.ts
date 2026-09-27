@@ -21,7 +21,7 @@
 
 import { z } from 'zod';
 
-import { parseOccSymbol } from '@tradr/shared';
+import { parseOccSymbol } from '@jurnal-zitn/shared';
 
 import { MarketDataError, PlatformRateLimitedError } from '../lib/unusual-whales.client';
 

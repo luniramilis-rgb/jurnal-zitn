@@ -2,6 +2,8 @@
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { setAppLocale } from '@/lib/locale';
+
 import { DeleteAccountDialog } from './DeleteAccountDialog';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -27,12 +29,14 @@ vi.mock('@/features/billing/useTierState', () => ({
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 beforeEach(() => {
+  setAppLocale('en');
   deleteState = { mutate: deleteMutate, isPending: false, isError: false, error: null };
   walletData = { balance: '2500000', available: '2500000' };
   tierData = { subscription: null };
 });
 
 afterEach(() => {
+  setAppLocale('id');
   cleanup();
   vi.clearAllMocks();
 });

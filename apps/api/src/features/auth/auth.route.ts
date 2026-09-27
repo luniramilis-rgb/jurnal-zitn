@@ -3,9 +3,10 @@ import { createHash } from 'node:crypto';
 import { eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { setCookie, getCookie } from 'hono/cookie';
+import { z } from 'zod';
 
-import { OnboardingPatchSchema, UserTimezoneSchema } from '@tradr/shared';
-import { RegisterSchema, LoginSchema } from '@tradr/shared/schemas/auth';
+import { AppLocaleEnum, OnboardingPatchSchema, UserTimezoneSchema } from '@jurnal-zitn/shared';
+import { RegisterSchema, LoginSchema } from '@jurnal-zitn/shared/schemas/auth';
 
 import { db } from '@/db';
 import { users } from '@/db/schema';
@@ -22,6 +23,8 @@ import {
   logoutUser,
   getReportingTimezone,
   setReportingTimezone,
+  getUserLocale,
+  setUserLocale,
   getOnboardingState,
   patchOnboardingState,
 } from './auth.service';
@@ -391,6 +394,76 @@ userPreferencesRouter.put('/users/me/timezone', validate('json', UserTimezoneSch
   // construction here: the write just put this value on the row.
   return c.json({ timezone, stored: true }, 200);
 });
+
+// ---------------------------------------------------------------------------
+// UI language preference (ZITN-TECH-017 A0)
+//
+// Third preference on this router, same `/api/users/me/<preference>` convention.
+// `stored` mirrors the timezone contract: false means the column is unset (a row
+// predating it) and the server is substituting DEFAULT_LOCALE ('id'), so a client
+// may seed it once from its own detected locale.
+// ---------------------------------------------------------------------------
+
+/**
+ * @swagger
+ * /api/users/me/locale:
+ *   get:
+ *     summary: Get the UI language preference.
+ *     description: >
+ *       Authed. Returns the stored locale (`id` | `en`). `stored: false` when the
+ *       column is unset and `id` (the default) is being substituted.
+ *     tags: [Auth]
+ *     responses:
+ *       200:
+ *           description: '`{ locale, stored }`.'
+ *           content:
+ *             application/json:
+ *               schema:
+ *                 type: object
+ *                 properties:
+ *                   locale: { type: string, enum: [id, en] }
+ *                   stored: { type: boolean }
+ *       401: { description: Authentication required. }
+ */
+userPreferencesRouter.get('/users/me/locale', async (c) => {
+  const userId = c.get('userId');
+  const { locale, stored } = await getUserLocale(userId);
+  return c.json({ locale, stored }, 200);
+});
+
+/**
+ * @swagger
+ * /api/users/me/locale:
+ *   put:
+ *     summary: Set the UI language preference.
+ *     description: >
+ *       Authed. `id` (Indonesia) or `en` (English). Affects UI copy and
+ *       number/date formatting only; it rewrites no stored data.
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [locale]
+ *             properties:
+ *               locale: { type: string, enum: [id, en] }
+ *     responses:
+ *       200: { description: '`{ locale, stored: true }`.' }
+ *       400: { description: Validation error. }
+ *       401: { description: Authentication required. }
+ */
+userPreferencesRouter.put(
+  '/users/me/locale',
+  validate('json', z.object({ locale: AppLocaleEnum }).strict()),
+  async (c) => {
+    const userId = c.get('userId');
+    const { locale } = c.req.valid('json');
+    await setUserLocale(userId, locale);
+    return c.json({ locale, stored: true }, 200);
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Onboarding preference

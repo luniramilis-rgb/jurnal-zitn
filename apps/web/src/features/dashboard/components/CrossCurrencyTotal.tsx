@@ -1,8 +1,9 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+﻿import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { useDashboardTotalQuery } from '@/features/accounting/hooks/useDashboardTotal';
 import { useMissingRatePrompt } from '@/features/accounting/hooks/useMissingRatePrompt';
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
+import { useT } from '@/hooks/useLocale';
 import { formatMoney } from '@/lib/format';
 
 /**
@@ -14,6 +15,7 @@ import { formatMoney } from '@/lib/format';
  * an inline deeplink to the settings page to enter the missing rate.
  */
 export function CrossCurrencyTotal() {
+  const t = useT();
   const { data: accounts, isLoading: accountsLoading } = useAccounts();
   const { data: total, isLoading: totalLoading } = useDashboardTotalQuery();
   const { shouldPrompt, missingPairs, deeplinkTo } = useMissingRatePrompt();
@@ -29,7 +31,7 @@ export function CrossCurrencyTotal() {
     return (
       <Card>
         <CardHeader>
-          <CardTitle>Total (all accounts)</CardTitle>
+          <CardTitle>{t('w.cross.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold text-muted-foreground">…</div>
@@ -43,7 +45,7 @@ export function CrossCurrencyTotal() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Total (all accounts)</CardTitle>
+        <CardTitle>{t('w.cross.title')}</CardTitle>
       </CardHeader>
       <CardContent>
         {shouldPrompt || total.total === null || displayCurrency === null ? (
@@ -59,7 +61,7 @@ export function CrossCurrencyTotal() {
               </TooltipTrigger>
               <TooltipContent>
                 <div className="text-xs">
-                  <p className="mb-1 font-medium">Missing exchange rate(s):</p>
+                  <p className="mb-1 font-medium">{t('w.cross.missing')}</p>
                   <ul className="space-y-0.5">
                     {missingPairs.map((p) => (
                       <li key={`${p.baseCurrency}-${p.quoteCurrency}`}>
@@ -75,7 +77,7 @@ export function CrossCurrencyTotal() {
                 href={deeplinkTo}
                 className="cursor-pointer text-sm text-primary underline-offset-4 hover:underline"
               >
-                Enter rate
+                {t('w.cross.enterRate')}
               </a>
             )}
           </div>

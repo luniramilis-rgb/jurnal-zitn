@@ -6,7 +6,7 @@ import {
   AdminResetRequestSchema,
   AdminUsageQuerySchema,
   ToggleAdminRequestSchema,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { adminDeleteUser } from '@/features/account-deletion/account-deletion.service';
 import { validate } from '@/lib/validation';

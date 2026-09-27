@@ -7,7 +7,7 @@ import {
   blackScholes,
   encodeOccSymbol,
   parseOccSymbol,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { ValidationError } from '@/lib/errors';
 import { validate } from '@/lib/validation';

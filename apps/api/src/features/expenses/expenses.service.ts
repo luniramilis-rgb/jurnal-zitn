@@ -1,14 +1,20 @@
 import Decimal from 'decimal.js';
 
-import { getCurrencyMinorUnits } from '@tradr/shared/constants/currencies';
-import { parseOccUnderlying } from '@tradr/shared/lib/occ';
+import {
+  computePphFinal,
+  PPH_FINAL_RATE_PERCENT,
+  resolveLocale,
+  translate,
+} from '@jurnal-zitn/shared';
+import { getCurrencyMinorUnits } from '@jurnal-zitn/shared/constants/currencies';
+import { parseOccUnderlying } from '@jurnal-zitn/shared/lib/occ';
 import type {
   CreateExpenseInput,
   ExpenseListResponse,
   FeeRollupResponse,
   TaxSummaryResponse,
   UpdateExpenseInput,
-} from '@tradr/shared/schemas/expense';
+} from '@jurnal-zitn/shared/schemas/expense';
 
 import { db } from '@/db';
 import { findSpotRate, findUserDisplayCurrency } from '@/features/accounting/accounting.query';
@@ -30,6 +36,8 @@ import {
   insertExpense,
   listCandidatePositionsByYear,
   listExpenses,
+  listIdxSellProceedsByCurrency,
+  selectUserLocaleById,
   listRealisedPositionsForYear,
   updateExpense as updateExpenseRow,
   updateUserTaxJurisdiction,
@@ -395,32 +403,11 @@ const taxLog: { warn: (obj: object) => void } = {
   warn: (obj) => logger.warn('tax_summary_helper', obj as Record<string, unknown>),
 };
 
-/**
- * Jurisdiction-specific clause for the disclaimer. Verbatim from
- * requirements §4.4 (see design §Component 6 "Disclaimer composition").
- */
-const JURISDICTION_CLAUSE: Record<TaxJurisdiction, string> = {
-  US: 'Brokerage fees on closed positions are already deducted from the realised P&L figures here. Recorded fill fees for visibility live on the separate Fee Rollup page (filledAt-bucketed). Wash-sale flags below are heuristic; they do not adjust the P&L figures.',
-  CA: "Commission fees paid through fills are already incorporated into the realised gain/loss above (consistent with the CRA's adjusted cost base treatment). The 50% capital-gains inclusion rate is NOT applied by Tradr — the realised P&L shown is the pre-inclusion-rate figure.",
-  other:
-    'Tradr does not support jurisdiction-specific tax rules for your jurisdiction. The figures below are computational aggregates only; consult a local tax professional.',
-};
-
-const DISCLAIMER_PREAMBLE =
-  'Tradr is not a tax advisor. The figures shown are computational aggregates of your trading data, not tax advice.';
-
-const DISCLAIMER_RECONCILIATION =
-  'Recorded fill fees and tracked expenses are surfaced in separate places — recorded fees on the [Fee Rollup page](/accounting/fee-rollup) (bucketed by `filledAt`), tracked expenses in the section below. Tradr does not compute a net taxable income — that subtraction depends on filer status and jurisdiction-specific deduction rules.';
-
-const DISCLAIMER_HEURISTIC =
-  'Wash-sale (US) and superficial-loss (CA) flags use a symbol-and-date heuristic, not lot-level matching. For options, matching uses the underlying — different strikes and expirations of the same underlying are flagged together. Wash-sale and superficial-loss flags aggregate across all of your accounts.';
-
-const DISCLAIMER_YEAR_BUCKETING =
-  "All year-bucketing uses UTC calendar boundaries. A position closed after 19:00 ET on December 31 will appear in the following year's tax summary.";
-
-const DISCLAIMER_FILING = 'Consult a qualified tax professional for filing.';
+// Disclaimer copy now lives in the shared i18n catalogue (`tax.disc.*`);
+// `composeDisclaimer` selects the locale from the user's preference.
 
 function composeDisclaimer(
+  locale: unknown,
   jurisdiction: TaxJurisdiction,
   year: number,
   ratesAsOf: string | null,
@@ -431,19 +418,31 @@ function composeDisclaimer(
   const isPastYear = year < new Date().getUTCFullYear();
   const stability =
     ratesAsOf === null
-      ? 'Currency conversion uses rates as of (none available — set a display currency to convert).'
-      : isPastYear
-        ? `Currency conversion uses rates as of ${ratesAsOf} (year-end). Reloading does not change the numbers unless you enter new rates dated on or before that date.`
-        : `Currency conversion uses rates as of ${ratesAsOf} (the most recent rates available). Reloading after new rates are entered or after time passes may change these numbers.`;
+      ? translate(locale, 'tax.disc.stabilityNone')
+      : translate(locale, isPastYear ? 'tax.disc.stabilityPast' : 'tax.disc.stabilityCurrent', {
+          date: ratesAsOf,
+        });
+
+  const jurisdictionKey =
+    jurisdiction === 'US'
+      ? 'tax.disc.recUS'
+      : jurisdiction === 'CA'
+        ? 'tax.disc.recCA'
+        : jurisdiction === 'ID'
+          ? 'tax.disc.recID'
+          : 'tax.disc.recOther';
 
   return [
-    DISCLAIMER_PREAMBLE,
-    JURISDICTION_CLAUSE[jurisdiction],
-    DISCLAIMER_RECONCILIATION,
-    DISCLAIMER_HEURISTIC,
+    translate(locale, 'tax.disc.preamble'),
+    translate(locale, jurisdictionKey),
+    translate(locale, 'tax.disc.reconcile'),
+    // Wash-sale/superficial-loss hanya relevan US/CA; IDX memakai PPh final.
+    ...(jurisdiction === 'US' || jurisdiction === 'CA'
+      ? [translate(locale, 'tax.disc.heuristic')]
+      : []),
     stability,
-    DISCLAIMER_YEAR_BUCKETING,
-    DISCLAIMER_FILING,
+    translate(locale, 'tax.disc.yearBucket'),
+    translate(locale, 'tax.disc.filing'),
   ].join('\n\n');
 }
 
@@ -464,6 +463,7 @@ function composeDisclaimer(
 export async function getTaxSummary(userId: string, year: number): Promise<TaxSummaryResponse> {
   // Step 1: jurisdiction.
   const jurisdiction = await getTaxJurisdiction(userId);
+  const locale = resolveLocale(await selectUserLocaleById(db, userId));
 
   // Step 2 + 3: data fetch (independent — issue in parallel).
   const [realisedRows, expensesByCategory] = await Promise.all([
@@ -491,7 +491,7 @@ export async function getTaxSummary(userId: string, year: number): Promise<TaxSu
   let washSales: TaxSummaryResponse['flags']['washSales'] = [];
   let superficialLosses: TaxSummaryResponse['flags']['superficialLosses'] = [];
 
-  if (jurisdiction !== 'other' && losingRows.length > 0) {
+  if ((jurisdiction === 'US' || jurisdiction === 'CA') && losingRows.length > 0) {
     // Window: [min(losing.closedAt) - 30d, max(losing.closedAt) + 30d].
     // `closedAt` is non-null on realised rows (Task 9 helpers also assume this
     // and skip nulls defensively; the same defence applies here).
@@ -536,6 +536,20 @@ export async function getTaxSummary(userId: string, year: number): Promise<TaxSu
         }));
       }
     }
+  }
+
+  // Step 6b: PPh final IDX — 0,1% dari nilai penjualan (hanya jurisdiction ID).
+  let pphFinal: TaxSummaryResponse['pphFinal'];
+  if (jurisdiction === 'ID') {
+    const proceedsRows = await listIdxSellProceedsByCurrency(db, userId, year);
+    pphFinal = {
+      rate: PPH_FINAL_RATE_PERCENT,
+      perCurrency: proceedsRows.map((r) => ({
+        currency: r.currency,
+        sellProceeds: new Decimal(r.proceeds).toFixed(getCurrencyMinorUnits(r.currency)),
+        amount: new Decimal(computePphFinal(r.proceeds)).toFixed(getCurrencyMinorUnits(r.currency)),
+      })),
+    };
   }
 
   // Step 7: display-currency lookup + year-end spot conversion.
@@ -593,11 +607,12 @@ export async function getTaxSummary(userId: string, year: number): Promise<TaxSu
         perCategory: perCategoryResponse,
       },
       flags: { washSales, superficialLosses },
+      ...(pphFinal ? { pphFinal } : {}),
       missingRates: [],
       excludedCurrencies: [],
       ratesAsOf: null,
       usedRates: [],
-      disclaimer: composeDisclaimer(jurisdiction, year, null),
+      disclaimer: composeDisclaimer(locale, jurisdiction, year, null),
     };
   }
 
@@ -680,10 +695,11 @@ export async function getTaxSummary(userId: string, year: number): Promise<TaxSu
       perCategory: perCategoryResponse,
     },
     flags: { washSales, superficialLosses },
+    ...(pphFinal ? { pphFinal } : {}),
     missingRates: Array.from(missingRatesMap.values()),
     excludedCurrencies: Array.from(excludedSet),
     ratesAsOf,
     usedRates,
-    disclaimer: composeDisclaimer(jurisdiction, year, ratesAsOf),
+    disclaimer: composeDisclaimer(locale, jurisdiction, year, ratesAsOf),
   };
 }

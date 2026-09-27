@@ -6,7 +6,7 @@
 // rendering so an unexpected shape never crashes. Error results delegate to
 // GenericToolCard for non-alarming copy (REQ-14.4).
 
-import type { ToolResultPart } from '@tradr/shared/schemas/advisor';
+import type { ToolResultPart } from '@jurnal-zitn/shared/schemas/advisor';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 

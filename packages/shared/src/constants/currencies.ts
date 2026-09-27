@@ -1,4 +1,5 @@
 export const SUPPORTED_CURRENCIES = [
+  { code: 'IDR', name: 'Indonesian Rupiah', minorUnits: 2 },
   { code: 'USD', name: 'US Dollar', minorUnits: 2 },
   { code: 'EUR', name: 'Euro', minorUnits: 2 },
   { code: 'GBP', name: 'British Pound', minorUnits: 2 },

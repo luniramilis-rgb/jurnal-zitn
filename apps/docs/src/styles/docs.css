@@ -1,5 +1,5 @@
 /* ============================================================================
-   Tradr — Starlight docs theme (Component 3)
+   Jurnal ZITN — Starlight docs theme (Component 3)
    Maps Starlight's `--sl-color-*` and font custom properties onto the SHARED
    design tokens (tokens.css) so /docs matches the app and marketing site:
    TERMINAL AMBER accent, dark-first surfaces, JetBrains Mono code — NOT
@@ -75,11 +75,11 @@
   --sl-color-hairline-shade: var(--hairline);
   --sl-color-text-accent: var(--accent-text);
 
-  --tradr-code-bg: oklch(0.13 0.005 265); /* below --bg (0.16), same cool cast */
+  --jurnal-zitn-code-bg: oklch(0.13 0.005 265); /* below --bg (0.16), same cool cast */
 }
 
 :root[data-theme='light'] {
-  --tradr-code-bg: var(--secondary); /* light has no "below white" — quiet fill */
+  --jurnal-zitn-code-bg: var(--secondary); /* light has no "below white" — quiet fill */
 }
 
 /* --- Focus indicator: cool-blue --focus, never amber (matches global.css) --- */

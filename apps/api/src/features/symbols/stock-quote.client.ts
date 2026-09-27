@@ -13,7 +13,7 @@
 // (bare `process.env` is ESLint-banned here); the key is NEVER logged and
 // NEVER returned to the client; the base URL is not user-influenced (no SSRF).
 
-import type { StockQuote } from '@tradr/shared';
+import type { StockQuote } from '@jurnal-zitn/shared';
 
 import { config } from '@/lib/config';
 import { AppError, NotFoundError } from '@/lib/errors';

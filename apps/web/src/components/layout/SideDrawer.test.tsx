@@ -4,7 +4,7 @@ import { cleanup, fireEvent, render, waitFor } from '@testing-library/react';
 import React, { useRef } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { PositionListItem } from '@tradr/shared';
+import type { PositionListItem } from '@jurnal-zitn/shared';
 
 import { useMediaQuery } from '@/hooks/useMediaQuery';
 import { DRAWER_STORAGE_KEY, useDrawerStore } from '@/stores/drawer.store';

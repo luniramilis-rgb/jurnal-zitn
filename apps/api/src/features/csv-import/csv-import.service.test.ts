@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, beforeAll, describe, it, expect } from 'vitest';
 
-import type { CsvPreviewRequest } from '@tradr/shared';
-import { readCsvImportSample } from '@tradr/shared/node/csv-import-samples';
+import type { CsvPreviewRequest } from '@jurnal-zitn/shared';
+import { readCsvImportSample } from '@jurnal-zitn/shared/node/csv-import-samples';
 
 import { bootstrap } from '@/app';
 import { db } from '@/db';
@@ -600,7 +600,7 @@ describe('commitImport — refusals & recovery (Component 7/8)', () => {
 
 // ---------------------------------------------------------------------------
 // Option path — integration cases (design Testing Strategy → Integration,
-// service half). Every assertion is on code/rowNumber/tradrField/csvColumn (and
+// service half). Every assertion is on code/rowNumber/journalField/csvColumn (and
 // that a message names the row and value), never a byte-exact message string.
 // ---------------------------------------------------------------------------
 
@@ -646,7 +646,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'OCC_STRIKE_RANGE',
         rowNumber: 2,
-        tradrField: 'strike',
+        journalField: 'strike',
         csvColumn: 'Strike',
       }),
     );
@@ -654,7 +654,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'OCC_STRIKE_PRECISION',
         rowNumber: 3,
-        tradrField: 'strike',
+        journalField: 'strike',
         csvColumn: 'Strike',
       }),
     );
@@ -662,7 +662,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'OCC_STRIKE_NOT_REPRESENTABLE',
         rowNumber: 4,
-        tradrField: 'strike',
+        journalField: 'strike',
         csvColumn: 'Strike',
       }),
     );
@@ -670,7 +670,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'OCC_BAD_UNDERLYING',
         rowNumber: 5,
-        tradrField: 'symbol',
+        journalField: 'symbol',
         csvColumn: 'Symbol',
       }),
     );
@@ -678,7 +678,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'OCC_DATE_RANGE',
         rowNumber: 6,
-        tradrField: 'expiry',
+        journalField: 'expiry',
         csvColumn: 'Expiry',
       }),
     );
@@ -686,7 +686,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'OCC_COMPACT_TOO_LONG',
         rowNumber: 7,
-        tradrField: 'symbol',
+        journalField: 'symbol',
         csvColumn: 'Symbol',
       }),
     );
@@ -736,7 +736,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
         expect.objectContaining({
           code: 'CONTRACT_FIELD_MISSING',
           rowNumber: 2,
-          tradrField: field,
+          journalField: field,
         }),
       );
     }
@@ -744,7 +744,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'CONTRACT_FIELD_ON_STOCK',
         rowNumber: 3,
-        tradrField: 'expiry',
+        journalField: 'expiry',
         csvColumn: 'Expiry',
       }),
     );
@@ -781,7 +781,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'OCC_NO_FORM_MATCH',
         rowNumber: 2,
-        tradrField: 'symbol',
+        journalField: 'symbol',
         csvColumn: 'Symbol',
       }),
     );
@@ -817,7 +817,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'CONTRACT_DESCRIPTOR_UNPARSEABLE',
         rowNumber: 2,
-        tradrField: 'descriptor',
+        journalField: 'descriptor',
         csvColumn: 'Option',
       }),
     );
@@ -855,7 +855,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'OPTION_MULTIPLIER_UNSUPPORTED',
         rowNumber: 2,
-        tradrField: 'multiplier',
+        journalField: 'multiplier',
         csvColumn: 'Multiplier',
       }),
     );
@@ -892,7 +892,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'OPTION_MULTIPLIER_UNSUPPORTED',
         rowNumber: 2,
-        tradrField: 'descriptor',
+        journalField: 'descriptor',
         csvColumn: 'Option',
       }),
     );
@@ -932,7 +932,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'OPTION_EVENT_NOT_SUPPORTED',
         rowNumber: 2,
-        tradrField: 'eventCode',
+        journalField: 'eventCode',
         csvColumn: 'Notes/Codes',
       }),
     );
@@ -1037,7 +1037,7 @@ describe('previewImport — option contract errors (REQ-2.4–2.6, 3.5, 4.1–4.
       expect.objectContaining({
         code: 'QUANTITY_SIGN_CONTRADICTION',
         rowNumber: 2,
-        tradrField: 'quantity',
+        journalField: 'quantity',
       }),
     );
   });

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-import type { WidgetPlacement } from '@tradr/shared';
+import type { WidgetPlacement } from '@jurnal-zitn/shared';
 
 import { EmptyState } from '@/components/EmptyState';
 import { Button } from '@/components/ui/button';
@@ -11,6 +11,7 @@ import PerformanceBarChart from '@/features/performance/components/PerformanceBa
 import { usePresetPerformance } from '@/features/performance/hooks/usePresetPerformance';
 import { useTimeframeSelection } from '@/features/performance/hooks/useTimeframeSelection';
 import { type PerformancePreset } from '@/features/performance/utils/derivePresetRange';
+import { useT } from '@/hooks/useLocale';
 import { useUserTimezone } from '@/hooks/useUserTimezone';
 
 import { widgetRegistry } from './registry';
@@ -62,6 +63,7 @@ function PerformanceChartWidget({ placement, onUpdateConfig }: PerformanceChartW
     }
   }, [parseSucceeded, onUpdateConfig]);
 
+  const t = useT();
   const { data: displayCurrencyData } = useDisplayCurrencyQuery();
   const displayCurrency = displayCurrencyData?.currency ?? null;
 
@@ -95,10 +97,10 @@ function PerformanceChartWidget({ placement, onUpdateConfig }: PerformanceChartW
   }
 
   if (isError) {
-    const message = error instanceof Error ? error.message : 'Failed to load performance chart';
+    const message = error instanceof Error ? error.message : t('w.perf.failed');
     return (
       <EmptyState
-        title="Couldn't load performance chart"
+        title={t('w.perf.errorTitle')}
         description={message}
         action={
           <Button
@@ -109,7 +111,7 @@ function PerformanceChartWidget({ placement, onUpdateConfig }: PerformanceChartW
               void refetch();
             }}
           >
-            Retry
+            {t('common.retry')}
           </Button>
         }
       />
@@ -117,7 +119,7 @@ function PerformanceChartWidget({ placement, onUpdateConfig }: PerformanceChartW
   }
 
   if (currencyData == null) {
-    return <EmptyState title="Close a position in this currency to see your chart." />;
+    return <EmptyState title={t('w.perf.empty')} />;
   }
 
   // `h-full` + a `flex-1` chart: the notice and the timeframe buttons take the

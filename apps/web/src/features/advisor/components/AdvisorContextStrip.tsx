@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 
-import type { ProviderId } from '@tradr/shared';
+import type { ProviderId } from '@jurnal-zitn/shared';
 
 import { useTradeDataConsent } from '../hooks/useTradeDataConsent';
 

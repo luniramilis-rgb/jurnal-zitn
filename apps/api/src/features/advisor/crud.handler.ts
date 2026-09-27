@@ -13,8 +13,8 @@
 
 import type { Context } from 'hono';
 
-import { ConversationRenameSchema, PersonaInputSchema } from '@tradr/shared';
-import type { ProviderId, ProviderModel } from '@tradr/shared';
+import { ConversationRenameSchema, PersonaInputSchema } from '@jurnal-zitn/shared';
+import type { ProviderId, ProviderModel } from '@jurnal-zitn/shared';
 
 import { decrypt, EncryptionError } from '@/lib/encryption';
 import { ValidationError } from '@/lib/errors';

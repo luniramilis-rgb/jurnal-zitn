@@ -6,7 +6,7 @@ import type {
   ExchangeRate,
   PreviewRateChangeInput,
   PreviewRateChangeResponse,
-} from '@tradr/shared/schemas/accounting';
+} from '@jurnal-zitn/shared/schemas/accounting';
 
 import { api } from '@/lib/api';
 

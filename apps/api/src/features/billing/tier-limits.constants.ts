@@ -1,4 +1,4 @@
-import type { ProviderId, Tier, TierLimits } from '@tradr/shared';
+import type { ProviderId, Tier, TierLimits } from '@jurnal-zitn/shared';
 
 import { currentPeriodKeyUtc } from '@/features/admin/gating.query';
 import { config } from '@/lib/config';

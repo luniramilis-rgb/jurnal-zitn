@@ -3,19 +3,19 @@ import { useEffect } from 'react';
 import { type Resolver, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-import { CURRENCY_CODES } from '@tradr/shared/constants/currencies';
+import { CURRENCY_CODES } from '@jurnal-zitn/shared/constants/currencies';
 import {
   EXPENSE_CATEGORIES,
   EXPENSE_CATEGORY_LABELS,
   type ExpenseCategory,
-} from '@tradr/shared/constants/expense-categories';
+} from '@jurnal-zitn/shared/constants/expense-categories';
 import {
   type CreateExpenseInput,
   CreateExpenseInputSchema,
   type Expense,
   type UpdateExpenseInput,
   UpdateExpenseInputSchema,
-} from '@tradr/shared/schemas/expense';
+} from '@jurnal-zitn/shared/schemas/expense';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -37,6 +37,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useCreateExpense, useUpdateExpense } from '@/features/expenses/hooks/useExpenses';
+import { useT } from '@/hooks/useLocale';
 
 type Mode = 'create' | 'edit';
 
@@ -91,6 +92,7 @@ export function ExpenseFormDialog({
   onOpenChange,
   initialExpense,
 }: ExpenseFormDialogProps) {
+  const t = useT();
   const createExpense = useCreateExpense();
   const updateExpense = useUpdateExpense();
 
@@ -179,7 +181,9 @@ export function ExpenseFormDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{mode === 'create' ? 'Add expense' : 'Edit expense'}</DialogTitle>
+          <DialogTitle>
+            {mode === 'create' ? t('exp.action.add') : t('exp.form.titleEdit')}
+          </DialogTitle>
           <DialogDescription>
             {mode === 'create'
               ? 'Record a deductible expense for your tax summary.'
@@ -189,7 +193,7 @@ export function ExpenseFormDialog({
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="expense-category">Category</Label>
+            <Label htmlFor="expense-category">{t('exp.field.category')}</Label>
             <Select
               value={category}
               onValueChange={(val) => form.setValue('category', val as ExpenseCategory)}
@@ -211,10 +215,10 @@ export function ExpenseFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="expense-description">Description</Label>
+            <Label htmlFor="expense-description">{t('exp.field.description')}</Label>
             <Input
               id="expense-description"
-              placeholder="e.g., TradingView Pro subscription"
+              placeholder={t('exp.field.descriptionPlaceholder')}
               {...form.register('description')}
             />
             {form.formState.errors.description && (
@@ -226,11 +230,11 @@ export function ExpenseFormDialog({
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div className="space-y-2">
-              <Label htmlFor="expense-amount">Amount</Label>
+              <Label htmlFor="expense-amount">{t('exp.field.amount')}</Label>
               <Input
                 id="expense-amount"
                 inputMode="decimal"
-                placeholder="e.g., 29.99"
+                placeholder={t('exp.field.amountPlaceholder')}
                 {...form.register('amount')}
               />
               {form.formState.errors.amount && (
@@ -238,7 +242,7 @@ export function ExpenseFormDialog({
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="expense-currency">Currency</Label>
+              <Label htmlFor="expense-currency">{t('exp.field.currency')}</Label>
               <Select value={currency} onValueChange={(val) => form.setValue('currency', val)}>
                 <SelectTrigger id="expense-currency" className="cursor-pointer">
                   <SelectValue />
@@ -258,7 +262,7 @@ export function ExpenseFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="expense-occurredAt">Date</Label>
+            <Label htmlFor="expense-occurredAt">{t('pos.col.date')}</Label>
             <Input id="expense-occurredAt" type="date" {...form.register('occurredAt')} />
             {form.formState.errors.occurredAt && (
               <p className="text-sm text-destructive">{form.formState.errors.occurredAt.message}</p>
@@ -266,11 +270,11 @@ export function ExpenseFormDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="expense-notes">Notes (optional)</Label>
+            <Label htmlFor="expense-notes">{t('exp.field.notesOptional')}</Label>
             <Textarea
               id="expense-notes"
               rows={3}
-              placeholder="Additional context..."
+              placeholder={t('exp.field.notesPlaceholder')}
               {...form.register('notes')}
             />
             {form.formState.errors.notes && (
@@ -286,10 +290,14 @@ export function ExpenseFormDialog({
               onClick={() => onOpenChange(false)}
               disabled={isPending}
             >
-              Cancel
+              {t('action.cancel')}
             </Button>
             <Button type="submit" className="cursor-pointer" disabled={isPending}>
-              {isPending ? 'Saving...' : mode === 'create' ? 'Add expense' : 'Save changes'}
+              {isPending
+                ? t('pos.fill.saving')
+                : mode === 'create'
+                  ? t('exp.action.add')
+                  : t('exp.form.save')}
             </Button>
           </DialogFooter>
         </form>

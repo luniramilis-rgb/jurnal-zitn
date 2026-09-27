@@ -3,7 +3,7 @@ import type { Context } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { createMiddleware } from 'hono/factory';
 
-import { BODY_LIMIT_BYTES, PutDashboardLayoutRequestSchema, type Theme } from '@tradr/shared';
+import { BODY_LIMIT_BYTES, PutDashboardLayoutRequestSchema, type Theme } from '@jurnal-zitn/shared';
 
 import { themeCookieAttributes } from '@/lib/cookie-policy';
 import { ValidationError } from '@/lib/errors';
@@ -55,7 +55,7 @@ const app = new Hono<AuthEnv>();
 app.use(authMiddleware);
 
 export function buildThemeCookie(value: Theme): string {
-  return `tradr_theme=${value}; ${themeCookieAttributes()}`;
+  return `jurnal_zitn_theme=${value}; ${themeCookieAttributes()}`;
 }
 
 /**
@@ -144,7 +144,7 @@ const consumeBodyOrEmit413 = createMiddleware(async (c, next) => {
  *       are validated as a set: at most one widget of each type, no two
  *       overlapping, none extending past the 12-column grid, and none below its
  *       type's minimum size. When `theme` is sent the response also sets the
- *       `tradr_theme` cookie so the next page load paints without a flash.
+ *       `jurnal_zitn_theme` cookie so the next page load paints without a flash.
  *     tags: [Dashboard]
  *     requestBody:
  *       required: true
@@ -212,7 +212,7 @@ app.get('/theme', async (c) => {
  *   post:
  *     summary: Re-issue the theme cookie.
  *     description: >
- *       Authed. Sets `tradr_theme` from the stored preference without changing
+ *       Authed. Sets `jurnal_zitn_theme` from the stored preference without changing
  *       it. Used to restore the cookie on a new device or after it is cleared,
  *       so the first paint matches the saved theme. The request body must be
  *       empty.

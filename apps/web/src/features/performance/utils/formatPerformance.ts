@@ -1,6 +1,6 @@
 import { formatInTimeZone } from 'date-fns-tz';
 
-import type { Granularity } from '@tradr/shared';
+import type { Granularity } from '@jurnal-zitn/shared';
 
 import {
   EM_DASH,

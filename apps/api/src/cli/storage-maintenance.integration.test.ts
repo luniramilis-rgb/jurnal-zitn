@@ -2,7 +2,7 @@
  * Integration tests for the storage-maintenance CLI service against a real
  * Postgres (hosted-platform Task 13; design §Component 9; REQ-3.1/3.2/3.3/3.4).
  *
- * Follows the repo's scratch-DB CLI pattern (`tradr.integration.test.ts`): a
+ * Follows the repo's scratch-DB CLI pattern (`jurnal-zitn.integration.test.ts`): a
  * dedicated scratch database with the standard migrations applied and its own
  * `max:1` connection, rather than the per-test transaction-rollback harness —
  * `migrateToInline`/`runGc` open their own connections and do per-row work, and
@@ -34,7 +34,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_FOLDER = path.resolve(__dirname, '../db/migrations');
 
 const BASE_URL =
-  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/tradr_test';
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test';
 const ADMIN_URL = BASE_URL.replace(/\/[^/]+$/, '/postgres');
 const BASE_NO_DB = BASE_URL.replace(/\/[^/]+$/, '');
 
@@ -192,7 +192,7 @@ async function partOf(sql: postgres.Sql, imageId: string): Promise<Part> {
 // -----------------------------------------------------------------------------------
 
 describe('migrateToInline (REQ-3.1/3.3/3.4 — idempotent, resumable, report-and-continue)', () => {
-  const DB = `tradr_test_storage_migrate_${Date.now()}`;
+  const DB = `jurnal_zitn_test_storage_migrate_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -276,7 +276,7 @@ describe('migrateToInline (REQ-3.1/3.3/3.4 — idempotent, resumable, report-and
 });
 
 describe('runGc (REQ-3.2 — age-guarded sweep protects put-before-commit)', () => {
-  const DB = `tradr_test_storage_gc_${Date.now()}`;
+  const DB = `jurnal_zitn_test_storage_gc_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -333,7 +333,7 @@ describe('runGc (REQ-3.2 — age-guarded sweep protects put-before-commit)', () 
 });
 
 describe('migrateToInline — position images (REQ-6.2, D10)', () => {
-  const DB = `tradr_test_storage_pmigrate_${Date.now()}`;
+  const DB = `jurnal_zitn_test_storage_pmigrate_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -413,7 +413,7 @@ describe('migrateToInline — position images (REQ-6.2, D10)', () => {
 });
 
 describe('runGc — position images (REQ-6.1, D10)', () => {
-  const DB = `tradr_test_storage_pgc_${Date.now()}`;
+  const DB = `jurnal_zitn_test_storage_pgc_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -494,7 +494,7 @@ async function tombstoneOutcome(sql: postgres.Sql, userId: string): Promise<stri
 }
 
 describe('runGc — completes unfinished tombstones (design C9, D13; Req 5.3)', () => {
-  const DB = `tradr_test_storage_tombstone_${Date.now()}`;
+  const DB = `jurnal_zitn_test_storage_tombstone_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {

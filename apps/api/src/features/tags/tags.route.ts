@@ -1,7 +1,11 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
 
-import { CreateTagSchema, StarterAnswerSchema, UpdateTagSchema } from '@tradr/shared/schemas/tag';
+import {
+  CreateTagSchema,
+  StarterAnswerSchema,
+  UpdateTagSchema,
+} from '@jurnal-zitn/shared/schemas/tag';
 
 import { db } from '@/db';
 import { validate } from '@/lib/validation';

@@ -1,6 +1,6 @@
 import { eq, sql } from 'drizzle-orm';
 
-import type { Theme, WidgetPlacement } from '@tradr/shared';
+import type { Theme, WidgetPlacement } from '@jurnal-zitn/shared';
 
 import type { Database, Transaction } from '@/db';
 import { dashboardLayouts, users } from '@/db/schema';

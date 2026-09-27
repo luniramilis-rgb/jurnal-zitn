@@ -1,6 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useT } from '@/hooks/useLocale';
 
 type AccountingTab = 'expenses' | 'fee-rollup' | 'tax-summary';
 
@@ -9,6 +10,7 @@ interface AccountingSubNavProps {
 }
 
 export function AccountingSubNav({ activeTab }: AccountingSubNavProps) {
+  const t = useT();
   const navigate = useNavigate();
 
   return (
@@ -20,13 +22,13 @@ export function AccountingSubNav({ activeTab }: AccountingSubNavProps) {
     >
       <TabsList>
         <TabsTrigger value="expenses" className="cursor-pointer">
-          Expenses
+          {t('acc.nav.expenses')}
         </TabsTrigger>
         <TabsTrigger value="fee-rollup" className="cursor-pointer">
-          Fee Rollup
+          {t('acc.nav.feeRollup')}
         </TabsTrigger>
         <TabsTrigger value="tax-summary" className="cursor-pointer">
-          Tax Summary
+          {t('tax.page.title')}
         </TabsTrigger>
       </TabsList>
     </Tabs>

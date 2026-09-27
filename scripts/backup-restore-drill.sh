@@ -8,7 +8,7 @@
 # object.
 #
 # STAGING ONLY — NEVER PRODUCTION (REQ-10.1). The drill NEVER restores over an
-# existing database: it CREATES a throwaway DB named `tradr_restore_drill_<ts>` on
+# existing database: it CREATES a throwaway DB named `jurnal_zitn_restore_drill_<ts>` on
 # the staging server, restores into that, and DROPs it afterwards. It also refuses
 # to run when the staging target resolves to the same host+port+database as the
 # source. These two guards make it structurally impossible to overwrite production.
@@ -23,7 +23,7 @@
 #
 # ---------------------------------------------------------------------------
 # Usage (manual / CI):
-#   SOURCE_DATABASE_URL=postgres://user:pass@src-host:5432/tradr \
+#   SOURCE_DATABASE_URL=postgres://user:pass@src-host:5432/jurnal-zitn \
 #   STAGING_ADMIN_URL=postgres://user:pass@staging-host:5432/postgres \
 #   scripts/backup-restore-drill.sh
 #
@@ -60,10 +60,10 @@ if [[ "$SRC_TARGET" == "$STAGING_TARGET" ]]; then
 fi
 
 # --- Fresh throwaway staging database ---------------------------------------
-STAGING_DB="tradr_restore_drill_$(date +%s)_$$"
+STAGING_DB="jurnal_zitn_restore_drill_$(date +%s)_$$"
 # Guard: we only ever create/drop a name with this prefix — defence in depth.
 case "$STAGING_DB" in
-  tradr_restore_drill_*) : ;;
+  jurnal_zitn_restore_drill_*) : ;;
   *) echo "REFUSING: generated staging DB name '$STAGING_DB' is not a drill DB." >&2; exit 2 ;;
 esac
 
@@ -71,8 +71,8 @@ esac
 # STAGING_ADMIN_URL = scheme://creds@host:port/admindb?opts
 RESTORE_DATABASE_URL="$(printf '%s' "$STAGING_ADMIN_URL" | sed -E "s#(^[a-zA-Z]+://[^/]+/)[^?]*#\1$STAGING_DB#")"
 
-DUMP_FILE="$(mktemp -t tradr-drill-XXXXXX.dump)"
-BASELINE_FILE="$(mktemp -t tradr-drill-baseline-XXXXXX.json)"
+DUMP_FILE="$(mktemp -t jurnal-zitn-drill-XXXXXX.dump)"
+BASELINE_FILE="$(mktemp -t jurnal-zitn-drill-baseline-XXXXXX.json)"
 
 cleanup() {
   rm -f "$DUMP_FILE" "$BASELINE_FILE"

@@ -6,7 +6,7 @@ import {
   type BreakdownQueryInput,
   type BreakdownRow,
   type PerformanceQueryInput,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { accounts, fills, positionTags, tags, users } from '@/db/schema';

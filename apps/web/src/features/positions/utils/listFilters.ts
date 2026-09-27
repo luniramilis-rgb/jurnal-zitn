@@ -1,4 +1,4 @@
-import { parseTagIdList } from '@tradr/shared/schemas/tag';
+import { parseTagIdList } from '@jurnal-zitn/shared/schemas/tag';
 
 /**
  * Build the positions-list filter object from raw URL search values.

@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
-import type { SeriesBucket } from '@tradr/shared';
+import type { SeriesBucket } from '@jurnal-zitn/shared';
 
 import { buildCalendarModel, type CalendarDay, type CalendarModel } from './buildCalendarModel';
 import { sumDecimalStrings } from './decimalSum';

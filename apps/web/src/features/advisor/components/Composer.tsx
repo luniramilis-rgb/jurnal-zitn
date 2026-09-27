@@ -23,9 +23,9 @@ import { Loader2, Paperclip, Send, X } from 'lucide-react';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import type { TierState } from '@tradr/shared';
-import { MAX_IMAGE_BYTES_DEFAULT } from '@tradr/shared/schemas/advisor';
-import type { Persona, ProviderId } from '@tradr/shared/schemas/advisor';
+import type { TierState } from '@jurnal-zitn/shared';
+import { MAX_IMAGE_BYTES_DEFAULT } from '@jurnal-zitn/shared/schemas/advisor';
+import type { Persona, ProviderId } from '@jurnal-zitn/shared/schemas/advisor';
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -129,7 +129,7 @@ export interface ComposerProps {
 // (hosted-platform REQ-4.6). The server schema stays authoritative.
 function advisorImageMaxBytes(): number {
   const configured =
-    typeof window !== 'undefined' ? window.__TRADR_CONFIG__?.advisorImageMaxBytes : undefined;
+    typeof window !== 'undefined' ? window.__JURNAL_ZITN_CONFIG__?.advisorImageMaxBytes : undefined;
   return typeof configured === 'number' && configured > 0 ? configured : MAX_IMAGE_BYTES_DEFAULT;
 }
 
@@ -467,7 +467,7 @@ export function Composer({
 
       <Textarea
         aria-label="Message"
-        placeholder="Message the Tradr Advisor…"
+        placeholder="Message the Jurnal ZITN Advisor…"
         value={text}
         disabled={disabled || hardCapped}
         onChange={(e) => setText(e.target.value)}

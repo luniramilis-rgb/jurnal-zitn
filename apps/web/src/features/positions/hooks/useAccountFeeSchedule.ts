@@ -1,4 +1,4 @@
-import type { FeeSchedule } from '@tradr/shared';
+import type { FeeSchedule } from '@jurnal-zitn/shared';
 
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { useBrokerages } from '@/features/brokerages/hooks/useBrokerages';

@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js';
 
-import { getCurrencyMinorUnits, parseOccSymbol, type Tag } from '@tradr/shared';
-import { classifyPosition } from '@tradr/shared/lib/performance';
+import { getCurrencyMinorUnits, parseOccSymbol, type Tag } from '@jurnal-zitn/shared';
+import { classifyPosition } from '@jurnal-zitn/shared/lib/performance';
 
 import type { Database, Transaction } from '@/db';
 import {

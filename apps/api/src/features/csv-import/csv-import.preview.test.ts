@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 
-import { CSV_IMPORT_PRESETS } from '@tradr/shared';
-import { readCsvImportSample } from '@tradr/shared/node/csv-import-samples';
+import { CSV_IMPORT_PRESETS } from '@jurnal-zitn/shared';
+import { readCsvImportSample } from '@jurnal-zitn/shared/node/csv-import-samples';
 
 import app from '@/app';
 import { config } from '@/lib/config';
@@ -480,7 +480,7 @@ describe('POST /api/csv-import/preview — deceptive Content-Length (REQ-1.6)', 
 
 // ---------------------------------------------------------------------------
 // Option path — route-level integration cases (design Testing Strategy →
-// Integration, preview-route half). Assertions are on code/rowNumber/tradrField/
+// Integration, preview-route half). Assertions are on code/rowNumber/journalField/
 // csvColumn and HTTP status, never a byte-exact message string.
 // ---------------------------------------------------------------------------
 
@@ -558,7 +558,7 @@ describe('POST /api/csv-import/preview — option integration (§32)', () => {
       expect.objectContaining({
         code: 'CONTRACT_FORM_MISSING',
         rowNumber: 2,
-        tradrField: 'symbol',
+        journalField: 'symbol',
         csvColumn: 'Symbol',
       }),
     );
@@ -609,7 +609,7 @@ describe('POST /api/csv-import/preview — option integration (§32)', () => {
       expect.objectContaining({
         code: 'MAPPING_COLUMN_ABSENT',
         rowNumber: 0,
-        tradrField: 'multiplier',
+        journalField: 'multiplier',
         csvColumn: 'Multiplier',
       }),
     );
@@ -636,7 +636,7 @@ describe('POST /api/csv-import/preview — option integration (§32)', () => {
       expect.objectContaining({
         code: 'ROW_MISSING_REQUIRED_FIELD',
         rowNumber: 2,
-        tradrField: 'symbol',
+        journalField: 'symbol',
         csvColumn: 'Symbol',
       }),
     );

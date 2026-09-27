@@ -1,6 +1,6 @@
 # Release runbook
 
-How a version of Tradr gets built and published. Covers the GitHub Actions
+How a version of Jurnal ZITN gets built and published. Covers the GitHub Actions
 workflows, the versioning model, and the assumptions an operator must know. For
 what a running instance connects to, see [External services](../external-services.md).
 
@@ -21,9 +21,9 @@ a private ops repo). Nothing here reaches a live environment on its own.
 The **git tag `vX.Y.Z` is the single source of version truth**. Everything
 else derives from it at build time:
 
-- GHCR images `ghcr.io/<owner>/tradr-api` and `tradr-web`, tagged `X.Y.Z` and
+- GHCR images `ghcr.io/<owner>/jurnal-zitn-api` and `jurnal-zitn-web`, tagged `X.Y.Z` and
   `latest`.
-- The `tradr-web-dist-vX.Y.Z.tar.gz` release asset (the built SPA, consumed by
+- The `jurnal-zitn-web-dist-vX.Y.Z.tar.gz` release asset (the built SPA, consumed by
   the downstream hosted deploy).
 - The GitHub Release itself, whose feed the in-app changelog reads
   (`CHANGELOG_GITHUB_REPO`).

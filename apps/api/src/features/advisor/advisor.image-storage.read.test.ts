@@ -28,7 +28,7 @@
  */
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { CanonicalMessage, StoredContentPart } from '@tradr/shared';
+import type { CanonicalMessage, StoredContentPart } from '@jurnal-zitn/shared';
 
 import { logger } from '@/lib/logger';
 

@@ -1,7 +1,7 @@
 import { Minus, MoreHorizontal, Plus, RotateCcw, Trash2, Play } from 'lucide-react';
 import { useState } from 'react';
 
-import type { PositionListItem } from '@tradr/shared';
+import type { PositionListItem } from '@jurnal-zitn/shared';
 
 import {
   AlertDialog,
@@ -21,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useT } from '@/hooks/useLocale';
 
 import { useDeletePosition, useOpenPosition, useReopenPosition } from '../hooks/usePosition';
 import { isOpenedTodayInAccountTz } from '../utils/reopenWindow';
@@ -49,6 +50,7 @@ interface Props {
  * symbol link already cover it.
  */
 export function PositionRowActions({ position }: Props) {
+  const t = useT();
   const deletePosition = useDeletePosition(position.id);
   const openPosition = useOpenPosition(position.id);
   const reopenPosition = useReopenPosition(position.id);
@@ -93,7 +95,7 @@ export function PositionRowActions({ position }: Props) {
               variant="ghost"
               size="icon-sm"
               className="cursor-pointer text-muted-foreground"
-              aria-label={`Actions for ${position.symbol}`}
+              aria-label={t('pos.actions.forSymbol', { symbol: position.symbol })}
               disabled={isPending}
             >
               <MoreHorizontal className="h-4 w-4" aria-hidden="true" />
@@ -105,7 +107,7 @@ export function PositionRowActions({ position }: Props) {
             {isOpen && (
               <DropdownMenuItem className="cursor-pointer" onSelect={() => setFillType('entry')}>
                 <Plus className="h-4 w-4" aria-hidden="true" />
-                Add to position
+                {t('pos.action.addTo')}
               </DropdownMenuItem>
             )}
             {isOpen && (
@@ -115,7 +117,7 @@ export function PositionRowActions({ position }: Props) {
                 onSelect={() => setFillType('exit')}
               >
                 <Minus className="h-4 w-4" aria-hidden="true" />
-                {openUnits <= 0 ? 'Reduce position (nothing open)' : 'Reduce position'}
+                {openUnits <= 0 ? t('pos.action.reduceNone') : t('pos.action.reduce')}
               </DropdownMenuItem>
             )}
             {isDraft && (
@@ -132,7 +134,7 @@ export function PositionRowActions({ position }: Props) {
                 }}
               >
                 <Play className="h-4 w-4" aria-hidden="true" />
-                Open position
+                {t('pos.action.open')}
               </DropdownMenuItem>
             )}
             {canReopen && (
@@ -141,7 +143,7 @@ export function PositionRowActions({ position }: Props) {
                 onSelect={() => reopenPosition.mutate({})}
               >
                 <RotateCcw className="h-4 w-4" aria-hidden="true" />
-                Reopen
+                {t('pos.action.reopen')}
               </DropdownMenuItem>
             )}
             <DropdownMenuSeparator />
@@ -151,7 +153,7 @@ export function PositionRowActions({ position }: Props) {
               onSelect={() => setDeleteOpen(true)}
             >
               <Trash2 className="h-4 w-4" aria-hidden="true" />
-              Delete
+              {t('pos.action.delete')}
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -189,18 +191,18 @@ export function PositionRowActions({ position }: Props) {
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete position</AlertDialogTitle>
+            <AlertDialogTitle>{t('pos.delete.title')}</AlertDialogTitle>
             {/* R4 amendment: the dialog SHALL name the position. */}
             <AlertDialogDescription>
               {isClosed
-                ? `Deleting the closed position "${position.symbol}" removes its realized P&L from the account balance and from tax and performance summaries — including prior tax years — and may change other positions' wash-sale classification. This cannot be undone.`
-                : `Are you sure you want to delete "${position.symbol}"? This cannot be undone.`}
+                ? t('pos.delete.closedBody', { symbol: position.symbol })
+                : t('pos.delete.body', { symbol: position.symbol })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
             <AlertDialogAction className="cursor-pointer" onClick={() => deletePosition.mutate()}>
-              Delete
+              {t('pos.action.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

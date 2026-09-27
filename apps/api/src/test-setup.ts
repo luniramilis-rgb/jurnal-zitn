@@ -28,7 +28,7 @@ let sql: ReturnType<typeof postgres>;
 
 beforeAll(async () => {
   const databaseUrl =
-    process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/tradr_test';
+    process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test';
   sql = postgres(databaseUrl, { max: 1 });
 
   const migrationDb = drizzle(sql, { schema });

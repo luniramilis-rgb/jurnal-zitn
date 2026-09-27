@@ -50,6 +50,11 @@ export const feeSchedules = pgTable('fee_schedules', {
   stockMaxPerFill: numeric('stock_max_per_fill', { precision: 18, scale: 8 })
     .notNull()
     .default('0'),
+  // IDX (ZITN-TECH-017 Fase 2): komisi persentase per sisi; > 0 menggantikan per-saham.
+  stockPercentBuy: numeric('stock_percent_buy', { precision: 18, scale: 8 }).notNull().default('0'),
+  stockPercentSell: numeric('stock_percent_sell', { precision: 18, scale: 8 })
+    .notNull()
+    .default('0'),
   optionsPerContractCommission: numeric('options_per_contract_commission', {
     precision: 18,
     scale: 8,

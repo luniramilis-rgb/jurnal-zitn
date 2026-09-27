@@ -26,6 +26,7 @@ import { Button } from '@/components/ui/button';
 import { hasNewReleases, useChangelogReleases } from '@/features/changelog/hooks/useChangelog';
 import { useSidebarPin } from '@/features/onboarding/hooks/useSidebarPin';
 import { useAuth } from '@/hooks/useAuth';
+import { useT } from '@/hooks/useLocale';
 import { useAdvisorEnabled } from '@/hooks/useRegistrationEnabled';
 import { docsUrl } from '@/lib/docs';
 import { cn } from '@/lib/utils';
@@ -107,6 +108,7 @@ export function Sidebar() {
   const changelogReleases = useChangelogReleases();
   const { pinned, setPinned } = useSidebarPin();
   const drawerOpen = useDrawerStore((s) => s.isOpen);
+  const t = useT();
 
   // Auto-collapse while the drawer is open; the pin survives and the labeled
   // state comes back on its own when the drawer closes.
@@ -114,7 +116,7 @@ export function Sidebar() {
 
   const changelogBadge = hasNewReleases(changelogReleases.data) ? (
     <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary">
-      <span className="sr-only">New updates available</span>
+      <span className="sr-only">{t('nav.newUpdates')}</span>
     </span>
   ) : undefined;
 
@@ -142,7 +144,7 @@ export function Sidebar() {
             <span aria-hidden="true" className="text-xs text-primary">
               ▴
             </span>
-            Tradr
+            Jurnal ZITN
           </span>
         ) : (
           <span aria-hidden="true" className="text-base text-primary">
@@ -178,112 +180,112 @@ export function Sidebar() {
       >
         <Link
           to="/dashboard"
-          aria-label="Dashboard"
-          title={expanded ? undefined : 'Dashboard'}
+          aria-label={t('nav.dashboard')}
+          title={expanded ? undefined : t('nav.dashboard')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Dashboard" Icon={LayoutDashboard} />
+          <ItemContent expanded={expanded} label={t('nav.dashboard')} Icon={LayoutDashboard} />
         </Link>
         {advisorEnabled && (
           <Link
             to="/advisor"
-            aria-label="Advisor"
-            title={expanded ? undefined : 'Advisor'}
+            aria-label={t('nav.advisor')}
+            title={expanded ? undefined : t('nav.advisor')}
             className={itemClass(expanded)}
           >
-            <ItemContent expanded={expanded} label="Advisor" Icon={Sparkles} />
+            <ItemContent expanded={expanded} label={t('nav.advisor')} Icon={Sparkles} />
           </Link>
         )}
 
-        <GroupLabel expanded={expanded} label="Trade" />
+        <GroupLabel expanded={expanded} label={t('nav.group.trade')} />
         <Link
           to="/positions"
-          aria-label="Positions"
-          title={expanded ? undefined : 'Positions'}
+          aria-label={t('nav.positions')}
+          title={expanded ? undefined : t('nav.positions')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Positions" Icon={TrendingUp} />
+          <ItemContent expanded={expanded} label={t('nav.positions')} Icon={TrendingUp} />
         </Link>
         <Link
           to="/calculator"
-          aria-label="Calculator"
-          title={expanded ? undefined : 'Calculator'}
+          aria-label={t('nav.calculator')}
+          title={expanded ? undefined : t('nav.calculator')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Calculator" Icon={Calculator} />
+          <ItemContent expanded={expanded} label={t('nav.calculator')} Icon={Calculator} />
         </Link>
         <Link
           to="/options"
-          aria-label="Options"
-          title={expanded ? undefined : 'Options'}
+          aria-label={t('nav.options')}
+          title={expanded ? undefined : t('nav.options')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Options" Icon={List} />
+          <ItemContent expanded={expanded} label={t('nav.options')} Icon={List} />
         </Link>
         <Link
           to="/import"
-          aria-label="Import"
-          title={expanded ? undefined : 'Import'}
+          aria-label={t('nav.import')}
+          title={expanded ? undefined : t('nav.import')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Import" Icon={ArrowDownToLine} />
+          <ItemContent expanded={expanded} label={t('nav.import')} Icon={ArrowDownToLine} />
         </Link>
 
-        <GroupLabel expanded={expanded} label="Review" />
+        <GroupLabel expanded={expanded} label={t('nav.group.review')} />
         {/* A plain link: the Performance route derives its own monthly-preset
             defaults at the boundary now, so the nav no longer seeds a search
             window or sits inert while the stored timezone loads. */}
         <Link
           to="/performance"
-          aria-label="Performance"
-          title={expanded ? undefined : 'Performance'}
+          aria-label={t('nav.performance')}
+          title={expanded ? undefined : t('nav.performance')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Performance" Icon={BarChart3} />
+          <ItemContent expanded={expanded} label={t('nav.performance')} Icon={BarChart3} />
         </Link>
         <Link
           to="/accounting/expenses"
-          aria-label="Accounting"
-          title={expanded ? undefined : 'Accounting'}
+          aria-label={t('nav.accounting')}
+          title={expanded ? undefined : t('nav.accounting')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Accounting" Icon={Receipt} />
+          <ItemContent expanded={expanded} label={t('nav.accounting')} Icon={Receipt} />
         </Link>
         <Link
           to="/accounts"
-          aria-label="Accounts"
-          title={expanded ? undefined : 'Accounts'}
+          aria-label={t('nav.accounts')}
+          title={expanded ? undefined : t('nav.accounts')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Accounts" Icon={CreditCard} />
+          <ItemContent expanded={expanded} label={t('nav.accounts')} Icon={CreditCard} />
         </Link>
         <Link
           to="/brokerages"
-          aria-label="Brokerages"
-          title={expanded ? undefined : 'Brokerages'}
+          aria-label={t('nav.brokerages')}
+          title={expanded ? undefined : t('nav.brokerages')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Brokerages" Icon={Landmark} />
+          <ItemContent expanded={expanded} label={t('nav.brokerages')} Icon={Landmark} />
         </Link>
 
-        <GroupLabel expanded={expanded} label="System" />
+        <GroupLabel expanded={expanded} label={t('nav.group.system')} />
         <Link
           to="/settings"
-          aria-label="Settings"
-          title={expanded ? undefined : 'Settings'}
+          aria-label={t('nav.settings')}
+          title={expanded ? undefined : t('nav.settings')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Settings" Icon={Settings} />
+          <ItemContent expanded={expanded} label={t('nav.settings')} Icon={Settings} />
         </Link>
         <Link
           to="/changelog"
-          aria-label="Changelog"
-          title={expanded ? undefined : 'Changelog'}
+          aria-label={t('nav.changelog')}
+          title={expanded ? undefined : t('nav.changelog')}
           className={itemClass(expanded)}
         >
           <ItemContent
             expanded={expanded}
-            label="Changelog"
+            label={t('nav.changelog')}
             Icon={Megaphone}
             badge={changelogBadge}
           />
@@ -295,19 +297,19 @@ export function Sidebar() {
           href={docsUrl('home')}
           target="_blank"
           rel="noreferrer"
-          aria-label="Docs"
+          aria-label={t('nav.docs')}
           className={itemClass(expanded)}
         >
-          <ItemContent expanded={expanded} label="Docs" Icon={BookOpen} />
+          <ItemContent expanded={expanded} label={t('nav.docs')} Icon={BookOpen} />
         </a>
         {user?.isAdmin && (
           <Link
             to="/admin"
-            aria-label="Admin"
-            title={expanded ? undefined : 'Admin'}
+            aria-label={t('nav.admin')}
+            title={expanded ? undefined : t('nav.admin')}
             className={itemClass(expanded)}
           >
-            <ItemContent expanded={expanded} label="Admin" Icon={Shield} />
+            <ItemContent expanded={expanded} label={t('nav.admin')} Icon={Shield} />
           </Link>
         )}
       </nav>
@@ -330,9 +332,9 @@ export function Sidebar() {
             size={expanded ? 'sm' : 'icon-sm'}
             className="cursor-pointer text-muted-foreground"
             onClick={() => logout.mutate()}
-            aria-label="Log out"
+            aria-label={t('nav.logout')}
           >
-            {expanded ? 'Log out' : <LogOut className="h-4 w-4" aria-hidden="true" />}
+            {expanded ? t('nav.logout') : <LogOut className="h-4 w-4" aria-hidden="true" />}
           </Button>
         </div>
       </div>

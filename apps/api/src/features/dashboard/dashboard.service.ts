@@ -9,7 +9,7 @@ import {
   type PutDashboardLayoutRequest,
   type Theme,
   type WidgetPlacement,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { UnauthorizedError } from '@/lib/errors';

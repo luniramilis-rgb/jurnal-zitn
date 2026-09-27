@@ -1,6 +1,10 @@
 import { Hono } from 'hono';
 
-import { BuyingPowerBasisBodySchema, CalculatorInputSchema, calculateTrade } from '@tradr/shared';
+import {
+  BuyingPowerBasisBodySchema,
+  CalculatorInputSchema,
+  calculateTrade,
+} from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { ValidationError } from '@/lib/errors';

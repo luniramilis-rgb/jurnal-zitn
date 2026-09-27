@@ -3,11 +3,13 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Account } from '@tradr/shared';
+import type { Account } from '@jurnal-zitn/shared';
 
 import type { DashboardTotalResponse } from '@/features/accounting/hooks/useDashboardTotal';
+import { setAppLocale } from '@/lib/locale';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+setAppLocale('en');
 
 // ---------------------------------------------------------------------------
 // Mocks

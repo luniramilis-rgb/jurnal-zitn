@@ -1,4 +1,4 @@
-import { resolveTimezone } from '@tradr/shared';
+import { resolveTimezone } from '@jurnal-zitn/shared';
 
 import { localPartsInTz, localStartOfMonth, localStartOfTomorrow } from './derivePresetRange';
 

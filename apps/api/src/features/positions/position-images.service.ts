@@ -14,7 +14,7 @@ import {
   POSITION_IMAGE_MAX_COUNT,
   type PositionImage,
   type StoredContentPart,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import type { Database } from '@/db';
 import { ImageFormatMismatchError, NotFoundError, PositionImageLimitError } from '@/lib/errors';

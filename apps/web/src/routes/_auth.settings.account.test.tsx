@@ -11,7 +11,9 @@ import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/re
 import { toast } from 'sonner';
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 
-import type { User } from '@tradr/shared';
+import type { User } from '@jurnal-zitn/shared';
+
+import { setAppLocale } from '@/lib/locale';
 
 import { Route as AccountRoute } from './_auth.settings.account';
 
@@ -77,6 +79,8 @@ let resendResponse: () => Response;
 let fetchSpy: MockInstance | null = null;
 
 beforeEach(() => {
+  // Salinan halaman akun dikunci berbahasa Inggris (default produk = id).
+  setAppLocale('en');
   meUser = { id: 'u1', email: 'me@user.dev', isAdmin: false, emailVerified: false };
   resendResponse = () => jsonResponse(200, { success: true });
 
@@ -98,6 +102,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  setAppLocale('id');
   fetchSpy?.mockRestore();
   fetchSpy = null;
 });

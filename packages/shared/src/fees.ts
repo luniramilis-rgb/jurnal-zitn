@@ -4,6 +4,12 @@ export interface FeeScheduleInput {
   stockPerShareCommission: string;
   stockMinPerFill: string;
   stockMaxPerFill: string;
+  /**
+   * Model persentase (IDX, ZITN-TECH-017 Fase 2). Bila > 0, komisi saham = harga × qty × pct/100
+   * (per sisi beli/jual) — menggantikan komisi per-saham. `undefined`/`0` memakai per-saham.
+   */
+  stockPercentBuy?: string;
+  stockPercentSell?: string;
   optionsPerContractCommission: string;
   optionsPerContractExchangeFee: string;
   optionsMinPerFill: string;
@@ -44,7 +50,13 @@ export function calculateFees(fills: FillInput[], feeSchedule: FeeScheduleInput)
       const perShare = new Decimal(feeSchedule.stockPerShareCommission);
       const min = new Decimal(feeSchedule.stockMinPerFill);
       const max = new Decimal(feeSchedule.stockMaxPerFill);
-      const raw = qty.times(perShare);
+      // IDX: fee persentase per sisi bila diisi (> 0); kalau tidak, per-saham (perilaku lama).
+      const pct = new Decimal(
+        (fill.side === 'buy' ? feeSchedule.stockPercentBuy : feeSchedule.stockPercentSell) ?? '0',
+      );
+      const raw = pct.gt(0)
+        ? qty.times(new Decimal(fill.price)).times(pct).div(100)
+        : qty.times(perShare);
       fee = clampFee(raw, min, max, qty);
     } else {
       const perContract = new Decimal(feeSchedule.optionsPerContractCommission);

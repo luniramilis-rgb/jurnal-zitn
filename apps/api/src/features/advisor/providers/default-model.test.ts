@@ -5,7 +5,7 @@
 
 import { describe, expect, it } from 'vitest';
 
-import type { ProviderModel } from '@tradr/shared';
+import type { ProviderModel } from '@jurnal-zitn/shared';
 
 import { selectDefaultClaudeModel } from './claude';
 import { selectDefaultGeminiModel } from './gemini';

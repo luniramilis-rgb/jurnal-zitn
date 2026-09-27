@@ -1,11 +1,12 @@
-import { Skeleton } from '@/components/ui/skeleton';
+﻿import { Skeleton } from '@/components/ui/skeleton';
 import { EM_DASH, moneyDirection } from '@/lib/format';
+import { getAppLocale } from '@/lib/locale';
 import { cn } from '@/lib/utils';
 
 export type NumericKind = 'money' | 'percent' | 'signed' | 'decimal' | 'integer';
 
 export interface NumericProps {
-  /** The figure to render. `null` ⇒ the absent state (em-dash). */
+  /** The figure to render. `null` â‡’ the absent state (em-dash). */
   value: number | string | null;
   /** Formatting family. Defaults to `'decimal'`. Greeks stay on `format6SigFig` and are NOT routed here. */
   kind?: NumericKind;
@@ -63,7 +64,7 @@ function formatBody(
   precision: number,
 ): string {
   if (kind === 'money') {
-    const parts = new Intl.NumberFormat(undefined, {
+    const parts = new Intl.NumberFormat(getAppLocale(), {
       style: 'currency',
       currency: currency ?? 'USD',
       minimumFractionDigits: precision,
@@ -76,7 +77,7 @@ function formatBody(
       .join('');
   }
 
-  const body = new Intl.NumberFormat(undefined, {
+  const body = new Intl.NumberFormat(getAppLocale(), {
     minimumFractionDigits: precision,
     maximumFractionDigits: precision,
   }).format(magnitude);

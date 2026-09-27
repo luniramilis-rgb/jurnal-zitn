@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { CanonicalPart } from '@tradr/shared';
+import type { CanonicalPart } from '@jurnal-zitn/shared';
 
 import { assembleCanonicalMessages } from './assemble';
 

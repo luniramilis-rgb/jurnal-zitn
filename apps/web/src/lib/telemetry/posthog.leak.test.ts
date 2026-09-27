@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-// @vitest-environment-options { "url": "https://app.tradr.io/reset-password?src=email#token=deadbeefcafe1234", "referrer": "https://mail.example.com/inbox/42" }
+// @vitest-environment-options { "url": "https://app.jurnal-zitn.io/reset-password?src=email#token=deadbeefcafe1234", "referrer": "https://mail.example.com/inbox/42" }
 
 // End-to-end proof that no vendor request carries the entry-URL fragment or the
 // full referrer.
@@ -24,8 +24,8 @@ import type { AnyRouter } from '@tanstack/react-router';
 import { beforeAll, describe, expect, it, vi } from 'vitest';
 
 const TOKEN = 'deadbeefcafe1234';
-const OWN_ORIGIN = 'https://app.tradr.io';
-const ENTRY_URL_NO_FRAGMENT = 'https://app.tradr.io/reset-password?src=email';
+const OWN_ORIGIN = 'https://app.jurnal-zitn.io';
+const ENTRY_URL_NO_FRAGMENT = 'https://app.jurnal-zitn.io/reset-password?src=email';
 const REFERRER_PATH = 'mail.example.com/inbox/42';
 const API_HOST = 'https://ph.example.test';
 
@@ -146,7 +146,7 @@ describe('no vendor request carries the reset token or the full referrer', () =>
     expect(window.location.href).toContain(`#token=${TOKEN}`);
     expect(document.referrer).toBe(`https://${REFERRER_PATH}`);
 
-    window.__TRADR_CONFIG__ = {
+    window.__JURNAL_ZITN_CONFIG__ = {
       posthogPublicKey: 'phc_leak_test',
       posthogPublicHost: API_HOST,
     };

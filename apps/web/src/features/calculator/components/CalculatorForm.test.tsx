@@ -12,7 +12,11 @@ import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { getAppLocale, setAppLocale } from '@/lib/locale';
+
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+// Suite default uji = `en`; kalkulator dirender dalam bahasa Inggris (label + format).
+setAppLocale('en');
 
 // ---- Mutable query fixtures (rebound per test) ------------------------------
 // The form's ONLY network dependencies are useAccounts / useBrokerages; mock
@@ -189,7 +193,7 @@ const RULED_ACCOUNT = {
 
 /** Same Intl call the Numeric primitive uses, so assertions match regardless of locale. */
 function fmtMoney(n: number, currency = 'USD'): string {
-  return new Intl.NumberFormat(undefined, {
+  return new Intl.NumberFormat(getAppLocale(), {
     style: 'currency',
     currency,
     minimumFractionDigits: 2,

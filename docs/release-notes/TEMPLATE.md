@@ -33,7 +33,7 @@ entirely for the release; generate_release_notes alone is a fine release.>
 
 ## Breaking changes
 
-<!-- Omit this section if there are none. Tradr is pre-1.0 — breaking
+<!-- Omit this section if there are none. Jurnal ZITN is pre-1.0 — breaking
 API/schema changes are expected and don't need shims (see CLAUDE.md) — so
 just be plain about what changed and what a self-hoster needs to do, if
 anything. -->

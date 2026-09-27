@@ -1,6 +1,6 @@
 // Accounting bench — ledger LIST, accounts-list balance aggregation, and
-// running-balance. Reuses the existing `tradr_test_migrate` DB the bench
-// harness already targets (do NOT introduce a separate `tradr_bench`).
+// running-balance. Reuses the existing `jurnal_zitn_test_migrate` DB the bench
+// harness already targets (do NOT introduce a separate `jurnal_zitn_bench`).
 //
 // Seeding strategy: 100k rows COPY-streamed across 50 accounts, plus an extra
 // 50k rows COPY-streamed into account[0] so the ledger-list / running-balance

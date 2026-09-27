@@ -1,6 +1,6 @@
 import { sql } from 'drizzle-orm';
 
-import { CURRENCY_CODES, type Tag } from '@tradr/shared';
+import { CURRENCY_CODES, type Tag } from '@jurnal-zitn/shared';
 
 import type { Database, Transaction } from '@/db';
 

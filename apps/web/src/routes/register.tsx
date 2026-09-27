@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { RegisterSchema } from '@tradr/shared';
+import { RegisterSchema } from '@jurnal-zitn/shared';
 
 import { AuthScreen } from '@/components/layout/AuthScreen';
 import { Button } from '@/components/ui/button';
@@ -12,8 +12,10 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useRegister } from '@/hooks/useAuth';
+import { useT } from '@/hooks/useLocale';
 import { useRegistrationEnabled } from '@/hooks/useRegistrationEnabled';
 import { useResendVerification } from '@/hooks/useResendVerification';
+import { apiErrorMessage } from '@/lib/api-error';
 import { detectBrowserTimezone } from '@/lib/browserTimezone';
 
 // Where someone sent here before launch can leave their address.
@@ -21,7 +23,7 @@ import { detectBrowserTimezone } from '@/lib/browserTimezone';
 // READ AT RUNTIME, NEVER COMPILED IN. This SPA is the same build every
 // self-hoster runs, so a hardcoded URL would show an operator who closed signups
 // on their own private instance an invitation to somebody else's newsletter.
-// It comes from the existing /config.js seam (window.__TRADR_CONFIG__,
+// It comes from the existing /config.js seam (window.__JURNAL_ZITN_CONFIG__,
 // NEWSLETTER_URL) like every other deploy-time frontend setting, and it is
 // ABSENT by default: an unconfigured build gets the notice with no link.
 //
@@ -30,7 +32,7 @@ import { detectBrowserTimezone } from '@/lib/browserTimezone';
 // than bounce the visitor off the one they chose to open.
 function newsletterUrl(): string | undefined {
   if (typeof window === 'undefined') return undefined;
-  return window.__TRADR_CONFIG__?.newsletterUrl || undefined;
+  return window.__JURNAL_ZITN_CONFIG__?.newsletterUrl || undefined;
 }
 
 // SF-3: this page is public and MUST NOT call useAuth() or mount the
@@ -45,17 +47,15 @@ function newsletterUrl(): string | undefined {
 // registration mutation alone, with no me-query beside it, exactly as `useLogin`
 // is on /login.
 
-const RegisterFormSchema = RegisterSchema.extend({
+const RegisterFormBase = RegisterSchema.extend({
   confirmPassword: z.string(),
-}).refine((data) => data.password === data.confirmPassword, {
-  message: 'Passwords do not match',
-  path: ['confirmPassword'],
 });
 
-type RegisterFormInput = z.infer<typeof RegisterFormSchema>;
+type RegisterFormInput = z.infer<typeof RegisterFormBase>;
 
 function RegisterPage() {
   const navigate = useNavigate();
+  const t = useT();
   const [apiError, setApiError] = useState('');
   // Check-your-email state flag: the registered address, set on a 201 with
   // emailVerified false (D14 — configuredness learned from our own response).
@@ -64,12 +64,22 @@ function RegisterPage() {
   const registerAccount = useRegister();
   const { registrationEnabled, isPending: configPending } = useRegistrationEnabled();
 
+  // Pesan mismatch ikut bahasa aktif; resolver dibangun ulang saat bahasa berganti.
+  const formSchema = useMemo(
+    () =>
+      RegisterFormBase.refine((data) => data.password === data.confirmPassword, {
+        message: t('auth.error.passwordMismatch'),
+        path: ['confirmPassword'],
+      }),
+    [t],
+  );
+
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<RegisterFormInput>({
-    resolver: zodResolver(RegisterFormSchema),
+    resolver: zodResolver(formSchema),
   });
 
   // The gate is decided before anything below renders, and every hook above has
@@ -83,7 +93,7 @@ function RegisterPage() {
   if (configPending) {
     return (
       <AuthScreen>
-        <div className="text-muted-foreground">Loading...</div>
+        <div className="text-muted-foreground">{t('auth.register.loading')}</div>
       </AuthScreen>
     );
   }
@@ -97,27 +107,27 @@ function RegisterPage() {
       <AuthScreen>
         <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle>{newsletter ? 'Signups open at launch' : 'Signups are closed'}</CardTitle>
+            <CardTitle>
+              {newsletter ? t('auth.register.closedLaunchTitle') : t('auth.register.closedTitle')}
+            </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              {newsletter
-                ? "New accounts aren't open yet. Join the newsletter and we'll tell you the day they are."
-                : "This instance isn't accepting new accounts. Ask whoever runs it if you need one."}
+              {newsletter ? t('auth.register.closedLaunchBody') : t('auth.register.closedBody')}
             </p>
 
             {newsletter && (
               <Button asChild className="w-full cursor-pointer">
                 <a href={newsletter} target="_blank" rel="noreferrer">
-                  Join the newsletter
+                  {t('auth.register.joinNewsletter')}
                 </a>
               </Button>
             )}
 
             <p className="text-center text-sm text-muted-foreground">
-              Already have an account?{' '}
+              {t('auth.register.haveAccount')}{' '}
               <Link to="/login" className="underline">
-                Log in
+                {t('auth.reset.loginLink')}
               </Link>
             </p>
           </CardContent>
@@ -136,13 +146,13 @@ function RegisterPage() {
       <AuthScreen>
         <Card className="w-full max-w-sm">
           <CardHeader>
-            <CardTitle>Check your email</CardTitle>
+            <CardTitle>{t('auth.register.checkEmailTitle')}</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-sm text-muted-foreground">
-              We sent a verification link to{' '}
-              <span className="font-medium text-foreground">{pendingEmail}</span>. Follow it to
-              verify your email address.
+              {t('auth.register.checkEmailPrefix')}{' '}
+              <span className="font-medium text-foreground">{pendingEmail}</span>.{' '}
+              {t('auth.register.checkEmailSuffix')}
             </p>
 
             {info && <p className="text-sm text-muted-foreground">{info}</p>}
@@ -154,7 +164,7 @@ function RegisterPage() {
               onClick={() => resend.mutate()}
               disabled={resend.isPending}
             >
-              {resend.isPending ? 'Sending...' : 'Resend verification email'}
+              {resend.isPending ? t('auth.register.resending') : t('auth.register.resend')}
             </Button>
 
             <Button
@@ -162,7 +172,7 @@ function RegisterPage() {
               className="w-full cursor-pointer"
               onClick={() => navigate({ to: '/dashboard' })}
             >
-              Continue to dashboard
+              {t('auth.register.continue')}
             </Button>
           </CardContent>
         </Card>
@@ -193,7 +203,7 @@ function RegisterPage() {
       }
     } catch (err: unknown) {
       const error = err as { message?: string };
-      setApiError(error?.message || 'An unexpected error occurred');
+      setApiError(apiErrorMessage(error, t));
     }
   };
 
@@ -201,14 +211,14 @@ function RegisterPage() {
     <AuthScreen>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Create an account</CardTitle>
+          <CardTitle>{t('auth.register.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           {apiError && <p className="mb-4 text-sm text-destructive">{apiError}</p>}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.field.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -224,7 +234,7 @@ function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.field.password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -240,7 +250,7 @@ function RegisterPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm password</Label>
+              <Label htmlFor="confirmPassword">{t('auth.field.confirmPassword')}</Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -256,14 +266,14 @@ function RegisterPage() {
             </div>
 
             <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting}>
-              {isSubmitting ? 'Creating account...' : 'Register'}
+              {isSubmitting ? t('auth.register.submitting') : t('auth.register.submit')}
             </Button>
           </form>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            Already have an account?{' '}
+            {t('auth.register.haveAccount')}{' '}
             <Link to="/login" className="underline">
-              Log in
+              {t('auth.reset.loginLink')}
             </Link>
           </p>
         </CardContent>

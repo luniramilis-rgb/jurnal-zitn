@@ -10,7 +10,7 @@
 import type { Context } from 'hono';
 import type { ZodError } from 'zod';
 
-import { QuoteSymbolParamSchema, SymbolQuerySchema } from '@tradr/shared';
+import { QuoteSymbolParamSchema, SymbolQuerySchema } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { isStockQuoteConfigured } from '@/lib/config';

@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tradr</title>
+    <title>Jurnal ZITN</title>
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-    <!-- tradr:boot-theme -->
+    <!-- jurnal-zitn:boot-theme -->
     <script>
 (function () {
   var ALLOWED = { light: 1, dark: 1, system: 1 };
-  var match = document.cookie.match(/(?:^|;\s*)tradr_theme=([^;]*)/);
+  var match = document.cookie.match(/(?:^|;\s*)jurnal_zitn_theme=([^;]*)/);
   var cookie = match ? decodeURIComponent(match[1]) : null;
   var valid = cookie && ALLOWED[cookie] ? cookie : null;
   var resolved =
@@ -22,8 +22,8 @@
   else document.documentElement.classList.remove('dark');
 })();
     </script>
-    <!-- /tradr:boot-theme -->
-    <!-- Runtime config: classic blocking script — sets window.__TRADR_CONFIG__
+    <!-- /jurnal-zitn:boot-theme -->
+    <!-- Runtime config: classic blocking script — sets window.__JURNAL_ZITN_CONFIG__
          before the deferred ES-module entry runs. Absent in dev (no /config.js). -->
     <script src="/config.js"></script>
   </head>

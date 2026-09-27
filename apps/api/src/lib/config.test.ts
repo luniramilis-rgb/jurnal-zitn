@@ -16,7 +16,7 @@ import {
 } from './config';
 
 const baseEnv = {
-  DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/tradr_test',
+  DATABASE_URL: 'postgresql://postgres:postgres@localhost:5432/jurnal_zitn_test',
   SESSION_SECRET: 'test-secret-that-is-at-least-32-characters-long',
   ENCRYPTION_KEY: 'a'.repeat(64),
 };
@@ -469,7 +469,7 @@ describe('envSchema hosted-platform optional vars', () => {
     const parsed = envSchema.parse({
       ...baseEnv,
       REDIS_URL: 'redis://localhost:6379',
-      DIRECT_DATABASE_URL: 'postgresql://postgres:postgres@direct:5432/tradr',
+      DIRECT_DATABASE_URL: 'postgresql://postgres:postgres@direct:5432/jurnal-zitn',
       DB_TRANSACTION_POOLER: 'true',
       OBJECT_STORAGE_ENDPOINT: 'https://account.r2.cloudflarestorage.com',
       OBJECT_STORAGE_BUCKET: 'advisor',
@@ -567,7 +567,7 @@ describe('hosted-platform config predicates', () => {
   it('isRedisConfigured / isDirectDatabaseConfigured true for a non-empty value', () => {
     config.REDIS_URL = 'redis://localhost:6379';
     expect(isRedisConfigured()).toBe(true);
-    config.DIRECT_DATABASE_URL = 'postgresql://postgres:postgres@direct:5432/tradr';
+    config.DIRECT_DATABASE_URL = 'postgresql://postgres:postgres@direct:5432/jurnal-zitn';
     expect(isDirectDatabaseConfigured()).toBe(true);
   });
 
@@ -625,8 +625,8 @@ describe('envSchema transactional-email vars', () => {
       SMTP_USER: 'mailer',
       SMTP_PASS: 'hunter2',
       EMAIL_FROM: 'no-reply@example.com',
-      EMAIL_FROM_NAME: 'Tradr',
-      WEB_BASE_URL: 'https://tradr.example.com',
+      EMAIL_FROM_NAME: 'Jurnal ZITN',
+      WEB_BASE_URL: 'https://jurnal-zitn.example.com',
     });
     expect(parsed.SMTP_HOST).toBe('smtp.example.com');
     expect(parsed.SMTP_PORT).toBe(2525);
@@ -634,8 +634,8 @@ describe('envSchema transactional-email vars', () => {
     expect(parsed.SMTP_USER).toBe('mailer');
     expect(parsed.SMTP_PASS).toBe('hunter2');
     expect(parsed.EMAIL_FROM).toBe('no-reply@example.com');
-    expect(parsed.EMAIL_FROM_NAME).toBe('Tradr');
-    expect(parsed.WEB_BASE_URL).toBe('https://tradr.example.com');
+    expect(parsed.EMAIL_FROM_NAME).toBe('Jurnal ZITN');
+    expect(parsed.WEB_BASE_URL).toBe('https://jurnal-zitn.example.com');
   });
 
   it.each(['abc', '0', '-1', '65536', '1.5'])('rejects SMTP_PORT=%j (boot-fail)', (v) => {
@@ -660,7 +660,7 @@ describe('envSchema transactional-email vars', () => {
     expect(envSchema.safeParse({ ...baseEnv, EMAIL_FROM: 'not-an-email' }).success).toBe(false);
   });
 
-  it.each(['Tradr\r\nBcc: evil@x.com', 'Tradr\nX', 'Tradr\r'])(
+  it.each(['Jurnal ZITN\r\nBcc: evil@x.com', 'Jurnal ZITN\nX', 'Jurnal ZITN\r'])(
     'rejects EMAIL_FROM_NAME with CR/LF %j (header hygiene)',
     (v) => {
       expect(envSchema.safeParse({ ...baseEnv, EMAIL_FROM_NAME: v }).success).toBe(false);
@@ -670,8 +670,11 @@ describe('envSchema transactional-email vars', () => {
 
 describe('envSchema.WEB_BASE_URL', () => {
   it('strips a trailing slash — always a bare origin (D3)', () => {
-    const parsed = envSchema.parse({ ...baseEnv, WEB_BASE_URL: 'https://tradr.example.com/' });
-    expect(parsed.WEB_BASE_URL).toBe('https://tradr.example.com');
+    const parsed = envSchema.parse({
+      ...baseEnv,
+      WEB_BASE_URL: 'https://jurnal-zitn.example.com/',
+    });
+    expect(parsed.WEB_BASE_URL).toBe('https://jurnal-zitn.example.com');
   });
 
   it('accepts an origin with an explicit port', () => {
@@ -680,13 +683,13 @@ describe('envSchema.WEB_BASE_URL', () => {
   });
 
   it.each([
-    'tradr.example.com', // no scheme — not an absolute URL
+    'jurnal-zitn.example.com', // no scheme — not an absolute URL
     '/reset-password', // relative
     'not a url',
-    'https://tradr.example.com/app', // path-bearing
-    'https://tradr.example.com/?x=1', // query
-    'https://tradr.example.com/#frag', // fragment
-    'ftp://tradr.example.com', // non-http(s) scheme
+    'https://jurnal-zitn.example.com/app', // path-bearing
+    'https://jurnal-zitn.example.com/?x=1', // query
+    'https://jurnal-zitn.example.com/#frag', // fragment
+    'ftp://jurnal-zitn.example.com', // non-http(s) scheme
   ])('rejects %j (origin-only refine, boot-fail)', (v) => {
     expect(envSchema.safeParse({ ...baseEnv, WEB_BASE_URL: v }).success).toBe(false);
   });
@@ -696,7 +699,7 @@ describe('assertEmailConfigCoherence', () => {
   const trio = {
     SMTP_HOST: 'smtp.example.com',
     EMAIL_FROM: 'no-reply@example.com',
-    WEB_BASE_URL: 'https://tradr.example.com',
+    WEB_BASE_URL: 'https://jurnal-zitn.example.com',
   };
 
   it('is silent when email is wholly unconfigured', () => {
@@ -715,7 +718,7 @@ describe('assertEmailConfigCoherence', () => {
       ...trio,
       SMTP_USER: 'mailer',
       SMTP_PASS: 'hunter2',
-      EMAIL_FROM_NAME: 'Tradr',
+      EMAIL_FROM_NAME: 'Jurnal ZITN',
     });
     expect(() => assertEmailConfigCoherence(parsed)).not.toThrow();
   });
@@ -746,7 +749,7 @@ describe('assertEmailConfigCoherence', () => {
     ],
     [
       'EMAIL_FROM_NAME alone',
-      { EMAIL_FROM_NAME: 'Tradr' },
+      { EMAIL_FROM_NAME: 'Jurnal ZITN' },
       ['SMTP_HOST', 'EMAIL_FROM', 'WEB_BASE_URL'],
     ],
     [
@@ -812,7 +815,7 @@ describe('isEmailConfigured', () => {
     config.EMAIL_FROM = 'no-reply@example.com';
     config.WEB_BASE_URL = undefined;
     expect(isEmailConfigured()).toBe(false);
-    config.WEB_BASE_URL = 'https://tradr.example.com';
+    config.WEB_BASE_URL = 'https://jurnal-zitn.example.com';
     expect(isEmailConfigured()).toBe(true);
     config.SMTP_HOST = undefined;
     expect(isEmailConfigured()).toBe(false);

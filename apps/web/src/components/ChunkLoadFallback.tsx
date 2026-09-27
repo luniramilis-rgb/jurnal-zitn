@@ -1,4 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { useT } from '@/hooks/useLocale';
 import { cn } from '@/lib/utils';
 
 export interface ChunkLoadFallbackProps {
@@ -25,6 +26,7 @@ export function ChunkLoadFallback({
   compact = false,
   className,
 }: ChunkLoadFallbackProps) {
+  const t = useT();
   const reloadButton = (
     <button
       type="button"
@@ -36,7 +38,7 @@ export function ChunkLoadFallback({
         'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
       )}
     >
-      Reload
+      {t('app.chunk.reload')}
     </button>
   );
 
@@ -51,7 +53,7 @@ export function ChunkLoadFallback({
         role="status"
         className={cn('flex items-start justify-between gap-4', className)}
       >
-        <AlertTitle>This part of Tradr couldn't load</AlertTitle>
+        <AlertTitle>{t('app.chunk.title')}</AlertTitle>
         {reloadButton}
       </Alert>
     );
@@ -66,11 +68,8 @@ export function ChunkLoadFallback({
       className={cn('flex items-start justify-between gap-4', className)}
     >
       <div>
-        <AlertTitle>This part of Tradr couldn't load</AlertTitle>
-        <AlertDescription>
-          The app was updated while this tab was open and the automatic reload didn't fix it. Reload
-          to get the current version.
-        </AlertDescription>
+        <AlertTitle>{t('app.chunk.title')}</AlertTitle>
+        <AlertDescription>{t('app.chunk.body')}</AlertDescription>
       </div>
       {reloadButton}
     </Alert>

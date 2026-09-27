@@ -6,7 +6,7 @@ import {
   WIDGET_DEFAULT_NAMESPACE,
   uuidv5Batch,
   type WidgetPlacement,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { EmptyState } from '@/components/EmptyState';
 import { PageHeader } from '@/components/layout/PageHeader';

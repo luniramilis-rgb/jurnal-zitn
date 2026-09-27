@@ -1,4 +1,4 @@
-import { PerWidgetMinSize, reconcileStoredLayout, type WidgetPlacement } from '@tradr/shared';
+import { PerWidgetMinSize, reconcileStoredLayout, type WidgetPlacement } from '@jurnal-zitn/shared';
 
 import { GRID_COLUMNS, GRID_MAX_ROWS } from './grid.constants';
 

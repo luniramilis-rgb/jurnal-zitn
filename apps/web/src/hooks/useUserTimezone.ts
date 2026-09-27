@@ -3,7 +3,7 @@
 // — nothing renders a timestamp in it. Every surface that buckets by day reads
 // from here. Nothing outside `lib/browserTimezone.ts` may call
 // Intl.DateTimeFormat().resolvedOptions().timeZone — a per-device guess is
-// exactly what moves a trade between calendar days when the user opens Tradr
+// exactly what moves a trade between calendar days when the user opens Jurnal ZITN
 // from another machine.
 //
 // This is NOT the account trading-day timezone (accounts.timezone, default
@@ -29,7 +29,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
-import { DEFAULT_REPORTING_TIMEZONE } from '@tradr/shared';
+import { DEFAULT_REPORTING_TIMEZONE } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 import { detectBrowserTimezone } from '@/lib/browserTimezone';

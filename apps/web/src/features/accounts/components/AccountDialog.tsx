@@ -3,8 +3,12 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { CreateAccountSchema, type CreateAccountInput, type Account } from '@tradr/shared';
-import { DEFAULT_ACCOUNT_TIMEZONE, IANA_TIMEZONES, SUPPORTED_CURRENCIES } from '@tradr/shared';
+import { CreateAccountSchema, type CreateAccountInput, type Account } from '@jurnal-zitn/shared';
+import {
+  DEFAULT_ACCOUNT_TIMEZONE,
+  IANA_TIMEZONES,
+  SUPPORTED_CURRENCIES,
+} from '@jurnal-zitn/shared';
 
 import {
   AlertDialog,
@@ -92,7 +96,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
 
   const formValues = (): CreateAccountInput => ({
     name: account?.name ?? '',
-    currency: account?.currency ?? 'USD',
+    currency: account?.currency ?? 'IDR',
     brokerageId: account?.brokerageId ?? null,
     startingBalance: undefined,
     timezone: account?.timezone ?? DEFAULT_ACCOUNT_TIMEZONE,

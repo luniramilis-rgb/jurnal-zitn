@@ -25,8 +25,8 @@
 import type { Context } from 'hono';
 import { streamSSE } from 'hono/streaming';
 
-import { makeStreamRequestSchema, MAX_IMAGE_BYTES_DEFAULT } from '@tradr/shared';
-import type { CanonicalPart, ProviderModel, StreamRequestInput } from '@tradr/shared';
+import { makeStreamRequestSchema, MAX_IMAGE_BYTES_DEFAULT } from '@jurnal-zitn/shared';
+import type { CanonicalPart, ProviderModel, StreamRequestInput } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { config, getPlatformApiKey } from '@/lib/config';

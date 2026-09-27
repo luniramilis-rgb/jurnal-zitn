@@ -261,3 +261,58 @@ describe('calculateFees', () => {
     expect(result.totalFees).toBe('2');
   });
 });
+
+describe('calculateFees — fee persentase IDX (Fase 2)', () => {
+  const idxSchedule: FeeScheduleInput = {
+    ...defaultSchedule,
+    stockPerShareCommission: '0',
+    stockMinPerFill: '0',
+    stockMaxPerFill: '0',
+    stockPercentBuy: '0.15',
+    stockPercentSell: '0.25',
+  };
+
+  function sideFill(side: 'buy' | 'sell', quantity: string, price: string): FillInput {
+    return { quantity, price, type: 'stock', side };
+  }
+
+  it('komisi beli = harga × qty × pct/100', () => {
+    // 10 lot × 100 = 1000 saham @1000 → 1.000.000 × 0.15% = 1500
+    const r = calculateFees([sideFill('buy', '1000', '1000')], idxSchedule);
+    expect(r.perFillFees).toEqual(['1500']);
+    expect(r.totalFees).toBe('1500');
+  });
+
+  it('komisi jual memakai persentase jual (termasuk PPh bila disetel broker)', () => {
+    // 1000 saham @1000 → 1.000.000 × 0.25% = 2500
+    const r = calculateFees([sideFill('sell', '1000', '1000')], idxSchedule);
+    expect(r.perFillFees).toEqual(['2500']);
+  });
+
+  it('persentase menggantikan per-saham saat > 0', () => {
+    const schedule: FeeScheduleInput = { ...idxSchedule, stockPerShareCommission: '1' };
+    // per-saham akan 1000; persentase menang → 1500
+    const r = calculateFees([sideFill('buy', '1000', '1000')], schedule);
+    expect(r.perFillFees).toEqual(['1500']);
+  });
+
+  it('jatuh kembali ke per-saham saat persentase 0/kosong', () => {
+    const schedule: FeeScheduleInput = {
+      ...idxSchedule,
+      stockPercentBuy: '0',
+      stockPercentSell: '0',
+      stockPerShareCommission: '0.005',
+    };
+    const r = calculateFees([sideFill('buy', '1000', '1000')], schedule);
+    // 1000 × 0.005 = 5
+    expect(r.perFillFees).toEqual(['5']);
+  });
+
+  it('min/max per fill tetap berlaku pada model persentase', () => {
+    const capped: FeeScheduleInput = { ...idxSchedule, stockMaxPerFill: '1000' };
+    expect(calculateFees([sideFill('buy', '1000', '1000')], capped).perFillFees).toEqual(['1000']);
+
+    const floored: FeeScheduleInput = { ...idxSchedule, stockMinPerFill: '2000' };
+    expect(calculateFees([sideFill('buy', '1000', '1000')], floored).perFillFees).toEqual(['2000']);
+  });
+});

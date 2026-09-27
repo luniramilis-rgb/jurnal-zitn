@@ -1,4 +1,4 @@
-import type { TagWithCount } from '@tradr/shared';
+import type { TagWithCount } from '@jurnal-zitn/shared';
 
 import {
   AlertDialog,

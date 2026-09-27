@@ -1,5 +1,12 @@
 import { vi } from 'vitest';
 
+import { setAppLocale } from '@/lib/locale';
+
+// Uji web berjalan dalam bahasa Inggris agar ekspektasi salinan lama tetap sah
+// (A0: default produk = `id`). Uji yang menyasar salinan Indonesia memanggil
+// `setAppLocale('id')` sendiri.
+setAppLocale('en');
+
 // jsdom does NOT implement matchMedia; install a no-op shim so any production
 // code path calling `useMediaQuery` (or similar) does not throw under tests.
 // Tests that need a specific `matches` value override via vi.stubGlobal in

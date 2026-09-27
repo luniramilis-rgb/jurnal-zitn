@@ -9,7 +9,7 @@ import type {
   Tag,
   TagWithCount,
   UpdateTagInput,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { ONBOARDING_QUERY_KEY } from '@/features/onboarding/hooks/useOnboarding';
 import { api, isUnauthorized } from '@/lib/api';

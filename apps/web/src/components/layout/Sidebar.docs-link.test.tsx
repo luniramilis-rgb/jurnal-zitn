@@ -9,6 +9,7 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+setAppLocale('en');
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({ children, to, ...rest }: { children: React.ReactNode; to: string }) => (
@@ -48,6 +49,7 @@ vi.mock('@/hooks/useUserTimezone', () => ({
 }));
 
 import { DOCS_BASE_URL, docsUrl } from '@/lib/docs';
+import { setAppLocale } from '@/lib/locale';
 
 import { Sidebar } from './Sidebar';
 

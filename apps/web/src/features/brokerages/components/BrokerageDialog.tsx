@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { type Brokerage, FeeScheduleSchema } from '@tradr/shared';
+import { type Brokerage, FeeScheduleSchema } from '@jurnal-zitn/shared';
 
 import {
   AlertDialog,
@@ -42,6 +42,8 @@ const DEFAULT_FEE_SCHEDULE: BrokerageFormValues['feeSchedule'] = {
   stockPerShareCommission: '0',
   stockMinPerFill: '0',
   stockMaxPerFill: '0',
+  stockPercentBuy: '0',
+  stockPercentSell: '0',
   optionsPerContractCommission: '0',
   optionsPerContractExchangeFee: '0',
   optionsMinPerFill: '0',
@@ -86,6 +88,8 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
       fs.stockPerShareCommission !== newFs.stockPerShareCommission ||
       fs.stockMinPerFill !== newFs.stockMinPerFill ||
       fs.stockMaxPerFill !== newFs.stockMaxPerFill ||
+      fs.stockPercentBuy !== newFs.stockPercentBuy ||
+      fs.stockPercentSell !== newFs.stockPercentSell ||
       fs.optionsPerContractCommission !== newFs.optionsPerContractCommission ||
       fs.optionsPerContractExchangeFee !== newFs.optionsPerContractExchangeFee ||
       fs.optionsMinPerFill !== newFs.optionsMinPerFill ||

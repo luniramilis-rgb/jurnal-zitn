@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { TAG_COLORS, type TagColor } from '@tradr/shared';
+import { TAG_COLORS, type TagColor } from '@jurnal-zitn/shared';
 
 import { cn } from '@/lib/utils';
 

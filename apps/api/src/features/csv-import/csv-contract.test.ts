@@ -1,7 +1,7 @@
 import { Decimal } from 'decimal.js';
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import type { ContractForm, LocatedError, NumberFormat } from '@tradr/shared';
+import type { ContractForm, LocatedError, NumberFormat } from '@jurnal-zitn/shared';
 
 import { decodeDescriptor, resolveContracts, type ContractOptions } from './csv-contract';
 import type { NormalizedRow } from './csv-normalize';
@@ -215,7 +215,11 @@ describe('resolveContracts — descriptor form', () => {
     );
     expect(result.rows).toEqual([]);
     const err = findError(result.errors, 'OCC_DATE_RANGE');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'descriptor', csvColumn: 'Description' });
+    expect(err).toMatchObject({
+      rowNumber: 2,
+      journalField: 'descriptor',
+      csvColumn: 'Description',
+    });
   });
 });
 
@@ -231,7 +235,7 @@ describe('resolveContracts — located error codes', () => {
     );
     expect(result.rows).toEqual([]);
     const err = findError(result.errors, 'CONTRACT_FORM_MISSING');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'symbol', csvColumn: 'Symbol' });
+    expect(err).toMatchObject({ rowNumber: 2, journalField: 'symbol', csvColumn: 'Symbol' });
     expect(err.message).toContain('Row 2');
   });
 
@@ -242,7 +246,7 @@ describe('resolveContracts — located error codes', () => {
     );
     expect(result.rows).toEqual([]);
     const missing = result.errors.filter((e) => e.code === 'CONTRACT_FIELD_MISSING');
-    expect(missing.map((e) => e.tradrField).sort()).toEqual(['expiry', 'right', 'strike']);
+    expect(missing.map((e) => e.journalField).sort()).toEqual(['expiry', 'right', 'strike']);
     expect(missing.map((e) => e.csvColumn).sort()).toEqual(['Expiry', 'Right', 'Strike']);
   });
 
@@ -253,7 +257,7 @@ describe('resolveContracts — located error codes', () => {
     );
     expect(result.rows).toEqual([]);
     const err = findError(result.errors, 'CONTRACT_FIELD_ON_STOCK');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'expiry', csvColumn: 'Expiry' });
+    expect(err).toMatchObject({ rowNumber: 2, journalField: 'expiry', csvColumn: 'Expiry' });
     expect(err.message).toContain('2026-03-20');
   });
 
@@ -264,7 +268,11 @@ describe('resolveContracts — located error codes', () => {
     );
     expect(result.rows).toEqual([]);
     const err = findError(result.errors, 'CONTRACT_DESCRIPTOR_UNPARSEABLE');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'descriptor', csvColumn: 'Description' });
+    expect(err).toMatchObject({
+      rowNumber: 2,
+      journalField: 'descriptor',
+      csvColumn: 'Description',
+    });
     expect(err.message).toContain('JAN 12 CALL');
   });
 
@@ -275,7 +283,11 @@ describe('resolveContracts — located error codes', () => {
     );
     expect(result.rows).toEqual([]);
     const err = findError(result.errors, 'OPTION_MULTIPLIER_UNSUPPORTED');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'multiplier', csvColumn: 'Multiplier' });
+    expect(err).toMatchObject({
+      rowNumber: 2,
+      journalField: 'multiplier',
+      csvColumn: 'Multiplier',
+    });
     expect(err.message).toContain('10');
   });
 
@@ -286,7 +298,11 @@ describe('resolveContracts — located error codes', () => {
     );
     expect(result.rows).toEqual([]);
     const err = findError(result.errors, 'OPTION_MULTIPLIER_UNSUPPORTED');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'descriptor', csvColumn: 'Description' });
+    expect(err).toMatchObject({
+      rowNumber: 2,
+      journalField: 'descriptor',
+      csvColumn: 'Description',
+    });
   });
 
   it('OPTION_EVENT_NOT_SUPPORTED via an A code', () => {
@@ -296,7 +312,7 @@ describe('resolveContracts — located error codes', () => {
     );
     expect(result.rows).toEqual([]);
     const err = findError(result.errors, 'OPTION_EVENT_NOT_SUPPORTED');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'eventCode', csvColumn: 'Code' });
+    expect(err).toMatchObject({ rowNumber: 2, journalField: 'eventCode', csvColumn: 'Code' });
     expect(err.message).toContain('assignment');
   });
 
@@ -306,7 +322,7 @@ describe('resolveContracts — located error codes', () => {
       opts('occ-symbol'),
     );
     const err = findError(result.errors, 'OPTION_EVENT_NOT_SUPPORTED');
-    expect(err).toMatchObject({ tradrField: 'eventCode' });
+    expect(err).toMatchObject({ journalField: 'eventCode' });
   });
 
   it('OCC_NO_FORM_MATCH for a double-space compact string that matches no form', () => {
@@ -316,7 +332,7 @@ describe('resolveContracts — located error codes', () => {
     );
     expect(result.rows).toEqual([]);
     const err = findError(result.errors, 'OCC_NO_FORM_MATCH');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'symbol', csvColumn: 'Symbol' });
+    expect(err).toMatchObject({ rowNumber: 2, journalField: 'symbol', csvColumn: 'Symbol' });
   });
 
   it('OCC_BAD_UNDERLYING located to symbol when the underlying comes from symbol', () => {
@@ -333,7 +349,7 @@ describe('resolveContracts — located error codes', () => {
       opts('composed'),
     );
     const err = findError(result.errors, 'OCC_BAD_UNDERLYING');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'symbol', csvColumn: 'Symbol' });
+    expect(err).toMatchObject({ rowNumber: 2, journalField: 'symbol', csvColumn: 'Symbol' });
     expect(err.message).toContain('1BAD');
   });
 
@@ -351,7 +367,7 @@ describe('resolveContracts — located error codes', () => {
       opts('composed'),
     );
     const err = findError(result.errors, 'OCC_STRIKE_RANGE');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'strike', csvColumn: 'Strike' });
+    expect(err).toMatchObject({ rowNumber: 2, journalField: 'strike', csvColumn: 'Strike' });
     expect(err.message).toContain('100000');
   });
 
@@ -369,7 +385,7 @@ describe('resolveContracts — located error codes', () => {
       opts('composed'),
     );
     const err = findError(result.errors, 'OCC_STRIKE_PRECISION');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'strike', csvColumn: 'Strike' });
+    expect(err).toMatchObject({ rowNumber: 2, journalField: 'strike', csvColumn: 'Strike' });
     expect(err.message).toContain('0.0001');
   });
 
@@ -387,7 +403,7 @@ describe('resolveContracts — located error codes', () => {
       opts('composed'),
     );
     const err = findError(result.errors, 'OCC_STRIKE_NOT_REPRESENTABLE');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'strike', csvColumn: 'Strike' });
+    expect(err).toMatchObject({ rowNumber: 2, journalField: 'strike', csvColumn: 'Strike' });
     expect(err.message).toContain('1234.567');
   });
 
@@ -405,7 +421,7 @@ describe('resolveContracts — located error codes', () => {
       opts('composed'),
     );
     const err = findError(result.errors, 'OCC_DATE_RANGE');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'expiry', csvColumn: 'Expiry' });
+    expect(err).toMatchObject({ rowNumber: 2, journalField: 'expiry', csvColumn: 'Expiry' });
     expect(err.message).toContain('2055-01-15');
   });
 
@@ -423,7 +439,7 @@ describe('resolveContracts — located error codes', () => {
       opts('composed'),
     );
     const err = findError(result.errors, 'OCC_COMPACT_TOO_LONG');
-    expect(err).toMatchObject({ rowNumber: 2, tradrField: 'symbol', csvColumn: 'Symbol' });
+    expect(err).toMatchObject({ rowNumber: 2, journalField: 'symbol', csvColumn: 'Symbol' });
   });
 });
 

@@ -4,7 +4,7 @@ import { act, renderHook, waitFor } from '@testing-library/react';
 import { createElement, type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { OnboardingState } from '@tradr/shared';
+import type { OnboardingState } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

@@ -4,8 +4,8 @@ import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { POSITION_IMAGE_MAX_BYTES, POSITION_IMAGE_MAX_COUNT } from '@tradr/shared';
-import type { PositionImage } from '@tradr/shared';
+import { POSITION_IMAGE_MAX_BYTES, POSITION_IMAGE_MAX_COUNT } from '@jurnal-zitn/shared';
+import type { PositionImage } from '@jurnal-zitn/shared';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { fileToBase64 } from '@/lib/image-file';

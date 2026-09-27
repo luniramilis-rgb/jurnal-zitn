@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import type { Granularity, PerformanceCurrency } from '@tradr/shared';
+import type { Granularity, PerformanceCurrency } from '@jurnal-zitn/shared';
 
 import {
   type CurrencyHistoryRange,

@@ -1,7 +1,7 @@
 import { config, isSplitOriginConfigured } from './config';
 
 // Centralized cookie policy for the two production cookie surfaces — the
-// `session` cookie (auth.route.ts) and the `tradr_theme` cookie
+// `session` cookie (auth.route.ts) and the `jurnal_zitn_theme` cookie
 // (dashboard.route.ts). Both flip to `SameSite=None; Secure` under split-origin
 // operation so credentialed cross-origin requests carry them (REQ-5.2/5.4).
 //
@@ -39,7 +39,7 @@ export function sessionCookieOptions(): SessionCookieOptions {
 
 /**
  * Attribute string (everything after `name=value; `) for the JS-readable
- * `tradr_theme` cookie — no HttpOnly, matching today's stance. Split-origin ⇒
+ * `jurnal_zitn_theme` cookie — no HttpOnly, matching today's stance. Split-origin ⇒
  * `SameSite=None; Secure`; otherwise `SameSite=Lax` with `Secure` only in
  * production, byte-identical to today (REQ-5.4/1.2).
  */

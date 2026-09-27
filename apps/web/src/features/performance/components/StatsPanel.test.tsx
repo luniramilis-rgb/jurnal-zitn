@@ -2,7 +2,7 @@
 import { renderToStaticMarkup } from 'react-dom/server';
 import { describe, expect, it } from 'vitest';
 
-import type { PerformanceStats } from '@tradr/shared';
+import type { PerformanceStats } from '@jurnal-zitn/shared';
 
 import { docsUrl } from '@/lib/docs';
 

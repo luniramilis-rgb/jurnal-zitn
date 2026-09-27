@@ -6,7 +6,7 @@
 
 import { useMutation } from '@tanstack/react-query';
 
-import type { CheckoutRequestInput } from '@tradr/shared';
+import type { CheckoutRequestInput } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

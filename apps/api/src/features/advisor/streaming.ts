@@ -31,7 +31,7 @@ import type {
   ProviderModel,
   StoredContentPart,
   StreamRequestInput,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { decrypt } from '@/lib/encryption';
 import { logger } from '@/lib/logger';

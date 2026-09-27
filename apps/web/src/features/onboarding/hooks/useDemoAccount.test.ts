@@ -12,7 +12,7 @@ import { createElement, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { Account } from '@tradr/shared';
+import type { Account } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 import { eventBus } from '@/stores/event-bus.store';

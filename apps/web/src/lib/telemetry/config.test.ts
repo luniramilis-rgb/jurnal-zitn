@@ -18,19 +18,19 @@ describe('getTelemetryConfig', () => {
     expect(getTelemetryConfig()).toEqual({});
   });
 
-  it('returns {} when __TRADR_CONFIG__ is absent', () => {
+  it('returns {} when __JURNAL_ZITN_CONFIG__ is absent', () => {
     vi.stubGlobal('window', {});
     expect(getTelemetryConfig()).toEqual({});
   });
 
-  it('returns {} when __TRADR_CONFIG__ is empty', () => {
-    vi.stubGlobal('window', { __TRADR_CONFIG__: {} });
+  it('returns {} when __JURNAL_ZITN_CONFIG__ is empty', () => {
+    vi.stubGlobal('window', { __JURNAL_ZITN_CONFIG__: {} });
     expect(getTelemetryConfig()).toEqual({});
   });
 
   it('returns each telemetry field when present', () => {
     vi.stubGlobal('window', {
-      __TRADR_CONFIG__: {
+      __JURNAL_ZITN_CONFIG__: {
         apiBaseUrl: 'https://api.example.com',
         posthogPublicKey: 'phc_abc123',
         posthogPublicHost: 'https://us.i.posthog.com',
@@ -47,7 +47,7 @@ describe('getTelemetryConfig', () => {
   });
 
   it('does not include apiBaseUrl', () => {
-    vi.stubGlobal('window', { __TRADR_CONFIG__: { apiBaseUrl: 'https://api.example.com' } });
+    vi.stubGlobal('window', { __JURNAL_ZITN_CONFIG__: { apiBaseUrl: 'https://api.example.com' } });
     expect(getTelemetryConfig()).not.toHaveProperty('apiBaseUrl', 'https://api.example.com');
     expect(getTelemetryConfig()).toEqual({});
   });
@@ -65,18 +65,18 @@ describe('isPostHogClientConfigured', () => {
 
   it('is false when posthogPublicKey is absent', () => {
     vi.stubGlobal('window', {
-      __TRADR_CONFIG__: { posthogPublicHost: 'https://us.i.posthog.com' },
+      __JURNAL_ZITN_CONFIG__: { posthogPublicHost: 'https://us.i.posthog.com' },
     });
     expect(isPostHogClientConfigured()).toBe(false);
   });
 
   it('is false when posthogPublicKey is an empty string', () => {
-    vi.stubGlobal('window', { __TRADR_CONFIG__: { posthogPublicKey: '' } });
+    vi.stubGlobal('window', { __JURNAL_ZITN_CONFIG__: { posthogPublicKey: '' } });
     expect(isPostHogClientConfigured()).toBe(false);
   });
 
   it('is true when posthogPublicKey is a non-empty string', () => {
-    vi.stubGlobal('window', { __TRADR_CONFIG__: { posthogPublicKey: 'phc_abc123' } });
+    vi.stubGlobal('window', { __JURNAL_ZITN_CONFIG__: { posthogPublicKey: 'phc_abc123' } });
     expect(isPostHogClientConfigured()).toBe(true);
   });
 });
@@ -94,7 +94,8 @@ describe('getFeedbackSurveyIds / isFeedbackSurveyConfigured', () => {
     vi.unstubAllGlobals();
   });
 
-  const stub = (cfg: Record<string, unknown>) => vi.stubGlobal('window', { __TRADR_CONFIG__: cfg });
+  const stub = (cfg: Record<string, unknown>) =>
+    vi.stubGlobal('window', { __JURNAL_ZITN_CONFIG__: cfg });
 
   it('is false with an empty config, no warn', () => {
     stub({});

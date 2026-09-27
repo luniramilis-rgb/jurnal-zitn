@@ -7,16 +7,16 @@
 // adapter implementation.
 //
 // Canonical, cross-app types (`CanonicalMessage`, `CanonicalPart`,
-// `ProviderModel`) are owned by `@tradr/shared` (Task 2) and re-exported below
+// `ProviderModel`) are owned by `@jurnal-zitn/shared` (Task 2) and re-exported below
 // so adapter authors import everything from one place.
 
-import type { CanonicalMessage, ProviderModel } from '@tradr/shared';
+import type { CanonicalMessage, ProviderModel } from '@jurnal-zitn/shared';
 
-export type { CanonicalMessage, CanonicalPart, ProviderModel } from '@tradr/shared';
+export type { CanonicalMessage, CanonicalPart, ProviderModel } from '@jurnal-zitn/shared';
 
 /**
  * The supported provider backends. Must stay in lockstep with
- * `ProviderIdSchema` in `@tradr/shared`. Gemini and OpenRouter (v6) ride the
+ * `ProviderIdSchema` in `@jurnal-zitn/shared`. Gemini and OpenRouter (v6) ride the
  * OpenAI-compatible adapter with their own base URLs and model metadata.
  */
 export type ProviderId = 'claude' | 'openai' | 'gemini' | 'openrouter';

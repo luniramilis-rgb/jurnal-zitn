@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import type {
   AdminDeleteUserRequest,
   AdminDeleteUserResult,
-} from '@tradr/shared/schemas/account-deletion';
+} from '@jurnal-zitn/shared/schemas/account-deletion';
 
 import { api } from '@/lib/api';
 

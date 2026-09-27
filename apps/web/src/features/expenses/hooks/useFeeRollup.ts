@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { type FeeRollupResponse, FeeRollupResponseSchema } from '@tradr/shared/schemas/expense';
+import {
+  type FeeRollupResponse,
+  FeeRollupResponseSchema,
+} from '@jurnal-zitn/shared/schemas/expense';
 
 import { api } from '@/lib/api';
 

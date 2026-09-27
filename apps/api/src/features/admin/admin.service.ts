@@ -6,7 +6,7 @@ import {
   type AdminUsage,
   type AdminUserDetail,
   type AdminUserListResponse,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { config } from '@/lib/config';

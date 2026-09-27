@@ -10,14 +10,14 @@ API_URL ?= http://localhost:3100
 # Known-good local-dev .env. This is a real file target (NOT .PHONY), so Make
 # only runs the recipe when .env is missing — an existing .env is never
 # clobbered. Values match docker-compose.dev.yml (postgres/postgres @ :5433,
-# db tradr_dev) and satisfy the api config schema's three required vars
+# db jurnal_zitn_dev) and satisfy the api config schema's three required vars
 # (DATABASE_URL, SESSION_SECRET >=32 chars, ENCRYPTION_KEY 64 hex chars). These
 # are throwaway local secrets — never used outside local development.
 .env:
 	@printf '%s\n' \
 	  'NODE_ENV=development' \
 	  'PORT=3100' \
-	  'DATABASE_URL=postgresql://postgres:postgres@localhost:5433/tradr_dev' \
+	  'DATABASE_URL=postgresql://postgres:postgres@localhost:5433/jurnal_zitn_dev' \
 	  'DB_POOL_SIZE=10' \
 	  'SESSION_SECRET=local-dev-session-secret-change-me-at-least-32-chars' \
 	  'ENCRYPTION_KEY=0000000000000000000000000000000000000000000000000000000000000000' \
@@ -32,7 +32,7 @@ dev: .env
 # hashing/validation matches production). Requires `make dev` to be running.
 # Idempotent: a pre-existing account (409) is treated as success.
 seed-user:
-	@code=$$(curl -sS -o /tmp/tradr-seed-user.json -w '%{http_code}' \
+	@code=$$(curl -sS -o /tmp/jurnal-zitn-seed-user.json -w '%{http_code}' \
 	    -X POST $(API_URL)/api/auth/register \
 	    -H 'Content-Type: application/json' \
 	    -d '{"email":"$(SEED_USER_EMAIL)","password":"$(SEED_USER_PASSWORD)"}' 2>/dev/null) || \
@@ -40,7 +40,7 @@ seed-user:
 	case "$$code" in \
 	  201) echo "Created dev user: $(SEED_USER_EMAIL) / $(SEED_USER_PASSWORD)" ;; \
 	  409) echo "Dev user already exists: $(SEED_USER_EMAIL) / $(SEED_USER_PASSWORD)" ;; \
-	  *) echo "Register failed (HTTP $$code):"; cat /tmp/tradr-seed-user.json; echo; exit 1 ;; \
+	  *) echo "Register failed (HTTP $$code):"; cat /tmp/jurnal-zitn-seed-user.json; echo; exit 1 ;; \
 	esac
 
 # Generate believable demo/dummy data (accounts, brokerages, positions/fills
@@ -51,11 +51,11 @@ seed-user:
 # dev@example.com (admin) and demo2@example.com, password devpass123.
 seed-demo: .env
 	docker compose -f docker-compose.dev.yml up -d
-	pnpm --filter @tradr/api seed
+	pnpm --filter @jurnal-zitn/api seed
 
 # Cut a release. The git tag vX.Y.Z is the single version driver: pushing it
-# runs release.yml (GHCR images tradr-api/tradr-web:X.Y.Z + :latest, the
-# tradr-web-dist tarball, and the GitHub Release that feeds the in-app
+# runs release.yml (GHCR images jurnal-zitn-api/jurnal-zitn-web:X.Y.Z + :latest, the
+# jurnal-zitn-web-dist tarball, and the GitHub Release that feeds the in-app
 # changelog and any downstream deploy). release.yml publishes NOTHING until the CI
 # workflow is green for the tagged commit, so push commit and tag together
 # (the command below) and the release waits for that CI run. The package.json
@@ -71,7 +71,7 @@ VERSIONED_PKGS := apps/api apps/web packages/shared bench e2e
 # gates on the committed artifact matching a fresh generate. Bumping the package
 # versions without regenerating therefore reds CI on the bump commit itself, which
 # blocks release.yml's ci-gate and publishes nothing. Regenerate in the same commit.
-OPENAPI_ARTIFACT := apps/docs/src/openapi/tradr-api.json
+OPENAPI_ARTIFACT := apps/docs/src/openapi/jurnal-zitn-api.json
 
 .PHONY: release
 release:
@@ -80,7 +80,7 @@ release:
 	@git diff --quiet HEAD || { echo "working tree not clean — commit or stash first"; exit 1; }
 	@node scripts/check-release-notes.mjs v$(VERSION) --pre-flight
 	@for p in $(VERSIONED_PKGS); do (cd $$p && npm pkg set version=$(VERSION)); done
-	pnpm --filter @tradr/docs openapi:generate
+	pnpm --filter @jurnal-zitn/docs openapi:generate
 	git add $(addsuffix /package.json,$(VERSIONED_PKGS)) $(OPENAPI_ARTIFACT)
 	git commit -m "chore(release): v$(VERSION)"
 	git tag v$(VERSION)

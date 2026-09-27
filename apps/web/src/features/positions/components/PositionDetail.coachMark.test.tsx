@@ -16,7 +16,7 @@
 import { render, screen, cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { OnboardingState, PositionDetail } from '@tradr/shared';
+import type { OnboardingState, PositionDetail } from '@jurnal-zitn/shared';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 import { useOnboardingQuery, useOnboardingPatch } from '@/features/onboarding/hooks/useOnboarding';

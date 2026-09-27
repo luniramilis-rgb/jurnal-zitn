@@ -53,7 +53,7 @@ importers:
       '@hono/zod-validator':
         specifier: ^0.4
         version: 0.4.3(hono@4.12.8)(zod@3.25.76)
-      '@tradr/shared':
+      '@jurnal-zitn/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       bcrypt:
@@ -181,7 +181,7 @@ importers:
       '@tanstack/react-router':
         specifier: ^1
         version: 1.167.3(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
-      '@tradr/shared':
+      '@jurnal-zitn/shared':
         specifier: workspace:*
         version: link:../../packages/shared
       class-variance-authority:
@@ -299,7 +299,7 @@ importers:
 
   bench:
     dependencies:
-      '@tradr/shared':
+      '@jurnal-zitn/shared':
         specifier: workspace:*
         version: link:../packages/shared
       drizzle-orm:

@@ -11,8 +11,8 @@ import {
   check,
 } from 'drizzle-orm/pg-core';
 
-import { CURRENCY_CODES } from '@tradr/shared/constants/currencies';
-import { EXPENSE_CATEGORIES } from '@tradr/shared/constants/expense-categories';
+import { CURRENCY_CODES } from '@jurnal-zitn/shared/constants/currencies';
+import { EXPENSE_CATEGORIES } from '@jurnal-zitn/shared/constants/expense-categories';
 
 import { users } from './users.schema';
 

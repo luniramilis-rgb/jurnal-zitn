@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { FeeSchedule } from '@tradr/shared';
+import type { FeeSchedule } from '@jurnal-zitn/shared';
 
 import { computeFillFee, fillSide } from './fillFees';
 
@@ -8,6 +8,8 @@ const schedule: FeeSchedule = {
   stockPerShareCommission: '0.005',
   stockMinPerFill: '1',
   stockMaxPerFill: '0',
+  stockPercentBuy: '0',
+  stockPercentSell: '0',
   optionsPerContractCommission: '0.65',
   optionsPerContractExchangeFee: '0',
   optionsMinPerFill: '0',

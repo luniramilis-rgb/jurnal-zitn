@@ -20,6 +20,7 @@ import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { TagChipList } from '@/features/tags/components/TagChip';
 import { TagFilterControl } from '@/features/tags/components/TagFilterControl';
 import { useTags } from '@/features/tags/hooks/useTags';
+import { useT } from '@/hooks/useLocale';
 import { captureClientEvent } from '@/lib/telemetry/posthog';
 import { cn } from '@/lib/utils';
 import { useDrawerStore } from '@/stores/drawer.store';
@@ -44,6 +45,7 @@ const STATUS_TABS = [
 ] as const;
 
 export function PositionList() {
+  const t = useT();
   // The list filters live in the URL so a filtered view is shareable and
   // reload-safe (REQ-3.3). `buildListFilters` returns `undefined` for the empty
   // view, which keys `['positions', 'list', undefined]` — the same key the
@@ -81,7 +83,7 @@ export function PositionList() {
   return (
     <>
       <PageHeader
-        page="Positions"
+        page={t('page.positions')}
         right={
           hasAccounts ? (
             // `data-tour` is the walkthrough's anchor for the log-a-position
@@ -92,18 +94,18 @@ export function PositionList() {
               className="cursor-pointer"
               onClick={() => handleDialogOpenChange(true)}
             >
-              New Position
+              {t('pos.list.new')}
             </Button>
           ) : (
             <Tooltip>
               <TooltipTrigger asChild>
                 <span>
                   <Button className="cursor-pointer" disabled>
-                    New Position
+                    {t('pos.list.new')}
                   </Button>
                 </span>
               </TooltipTrigger>
-              <TooltipContent>Create an account first</TooltipContent>
+              <TooltipContent>{t('pos.list.createAccountFirst')}</TooltipContent>
             </Tooltip>
           )
         }
@@ -151,13 +153,10 @@ export function PositionList() {
         </div>
       ) : !positions?.length ? (
         filters === undefined ? (
-          <EmptyState
-            title="No positions yet"
-            description="Log your first position to see it here."
-          />
+          <EmptyState title={t('pos.list.empty')} description={t('pos.list.emptyDesc')} />
         ) : (
           <EmptyState
-            title="No positions match this filter"
+            title={t('pos.list.emptyFiltered')}
             action={
               <Button
                 variant="outline"
@@ -169,7 +168,7 @@ export function PositionList() {
                   })
                 }
               >
-                Clear filters
+                {t('pos.list.clearFilters')}
               </Button>
             }
           />
@@ -178,20 +177,22 @@ export function PositionList() {
         <Table className="text-sm">
           <TableHeader>
             <TableRow className="border-hairline">
-              <TableHead>Symbol</TableHead>
-              <TableHead>Side</TableHead>
-              <TableHead>Status</TableHead>
-              {!drawerOpen && <TableHead className="hidden md:table-cell">Tags</TableHead>}
-              {!drawerOpen && <TableHead>Account</TableHead>}
-              <TableHead className="text-right">Qty</TableHead>
-              {!drawerOpen && <TableHead className="text-right">Entry</TableHead>}
-              {!drawerOpen && <TableHead className="text-right">Exit</TableHead>}
-              <TableHead className="text-right">P&L</TableHead>
-              <TableHead className="text-right">R</TableHead>
-              {!drawerOpen && <TableHead className="text-right">Fees</TableHead>}
-              {!drawerOpen && <TableHead className="text-right">Age</TableHead>}
+              <TableHead>{t('pos.col.symbol')}</TableHead>
+              <TableHead>{t('pos.col.side')}</TableHead>
+              <TableHead>{t('pos.col.status')}</TableHead>
+              {!drawerOpen && (
+                <TableHead className="hidden md:table-cell">{t('pos.col.tags')}</TableHead>
+              )}
+              {!drawerOpen && <TableHead>{t('pos.col.account')}</TableHead>}
+              <TableHead className="text-right">{t('pos.col.qty')}</TableHead>
+              {!drawerOpen && <TableHead className="text-right">{t('pos.col.entry')}</TableHead>}
+              {!drawerOpen && <TableHead className="text-right">{t('pos.col.exit')}</TableHead>}
+              <TableHead className="text-right">{t('pos.col.pnl')}</TableHead>
+              <TableHead className="text-right">{t('pos.col.r')}</TableHead>
+              {!drawerOpen && <TableHead className="text-right">{t('pos.col.fees')}</TableHead>}
+              {!drawerOpen && <TableHead className="text-right">{t('pos.col.age')}</TableHead>}
               <TableHead className="w-10 text-right">
-                <span className="sr-only">Actions</span>
+                <span className="sr-only">{t('pos.col.actions')}</span>
               </TableHead>
             </TableRow>
           </TableHeader>

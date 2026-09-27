@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import type { Brokerage, CreateBrokerageInput, UpdateBrokerageInput } from '@tradr/shared';
+import type { Brokerage, CreateBrokerageInput, UpdateBrokerageInput } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

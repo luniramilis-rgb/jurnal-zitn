@@ -26,7 +26,7 @@ import { expect, test, type APIRequestContext, type Page } from '@playwright/tes
  *      `?classification=breakeven` across a reload.
  *   7. `stat-Expectancy` is +1,728.00 ÷ 10 before step 6 and ÷ 11 after.
  *
- * Step 8 (the `pnpm --filter @tradr/web build` + `check-bundle-size.mjs` gate)
+ * Step 8 (the `pnpm --filter @jurnal-zitn/web build` + `check-bundle-size.mjs` gate)
  * is a build check run outside Playwright, not a case here.
  *
  * ASSERTIONS ARE ON THE DOM, THE URL AND THE NETWORK, NEVER ON REACT STATE.

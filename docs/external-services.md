@@ -1,12 +1,12 @@
 # External services
 
-What a **running** Tradr instance talks to over the network, why, and which
+What a **running** Jurnal ZITN instance talks to over the network, why, and which
 configuration turns each connection on. Build/CI dependencies are out of scope.
 For setup procedures see the [deployment runbook](runbooks/deployment.md).
 
 ## Baseline: no external services required
 
-With no optional keys configured, Tradr is a manual trading journal that talks
+With no optional keys configured, Jurnal ZITN is a manual trading journal that talks
 only to its own PostgreSQL. Every integration below is **opt-in and
 feature-gating**: when its configuration is absent, the feature is absent (not
 degraded) and the process makes **no outbound calls** for it.
@@ -64,7 +64,7 @@ own repo or leave the default.
 
 Both surfaces gate independently; all four observability vars are optional. A
 fresh clone with none set loads no SDK and makes no telemetry calls. Structured
-logs go to stdout only — Tradr ships them to no third-party sink of its own. See
+logs go to stdout only — Jurnal ZITN ships them to no third-party sink of its own. See
 the privacy-posture notes in `.env.example` for exactly what is (and is not)
 sent, and [analytics.md](analytics.md) for the PostHog event catalogue and
 privacy design.
@@ -110,7 +110,7 @@ Inbound: Stripe webhooks.
   CSV-import presets mention IBKR; there is no runtime integration.
 - **Transactional email** — explicitly a future spec. There is **no email
   sending anywhere in the codebase**. Password recovery deliberately does not
-  depend on it: self-host uses the `tradr reset-password` CLI; hosted is
+  depend on it: self-host uses the `jurnal-zitn reset-password` CLI; hosted is
   admin-assisted token issue until the email spec ships.
 
 ## Notably absent

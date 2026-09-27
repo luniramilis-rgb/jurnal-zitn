@@ -4,8 +4,8 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, fireEvent, waitFor, cleanup, act } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { TierState } from '@tradr/shared';
-import type { Persona } from '@tradr/shared/schemas/advisor';
+import type { TierState } from '@jurnal-zitn/shared';
+import type { Persona } from '@jurnal-zitn/shared/schemas/advisor';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
@@ -184,7 +184,7 @@ afterEach(() => {
 describe('AdvisorPage', () => {
   it('case 1: renders the empty-state message when there are no conversations and a key exists', () => {
     renderPage({ conversationId: null });
-    expect(screen.getByText('Start a conversation with the Tradr Advisor.')).toBeTruthy();
+    expect(screen.getByText('Start a conversation with the Jurnal ZITN Advisor.')).toBeTruthy();
     // Composer is present and enabled (a key is configured).
     expect(screen.getByTestId('composer')).toBeTruthy();
   });

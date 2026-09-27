@@ -8,7 +8,7 @@
 
 import { useMutation } from '@tanstack/react-query';
 
-import type { StockQuoteResponse } from '@tradr/shared';
+import type { StockQuoteResponse } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

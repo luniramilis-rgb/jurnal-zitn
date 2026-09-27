@@ -3,7 +3,7 @@ import { createFileRoute, Link, useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { LoginSchema, type LoginInput } from '@tradr/shared';
+import { LoginSchema, type LoginInput } from '@jurnal-zitn/shared';
 
 import { AuthScreen } from '@/components/layout/AuthScreen';
 import { Button } from '@/components/ui/button';
@@ -11,7 +11,9 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useLogin } from '@/hooks/useAuth';
+import { useT } from '@/hooks/useLocale';
 import { useRegistrationEnabled } from '@/hooks/useRegistrationEnabled';
+import { apiErrorMessage } from '@/lib/api-error';
 
 // SF-3: this page is public and MUST NOT call useAuth() or mount the
 // ['auth','me'] query — the api client's global 401 interception would answer a
@@ -22,6 +24,7 @@ import { useRegistrationEnabled } from '@/hooks/useRegistrationEnabled';
 function LoginPage() {
   const login = useLogin();
   const navigate = useNavigate();
+  const t = useT();
   const { registrationEnabled } = useRegistrationEnabled();
   const [apiError, setApiError] = useState('');
   const expired = new URLSearchParams(window.location.search).get('expired');
@@ -42,7 +45,7 @@ function LoginPage() {
       navigate({ to: '/dashboard' });
     } catch (err: unknown) {
       const error = err as { message?: string };
-      setApiError(error?.message || 'An unexpected error occurred');
+      setApiError(apiErrorMessage(error, t));
     }
   };
 
@@ -50,24 +53,24 @@ function LoginPage() {
     <AuthScreen>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Log in</CardTitle>
+          <CardTitle>{t('auth.login.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           {expired === 'true' && (
-            <p className="mb-4 text-sm text-destructive">Session expired. Please log in again.</p>
+            <p className="mb-4 text-sm text-destructive">{t('auth.login.expired')}</p>
           )}
 
           {/* Deletion is not an error — muted, never text-destructive. The
               account-deletion hook navigates here after a `deleted` outcome. */}
           {deleted === 'true' && (
-            <p className="mb-4 text-sm text-muted-foreground">Your account was deleted.</p>
+            <p className="mb-4 text-sm text-muted-foreground">{t('auth.login.deleted')}</p>
           )}
 
           {apiError && <p className="mb-4 text-sm text-destructive">{apiError}</p>}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('auth.field.email')}</Label>
               <Input
                 id="email"
                 type="email"
@@ -83,7 +86,7 @@ function LoginPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t('auth.field.password')}</Label>
               <Input
                 id="password"
                 type="password"
@@ -99,7 +102,7 @@ function LoginPage() {
             </div>
 
             <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting}>
-              {isSubmitting ? 'Logging in...' : 'Log in'}
+              {isSubmitting ? t('auth.login.submitting') : t('auth.login.submit')}
             </Button>
           </form>
 
@@ -107,7 +110,7 @@ function LoginPage() {
               linked page shows the defined-unavailability state. */}
           <p className="mt-4 text-center text-sm text-muted-foreground">
             <Link to="/forgot-password" className="underline">
-              Forgot password?
+              {t('auth.login.forgot')}
             </Link>
           </p>
 
@@ -119,9 +122,9 @@ function LoginPage() {
               server refuses the POST either way. */}
           {registrationEnabled && (
             <p className="mt-2 text-center text-sm text-muted-foreground">
-              Don't have an account?{' '}
+              {t('auth.login.noAccount')}{' '}
               <Link to="/register" className="underline">
-                Register
+                {t('auth.login.register')}
               </Link>
             </p>
           )}

@@ -1,6 +1,6 @@
 import { and, eq, inArray, sql } from 'drizzle-orm';
 
-import type { PositionImage, StoredContentPart } from '@tradr/shared';
+import type { PositionImage, StoredContentPart } from '@jurnal-zitn/shared';
 
 import type { Database, Transaction } from '@/db';
 import { positionImages, positions } from '@/db/schema';

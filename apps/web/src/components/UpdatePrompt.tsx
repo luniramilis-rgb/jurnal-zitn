@@ -2,6 +2,7 @@ import { useRouter } from '@tanstack/react-router';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
+import { useT } from '@/hooks/useLocale';
 import { useUpdateMonitor } from '@/hooks/useUpdateMonitor';
 import { captureClientEvent } from '@/lib/telemetry/posthog';
 import { getUpdateMonitor } from '@/lib/updateMonitor';
@@ -18,6 +19,7 @@ export const UPDATE_TOAST_ID = 'app-update';
  */
 export function UpdatePrompt(): null {
   const router = useRouter();
+  const t = useT();
   const monitor = getUpdateMonitor();
   const { promptVisible, servedVersion, bootVersion, learnedVia } = useUpdateMonitor();
 
@@ -41,12 +43,11 @@ export function UpdatePrompt(): null {
 
   useEffect(() => {
     if (promptVisible && servedVersion !== undefined) {
-      toast('Tradr has been updated', {
+      toast(t('app.update.toast'), {
         id: UPDATE_TOAST_ID,
         description: (
           <>
-            Reload to switch to the version being served. Anything unsaved on this page will be
-            lost.
+            {t('app.update.description')}
             <span className="mt-1 block font-mono text-xs">
               {bootVersion} → {servedVersion}
             </span>
@@ -55,14 +56,14 @@ export function UpdatePrompt(): null {
         duration: Infinity,
         dismissible: true,
         action: {
-          label: 'Reload',
+          label: t('app.update.reload'),
           onClick: () => {
             captureClientEvent('app_update_prompt_accepted', { bootVersion, servedVersion });
             monitor.accept();
           },
         },
         cancel: {
-          label: 'Not now',
+          label: t('app.update.dismiss'),
           onClick: () => {
             captureClientEvent('app_update_prompt_dismissed', { bootVersion, servedVersion });
             monitor.dismiss();

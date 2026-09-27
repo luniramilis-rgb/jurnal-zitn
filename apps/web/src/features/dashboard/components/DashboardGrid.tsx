@@ -9,7 +9,7 @@ import {
 import { useEffect, useMemo, useRef, useState, type ReactElement, type ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
-import { PerWidgetMinSize, type WidgetPlacement } from '@tradr/shared/schemas/dashboard';
+import { PerWidgetMinSize, type WidgetPlacement } from '@jurnal-zitn/shared/schemas/dashboard';
 
 import { GRID_COLUMNS, GRID_GAP_PX, GRID_MAX_ROWS, GRID_ROW_HEIGHT_PX } from '../grid.constants';
 import { keepStoredGeometry, reserveTopRightSlot, sortByYThenX } from '../layout';

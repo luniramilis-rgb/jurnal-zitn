@@ -1,7 +1,7 @@
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import type { CreatePositionInput, Position, PositionListItem } from '@tradr/shared';
+import type { CreatePositionInput, Position, PositionListItem } from '@jurnal-zitn/shared';
 
 import { billingKeys } from '@/features/billing/useWalletBalance';
 import { api, isUnauthorized } from '@/lib/api';

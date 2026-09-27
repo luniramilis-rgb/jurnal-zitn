@@ -5,7 +5,7 @@ module.exports = {
       name: 'no-web-to-shared-lib',
       severity: 'error',
       comment:
-        'apps/web must not import from @tradr/shared/src/lib/* — computation primitives live in schemas/, or backend-only. Expose a new shared surface via packages/shared/src/index.ts if the UI genuinely needs it.',
+        'apps/web must not import from @jurnal-zitn/shared/src/lib/* — computation primitives live in schemas/, or backend-only. Expose a new shared surface via packages/shared/src/index.ts if the UI genuinely needs it.',
       from: { path: '^apps/web/' },
       to: { path: '^packages/shared/src/lib/' },
     },

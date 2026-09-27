@@ -7,7 +7,7 @@ import { cleanup, render } from '@testing-library/react';
 import { StrictMode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ChangelogReleasesResponse } from '@tradr/shared';
+import type { ChangelogReleasesResponse } from '@jurnal-zitn/shared';
 
 import { ChangelogPage } from './ChangelogPage';
 

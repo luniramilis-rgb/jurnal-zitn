@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import type { AdminUserListItem, ToggleAdminRequest } from '@tradr/shared/schemas/admin';
+import type { AdminUserListItem, ToggleAdminRequest } from '@jurnal-zitn/shared/schemas/admin';
 
 import { api } from '@/lib/api';
 

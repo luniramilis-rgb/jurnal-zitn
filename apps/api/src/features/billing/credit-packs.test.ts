@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { CreditPackSchema } from '@tradr/shared';
+import { CreditPackSchema } from '@jurnal-zitn/shared';
 
 import { CREDIT_PACKS } from './credit-packs';
 

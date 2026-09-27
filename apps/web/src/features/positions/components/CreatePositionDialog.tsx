@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import type { CreatePositionInput } from '@tradr/shared';
+import type { CreatePositionInput } from '@jurnal-zitn/shared';
 
 import { SymbolAutocomplete } from '@/components/SymbolAutocomplete';
 import { Button } from '@/components/ui/button';
@@ -21,6 +21,7 @@ import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { approachingRemaining, isAccountWritable } from '@/features/billing/tier-usage';
 import { UpgradeLink } from '@/features/billing/UpgradeLink';
 import { useTierState } from '@/features/billing/useTierState';
+import { useT } from '@/hooks/useLocale';
 
 import { getPositionErrorCode, useCreatePosition } from '../hooks/usePositions';
 import { encodeContract, occErrorField, type OptionContractInputs } from '../utils/occForm';
@@ -130,6 +131,7 @@ const TIER_REFUSAL_MESSAGES: Record<string, string> = {
 };
 
 export function CreatePositionDialog({ open, onOpenChange }: Props) {
+  const t = useT();
   const { data: accounts } = useAccounts();
   const createPosition = useCreatePosition();
   const { data: tierState } = useTierState();
@@ -253,7 +255,7 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>New Position</DialogTitle>
+          <DialogTitle>{t('pos.list.new')}</DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           {tierRefusalCode && (
@@ -277,7 +279,7 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
 
           {assetType === 'stock' ? (
             <div className="space-y-2">
-              <Label htmlFor="symbol">Symbol</Label>
+              <Label htmlFor="symbol">{t('pos.col.symbol')}</Label>
               {/* The same control the calculator uses, for the reason above the
                   import.
 
@@ -300,7 +302,7 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
                 onChange={(ticker) =>
                   form.setValue('symbol', ticker, { shouldValidate: true, shouldDirty: true })
                 }
-                placeholder="e.g., AAPL"
+                placeholder={t('pos.field.entryPlaceholder')}
               />
               {form.formState.errors.symbol && (
                 <p className="text-sm text-destructive">{form.formState.errors.symbol.message}</p>
@@ -326,7 +328,7 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label>Side</Label>
+              <Label>{t('pos.col.side')}</Label>
               <Select
                 value={form.watch('side')}
                 onValueChange={(val) => form.setValue('side', val as 'long' | 'short')}
@@ -335,13 +337,13 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="long">Long</SelectItem>
-                  <SelectItem value="short">Short</SelectItem>
+                  <SelectItem value="long">{t('pos.side.long')}</SelectItem>
+                  <SelectItem value="short">{t('pos.side.short')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-2">
-              <Label>Asset Type</Label>
+              <Label>{t('pos.field.assetType')}</Label>
               <Select
                 value={assetType}
                 onValueChange={(val) => handleAssetTypeChange(val as 'stock' | 'option')}
@@ -350,21 +352,21 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="stock">Stock</SelectItem>
-                  <SelectItem value="option">Option</SelectItem>
+                  <SelectItem value="stock">{t('pos.asset.stock')}</SelectItem>
+                  <SelectItem value="option">{t('pos.asset.option')}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="space-y-2">
-            <Label>Account</Label>
+            <Label>{t('pos.col.account')}</Label>
             <Select
               value={form.watch('accountId')}
               onValueChange={(val) => form.setValue('accountId', val)}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Select account" />
+                <SelectValue placeholder={t('pos.field.selectAccount')} />
               </SelectTrigger>
               <SelectContent>
                 {/* Non-writable accounts are disabled + badged instead of
@@ -386,8 +388,12 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="notes">Notes</Label>
-            <Textarea id="notes" {...form.register('notes')} placeholder="Optional notes..." />
+            <Label htmlFor="notes">{t('pos.field.notes')}</Label>
+            <Textarea
+              id="notes"
+              {...form.register('notes')}
+              placeholder={t('pos.field.notesPlaceholder')}
+            />
           </div>
 
           <div className="flex justify-end gap-2">
@@ -397,7 +403,7 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
               className="cursor-pointer"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t('action.cancel')}
             </Button>
             <Button
               type="submit"
@@ -409,7 +415,7 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
               className="cursor-pointer"
               disabled={createPosition.isPending}
             >
-              {createPosition.isPending ? 'Creating...' : 'Create'}
+              {createPosition.isPending ? t('pos.dialog.creating') : t('pos.action.create')}
             </Button>
           </div>
         </form>

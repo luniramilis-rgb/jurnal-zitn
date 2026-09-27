@@ -10,7 +10,7 @@
 // Process-local state-module discipline mirrors
 // `apps/api/src/features/advisor/idempotency-map.ts`.
 
-import type { ChangelogRelease } from '@tradr/shared';
+import type { ChangelogRelease } from '@jurnal-zitn/shared';
 
 /**
  * TTL and negative-cache intervals are module constants, NOT operator-tunable

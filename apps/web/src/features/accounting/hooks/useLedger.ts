@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import type { LedgerEntryListResponse } from '@tradr/shared/schemas/accounting';
+import type { LedgerEntryListResponse } from '@jurnal-zitn/shared/schemas/accounting';
 
 import { api } from '@/lib/api';
 

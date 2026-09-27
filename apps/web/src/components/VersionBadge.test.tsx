@@ -8,29 +8,29 @@ import { VersionBadge } from './VersionBadge';
 
 afterEach(() => {
   cleanup();
-  delete window.__TRADR_CONFIG__;
+  delete window.__JURNAL_ZITN_CONFIG__;
 });
 
 describe('appVersion', () => {
   it("falls back to 'localdev' when config.js is absent (local dev)", () => {
-    delete window.__TRADR_CONFIG__;
+    delete window.__JURNAL_ZITN_CONFIG__;
     expect(appVersion()).toBe('localdev');
   });
 
   it("falls back to 'localdev' when config.js omits appVersion", () => {
-    window.__TRADR_CONFIG__ = { apiBaseUrl: 'https://api.example.com/api' };
+    window.__JURNAL_ZITN_CONFIG__ = { apiBaseUrl: 'https://api.example.com/api' };
     expect(appVersion()).toBe('localdev');
   });
 
   it('returns the deploy-stamped string when present', () => {
-    window.__TRADR_CONFIG__ = { appVersion: 'v0.1.0-ab67fad' };
+    window.__JURNAL_ZITN_CONFIG__ = { appVersion: 'v0.1.0-ab67fad' };
     expect(appVersion()).toBe('v0.1.0-ab67fad');
   });
 });
 
 describe('VersionBadge', () => {
   it('renders the stamped version', () => {
-    window.__TRADR_CONFIG__ = { appVersion: 'v0.1.0-ab67fad' };
+    window.__JURNAL_ZITN_CONFIG__ = { appVersion: 'v0.1.0-ab67fad' };
     render(<VersionBadge />);
     expect(screen.getByText('v0.1.0-ab67fad')).toBeTruthy();
   });

@@ -23,15 +23,15 @@ import { driver, type Driver, type DriveStep, type DriverHook } from 'driver.js'
 import '../tour.css';
 
 /** Consumed by `tour.css`; also the hook a future restyle can hang off. */
-const POPOVER_CLASS = 'tradr-tour';
+const POPOVER_CLASS = 'jurnal-zitn-tour';
 /** The hint element's class, styled in `tour.css`. */
-const HINT_CLASS = 'tradr-tour-action-hint';
+const HINT_CLASS = 'jurnal-zitn-tour-action-hint';
 /** driver.js's own disabled-button class — `opacity: .5; pointer-events: none`. */
 const DRIVER_BTN_DISABLED_CLASS = 'driver-popover-btn-disabled';
 /** On the popover while the step cannot be advanced by "Next". */
-const HELD_CLASS = 'tradr-tour-held';
+const HELD_CLASS = 'jurnal-zitn-tour-held';
 /** Narrower popover, for the one step with no room at the full width. */
-const NARROW_CLASS = 'tradr-tour-narrow';
+const NARROW_CLASS = 'jurnal-zitn-tour-narrow';
 
 export type TourStepSide = 'top' | 'right' | 'bottom' | 'left';
 export type TourStepAlign = 'start' | 'center' | 'end';

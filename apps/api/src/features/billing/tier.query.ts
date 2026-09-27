@@ -1,4 +1,4 @@
-import type { Tier, TierLimits, TierState } from '@tradr/shared';
+import type { Tier, TierLimits, TierState } from '@jurnal-zitn/shared';
 
 import type { Database, Transaction } from '@/db';
 import { countAccountsByUser, resolveWritableAccountId } from '@/features/accounts/accounts.query';

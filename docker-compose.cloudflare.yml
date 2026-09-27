@@ -1,0 +1,28 @@
+# Overlay opsional: menyajikan container `web` lewat Cloudflare Tunnel
+# (ZITN-TECH-017 runtime A). Tidak perlu membuka port host — tunnel yang mendail keluar.
+#
+# Pemakaian:
+#   cp .env.example .env                 # isi POSTGRES_*/secret
+#   # Zero Trust -> Networks -> Tunnels -> Create tunnel -> copy token:
+#   #   TUNNEL_TOKEN=eyJ...
+#   docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml up -d
+#
+# Di dashboard Cloudflare, tambahkan Public Hostname pada tunnel:
+#   jurnal.zeninthenoise.com  ->  http://web:80
+# Dashboard akan MEMBUAT record CNAME proxied `jurnal` secara otomatis (tak perlu
+# `cloudflared tunnel route dns` manual).
+#
+# Catatan: `jurnal-zitn` adalah nama network di docker-compose.yml; `web` melayani
+# SPA + proxy /api pada port 80.
+
+services:
+  cloudflared:
+    image: cloudflare/cloudflared:2026.5.2
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${TUNNEL_TOKEN:?set TUNNEL_TOKEN in .env}
+    depends_on:
+      - web
+    networks:
+      - jurnal-zitn
+    restart: unless-stopped

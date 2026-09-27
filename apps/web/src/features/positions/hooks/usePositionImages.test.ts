@@ -5,7 +5,7 @@ import { createElement, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { PositionDetail, PositionImage } from '@tradr/shared';
+import type { PositionDetail, PositionImage } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

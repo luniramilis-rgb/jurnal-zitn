@@ -29,13 +29,13 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends python3 make g++ \
   && rm -rf /var/lib/apt/lists/*
 
-# Copy the whole monorepo (Vite resolves @tradr/shared from workspace source).
+# Copy the whole monorepo (Vite resolves @jurnal-zitn/shared from workspace source).
 # .dockerignore keeps the context slim (no node_modules, no .git, no .env).
 COPY . .
 
 # Reproducible install, then the unaltered prod build (vite build -> apps/web/dist).
 RUN pnpm install --frozen-lockfile
-RUN pnpm --filter @tradr/web build
+RUN pnpm --filter @jurnal-zitn/web build
 
 # ---------------------------------------------------------------------------
 # Runner: stock nginx:alpine. No Node. The official entrypoint runs
@@ -51,7 +51,7 @@ FROM nginx:1.27-alpine AS runner
 
 # Deployed-version string, BAKED at build time (observability REQ-7.6), mirroring
 # Dockerfile.api:64-65. Read by 10-runtime-config.sh for two things: the SPA's
-# corner version badge (config.js `appVersion`) and the tradr_web_build_info
+# corner version badge (config.js `appVersion`) and the jurnal_zitn_web_build_info
 # labels in /metrics. Stamped by the release workflow; empty in local builds, so
 # `emit` skips appVersion and config.js is unchanged. Deliberately NOT routed
 # through .env (REQ-7.7) — the `api` service reads that same file via env_file:,

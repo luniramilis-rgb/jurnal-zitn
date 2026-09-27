@@ -1,11 +1,11 @@
 ---
 title: Back up and restore
-description: Back up a self-hosted Tradr instance with pg_dump or a volume snapshot, restore it into a fresh stack, and prove the backup works with the shipped restore drill.
+description: Back up a self-hosted Jurnal ZITN instance with pg_dump or a volume snapshot, restore it into a fresh stack, and prove the backup works with the shipped restore drill.
 ---
 
 import HostedOnly from '@/components/HostedOnly.astro';
 
-Tradr keeps all its state in one PostgreSQL database, so a backup is a database
+Jurnal ZITN keeps all its state in one PostgreSQL database, so a backup is a database
 dump plus one file. This page covers both, the restore, and how to check that a
 backup restores before you need it to.
 
@@ -27,7 +27,7 @@ no proprietary format.
 
 `.env` is **not** in the database, and one value in it is unrecoverable.
 
-Tradr encrypts each user's provider API keys at rest with `ENCRYPTION_KEY`. A
+Jurnal ZITN encrypts each user's provider API keys at rest with `ENCRYPTION_KEY`. A
 restored database still holds those encrypted keys. Without the original
 `ENCRYPTION_KEY`, nothing can decrypt them. The only repair is for every user to
 paste their key again.
@@ -43,8 +43,8 @@ contains `POSTGRES_PASSWORD`, `SESSION_SECRET`, and `ENCRYPTION_KEY`.
 ## Find your volume name
 
 Docker prefixes the volume with the Compose project name. The project name
-defaults to the directory you run `docker compose` in, so a clone in `tradr/`
-gives `tradr_pgdata`.
+defaults to the directory you run `docker compose` in, so a clone in `jurnal-zitn/`
+gives `jurnal_zitn_pgdata`.
 
 Confirm it rather than assuming it:
 
@@ -53,7 +53,7 @@ docker volume ls | grep pgdata
 ```
 
 **Expected result:** a line ending in `_pgdata`. Use that name wherever this page
-writes `tradr_pgdata`.
+writes `jurnal_zitn_pgdata`.
 
 ## Method 1 — logical dump, no downtime
 
@@ -94,11 +94,11 @@ Take a dump on a schedule, and keep more than one. A backup taken every night is
 worth little if last night's ran against an already-corrupt database.
 
 ```bash
-# /etc/cron.d/tradr-backup — nightly at 03:15, keep 14 days
-15 3 * * * root cd /srv/tradr && docker compose exec -T postgres \
+# /etc/cron.d/jurnal-zitn-backup — nightly at 03:15, keep 14 days
+15 3 * * * root cd /srv/jurnal-zitn && docker compose exec -T postgres \
   sh -c 'pg_dump -U "$POSTGRES_USER" -d "$POSTGRES_DB"' \
-  > /srv/backups/tradr-$(date +\%F).sql \
-  && find /srv/backups -name 'tradr-*.sql' -mtime +14 -delete
+  > /srv/backups/jurnal-zitn-$(date +\%F).sql \
+  && find /srv/backups -name 'jurnal-zitn-*.sql' -mtime +14 -delete
 ```
 
 Copy the backups somewhere the server cannot reach. A backup on the same disk as
@@ -112,7 +112,7 @@ from, and sometimes cannot.
 
 ```bash
 docker compose down
-docker run --rm -v tradr_pgdata:/data -v "$PWD":/backup alpine \
+docker run --rm -v jurnal_zitn_pgdata:/data -v "$PWD":/backup alpine \
   tar czf /backup/pgdata-$(date +%F).tar.gz -C /data .
 docker compose up -d
 ```
@@ -120,7 +120,7 @@ docker compose up -d
 **Expected result:** an archive of a few megabytes, and the stack back up within a
 minute.
 
-A snapshot restores only into the **same Postgres major version**. Tradr ships
+A snapshot restores only into the **same Postgres major version**. Jurnal ZITN ships
 `postgres:16`. A logical dump carries no such restriction, so prefer method 1
 unless you want a fast whole-instance clone.
 
@@ -135,7 +135,7 @@ restoring over live data leaves a mixture of both.
 docker compose down -v
 ```
 
-**Expected result:** Docker reports `Volume tradr_pgdata Removed`.
+**Expected result:** Docker reports `Volume jurnal_zitn_pgdata Removed`.
 
 :::danger
 `docker compose down -v` deletes your data. Take a dump first, even a stale one.
@@ -178,7 +178,7 @@ and the api starts serving.
 ### 5. Check the restore
 
 ```bash
-docker compose exec api tradr migrate --status
+docker compose exec api jurnal-zitn migrate --status
 ```
 
 **Expected result:** exit code 0, and a final line reading `Schema is up to date.`
@@ -192,9 +192,9 @@ Replace the data directory instead of loading SQL. The stack must be down.
 
 ```bash
 docker compose down
-docker volume rm tradr_pgdata
-docker volume create tradr_pgdata
-docker run --rm -v tradr_pgdata:/data -v "$PWD":/backup alpine \
+docker volume rm jurnal_zitn_pgdata
+docker volume create jurnal_zitn_pgdata
+docker run --rm -v jurnal_zitn_pgdata:/data -v "$PWD":/backup alpine \
   tar xzf /backup/pgdata-2026-08-04.tar.gz -C /data
 docker compose up -d
 ```
@@ -212,7 +212,7 @@ A backup nobody has restored is a hypothesis. The repository ships a drill that
 tests one for you:
 
 ```bash
-SOURCE_DATABASE_URL=postgres://user:pass@your-host:5432/tradr \
+SOURCE_DATABASE_URL=postgres://user:pass@your-host:5432/jurnal-zitn \
 STAGING_ADMIN_URL=postgres://user:pass@other-host:5432/postgres \
 scripts/backup-restore-drill.sh
 ```
@@ -258,7 +258,7 @@ server needs different values. Leave the three secrets alone.
 - **The api crash-loops after a restore and names the encryption key** — the
   `.env` on this server carries a different `ENCRYPTION_KEY` than the data was
   written with. Restore the original `.env`.
-- **The api crash-loops with `password authentication failed for user "tradr"`** —
+- **The api crash-loops with `password authentication failed for user "jurnal-zitn"`** —
   you regenerated `.env` against an existing volume. Postgres applies
   `POSTGRES_PASSWORD` once, when it initialises the data directory, and ignores it
   on every later start. Put the original password back, or destroy the volume and

@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { PanelRightClose } from 'lucide-react';
 
-import type { PositionListItem } from '@tradr/shared';
+import type { PositionListItem } from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import { Button } from '@/components/ui/button';

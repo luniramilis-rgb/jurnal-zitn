@@ -4,7 +4,7 @@
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { ChangelogRelease } from '@tradr/shared';
+import type { ChangelogRelease } from '@jurnal-zitn/shared';
 
 import {
   ChangelogUnavailableError,

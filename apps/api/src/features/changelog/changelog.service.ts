@@ -21,7 +21,7 @@ import type {
   ChangelogRelease,
   ChangelogReleasesResponse,
   MarkChangelogViewedResponse,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { config } from '@/lib/config';

@@ -1,7 +1,7 @@
-import type { ContractForm, Mapping, RowShape } from '@tradr/shared';
+import type { ContractForm, Mapping, RowShape } from '@jurnal-zitn/shared';
 
 /**
- * Target Tradr fields a CSV column can be mapped to, per row shape (design
+ * Target Jurnal ZITN fields a CSV column can be mapped to, per row shape (design
  * Component 2 / REQ-2.2). `required` fields must be mapped before a preview can
  * run; the mapper marks them. The `execution` shape additionally requires
  * EXACTLY ONE of `type`/`action` — both are listed as optional here and the

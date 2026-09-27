@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import Stripe from 'stripe';
 
-import type { ProviderId, WalletBalance, WalletHistoryItem } from '@tradr/shared';
+import type { ProviderId, WalletBalance, WalletHistoryItem } from '@jurnal-zitn/shared';
 
 import { db, type Transaction } from '@/db';
 import { config, isStripeConfigured } from '@/lib/config';
@@ -363,7 +363,7 @@ export function classifyReconciliation(
 /**
  * Pure proportional-reversal math (REQ-3.9). A full dispute/refund reverses the
  * whole grant; a partial `charge.refunded` reverses the refunded FRACTION of the
- * grant (`grant * refunded / chargeAmount`), floor-rounded so Tradr never
+ * grant (`grant * refunded / chargeAmount`), floor-rounded so Jurnal ZITN never
  * over-reverses on rounding. Returns the magnitude to claw back (a positive
  * bigint); the caller applies it as a negative `reversal` delta.
  */

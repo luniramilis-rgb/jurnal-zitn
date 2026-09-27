@@ -26,7 +26,7 @@ export const accounts = pgTable(
     // openedAt/closedAt are compared in for R13's same-day reopen rule, so an
     // evening US session that crosses UTC midnight is still one trading day.
     // Validated against the IANA set at the validation layer, not in the DB.
-    timezone: varchar('timezone', { length: 64 }).notNull().default('America/New_York'),
+    timezone: varchar('timezone', { length: 64 }).notNull().default('Asia/Jakarta'),
     brokerageId: uuid('brokerage_id').references(() => brokerages.id, { onDelete: 'restrict' }),
     // User-entered opening balance, NOT a cached aggregate — the derived
     // balance everywhere is starting_balance + SUM over ledger_entries, so the

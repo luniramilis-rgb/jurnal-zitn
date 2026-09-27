@@ -11,7 +11,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import type { StreamRequestInput } from '@tradr/shared/schemas/advisor';
+import type { StreamRequestInput } from '@jurnal-zitn/shared/schemas/advisor';
 
 import { resolveApiUrl } from '../../../lib/api';
 import { readSseStream, SsePreStreamError } from '../lib/sse';

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# Tradr self-hosting quickstart — the canonical setup path.
+# Jurnal ZITN self-hosting quickstart — the canonical setup path.
 #
 # This script IS the documentation. The README and the docs site point at it
 # rather than restating the commands, so there is no second copy to drift — the
@@ -75,7 +75,7 @@ echo "waiting for http://localhost:${WEB_PORT}/api/health ..."
 for _ in $(seq 1 60); do
   if curl -fsS "http://localhost:${WEB_PORT}/api/health" 2>/dev/null; then
     echo
-    echo "Tradr is up: http://localhost:${WEB_PORT}"
+    echo "Jurnal ZITN is up: http://localhost:${WEB_PORT}"
     exit 0
   fi
   sleep 2

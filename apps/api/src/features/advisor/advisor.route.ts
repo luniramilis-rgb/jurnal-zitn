@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import type { Context } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 
-import { ADVISOR_MAX_IMAGES_PER_MESSAGE, MAX_IMAGE_BYTES_DEFAULT } from '@tradr/shared';
+import { ADVISOR_MAX_IMAGES_PER_MESSAGE, MAX_IMAGE_BYTES_DEFAULT } from '@jurnal-zitn/shared';
 
 import { config, isAdvisorEnabled } from '@/lib/config';
 import { AppError } from '@/lib/errors';

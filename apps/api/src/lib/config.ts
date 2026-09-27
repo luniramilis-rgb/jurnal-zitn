@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import type { ProviderId } from '@tradr/shared';
+import type { ProviderId } from '@jurnal-zitn/shared';
 
 import { logger } from './logger';
 
@@ -182,6 +182,11 @@ export const envSchema = z.object({
     (v) => (v === '' ? undefined : v),
     z.string().url().default('https://api.github.com'),
   ),
+  // ZITN SSO (ZITN-TECH-017, runtime A): HMAC-SHA256 shared secret used to verify the
+  // one-time token minted by ZITN (`functions/lib/journal_sso.mjs`). Optional and
+  // fail-closed: unset ⇒ the `/api/auth/sso` route answers 503 and no token is accepted.
+  // Empty string ⇒ unset (blank .env line), the CHANGELOG_GITHUB_REPO idiom above.
+  JOURNAL_SSO_SECRET: z.preprocess((v) => (v === '' ? undefined : v), z.string().optional()),
   // Observability telemetry (REQ-1.2/1.3). ALL optional — each surface is absent,
   // not broken, when unconfigured (REQ-10.2). Gated via the predicates below;
   // read through `config`, never bare process.env (ESLint-banned here).
@@ -221,7 +226,7 @@ export const envSchema = z.object({
   // images inline base64-in-JSONB, the process-local rate limiter, same-origin
   // SameSite=Lax cookies, migrations over DATABASE_URL, prepared statements on.
   // Secrets (OBJECT_STORAGE_*_KEY, REDIS_URL) are server-side env only — NEVER
-  // emitted to the frontend window.__TRADR_CONFIG__ seam. Read via `config` / the
+  // emitted to the frontend window.__JURNAL_ZITN_CONFIG__ seam. Read via `config` / the
   // isXConfigured predicates below, never bare process.env (ESLint-banned here).
   //
   // Centralized rate-limit store (REQ-7). Empty-tolerant (POSTHOG_HOST idiom): a
@@ -431,7 +436,7 @@ function parseEnv(): z.infer<typeof envSchema> {
     return `  ${name}: ${issue.message}`;
   });
 
-  console.error('Tradr cannot start — the environment is not valid.\n');
+  console.error('Jurnal ZITN cannot start — the environment is not valid.\n');
   console.error(problems.join('\n'));
   console.error(`\nEvery variable, its default, and how to generate it:\n  ${ENV_VARS_DOCS_URL}\n`);
   console.error('If this is a fresh install, ./docker/quickstart.sh writes a working .env.\n');
@@ -590,6 +595,15 @@ export function isSplitOriginConfigured(): boolean {
 /** True when a non-pooled direct DB URL is configured for migrations/CLI (REQ-9.1). */
 export function isDirectDatabaseConfigured(): boolean {
   return !!config.DIRECT_DATABASE_URL;
+}
+
+/**
+ * True when the ZITN SSO bridge is configured (ZITN-TECH-017). Fail-closed: without
+ * `JOURNAL_SSO_SECRET` the `/api/auth/sso` route refuses every token. Reads `config`
+ * LIVE per call (the isSplitOriginConfigured pattern) so tests can toggle it.
+ */
+export function isSsoConfigured(): boolean {
+  return !!config.JOURNAL_SSO_SECRET;
 }
 
 /**

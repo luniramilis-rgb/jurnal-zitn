@@ -18,7 +18,7 @@ import { Hono } from 'hono';
 import {
   PasswordResetCompleteSchema,
   PasswordResetRequestSchema,
-} from '@tradr/shared/schemas/auth';
+} from '@jurnal-zitn/shared/schemas/auth';
 
 import { isEmailConfigured } from '@/lib/config';
 import { AppError } from '@/lib/errors';
@@ -86,7 +86,7 @@ passwordReset.post(
       throw new AppError(
         409,
         'EMAIL_NOT_CONFIGURED',
-        'This instance has no email configured. Self-service reset is unavailable — ask your operator (tradr reset-password).',
+        'This instance has no email configured. Self-service reset is unavailable — ask your operator (jurnal-zitn reset-password).',
       );
     }
     const { email } = c.req.valid('json');

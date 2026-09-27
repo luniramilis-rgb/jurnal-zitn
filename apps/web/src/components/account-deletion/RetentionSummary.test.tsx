@@ -1,12 +1,17 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { docsUrl } from '@/lib/docs';
+import { setAppLocale } from '@/lib/locale';
 
 import { RetentionSummary } from './RetentionSummary';
 
-afterEach(cleanup);
+beforeEach(() => setAppLocale('en'));
+afterEach(() => {
+  cleanup();
+  setAppLocale('id');
+});
 
 describe('RetentionSummary', () => {
   it('shows the survival and money lines', () => {

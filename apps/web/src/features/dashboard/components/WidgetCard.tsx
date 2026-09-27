@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useId, useRef } from 'react';
 
-import type { WidgetPlacement } from '@tradr/shared';
+import type { WidgetPlacement } from '@jurnal-zitn/shared';
 
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary';
 import { ChunkLoadFallback } from '@/components/ChunkLoadFallback';
@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useT } from '@/hooks/useLocale';
 
 import { widgetRegistry } from '../widgets/registry';
 
@@ -47,6 +48,7 @@ export function WidgetCard({
   focusOnMount,
   draggable = false,
 }: WidgetCardProps): React.ReactElement {
+  const t = useT();
   const ref = useRef<HTMLElement | null>(null);
   const titleId = useId();
   const descId = useId();
@@ -83,10 +85,10 @@ export function WidgetCard({
           id={titleId}
           className="truncate font-mono text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground"
         >
-          {def.displayName}
+          {t(def.displayNameKey)}
         </h3>
         <span id={descId} className="sr-only">
-          {def.displayName} widget
+          {t(def.displayNameKey)} widget
         </span>
         <div className="flex items-center gap-1">
           {/*
@@ -110,7 +112,7 @@ export function WidgetCard({
           <div className={WIDGET_DRAG_CANCEL_CLASS}>
             <DropdownMenu>
               <DropdownMenuTrigger
-                aria-label={`${def.displayName} menu`}
+                aria-label={`${t(def.displayNameKey)} menu`}
                 className="cursor-pointer rounded p-1 text-muted-foreground hover:bg-accent"
               >
                 <span aria-hidden="true">···</span>

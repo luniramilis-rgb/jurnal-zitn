@@ -2,7 +2,7 @@
      GitHub strips webfonts from README images, so live text would render in
      system fonts. One dark banner serves both GitHub themes. -->
 <p align="center">
-  <img src=".github/assets/banner.svg" alt="Tradr — the open-source trading journal with nothing to hide" width="1280">
+  <img src=".github/assets/banner.svg" alt="Jurnal ZITN — the open-source trading journal with nothing to hide" width="1280">
 </p>
 
 <p align="center">
@@ -22,10 +22,10 @@
      risk. Re-shoot from a seeded local instance (pnpm seed;
      dev@example.com / devpass123) when the dashboard changes. -->
 <p align="center">
-  <img src=".github/assets/dashboard.png" alt="The Tradr dashboard: stats summary, open positions, monthly P&L chart and account balances for the seeded demo account" width="1280">
+  <img src=".github/assets/dashboard.png" alt="The Jurnal ZITN dashboard: stats summary, open positions, monthly P&L chart and account balances for the seeded demo account" width="1280">
 </p>
 
-Tradr is a self-hostable journal for options and equities traders. It records the whole
+Jurnal ZITN is a self-hostable journal for options and equities traders. It records the whole
 arc of a position — draft, scale-in, partial close — with every fill, fee, and note
 attached, then shows you what your record actually says.
 
@@ -50,13 +50,13 @@ Requires Docker with Compose v2 and `openssl`. About two minutes.
 
 ```bash
 git clone https://github.com/madmatt112/tradr.git
-cd tradr
+cd jurnal-zitn
 ./docker/quickstart.sh
 ```
 
 The script generates the three required secrets, writes your `.env`, starts the stack,
 and waits for the API to report healthy. It never overwrites an existing `.env`. When it
-finishes, Tradr is on <http://localhost:8080> (override with `WEB_PORT`).
+finishes, Jurnal ZITN is on <http://localhost:8080> (override with `WEB_PORT`).
 
 This is the same script CI runs in its `docker-smoke` job, so these instructions are
 executed on every push rather than proofread. To do it by hand instead, or to run behind
@@ -139,6 +139,6 @@ issue for security problems.
 Apache-2.0 — free to use, self-host, modify, and redistribute. See [`LICENSE`](LICENSE) and
 [`NOTICE`](NOTICE).
 
-The license covers the **code**, not the **name**. "Tradr" and the Tradr logo are
+The license covers the **code**, not the **name**. "Jurnal ZITN" and the Jurnal ZITN logo are
 trademarks: fork the code freely, but a modified or independently hosted version needs a
 different name. See [`TRADEMARK.md`](TRADEMARK.md).

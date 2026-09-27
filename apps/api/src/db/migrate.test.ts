@@ -1,5 +1,5 @@
 /**
- * Migration tests — run against the `tradr_test_migrate` DB created by
+ * Migration tests — run against the `jurnal_zitn_test_migrate` DB created by
  * docker/init-test-db.sql (Task 0.5). These tests use the standalone vitest
  * project `migrations` (apps/api/vitest.config.migrations.ts) and DO NOT use
  * the per-test transaction-rollback harness in apps/api/src/test-setup.ts.
@@ -20,11 +20,11 @@ import {
 const SUPERUSER_URL =
   process.env.MIGRATE_TEST_DATABASE_URL ||
   process.env.DATABASE_URL ||
-  'postgresql://postgres:postgres@localhost:5433/tradr_test_migrate';
+  'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test_migrate';
 
 const USER_URL =
   process.env.MIGRATE_TEST_USER_DATABASE_URL ||
-  'postgresql://tradr_test_user:tradr_test_user@localhost:5433/tradr_test_migrate';
+  'postgresql://jurnal_zitn_test_user:jurnal_zitn_test_user@localhost:5433/jurnal_zitn_test_migrate';
 
 const POST_MIGRATION_FILENAME = '0001_positions_user_status_closed_at_idx.sql';
 const POST_MIGRATION_INDEX = 'positions_user_status_closed_at_idx';
@@ -419,7 +419,7 @@ describe('Task 24(j) — runMigrations advisory-lock serialization under DB_POOL
   // work to apply and contend the advisory lock. Without this, both runs are
   // no-ops on an already-migrated DB and the lock is never meaningfully
   // exercised — the test would pass even if the lock were removed.
-  const SCRATCH_DB = `tradr_test_migrate_j_${Date.now()}`;
+  const SCRATCH_DB = `jurnal_zitn_test_migrate_j_${Date.now()}`;
   const SUPERUSER_BASE = SUPERUSER_URL.replace(/\/[^/]+$/, '');
   const SCRATCH_URL = `${SUPERUSER_BASE}/${SCRATCH_DB}`;
 
@@ -491,7 +491,7 @@ describe('Task 24(j) — runMigrations advisory-lock serialization under DB_POOL
   });
 });
 
-describe('Task 24(k) — journal-write-fails idempotency as non-superuser tradr_test_user', () => {
+describe('Task 24(k) — journal-write-fails idempotency as non-superuser jurnal_zitn_test_user', () => {
   it('REVOKE INSERT on journal makes runPostMigrations throw; restore + re-run produces exactly one journal row', async () => {
     // (1) connect as superuser
     const admin = adminClient();
@@ -501,26 +501,28 @@ describe('Task 24(k) — journal-write-fails idempotency as non-superuser tradr_
       await admin.unsafe(`DROP INDEX CONCURRENTLY IF EXISTS ${POST_MIGRATION_INDEX}`);
 
       // (2) baseline grant — needed so REVOKE later has something to REVOKE.
-      await admin.unsafe(`GRANT SELECT, INSERT ON _post_migrations_journal TO tradr_test_user`);
+      await admin.unsafe(
+        `GRANT SELECT, INSERT ON _post_migrations_journal TO jurnal_zitn_test_user`,
+      );
 
       // (3) grant CREATE ON SCHEMA public so the role can build the index
       // (CREATE INDEX CONCURRENTLY requires CREATE on the schema).
-      await admin.unsafe(`GRANT CREATE ON SCHEMA public TO tradr_test_user`);
+      await admin.unsafe(`GRANT CREATE ON SCHEMA public TO jurnal_zitn_test_user`);
 
       // CREATE INDEX requires table ownership. Temporarily reassign the
-      // positions table to tradr_test_user so the runner can build the
+      // positions table to jurnal_zitn_test_user so the runner can build the
       // index. The afterAll-equivalent cleanup below restores ownership.
       // (Postgres 16 lacks the per-table MAINTAIN privilege from PG 17,
       // so ownership reassignment is the cleanest path.)
-      await admin.unsafe(`ALTER TABLE positions OWNER TO tradr_test_user`);
+      await admin.unsafe(`ALTER TABLE positions OWNER TO jurnal_zitn_test_user`);
 
       // (4) the test REVOKE — INSERT on the journal will now fail for the role.
-      await admin.unsafe(`REVOKE INSERT ON _post_migrations_journal FROM tradr_test_user`);
+      await admin.unsafe(`REVOKE INSERT ON _post_migrations_journal FROM jurnal_zitn_test_user`);
     } finally {
       await admin.end();
     }
 
-    // (5) reconnect as tradr_test_user via MIGRATE_TEST_USER_DATABASE_URL.
+    // (5) reconnect as jurnal_zitn_test_user via MIGRATE_TEST_USER_DATABASE_URL.
     // runPostMigrations() reads its connection URL from config.DATABASE_URL,
     // which is frozen at module-load time. Use vi.resetModules + dynamic
     // import to reload the migrate module under the user URL.
@@ -556,12 +558,12 @@ describe('Task 24(k) — journal-write-fails idempotency as non-superuser tradr_
       expect(j).toHaveLength(0);
 
       // (7) restore GRANT INSERT.
-      await admin2.unsafe(`GRANT INSERT ON _post_migrations_journal TO tradr_test_user`);
+      await admin2.unsafe(`GRANT INSERT ON _post_migrations_journal TO jurnal_zitn_test_user`);
     } finally {
       await admin2.end();
     }
 
-    // (8) re-invoke runPostMigrations as tradr_test_user. The index already
+    // (8) re-invoke runPostMigrations as jurnal_zitn_test_user. The index already
     // exists + indisvalid=true, so the runner skips the rebuild and writes
     // the journal row. Exactly one row at the end.
     await userMigrate.runPostMigrations();
@@ -580,11 +582,11 @@ describe('Task 24(k) — journal-write-fails idempotency as non-superuser tradr_
       const cleanup = adminClient();
       try {
         await cleanup.unsafe(
-          `REVOKE INSERT, SELECT ON _post_migrations_journal FROM tradr_test_user`,
+          `REVOKE INSERT, SELECT ON _post_migrations_journal FROM jurnal_zitn_test_user`,
         );
         // Restore positions ownership to superuser.
         await cleanup.unsafe(`ALTER TABLE positions OWNER TO postgres`);
-        await cleanup.unsafe(`REVOKE CREATE ON SCHEMA public FROM tradr_test_user`);
+        await cleanup.unsafe(`REVOKE CREATE ON SCHEMA public FROM jurnal_zitn_test_user`);
       } finally {
         await cleanup.end();
       }

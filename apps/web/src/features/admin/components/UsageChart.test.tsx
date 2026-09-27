@@ -4,7 +4,7 @@ import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { AdminUsage } from '@tradr/shared/schemas/admin';
+import type { AdminUsage } from '@jurnal-zitn/shared/schemas/admin';
 
 // ResponsiveContainer measures via ResizeObserver (never fires in jsdom); mock
 // it to a fixed-size passthrough so the SVG axes/line render for assertion.

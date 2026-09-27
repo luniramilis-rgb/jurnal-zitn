@@ -22,7 +22,7 @@
  * regenerates from scratch — same picture every time.
  *
  * Usage:
- *   pnpm --filter @tradr/api seed     # or: make seed-demo  (no API server needed)
+ *   pnpm --filter @jurnal-zitn/api seed     # or: make seed-demo  (no API server needed)
  *
  * Logins it creates (password is `devpass123` for all):
  *   dev@example.com    — admin, USD, rich data + advisor + wallet
@@ -33,8 +33,8 @@ import { randomUUID } from 'node:crypto';
 import bcrypt from 'bcrypt';
 import { eq } from 'drizzle-orm';
 
-import { calculateFees } from '@tradr/shared';
-import type { FeeScheduleInput } from '@tradr/shared';
+import { calculateFees } from '@jurnal-zitn/shared';
+import type { FeeScheduleInput } from '@jurnal-zitn/shared';
 
 import { bootstrap } from '@/app';
 import { db, sql, type Transaction } from '@/db';

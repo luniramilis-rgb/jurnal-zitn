@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import type { CsvPreviewRequest, RowShape } from '@tradr/shared';
+import type { CsvPreviewRequest, RowShape } from '@jurnal-zitn/shared';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';

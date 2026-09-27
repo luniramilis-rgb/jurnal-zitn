@@ -12,7 +12,7 @@
 // surface's established chooser pattern) rather than the radix Select used in the
 // settings cards.
 
-import type { BillingModel, ProviderId } from '@tradr/shared';
+import type { BillingModel, ProviderId } from '@jurnal-zitn/shared';
 
 import { Label } from '@/components/ui/label';
 

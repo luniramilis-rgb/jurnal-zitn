@@ -1,7 +1,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
-import type { ReconcileBalanceResponse } from '@tradr/shared/schemas/accounting';
+import type { ReconcileBalanceResponse } from '@jurnal-zitn/shared/schemas/accounting';
 
 import { api } from '@/lib/api';
 

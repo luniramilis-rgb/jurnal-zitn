@@ -1,8 +1,8 @@
 import { eq, lt, sql, count, asc, inArray } from 'drizzle-orm';
 import type { SQL } from 'drizzle-orm';
 
-import { MAX_COACH_MARKS_SEEN } from '@tradr/shared';
-import type { OnboardingPatch } from '@tradr/shared';
+import { MAX_COACH_MARKS_SEEN } from '@jurnal-zitn/shared';
+import type { OnboardingPatch } from '@jurnal-zitn/shared';
 
 import type { Database, Transaction } from '@/db';
 import { users, sessions } from '@/db/schema';
@@ -20,7 +20,13 @@ type DB = Database | Transaction;
 // ask".
 export function insertUser(
   db: DB,
-  data: { email: string; passwordHash: string; emailVerified?: boolean; timezone?: string },
+  data: {
+    email: string;
+    passwordHash: string;
+    emailVerified?: boolean;
+    timezone?: string;
+    zitnUserId?: string;
+  },
 ) {
   return db
     .insert(users)
@@ -29,6 +35,7 @@ export function insertUser(
       passwordHash: data.passwordHash,
       emailVerified: data.emailVerified,
       timezone: data.timezone,
+      zitnUserId: data.zitnUserId,
     })
     .returning()
     .then((rows) => rows[0]);
@@ -51,6 +58,25 @@ export function selectUserTimezone(db: DB, userId: string) {
 /** Persist the reporting timezone. Zone validity is the route's Zod duty. */
 export function updateUserTimezone(db: DB, userId: string, timezone: string) {
   return db.update(users).set({ timezone, updatedAt: new Date() }).where(eq(users.id, userId));
+}
+
+/**
+ * Raw read of the UI-language preference (`locale`). Returns the column verbatim —
+ * `null` for a pre-migration row, `undefined` for no such user. Resolving either to a
+ * supported locale is `getUserLocale`'s job.
+ */
+export function selectUserLocale(db: DB, userId: string) {
+  return db
+    .select({ locale: users.locale })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1)
+    .then((rows) => rows[0]?.locale);
+}
+
+/** Persist the UI-language preference. Locale validity is the route's Zod duty. */
+export function updateUserLocale(db: DB, userId: string, locale: string) {
+  return db.update(users).set({ locale, updatedAt: new Date() }).where(eq(users.id, userId));
 }
 
 /**

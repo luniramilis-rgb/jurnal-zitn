@@ -6,6 +6,8 @@
 // shared `@/lib/format` BigInt path (visual-design Task 4); micro-USD uses its
 // own BigInt path so the full money magnitude never passes through a JS float.
 
+import { getAppLocale } from '@/lib/locale';
+
 export const MICRO_USD_PER_USD = 1_000_000;
 const MICRO_USD_PER_CENT = 10_000n;
 
@@ -33,7 +35,7 @@ export function formatMicroUsd(microUsd: string): string {
   // for the dollar part; we swap in our string-computed cents. BigInt has no
   // negative zero, so a negative input that rounds to $0 loses its sign here —
   // we re-add it to match the prior float behaviour (e.g. `-1` → `-$0.00`).
-  const parts = USD_FORMAT.formatToParts(negative ? -dollars : dollars);
+  const parts = usdFormat().formatToParts(negative ? -dollars : dollars);
   let out = '';
   let hasMinus = false;
   for (const part of parts) {
@@ -43,13 +45,14 @@ export function formatMicroUsd(microUsd: string): string {
   return negative && !hasMinus ? `-${out}` : out;
 }
 
-const USD_FORMAT = new Intl.NumberFormat(undefined, {
-  style: 'currency',
-  currency: 'USD',
-});
+// Dibangun per panggilan agar mengikuti locale aktif (A0/A5), bukan env peramban
+// yang tertangkap saat modul dimuat.
+function usdFormat(): Intl.NumberFormat {
+  return new Intl.NumberFormat(getAppLocale(), { style: 'currency', currency: 'USD' });
+}
 
 // Integer-string counts (token sums). BigInt keeps arbitrarily large values
 // exact; Intl.NumberFormat accepts bigint directly.
 export function formatIntString(value: string): string {
-  return new Intl.NumberFormat().format(BigInt(value));
+  return new Intl.NumberFormat(getAppLocale()).format(BigInt(value));
 }

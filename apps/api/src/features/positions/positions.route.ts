@@ -1,13 +1,13 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
 
-import { ClassificationSchema } from '@tradr/shared/schemas/performance';
+import { ClassificationSchema } from '@jurnal-zitn/shared/schemas/performance';
 import {
   CreatePositionSchema,
   UpdatePositionSchema,
   ReopenPositionSchema,
-} from '@tradr/shared/schemas/position';
-import { TagIdListParamSchema, SetPositionTagsSchema } from '@tradr/shared/schemas/tag';
+} from '@jurnal-zitn/shared/schemas/position';
+import { TagIdListParamSchema, SetPositionTagsSchema } from '@jurnal-zitn/shared/schemas/tag';
 
 import { db } from '@/db';
 import { setPositionTags } from '@/features/tags/tags.service';

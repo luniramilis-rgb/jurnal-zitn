@@ -14,7 +14,7 @@ export default defineConfig({
     env: {
       DATABASE_URL:
         process.env.MIGRATE_TEST_DATABASE_URL ||
-        'postgresql://postgres:postgres@localhost:5433/tradr_test_migrate',
+        'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test_migrate',
       SESSION_SECRET: 'test-secret-that-is-at-least-32-characters-long',
       NODE_ENV: 'test',
       PORT: '3102',

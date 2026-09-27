@@ -1,4 +1,4 @@
-import type { LocatedError, LocatedWarning } from '@tradr/shared';
+import type { LocatedError, LocatedWarning } from '@jurnal-zitn/shared';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
@@ -7,11 +7,11 @@ interface IssueListProps {
   warnings: LocatedWarning[];
 }
 
-function location(rowNumber?: number, csvColumn?: string, tradrField?: string): string {
+function location(rowNumber?: number, csvColumn?: string, journalField?: string): string {
   const parts: string[] = [];
   if (rowNumber && rowNumber > 0) parts.push(`Row ${rowNumber}`);
   if (csvColumn) parts.push(`column "${csvColumn}"`);
-  if (tradrField) parts.push(`field ${tradrField}`);
+  if (journalField) parts.push(`field ${journalField}`);
   return parts.join(' · ');
 }
 
@@ -35,7 +35,7 @@ export function IssueList({ errors, warnings }: IssueListProps) {
           </CardHeader>
           <CardContent className="space-y-2">
             {errors.map((e, i) => {
-              const loc = location(e.rowNumber, e.csvColumn, e.tradrField);
+              const loc = location(e.rowNumber, e.csvColumn, e.journalField);
               return (
                 <div
                   key={`${e.code}-${i}`}

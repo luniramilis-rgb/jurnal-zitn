@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
 
-import { CreateFillSchema, UpdateFillSchema } from '@tradr/shared/schemas/position';
+import { CreateFillSchema, UpdateFillSchema } from '@jurnal-zitn/shared/schemas/position';
 
 import { db } from '@/db';
 import { validate } from '@/lib/validation';

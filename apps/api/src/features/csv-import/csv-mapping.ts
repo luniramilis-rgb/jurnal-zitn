@@ -1,11 +1,11 @@
-import type { Mapping, RowShape } from '@tradr/shared';
+import type { Mapping, RowShape } from '@jurnal-zitn/shared';
 
 import type { ParsedCsv } from './csv-parse';
 
 /**
  * Mapping + transforms — pure leaf module (no HTTP, no DB).
  *
- * Applies a {@link Mapping} (CSV column -> Tradr field, per row shape) and the
+ * Applies a {@link Mapping} (CSV column -> Jurnal ZITN field, per row shape) and the
  * canonical value transforms to produce typed-but-unnormalized cells, and
  * reports mapping-level errors. Implements design Component 2 (REQ-2).
  *
@@ -21,12 +21,12 @@ import type { ParsedCsv } from './csv-parse';
 type TransformField = 'side' | 'assetType' | 'type' | 'action' | 'right';
 
 /**
- * A mapping-level error, reported before any row processing. Located by Tradr
+ * A mapping-level error, reported before any row processing. Located by Jurnal ZITN
  * field and/or CSV column where applicable (REQ-2.2, REQ-2.4).
  */
 export interface MappingError {
-  /** Tradr target field the error concerns, when applicable. */
-  tradrField?: string;
+  /** Jurnal ZITN target field the error concerns, when applicable. */
+  journalField?: string;
   /** CSV column the field was mapped to, when applicable. */
   csvColumn?: string;
   /** Stable machine code. */
@@ -39,8 +39,8 @@ export interface MappingError {
 export interface MappedCellError {
   /** 1-based source row number; the header counts as row 1. */
   rowNumber: number;
-  /** Tradr target field the error concerns, when applicable. */
-  tradrField?: string;
+  /** Jurnal ZITN target field the error concerns, when applicable. */
+  journalField?: string;
   /** CSV column the cell came from, when applicable. */
   csvColumn?: string;
   /** Stable machine code. */
@@ -50,7 +50,7 @@ export interface MappedCellError {
 }
 
 /**
- * One mapped CSV row: Tradr field -> raw-but-canonicalized cell value. Enum
+ * One mapped CSV row: Jurnal ZITN field -> raw-but-canonicalized cell value. Enum
  * fields (`side`/`assetType`/`type`/`action`) hold their canonical token;
  * numeric/date/text fields hold the trimmed raw string for the normalizer
  * (Component 3) to parse. Cells the row did not populate are absent.
@@ -58,7 +58,7 @@ export interface MappedCellError {
 export interface MappedRow {
   /** 1-based source row number; the header counts as row 1. */
   sourceRow: number;
-  /** Tradr field -> value. */
+  /** Jurnal ZITN field -> value. */
   values: Record<string, string>;
 }
 
@@ -69,7 +69,7 @@ export interface ApplyMappingResult {
 }
 
 /**
- * Required Tradr fields per row shape, exactly as REQ-2.2.
+ * Required Jurnal ZITN fields per row shape, exactly as REQ-2.2.
  *
  * `execution` additionally requires EXACTLY ONE of (`type` | `action`); that
  * one-of rule is checked separately in {@link validateMappingShape}.
@@ -182,7 +182,7 @@ export function validateMappingShape(headers: string[], mapping: Mapping): Mappi
     if (field === 'assetType' && descriptorSuppliesAssetType) continue;
     if (!columns[field]) {
       errors.push({
-        tradrField: field,
+        journalField: field,
         code: 'MAPPING_FIELD_MISSING',
         message: `Required field "${field}" is not mapped to a column.`,
       });
@@ -210,7 +210,7 @@ export function validateMappingShape(headers: string[], mapping: Mapping): Mappi
   // form needs an expiry format (REQ-2.6, REQ-3.5).
   if (mapping.contractForm === 'descriptor' && !columns.descriptor) {
     errors.push({
-      tradrField: 'descriptor',
+      journalField: 'descriptor',
       code: 'MAPPING_FIELD_MISSING',
       message: `Required field "descriptor" is not mapped to a column.`,
     });
@@ -226,7 +226,7 @@ export function validateMappingShape(headers: string[], mapping: Mapping): Mappi
   for (const [field, column] of Object.entries(columns)) {
     if (column && !headerSet.has(column)) {
       errors.push({
-        tradrField: field,
+        journalField: field,
         csvColumn: column,
         code: 'MAPPING_COLUMN_ABSENT',
         message: `Field "${field}" is mapped to column "${column}", which is not in the file.`,
@@ -257,7 +257,7 @@ export function applyMapping(parsed: ParsedCsv, mapping: Mapping): ApplyMappingR
   const rows: MappedRow[] = [];
   const errors: MappedCellError[] = [];
 
-  // Map Tradr field -> column index, resolved once.
+  // Map Jurnal ZITN field -> column index, resolved once.
   const headerIndex = new Map<string, number>();
   parsed.headers.forEach((h, i) => headerIndex.set(h, i));
 
@@ -290,7 +290,7 @@ export function applyMapping(parsed: ParsedCsv, mapping: Mapping): ApplyMappingR
         if (canonical === undefined) {
           errors.push({
             rowNumber: sourceRow,
-            tradrField: field,
+            journalField: field,
             csvColumn: mapping.columns[field],
             code: 'TRANSFORM_NO_MATCH',
             message: `Value "${raw}" for field "${field}" has no matching transform.`,
@@ -315,7 +315,7 @@ export function applyMapping(parsed: ParsedCsv, mapping: Mapping): ApplyMappingR
     for (const field of missing) {
       errors.push({
         rowNumber: sourceRow,
-        tradrField: field,
+        journalField: field,
         csvColumn: mapping.columns[field],
         code: 'ROW_MISSING_REQUIRED_FIELD',
         message: `Row is missing required field "${field}" for the "${mapping.rowShape}" row shape.`,

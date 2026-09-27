@@ -9,7 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import type { EquityCurvePoint } from '@tradr/shared';
+import type { EquityCurvePoint } from '@jurnal-zitn/shared';
 
 import { CHART_MIN_HEIGHT_PX } from '@/features/performance/chart.constants';
 import { formatMoney } from '@/lib/format';

@@ -39,16 +39,16 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { PerformanceResponse, WidgetPlacement } from '@tradr/shared';
-import { DEFAULT_WIDGETS } from '@tradr/shared/constants/dashboard-defaults';
+import type { PerformanceResponse, WidgetPlacement } from '@jurnal-zitn/shared';
+import { DEFAULT_WIDGETS } from '@jurnal-zitn/shared/constants/dashboard-defaults';
 import {
   BODY_PADDING_PX,
   CARD_BORDER_PX,
   CARD_HEADER_PX,
   STACK_GAP_PX,
   TIMEFRAME_ROW_PX,
-} from '@tradr/shared/constants/dashboard-geometry';
-import { PerWidgetMinSize } from '@tradr/shared/schemas/dashboard';
+} from '@jurnal-zitn/shared/constants/dashboard-geometry';
+import { PerWidgetMinSize } from '@jurnal-zitn/shared/schemas/dashboard';
 
 import { useDisplayCurrencyQuery } from '@/features/accounting/hooks/useDisplayCurrency';
 import { CHART_MIN_HEIGHT_PX } from '@/features/performance/chart.constants';

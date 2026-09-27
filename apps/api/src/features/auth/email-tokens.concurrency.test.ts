@@ -27,7 +27,7 @@ import { issueEmailToken, RESET_TOKEN_TTL_MS } from './email-tokens.service';
  */
 
 const DATABASE_URL =
-  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/tradr_test';
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test';
 
 let dedicatedSql: ReturnType<typeof postgres>;
 let dedicatedDb: Database;

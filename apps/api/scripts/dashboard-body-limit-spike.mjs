@@ -1,11 +1,11 @@
 // validated against hono@4.12.8 / node@24.13 on 2026-05-25 — OUTCOME (a) FICTIONAL: default HTTPException machinery handles bodyLimit throws cleanly; bespoke onError retained for envelope shape
-// Run: pnpm --filter @tradr/api exec tsx apps/api/scripts/dashboard-body-limit-spike.mjs
-// (tsx is used because @tradr/shared is .ts-source — node cannot resolve workspace .ts imports natively.)
+// Run: pnpm --filter @jurnal-zitn/api exec tsx apps/api/scripts/dashboard-body-limit-spike.mjs
+// (tsx is used because @jurnal-zitn/shared is .ts-source — node cannot resolve workspace .ts imports natively.)
 // Re-run before any Hono major-version upgrade. v4-1: CHECKED-IN, NOT deletable.
 
 import { Hono } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
-import { BODY_LIMIT_BYTES } from '@tradr/shared';
+import { BODY_LIMIT_BYTES } from '@jurnal-zitn/shared';
 
 let unhandledRejectionCaptured = null;
 process.once('unhandledRejection', (err) => {

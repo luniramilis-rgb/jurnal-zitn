@@ -555,7 +555,7 @@ test.describe('Ledger balances — single currency user', () => {
     await expect(page.getByText('$1,050.00')).toBeVisible();
   });
 
-  // Requirement 8 — the user states the account's real cash balance and Tradr
+  // Requirement 8 — the user states the account's real cash balance and Jurnal ZITN
   // posts one adjusting entry for the difference.
   test('reconciling the cash balance updates the balance card and the ledger', async ({ page }) => {
     await page.goto(`/accounts/${USD_ACCOUNT_ID}`);

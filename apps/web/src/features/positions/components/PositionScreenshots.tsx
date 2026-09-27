@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
-import { POSITION_IMAGE_MAX_BYTES, POSITION_IMAGE_MAX_COUNT } from '@tradr/shared';
-import type { PositionImage } from '@tradr/shared';
+import { POSITION_IMAGE_MAX_BYTES, POSITION_IMAGE_MAX_COUNT } from '@jurnal-zitn/shared';
+import type { PositionImage } from '@jurnal-zitn/shared';
 
 import {
   AlertDialog,
@@ -16,6 +16,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { useT } from '@/hooks/useLocale';
 import { isApiCrossOrigin } from '@/lib/api';
 import { ACCEPTED_IMAGE_FORMATS, fileToBase64, imageFilesFromClipboard } from '@/lib/image-file';
 
@@ -39,6 +40,7 @@ interface Props {
 // read to base64 and posted one at a time in pick order. Thumbnails open the
 // lightbox; each carries a delete confirmation.
 export function PositionScreenshots({ positionId, symbol, images }: Props) {
+  const t = useT();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const upload = useUploadPositionImage(positionId);
   const deleteImage = useDeletePositionImage(positionId);
@@ -110,7 +112,7 @@ export function PositionScreenshots({ positionId, symbol, images }: Props) {
   return (
     <div>
       <div className="mb-3 flex items-center justify-between">
-        <h2 className="text-lg font-semibold">Screenshots</h2>
+        <h2 className="text-lg font-semibold">{t('pos.shots.title')}</h2>
         <Tooltip>
           <TooltipTrigger asChild>
             <span>
@@ -120,14 +122,12 @@ export function PositionScreenshots({ positionId, symbol, images }: Props) {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={atCap}
               >
-                Add screenshot
+                {t('pos.shots.add')}
               </Button>
             </span>
           </TooltipTrigger>
           {atCap && (
-            <TooltipContent>
-              This position holds the maximum of {POSITION_IMAGE_MAX_COUNT} screenshots
-            </TooltipContent>
+            <TooltipContent>{t('pos.shots.cap', { n: POSITION_IMAGE_MAX_COUNT })}</TooltipContent>
           )}
         </Tooltip>
         <input
@@ -141,14 +141,14 @@ export function PositionScreenshots({ positionId, symbol, images }: Props) {
       </div>
 
       {images.length === 0 ? (
-        <p className="text-sm text-muted-foreground">No screenshots yet</p>
+        <p className="text-sm text-muted-foreground">{t('pos.shots.empty')}</p>
       ) : (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4">
           {images.map((image, index) => (
             <div key={image.id} className="relative">
               <button
                 type="button"
-                aria-label={`Open screenshot ${index + 1}`}
+                aria-label={t('pos.shots.openAria', { n: index + 1 })}
                 className="block w-full cursor-pointer overflow-hidden rounded-md border border-border"
                 onClick={() => setLightboxIndex(index)}
               >
@@ -175,11 +175,11 @@ export function PositionScreenshots({ positionId, symbol, images }: Props) {
                 type="button"
                 variant="destructive"
                 size="sm"
-                aria-label={`Delete screenshot ${index + 1}`}
+                aria-label={t('pos.shots.deleteAria', { n: index + 1 })}
                 className="absolute top-1 right-1 cursor-pointer"
                 onClick={() => setDeleteId(image.id)}
               >
-                Delete
+                {t('pos.action.delete')}
               </Button>
             </div>
           ))}
@@ -197,13 +197,11 @@ export function PositionScreenshots({ positionId, symbol, images }: Props) {
       <AlertDialog open={deleteId !== null} onOpenChange={(open) => !open && setDeleteId(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete screenshot</AlertDialogTitle>
-            <AlertDialogDescription>
-              This screenshot will be permanently removed. This cannot be undone.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t('pos.shots.deleteTitle')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('pos.shots.deleteBody')}</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="cursor-pointer"
               onClick={() => {
@@ -211,7 +209,7 @@ export function PositionScreenshots({ positionId, symbol, images }: Props) {
                 setDeleteId(null);
               }}
             >
-              Delete
+              {t('pos.action.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

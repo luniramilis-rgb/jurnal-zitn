@@ -1,14 +1,15 @@
 import { describe, expect, it } from 'vitest';
 
 import { calculateTrade } from './calculator';
-import type { FeeScheduleInput } from './fees';
 import { CalculatorInputSchema, DOLLAR_RISK_MAX, PRICE_MAX } from './schemas/calculator';
 import type { CalculatorInput } from './schemas/calculator';
 
-const zeroFeeSchedule: FeeScheduleInput = {
+const zeroFeeSchedule: NonNullable<CalculatorInput['feeSchedule']> = {
   stockPerShareCommission: '0.005',
   stockMinPerFill: '0',
   stockMaxPerFill: '0',
+  stockPercentBuy: '0',
+  stockPercentSell: '0',
   optionsPerContractCommission: '0.65',
   optionsPerContractExchangeFee: '0',
   optionsMinPerFill: '0',

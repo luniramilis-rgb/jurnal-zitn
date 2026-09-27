@@ -1,6 +1,6 @@
 import { eq, and, sql, inArray } from 'drizzle-orm';
 
-import type { Tag, TagWithCount } from '@tradr/shared';
+import type { Tag, TagWithCount } from '@jurnal-zitn/shared';
 
 import type { Database, Transaction } from '@/db';
 import { tags, positionTags, users } from '@/db/schema';

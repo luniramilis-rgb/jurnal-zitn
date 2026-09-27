@@ -1,16 +1,17 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { createFileRoute, Link } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { PasswordResetCompleteSchema } from '@tradr/shared/schemas/auth';
+import { PasswordResetCompleteSchema } from '@jurnal-zitn/shared/schemas/auth';
 
 import { AuthScreen } from '@/components/layout/AuthScreen';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useT } from '@/hooks/useLocale';
 import { api } from '@/lib/api';
 
 // SF-3: this page is public and MUST NOT call useAuth() or mount the
@@ -33,28 +34,34 @@ function readTokenFromHash(): string {
 }
 
 // The register.tsx confirm pattern, reusing the shared password policy.
-const ResetPasswordFormSchema = PasswordResetCompleteSchema.pick({
-  password: true,
-})
-  .extend({ confirmPassword: z.string() })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: 'Passwords do not match',
-    path: ['confirmPassword'],
-  });
+const ResetPasswordFormBase = PasswordResetCompleteSchema.pick({ password: true }).extend({
+  confirmPassword: z.string(),
+});
 
-type ResetPasswordFormInput = z.infer<typeof ResetPasswordFormSchema>;
+type ResetPasswordFormInput = z.infer<typeof ResetPasswordFormBase>;
 
 function ResetPasswordPage() {
+  const t = useT();
   const [token] = useState(readTokenFromHash);
   const [state, setState] = useState<'form' | 'success' | 'expired'>('form');
   const [apiError, setApiError] = useState('');
+
+  // Pesan mismatch ikut bahasa aktif; resolver dibangun ulang saat bahasa berganti.
+  const formSchema = useMemo(
+    () =>
+      ResetPasswordFormBase.refine((data) => data.password === data.confirmPassword, {
+        message: t('auth.error.passwordMismatch'),
+        path: ['confirmPassword'],
+      }),
+    [t],
+  );
 
   const {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm<ResetPasswordFormInput>({
-    resolver: zodResolver(ResetPasswordFormSchema),
+    resolver: zodResolver(formSchema),
   });
 
   const onSubmit = async (data: ResetPasswordFormInput) => {
@@ -71,9 +78,9 @@ function ResetPasswordPage() {
       if (code === 'INVALID_OR_EXPIRED_TOKEN') {
         setState('expired');
       } else if (code === 'RATE_LIMITED') {
-        setApiError('Too many requests — try again later.');
+        setApiError(t('auth.error.rateLimited'));
       } else {
-        setApiError('Something went wrong. Please try again.');
+        setApiError(t('auth.error.generic'));
       }
     }
   };
@@ -82,14 +89,14 @@ function ResetPasswordPage() {
     <AuthScreen>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Set a new password</CardTitle>
+          <CardTitle>{t('auth.reset.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           {!token && (
             <p className="text-sm text-muted-foreground">
-              This link is missing its reset token. Open the link from your email again, or{' '}
+              {t('auth.reset.missingToken')}{' '}
               <Link to="/forgot-password" className="underline">
-                request a new reset link
+                {t('auth.reset.missingTokenCta')}
               </Link>
               .
             </p>
@@ -97,10 +104,10 @@ function ResetPasswordPage() {
 
           {token && state === 'success' && (
             <>
-              <p className="text-sm text-muted-foreground">Your password has been reset.</p>
+              <p className="text-sm text-muted-foreground">{t('auth.reset.success')}</p>
               <p className="mt-4 text-center text-sm text-muted-foreground">
                 <Link to="/login" className="underline">
-                  Log in
+                  {t('auth.reset.loginLink')}
                 </Link>
               </p>
             </>
@@ -108,9 +115,9 @@ function ResetPasswordPage() {
 
           {token && state === 'expired' && (
             <p className="text-sm text-muted-foreground">
-              This link is invalid or has expired.{' '}
+              {t('auth.link.expired')}{' '}
               <Link to="/forgot-password" className="underline">
-                Request a new reset link
+                {t('auth.reset.requestNew')}
               </Link>
               .
             </p>
@@ -122,7 +129,7 @@ function ResetPasswordPage() {
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="password">New password</Label>
+                  <Label htmlFor="password">{t('auth.field.newPassword')}</Label>
                   <Input
                     id="password"
                     type="password"
@@ -138,7 +145,7 @@ function ResetPasswordPage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="confirmPassword">Confirm password</Label>
+                  <Label htmlFor="confirmPassword">{t('auth.field.confirmPassword')}</Label>
                   <Input
                     id="confirmPassword"
                     type="password"
@@ -154,7 +161,7 @@ function ResetPasswordPage() {
                 </div>
 
                 <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting}>
-                  {isSubmitting ? 'Resetting...' : 'Reset password'}
+                  {isSubmitting ? t('auth.reset.submitting') : t('auth.reset.submit')}
                 </Button>
               </form>
             </>

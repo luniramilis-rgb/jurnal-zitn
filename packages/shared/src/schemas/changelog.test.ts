@@ -12,7 +12,7 @@ const validRelease = {
   tag: 'v1.2.0',
   publishedAt: '2026-05-01T12:00:00Z',
   body: '## Highlights\n\n- Faster equity curve',
-  htmlUrl: 'https://github.com/acme/tradr/releases/tag/v1.2.0',
+  htmlUrl: 'https://github.com/acme/jurnal-zitn/releases/tag/v1.2.0',
   prerelease: false,
 };
 
@@ -50,7 +50,7 @@ describe('ChangelogReleaseSchema', () => {
       expect(
         ChangelogReleaseSchema.safeParse({
           ...validRelease,
-          htmlUrl: 'https://github.com/acme/tradr/releases/tag/v1.0.0',
+          htmlUrl: 'https://github.com/acme/jurnal-zitn/releases/tag/v1.0.0',
         }).success,
       ).toBe(true);
     });
@@ -66,7 +66,7 @@ describe('ChangelogReleaseSchema', () => {
       expect(
         ChangelogReleaseSchema.safeParse({
           ...validRelease,
-          htmlUrl: 'http://github.com/acme/tradr/releases/tag/v1.0.0',
+          htmlUrl: 'http://github.com/acme/jurnal-zitn/releases/tag/v1.0.0',
         }).success,
       ).toBe(false);
     });

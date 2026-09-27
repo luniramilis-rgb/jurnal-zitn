@@ -1,7 +1,7 @@
 import Decimal from 'decimal.js';
 import { describe, it, expect, vi } from 'vitest';
 
-import { parseOccUnderlying } from '@tradr/shared/lib/occ';
+import { parseOccUnderlying } from '@jurnal-zitn/shared/lib/occ';
 
 import { db } from '@/db';
 import { users } from '@/db/schema';

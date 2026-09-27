@@ -3,7 +3,7 @@ import type { Context } from 'hono';
 import { bodyLimit } from 'hono/body-limit';
 import { z } from 'zod';
 
-import { POSITION_IMAGE_MAX_BYTES, UploadPositionImageSchema } from '@tradr/shared';
+import { POSITION_IMAGE_MAX_BYTES, UploadPositionImageSchema } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { PositionImageTooLargeError, ValidationError } from '@/lib/errors';

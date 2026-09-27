@@ -1,9 +1,9 @@
 ---
 title: Operational metrics
-description: The Prometheus metric contract Tradr exposes — every metric name, type, label set, and meaning, how to turn the surface on, and what this feature deliberately does not deliver.
+description: The Prometheus metric contract Jurnal ZITN exposes — every metric name, type, label set, and meaning, how to turn the surface on, and what this feature deliberately does not deliver.
 ---
 
-Tradr can expose operational metrics in the Prometheus text format: request
+Jurnal ZITN can expose operational metrics in the Prometheus text format: request
 rate, request latency, database health, Node.js process health, and the deployed
 build version. The surface is off by default. One variable turns it on.
 
@@ -11,7 +11,7 @@ This page is the whole contract. It gives you enough to build a dashboard
 without reading the source.
 
 **This is not the [Methodology](/user-guide/reference/metrics-glossary/) page.**
-That page defines the _trading_ figures Tradr computes — win rate, expectancy,
+That page defines the _trading_ figures Jurnal ZITN computes — win rate, expectancy,
 profit factor. This page covers the _operational_ metrics an instance reports
 about itself.
 
@@ -19,7 +19,7 @@ about itself.
 
 Read this first, so you know what you are getting.
 
-Tradr exposes metrics. It does not collect them. This feature ships no
+Jurnal ZITN exposes metrics. It does not collect them. This feature ships no
 Prometheus, no Grafana, no agent, and no scrape configuration.
 
 - **Nothing scrapes these metrics.** This repository ships no scrape
@@ -66,7 +66,7 @@ Two more variables tune the api listener. Both have working defaults. See
 
 ## The two surfaces
 
-Tradr exposes metrics from two places, and they behave differently.
+Jurnal ZITN exposes metrics from two places, and they behave differently.
 
 ### The api container
 
@@ -106,23 +106,23 @@ It contains one metric and nothing else.
 
 ### API metrics
 
-| Metric                                | Type                      | Labels                      | Meaning                                                                                         |
-| ------------------------------------- | ------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------- |
-| `tradr_build_info`                    | gauge                     | `version`, `commit`         | API build identity. Always the constant `1` — the information is in the labels.                 |
-| `tradr_http_requests_total`           | counter                   | `method`, `route`, `status` | HTTP requests handled, by method, matched route pattern, and numeric status.                    |
-| `tradr_http_request_duration_seconds` | histogram                 | `method`                    | Request latency in seconds, measured to response start. No `route` label.                       |
-| `tradr_db_up`                         | gauge                     | —                           | `1` when the scrape-time `SELECT 1` succeeded, `0` when it failed or timed out.                 |
-| `tradr_db_probe_duration_seconds`     | gauge                     | —                           | Duration in seconds of the scrape-time database probe.                                          |
-| `tradr_db_connections`                | gauge                     | `state`                     | Backend connections to the current database by state, from `pg_stat_activity`. Database-global. |
-| `tradr_db_pool_max`                   | gauge                     | —                           | Configured maximum size of this instance's connection pool (`DB_POOL_SIZE`, default `10`).      |
-| `process_*`, `nodejs_*`               | counter, gauge, histogram | various                     | Node.js process and runtime metrics.                                                            |
+| Metric                                      | Type                      | Labels                      | Meaning                                                                                         |
+| ------------------------------------------- | ------------------------- | --------------------------- | ----------------------------------------------------------------------------------------------- |
+| `jurnal_zitn_build_info`                    | gauge                     | `version`, `commit`         | API build identity. Always the constant `1` — the information is in the labels.                 |
+| `jurnal_zitn_http_requests_total`           | counter                   | `method`, `route`, `status` | HTTP requests handled, by method, matched route pattern, and numeric status.                    |
+| `jurnal_zitn_http_request_duration_seconds` | histogram                 | `method`                    | Request latency in seconds, measured to response start. No `route` label.                       |
+| `jurnal_zitn_db_up`                         | gauge                     | —                           | `1` when the scrape-time `SELECT 1` succeeded, `0` when it failed or timed out.                 |
+| `jurnal_zitn_db_probe_duration_seconds`     | gauge                     | —                           | Duration in seconds of the scrape-time database probe.                                          |
+| `jurnal_zitn_db_connections`                | gauge                     | `state`                     | Backend connections to the current database by state, from `pg_stat_activity`. Database-global. |
+| `jurnal_zitn_db_pool_max`                   | gauge                     | —                           | Configured maximum size of this instance's connection pool (`DB_POOL_SIZE`, default `10`).      |
+| `process_*`, `nodejs_*`                     | counter, gauge, histogram | various                     | Node.js process and runtime metrics.                                                            |
 
-`tradr_db_probe_duration_seconds` and `tradr_db_pool_max` are gauges by
+`jurnal_zitn_db_probe_duration_seconds` and `jurnal_zitn_db_pool_max` are gauges by
 decision, not by accident. One probe sample per scrape supports no quantiles, so
 a histogram of it would be misleading.
 
 The `process_*` and `nodejs_*` metrics keep their conventional names rather than
-taking the `tradr_` prefix, so standard community dashboards and alert rules work
+taking the `jurnal_zitn_` prefix, so standard community dashboards and alert rules work
 unmodified.
 
 The set is 31 metrics. It covers resident memory, heap size and use, event-loop
@@ -132,9 +132,9 @@ the Node.js version.
 
 ### Web metrics
 
-| Metric                 | Type  | Labels              | Meaning                                      |
-| ---------------------- | ----- | ------------------- | -------------------------------------------- |
-| `tradr_web_build_info` | gauge | `version`, `commit` | SPA build identity. Always the constant `1`. |
+| Metric                       | Type  | Labels              | Meaning                                      |
+| ---------------------------- | ----- | ------------------- | -------------------------------------------- |
+| `jurnal_zitn_web_build_info` | gauge | `version`, `commit` | SPA build identity. Always the constant `1`. |
 
 That is the entire web exposition. Three lines: `# HELP`, `# TYPE`, and one
 sample.
@@ -176,17 +176,17 @@ The set stays bounded. Each mounted router adds at most one wildcard value.
 
 ### The other labels
 
-| Label     | On                                                                 | Values                                                                                                                                |
-| --------- | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
-| `method`  | `tradr_http_requests_total`, `tradr_http_request_duration_seconds` | The HTTP method: `GET`, `POST`, `PUT`, `DELETE`, `PATCH`.                                                                             |
-| `status`  | `tradr_http_requests_total`                                        | The numeric HTTP status code, as a string.                                                                                            |
-| `state`   | `tradr_db_connections`                                             | `active`, `idle`, `idle_in_transaction`. Exactly three, enumerated explicitly, so a state outside that set adds no series. See below. |
-| `version` | `tradr_build_info`, `tradr_web_build_info`                         | `APP_VERSION` verbatim, or `unknown`.                                                                                                 |
-| `commit`  | `tradr_build_info`, `tradr_web_build_info`                         | The text after the final `-` in `APP_VERSION`, or `unknown`.                                                                          |
+| Label     | On                                                                             | Values                                                                                                                                |
+| --------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `method`  | `jurnal_zitn_http_requests_total`, `jurnal_zitn_http_request_duration_seconds` | The HTTP method: `GET`, `POST`, `PUT`, `DELETE`, `PATCH`.                                                                             |
+| `status`  | `jurnal_zitn_http_requests_total`                                              | The numeric HTTP status code, as a string.                                                                                            |
+| `state`   | `jurnal_zitn_db_connections`                                                   | `active`, `idle`, `idle_in_transaction`. Exactly three, enumerated explicitly, so a state outside that set adds no series. See below. |
+| `version` | `jurnal_zitn_build_info`, `jurnal_zitn_web_build_info`                         | `APP_VERSION` verbatim, or `unknown`.                                                                                                 |
+| `commit`  | `jurnal_zitn_build_info`, `jurnal_zitn_web_build_info`                         | The text after the final `-` in `APP_VERSION`, or `unknown`.                                                                          |
 
 ### `state` is not Postgres's spelling
 
-The `state` label values are Tradr's, not `pg_stat_activity`'s. Postgres writes
+The `state` label values are Jurnal ZITN's, not `pg_stat_activity`'s. Postgres writes
 the transaction states as words with spaces; the label uses underscores, and the
 mapping is deliberately many-to-one:
 
@@ -207,9 +207,9 @@ Every remaining state Postgres can report — `fastpath function call`, `disable
 and a null state — is excluded and contributes no series. That is what keeps the
 set at three regardless of what the database returns.
 
-`tradr_http_request_duration_seconds` carries **no `route` label**, deliberately.
+`jurnal_zitn_http_request_duration_seconds` carries **no `route` label**, deliberately.
 A per-route histogram costs about 2,730 series against a 2,000-series budget. Per-route
-error rate survives on `tradr_http_requests_total`; per-route latency is the
+error rate survives on `jurnal_zitn_http_requests_total`; per-route latency is the
 sacrifice. Its buckets are explicit, not the library defaults, and reach the long
 tail of this API: `0.005, 0.01, 0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5, 10, 30,
 60, 300` seconds. CSV import sits behind a 300-second timeout, so the library's
@@ -221,7 +221,7 @@ only response start is meaningful.
 
 ## Every scrape is a database probe
 
-`tradr_db_up`, `tradr_db_probe_duration_seconds`, and `tradr_db_connections` are
+`jurnal_zitn_db_up`, `jurnal_zitn_db_probe_duration_seconds`, and `jurnal_zitn_db_connections` are
 sampled on demand. The api opens a transaction, sets a statement timeout, runs
 `SELECT 1`, then queries `pg_stat_activity`. It does this _while answering the
 scrape_, before it serializes the exposition.
@@ -243,26 +243,26 @@ most one connection is ever committed to the probe.
 
 The consequence matters when you read the numbers. Two overlapping scrapes share
 one probe, and the second one publishes values it did not measure. That applies
-to `tradr_db_up`, `tradr_db_probe_duration_seconds`, and `tradr_db_connections`
+to `jurnal_zitn_db_up`, `jurnal_zitn_db_probe_duration_seconds`, and `jurnal_zitn_db_connections`
 alike.
 
-This is also why `tradr_db_probe_duration_seconds` can exceed the 5-second
+This is also why `jurnal_zitn_db_probe_duration_seconds` can exceed the 5-second
 ceiling. A joining scrape publishes the duration the _original_ probe measured,
 and that probe started earlier.
 
-`tradr_db_probe_duration_seconds` is also wider than the `SELECT 1` alone. The
+`jurnal_zitn_db_probe_duration_seconds` is also wider than the `SELECT 1` alone. The
 clock starts before the transaction opens, so the value includes the `BEGIN` and
 the `SET LOCAL statement_timeout` that bound the probe.
 
-## Reading `tradr_db_connections`
+## Reading `jurnal_zitn_db_connections`
 
 **The value is database-global, not process-local.** It comes from
 `pg_stat_activity` scoped to the current database, so every api instance reports
-the same counts. Those counts also include the `tradr` CLI, a migration run, and
+the same counts. Those counts also include the `jurnal-zitn` CLI, a migration run, and
 any open `psql` session.
 
 A dashboard that **sums** this metric across instances over-counts by the replica
-factor. Compare a single instance against `tradr_db_pool_max` instead. That gauge
+factor. Compare a single instance against `jurnal_zitn_db_pool_max` instead. That gauge
 exists because the Postgres driver exposes no pool statistics of its own, so it
 is the only saturation reference available.
 
@@ -274,15 +274,15 @@ Enough PromQL to build the first panel of a dashboard. Adjust the range vector
 **Request rate**, per second, broken out by route:
 
 ```promql
-sum by (route) (rate(tradr_http_requests_total[5m]))
+sum by (route) (rate(jurnal_zitn_http_requests_total[5m]))
 ```
 
 **Error rate** as a fraction of all requests. `status` is a string, so match it
 with a regex rather than a numeric comparison:
 
 ```promql
-(sum(rate(tradr_http_requests_total{status=~"5.."}[5m])) or vector(0))
-  / sum(rate(tradr_http_requests_total[5m]))
+(sum(rate(jurnal_zitn_http_requests_total{status=~"5.."}[5m])) or vector(0))
+  / sum(rate(jurnal_zitn_http_requests_total[5m]))
 ```
 
 The `or vector(0)` is not decoration. An instance that has served no `5xx` has no
@@ -298,7 +298,7 @@ label must survive the aggregation, so it belongs in the `by` clause:
 ```promql
 histogram_quantile(
   0.95,
-  sum by (le) (rate(tradr_http_request_duration_seconds_bucket[5m]))
+  sum by (le) (rate(jurnal_zitn_http_request_duration_seconds_bucket[5m]))
 )
 ```
 
@@ -309,12 +309,12 @@ the documented trade-off above.
 **Pool saturation**, the fraction of one instance's pool in use:
 
 ```promql
-sum without (state) (tradr_db_connections) / tradr_db_pool_max
+sum without (state) (jurnal_zitn_db_connections) / jurnal_zitn_db_pool_max
 ```
 
 `without (state)` is the load-bearing part, and a bare `sum()` breaks this query
 twice over. `sum()` drops _every_ label, `job` and `instance` included, so the
-left-hand side has nothing left to match `tradr_db_pool_max` on and the
+left-hand side has nothing left to match `jurnal_zitn_db_pool_max` on and the
 expression returns no result at all — not a wrong number, nothing. It would also
 be exactly the across-instance sum the section above warns against, because these
 counts are database-global. `sum without (state)` collapses only the three
@@ -331,7 +331,7 @@ pool-exhaustion precursor: connections held open by transactions that are no
 longer doing work.
 
 ```promql
-tradr_db_connections{state="idle_in_transaction"}
+jurnal_zitn_db_connections{state="idle_in_transaction"}
 ```
 
 ## When the database is down
@@ -339,16 +339,16 @@ tradr_db_connections{state="idle_in_transaction"}
 The scrape still returns `200`. A database failure never fails a scrape.
 
 Static facts stay published; sampled facts disappear. So a failed probe leaves
-`tradr_db_up 0`, a `tradr_db_probe_duration_seconds` value, and **no**
-`tradr_db_connections` series at all. The series is omitted rather than reported
+`jurnal_zitn_db_up 0`, a `jurnal_zitn_db_probe_duration_seconds` value, and **no**
+`jurnal_zitn_db_connections` series at all. The series is omitted rather than reported
 stale.
 
-Use `tradr_db_up` to tell the two failure modes apart:
+Use `jurnal_zitn_db_up` to tell the two failure modes apart:
 
-| What you see                                       | Means                           |
-| -------------------------------------------------- | ------------------------------- |
-| No `tradr_db_connections`, `tradr_db_up 0` present | The database is down.           |
-| No `tradr_db_connections`, no `tradr_db_up` either | The instance is not scrapeable. |
+| What you see                                                   | Means                           |
+| -------------------------------------------------------------- | ------------------------------- |
+| No `jurnal_zitn_db_connections`, `jurnal_zitn_db_up 0` present | The database is down.           |
+| No `jurnal_zitn_db_connections`, no `jurnal_zitn_db_up` either | The instance is not scrapeable. |
 
 If serialization itself fails, the api serves an empty body with `200` and the
 correct content type, and logs at `error`. The target stays up.
@@ -394,10 +394,10 @@ A stranger learns your request volume by route and status, and your latency
 distribution. They also learn your connection counts, and your memory and
 event-loop health.
 
-They learn **two** versions, and both are the sensitive part. `tradr_build_info`
-carries the Tradr version you run. `nodejs_version_info`, one of the standard
+They learn **two** versions, and both are the sensitive part. `jurnal_zitn_build_info`
+carries the Jurnal ZITN version you run. `nodejs_version_info`, one of the standard
 default metrics, carries the exact **Node.js runtime version** in its `version`
-label — it ships with that default set rather than being something Tradr chose to
+label — it ships with that default set rather than being something Jurnal ZITN chose to
 publish, and it is easy to overlook when reasoning about what the surface
 discloses. Between them they tell an attacker which application advisories and
 which runtime advisories apply to you.
@@ -411,7 +411,7 @@ states instead.
 ### A metrics port conflict does not stop the api
 
 If `METRICS_PORT` is already in use, the api logs at `error` and **keeps serving
-requests**. Tradr does not refuse to boot over an observability port.
+requests**. Jurnal ZITN does not refuse to boot over an observability port.
 
 The failure is visible where it matters: your collector reports `up == 0` for
 that target. Check the api container's logs for
@@ -428,7 +428,7 @@ code, a body, or a header.
 ## Getting a real version instead of `unknown`
 
 If you build the images yourself with `docker compose build`, **both**
-`tradr_build_info` and `tradr_web_build_info` report `version="unknown"` and
+`jurnal_zitn_build_info` and `jurnal_zitn_web_build_info` report `version="unknown"` and
 `commit="unknown"`.
 
 This is expected, not a bug. Neither `build:` block in the shipped
@@ -441,8 +441,8 @@ tag into both images. Put both series on one panel and compare their `version`
 labels:
 
 ```promql
-tradr_build_info
-tradr_web_build_info
+jurnal_zitn_build_info
+jurnal_zitn_web_build_info
 ```
 
 Two different values mean a half-finished deploy. Two `unknown` values mean you
@@ -457,7 +457,7 @@ docker compose build \
 docker compose up -d
 ```
 
-**Expected result:** `tradr_build_info` and `tradr_web_build_info` both report
+**Expected result:** `jurnal_zitn_build_info` and `jurnal_zitn_web_build_info` both report
 that string as `version`, and the short sha as `commit`.
 
 The `commit` label is the text after the final `-`, on both halves. A value with
@@ -473,14 +473,14 @@ drift metric into a drift source.
 
 A single api instance emits under 2,000 active series. The budget:
 
-| Source                                                               | Series     |
-| -------------------------------------------------------------------- | ---------- |
-| `tradr_http_requests_total` — 195 routes × about 5 observed statuses | ~1,000     |
-| `tradr_http_request_duration_seconds` — 5 methods × 17 series each   | ~85        |
-| `process_*` and `nodejs_*`                                           | ~69        |
-| Database metrics                                                     | 6          |
-| `tradr_build_info`                                                   | 1          |
-| **Total**                                                            | **~1,161** |
+| Source                                                                     | Series     |
+| -------------------------------------------------------------------------- | ---------- |
+| `jurnal_zitn_http_requests_total` — 195 routes × about 5 observed statuses | ~1,000     |
+| `jurnal_zitn_http_request_duration_seconds` — 5 methods × 17 series each   | ~85        |
+| `process_*` and `nodejs_*`                                                 | ~69        |
+| Database metrics                                                           | 6          |
+| `jurnal_zitn_build_info`                                                   | 1          |
+| **Total**                                                                  | **~1,161** |
 
 The `process_*` and `nodejs_*` row is a measured figure, not an estimate: 69
 series on a freshly armed instance, give or take one or two —

@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 /**
  * Node-only accessors for the committed CSV import sample fixtures (REQ-3.3).
  *
- * These read files from disk, so they live under `@tradr/shared/node/*` and are
+ * These read files from disk, so they live under `@jurnal-zitn/shared/node/*` and are
  * deliberately NOT re-exported from `index.ts` (the barrel is web-bundled). Only
  * server/test code (e.g. the `apps/api` preset conformance test) imports them.
  */

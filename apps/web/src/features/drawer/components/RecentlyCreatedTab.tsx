@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
-import type { PositionListItem } from '@tradr/shared';
+import type { PositionListItem } from '@jurnal-zitn/shared';
 
 import { Alert } from '@/components/ui/alert';
 import { usePositions } from '@/features/positions/hooks/usePositions';

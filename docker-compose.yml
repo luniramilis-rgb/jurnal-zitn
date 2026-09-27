@@ -11,12 +11,12 @@
 # published; only web exposes a host port.
 
 networks:
-  tradr:
+  jurnal-zitn:
     driver: bridge
     ipam:
       config:
         # Operator-overridable; keep in sync with TRUSTED_PROXIES in .env.
-        - subnet: ${TRADR_SUBNET:-172.28.0.0/24}
+        - subnet: ${JURNAL_ZITN_SUBNET:-172.28.0.0/24}
 
 volumes:
   pgdata:
@@ -36,14 +36,14 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - tradr
+      - jurnal-zitn
     restart: unless-stopped
 
   api:
     # Documented alternative to building locally: pull a pinned, multi-arch
     # GHCR image published by the release workflow (task 15). Replace the
     # `build:` block with, e.g.:
-    #   image: ghcr.io/<owner>/tradr-api:1.2.3
+    #   image: ghcr.io/<owner>/jurnal-zitn-api:1.2.3
     build:
       context: .
       dockerfile: docker/Dockerfile.api
@@ -160,12 +160,12 @@ services:
       timeout: 5s
       retries: 5
     networks:
-      - tradr
+      - jurnal-zitn
     restart: unless-stopped
 
   web:
     # Documented alternative (see api): replace `build:` with
-    #   image: ghcr.io/<owner>/tradr-web:1.2.3
+    #   image: ghcr.io/<owner>/jurnal-zitn-web:1.2.3
     build:
       context: .
       dockerfile: docker/Dockerfile.web
@@ -196,5 +196,5 @@ services:
       # into a drift source.
       METRICS_ENABLED: ${METRICS_ENABLED:-false}
     networks:
-      - tradr
+      - jurnal-zitn
     restart: unless-stopped

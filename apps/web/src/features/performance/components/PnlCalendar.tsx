@@ -2,8 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { type ReactNode, useState } from 'react';
 
-
-import type { PerformanceQueryInput } from '@tradr/shared';
+import type { PerformanceQueryInput } from '@jurnal-zitn/shared';
 
 import { EmptyState } from '@/components/EmptyState';
 import { Numeric } from '@/components/Numeric';

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { PerformanceResponse } from '@tradr/shared';
+import type { PerformanceResponse } from '@jurnal-zitn/shared';
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';

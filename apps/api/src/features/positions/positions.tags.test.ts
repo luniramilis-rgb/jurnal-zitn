@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 
-import { TAG_LIMITS } from '@tradr/shared';
+import { TAG_LIMITS } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db } from '@/db';

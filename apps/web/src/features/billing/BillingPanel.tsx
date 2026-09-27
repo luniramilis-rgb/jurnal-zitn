@@ -8,7 +8,7 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import type { CreditPack } from '@tradr/shared';
+import type { CreditPack } from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import { Button } from '@/components/ui/button';

@@ -22,6 +22,7 @@ import {
 } from '@/components/ui/table';
 import { useMissingRatePrompt } from '@/features/accounting/hooks/useMissingRatePrompt';
 import { useFeeRollup } from '@/features/expenses/hooks/useFeeRollup';
+import { useT } from '@/hooks/useLocale';
 import { formatCurrency } from '@/lib/format';
 
 const TAX_SUMMARY_PATH = '/accounting/tax-summary';
@@ -81,6 +82,7 @@ function DisclaimerBody({ text }: { text: string }) {
 }
 
 export function FeeRollupPage() {
+  const t = useT();
   const currentYear = new Date().getUTCFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
 
@@ -98,7 +100,7 @@ export function FeeRollupPage() {
   return (
     <div className="space-y-6">
       <div>
-        <PageHeader page="Fee Rollup" className="mb-2" />
+        <PageHeader page={t('fee.page.title')} className="mb-2" />
         <p className="text-sm text-muted-foreground">
           Recorded fill fees aggregated by account and currency for the selected year.
         </p>
@@ -107,7 +109,7 @@ export function FeeRollupPage() {
         <div className="flex items-end gap-3">
           <div className="space-y-1">
             <label htmlFor="fee-rollup-year" className="text-xs text-muted-foreground">
-              Year
+              {t('tax.field.year')}
             </label>
             <Select
               value={String(selectedYear)}
@@ -144,7 +146,7 @@ export function FeeRollupPage() {
 
       {data && data.missingRates.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 rounded-md border border-warning/30 bg-warning/10 p-3 text-sm text-foreground">
-          <span className="font-medium text-warning">Missing exchange rate(s):</span>
+          <span className="font-medium text-warning">{t('tax.missingRates')}</span>
           <ul className="flex flex-wrap gap-x-3 gap-y-1">
             {data.missingRates.map((p) => (
               <li key={`${p.base}-${p.quote}`}>
@@ -170,27 +172,25 @@ export function FeeRollupPage() {
           <Skeleton className="h-10 w-full" />
         </div>
       ) : isError ? (
-        <div className="py-8 text-center text-sm text-destructive">
-          Failed to load fee rollup. Please try again.
-        </div>
+        <div className="py-8 text-center text-sm text-destructive">{t('fee.loadFailed')}</div>
       ) : !data || data.totalsByAccount.length === 0 ? (
         <EmptyState
           icon={<ReceiptText className="h-10 w-10" />}
-          title={`No recorded fill fees for ${selectedYear}`}
-          description="When you record fills with fees, they will be aggregated here by account and currency."
+          title={t('fee.emptyTitle', { year: selectedYear })}
+          description={t('fee.emptyDesc')}
         />
       ) : (
         <>
           <div>
-            <h2 className="mb-2 text-lg font-semibold">Per-account totals</h2>
+            <h2 className="mb-2 text-lg font-semibold">{t('fee.perAccount')}</h2>
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Account</TableHead>
-                  <TableHead>Currency</TableHead>
-                  <TableHead className="text-right">Stock fees</TableHead>
-                  <TableHead className="text-right">Options fees</TableHead>
-                  <TableHead className="text-right">Total fees</TableHead>
+                  <TableHead>{t('pos.col.account')}</TableHead>
+                  <TableHead>{t('fee.col.currency')}</TableHead>
+                  <TableHead className="text-right">{t('fee.col.stockFees')}</TableHead>
+                  <TableHead className="text-right">{t('fee.col.optionsFees')}</TableHead>
+                  <TableHead className="text-right">{t('fee.col.totalFees')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -215,7 +215,7 @@ export function FeeRollupPage() {
 
           {data.perCurrencyTotals.length > 0 && (
             <div>
-              <h2 className="mb-2 text-lg font-semibold">Per-currency totals</h2>
+              <h2 className="mb-2 text-lg font-semibold">{t('fee.perCurrency')}</h2>
               <div className="rounded-md border p-4">
                 <div className="flex flex-wrap gap-4">
                   {data.perCurrencyTotals.map((row) => (

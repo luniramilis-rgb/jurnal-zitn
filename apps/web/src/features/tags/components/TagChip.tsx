@@ -1,6 +1,6 @@
 import { XIcon } from 'lucide-react';
 
-import { TAG_CATEGORY_PREFIX, type Tag, type TagColor } from '@tradr/shared';
+import { TAG_CATEGORY_PREFIX, type Tag, type TagColor } from '@jurnal-zitn/shared';
 
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';

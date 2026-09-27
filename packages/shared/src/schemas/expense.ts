@@ -100,7 +100,7 @@ export const ExpenseListResponseSchema = z
   })
   .strict();
 
-export const TaxJurisdictionEnum = z.enum(['US', 'CA', 'other']);
+export const TaxJurisdictionEnum = z.enum(['US', 'CA', 'ID', 'other']);
 
 export const UpdateTaxJurisdictionInputSchema = z
   .object({
@@ -215,6 +215,20 @@ export const TaxSummaryResponseSchema = z
       washSales: z.array(WashSaleFlag),
       superficialLosses: z.array(SuperficialLossFlag),
     }),
+    // PPh final IDX (ZITN-TECH-017 Fase 2b): 0,1% dari nilai penjualan. Hanya diisi
+    // saat jurisdiction === 'ID'; di yurisdiksi lain field absen.
+    pphFinal: z
+      .object({
+        rate: z.string(),
+        perCurrency: z.array(
+          z.object({
+            currency: z.string().length(3),
+            sellProceeds: z.string(),
+            amount: z.string(),
+          }),
+        ),
+      })
+      .optional(),
     missingRates: z.array(
       z.object({
         base: z.string().length(3),

@@ -1,7 +1,7 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Playwright config for the Tradr e2e suite.
+ * Playwright config for the Jurnal ZITN e2e suite.
  *
  * Playwright owns the full stack lifecycle via the `webServer` array below: it
  * boots a local Unusual Whales stub (e2e/support/uw-stub-server.ts), the API
@@ -12,7 +12,7 @@ import { defineConfig, devices } from '@playwright/test';
  * migrations on boot, so no separate migrate step is needed.
  *
  * In CI the `e2e` job in .github/workflows/ci.yml starts the postgres service,
- * installs Playwright browsers, and runs `pnpm --filter @tradr/e2e test`;
+ * installs Playwright browsers, and runs `pnpm --filter @jurnal-zitn/e2e test`;
  * Playwright boots web + api + stub itself.
  *
  * `BASE_URL` is read from the env so CI can point at a preview deploy or a
@@ -65,7 +65,7 @@ const apiEnv: Record<string, string> = {
   // DATABASE_URL from the workflow env (its service container is on 5432), so
   // this default is only ever the local path.
   DATABASE_URL:
-    process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5433/tradr_test',
+    process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test',
   SESSION_SECRET:
     process.env.SESSION_SECRET ?? 'e2e-session-secret-that-is-at-least-32-characters-long',
   ENCRYPTION_KEY:
@@ -77,7 +77,7 @@ const apiEnv: Record<string, string> = {
   // and never hit the live api.github.com. The repo slug is a fixture value —
   // the stub serves the same fixtures for any owner/repo path.
   CHANGELOG_GITHUB_BASE_URL: `http://localhost:${githubStubPort}`,
-  CHANGELOG_GITHUB_REPO: 'e2e-fixtures/tradr-changelog',
+  CHANGELOG_GITHUB_REPO: 'e2e-fixtures/jurnal-zitn-changelog',
   // ─── Symbol search + delayed quotes (symbol-search-quotes Task 14) ────────
   // SEC_TICKERS_URL is set UNCONDITIONALLY → the local SEC stub. The e2e API
   // boots NODE_ENV=development, so Task 9's bootstrap `void syncSymbolsIfStale()`
@@ -111,7 +111,7 @@ const apiEnv: Record<string, string> = {
   // exported boots the API byte-identical to before this block existed. To
   // arm an email round-trip run, export the .env.example dev-Mailpit values
   // (SMTP_HOST=localhost SMTP_PORT=1025 SMTP_TLS_MODE=none
-  // EMAIL_FROM=dev@tradr.local) before `pnpm test` —
+  // EMAIL_FROM=dev@jurnal-zitn.local) before `pnpm test` —
   // tests/transactional-email.spec.ts un-skips itself when the API is armed
   // AND the Mailpit API answers on :8025.
   //
@@ -156,14 +156,14 @@ export default defineConfig({
   webServer: manageStack
     ? [
         {
-          command: 'pnpm --filter @tradr/e2e exec tsx support/uw-stub-server.ts',
+          command: 'pnpm --filter @jurnal-zitn/e2e exec tsx support/uw-stub-server.ts',
           url: `http://localhost:${uwStubPort}/__health`,
           reuseExistingServer,
           timeout: 30_000,
           env: { UW_STUB_PORT: String(uwStubPort) },
         },
         {
-          command: 'pnpm --filter @tradr/e2e exec tsx support/github-stub-server.ts',
+          command: 'pnpm --filter @jurnal-zitn/e2e exec tsx support/github-stub-server.ts',
           url: `http://localhost:${githubStubPort}/__health`,
           reuseExistingServer,
           timeout: 30_000,
@@ -172,7 +172,7 @@ export default defineConfig({
         {
           // SEC company-tickers stub — the API's SEC_TICKERS_URL points here so
           // bootstrap symbol population is deterministic and never hits live SEC.
-          command: 'pnpm --filter @tradr/e2e exec tsx support/sec-tickers-stub-server.ts',
+          command: 'pnpm --filter @jurnal-zitn/e2e exec tsx support/sec-tickers-stub-server.ts',
           url: `http://localhost:${secStubPort}/__health`,
           reuseExistingServer,
           timeout: 30_000,
@@ -182,14 +182,14 @@ export default defineConfig({
           // Delayed-quote provider stub — the API's STOCK_QUOTE_BASE_URL points
           // here so pull-quote lookups are deterministic and never hit live API
           // Ninjas. Only reached when STOCK_QUOTE_API_KEY arms the capability.
-          command: 'pnpm --filter @tradr/e2e exec tsx support/stock-quote-stub-server.ts',
+          command: 'pnpm --filter @jurnal-zitn/e2e exec tsx support/stock-quote-stub-server.ts',
           url: `http://localhost:${quoteStubPort}/__health`,
           reuseExistingServer,
           timeout: 30_000,
           env: { QUOTE_STUB_PORT: String(quoteStubPort) },
         },
         {
-          command: 'pnpm --filter @tradr/api exec tsx src/index.ts',
+          command: 'pnpm --filter @jurnal-zitn/api exec tsx src/index.ts',
           url: `http://localhost:${apiPort}/api/health`,
           reuseExistingServer,
           timeout: 120_000,
@@ -205,7 +205,7 @@ export default defineConfig({
           // bundle renders at constant speed. `preview` mirrors the dev `/api`
           // proxy (apps/web/vite.config.ts), so requests route identically. The
           // longer timeout covers the one-time build before the server is up.
-          command: `pnpm --filter @tradr/web build && pnpm --filter @tradr/web exec vite preview --port ${webPort} --strictPort`,
+          command: `pnpm --filter @jurnal-zitn/web build && pnpm --filter @jurnal-zitn/web exec vite preview --port ${webPort} --strictPort`,
           url: baseURL,
           reuseExistingServer,
           timeout: 180_000,

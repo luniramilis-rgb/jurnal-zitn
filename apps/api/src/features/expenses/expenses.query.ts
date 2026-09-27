@@ -1,5 +1,7 @@
 import { and, desc, eq, gte, lte, or, sql } from 'drizzle-orm';
 
+import type { TaxJurisdiction } from '@jurnal-zitn/shared';
+
 import type { Database, Transaction } from '@/db';
 import { ledgerEntries } from '@/db/schema/accounting.schema';
 import { accounts } from '@/db/schema/accounts.schema';
@@ -239,6 +241,46 @@ export type RealisedPositionRow = {
  * predicate redundant, but the cost is one extra predicate and it shuts down
  * the cross-user-leak hazard at the query layer.
  */
+export function selectUserLocaleById(
+  db: Database | Transaction,
+  userId: string,
+): Promise<string | null | undefined> {
+  return db
+    .select({ locale: users.locale })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1)
+    .then((rows) => rows[0]?.locale);
+}
+
+export async function listIdxSellProceedsByCurrency(
+  db: Database | Transaction,
+  userId: string,
+  year: number,
+): Promise<{ currency: string; proceeds: string }[]> {
+  const windowStart = `${year}-01-01T00:00:00Z`;
+  const windowEnd = `${year + 1}-01-01T00:00:00Z`;
+
+  return db
+    .select({
+      currency: accounts.currency,
+      proceeds: sql<string>`SUM(${fills.price} * ${fills.quantity})::text`,
+    })
+    .from(fills)
+    .innerJoin(positions, eq(fills.positionId, positions.id))
+    .innerJoin(accounts, eq(positions.accountId, accounts.id))
+    .where(
+      and(
+        eq(positions.userId, userId),
+        eq(fills.type, 'exit'),
+        eq(positions.side, 'long'),
+        sql`${fills.filledAt} >= ${windowStart}`,
+        sql`${fills.filledAt} < ${windowEnd}`,
+      ),
+    )
+    .groupBy(accounts.currency);
+}
+
 export async function listRealisedPositionsForYear(
   db: Database | Transaction,
   userId: string,
@@ -412,7 +454,7 @@ export async function aggregateFeesByAccountForYear(
 // Jurisdiction queries (Task 7.4)
 // ---------------------------------------------------------------------------
 
-export type TaxJurisdiction = 'US' | 'CA' | 'other';
+export type { TaxJurisdiction };
 
 /**
  * Read the user's stored tax jurisdiction. Returns NULL straight through —

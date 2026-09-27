@@ -5,11 +5,14 @@ import { z } from 'zod';
 
 import {
   CreateFillSchema,
+  lotsToShares,
+  roundToIdxTick,
+  sharesToLots,
   UpdateFillSchema,
   type CreateFillInput,
   type UpdateFillInput,
   type Fill,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -24,6 +27,7 @@ import {
 } from '@/components/ui/select';
 import { Switch } from '@/components/ui/switch';
 import { Textarea } from '@/components/ui/textarea';
+import { useT } from '@/hooks/useLocale';
 
 import { useAccountFeeSchedule } from '../hooks/useAccountFeeSchedule';
 import { useAddFill, useUpdateFill } from '../hooks/usePosition';
@@ -100,6 +104,7 @@ export function FillDialog({
   const addFill = useAddFill(positionId);
   const updateFill = useUpdateFill(positionId);
   const feeSchedule = useAccountFeeSchedule(position?.accountId);
+  const t = useT();
 
   // Manual fees and the server's schedule-derived brokerageFees are ADDITIVE
   // (pnl.ts subtracts fill fees from realizedPnl, then netPnl subtracts
@@ -109,6 +114,15 @@ export function FillDialog({
   // stack on top of the schedule; the copy below says so.
   const feeIsCalculable = !isEdit && !!position && feeSchedule !== null;
   const [feeOverride, setFeeOverride] = useState(false);
+
+  // Mode IDX (ZITN-TECH-017 Fase 2b-2): jadwal fee persentase menandakan broker IDX.
+  // Menyalakan entri per-lot (1 lot = 100 saham) dan pembulatan harga ke tick IDX.
+  const idxMode =
+    !!feeSchedule &&
+    (Number(feeSchedule.stockPercentBuy) > 0 || Number(feeSchedule.stockPercentSell) > 0);
+  const showLotToggle = idxMode && !isEdit;
+  const [useLots, setUseLots] = useState(false);
+  const [lotInput, setLotInput] = useState('');
 
   const form = useForm<CreateFillInput>({
     resolver: zodResolver(isEdit ? FillEditFormSchema : FillFormSchema),
@@ -147,6 +161,8 @@ export function FillDialog({
       filledAt: new Date().toISOString().slice(0, 16),
     });
     setFeeOverride(false);
+    setUseLots(false);
+    setLotInput('');
     // `form` is stable across renders; re-seed only on an open transition or a
     // change of direction.
   }, [open, defaultType, isEdit, position, form]);
@@ -212,18 +228,18 @@ export function FillDialog({
         <DialogHeader>
           <DialogTitle>
             {isEdit
-              ? 'Edit Fill'
+              ? t('pos.fill.title.edit')
               : defaultType === 'entry'
-                ? 'Add to position'
+                ? t('pos.fill.title.addTo')
                 : defaultType === 'exit'
-                  ? 'Reduce position'
-                  : 'Add Fill'}
+                  ? t('pos.fill.title.reduce')
+                  : t('pos.fill.title.add')}
           </DialogTitle>
         </DialogHeader>
         <form onSubmit={onSubmit} className="space-y-4">
           {!isEdit && !defaultType && (
             <div className="space-y-2">
-              <Label>Type</Label>
+              <Label>{t('pos.field.type')}</Label>
               <Select
                 value={form.watch('type')}
                 onValueChange={(val) => form.setValue('type', val as 'entry' | 'exit')}
@@ -244,17 +260,69 @@ export function FillDialog({
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="price">Price</Label>
-              <Input id="price" {...form.register('price')} placeholder="0.00" />
+              <Label htmlFor="price">{t('pos.field.price')}</Label>
+              <Input
+                id="price"
+                {...form.register('price', {
+                  onBlur: (e) => {
+                    if (!idxMode) return;
+                    const raw = e.target.value;
+                    if (!raw) return;
+                    form.setValue('price', roundToIdxTick(raw), { shouldValidate: true });
+                  },
+                })}
+                placeholder="0.00"
+              />
+              {idxMode && (
+                <p className="text-xs text-muted-foreground">{t('pos.fill.priceTick')}</p>
+              )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="quantity">Quantity</Label>
-              <Input
-                id="quantity"
-                {...form.register('quantity')}
-                placeholder="0"
-                disabled={isClosedPosition && isEdit}
-              />
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="quantity">
+                  {useLots ? t('pos.field.quantityLot') : t('pos.field.quantity')}
+                </Label>
+                {showLotToggle && (
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="lot-mode" className="text-xs font-normal text-muted-foreground">
+                      {t('pos.lot.toggle')}
+                    </Label>
+                    <Switch
+                      id="lot-mode"
+                      className="cursor-pointer"
+                      checked={useLots}
+                      onCheckedChange={(on) => {
+                        const shares = form.getValues('quantity');
+                        setUseLots(on);
+                        setLotInput(on && shares ? sharesToLots(shares) : '');
+                      }}
+                    />
+                  </div>
+                )}
+              </div>
+              {useLots ? (
+                <Input
+                  id="quantity"
+                  inputMode="decimal"
+                  value={lotInput}
+                  placeholder="0"
+                  disabled={isClosedPosition && isEdit}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    setLotInput(v);
+                    form.setValue('quantity', v === '' ? '' : lotsToShares(v), {
+                      shouldValidate: true,
+                    });
+                  }}
+                />
+              ) : (
+                <Input
+                  id="quantity"
+                  {...form.register('quantity')}
+                  placeholder="0"
+                  disabled={isClosedPosition && isEdit}
+                />
+              )}
               {showQuantityPresets && position && (
                 <div className="flex items-center gap-1">
                   {QUANTITY_PRESETS.map((preset) => (
@@ -264,13 +332,15 @@ export function FillDialog({
                       variant="outline"
                       size="xs"
                       className="cursor-pointer"
-                      onClick={() =>
-                        form.setValue(
-                          'quantity',
-                          presetQuantity(position.openUnits, preset.fraction, position.assetType),
-                          { shouldValidate: true },
-                        )
-                      }
+                      onClick={() => {
+                        const shares = presetQuantity(
+                          position.openUnits,
+                          preset.fraction,
+                          position.assetType,
+                        );
+                        form.setValue('quantity', shares, { shouldValidate: true });
+                        if (useLots) setLotInput(sharesToLots(shares));
+                      }}
                     >
                       {preset.label}
                     </Button>
@@ -286,14 +356,14 @@ export function FillDialog({
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <div className="flex items-center justify-between gap-2">
-                <Label htmlFor="fees">Fees</Label>
+                <Label htmlFor="fees">{t('pos.field.fees')}</Label>
                 {feeIsCalculable && (
                   <div className="flex items-center gap-2">
                     <Label
                       htmlFor="fee-override"
                       className="text-xs font-normal text-muted-foreground"
                     >
-                      Override
+                      {t('pos.fill.override')}
                     </Label>
                     <Switch
                       id="fee-override"
@@ -314,23 +384,19 @@ export function FillDialog({
                     value={previewFee ?? ''}
                     placeholder="Enter price and quantity"
                   />
-                  <p className="text-xs text-muted-foreground">
-                    Calculated from the account&apos;s brokerage fee schedule.
-                  </p>
+                  <p className="text-xs text-muted-foreground">{t('pos.fill.calcFromSchedule')}</p>
                 </>
               ) : (
                 <>
                   <Input id="fees" {...form.register('fees')} placeholder="0.00" />
                   {feeIsCalculable && feeOverride && (
-                    <p className="text-xs text-muted-foreground">
-                      Added on top of the brokerage schedule, which still applies to this position.
-                    </p>
+                    <p className="text-xs text-muted-foreground">{t('pos.fill.addedOnTop')}</p>
                   )}
                 </>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="filledAt">Date &amp; Time</Label>
+              <Label htmlFor="filledAt">{t('pos.field.dateTime')}</Label>
               <Input id="filledAt" type="datetime-local" {...form.register('filledAt')} />
             </div>
           </div>
@@ -346,8 +412,12 @@ export function FillDialog({
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="fill-notes">Notes</Label>
-            <Textarea id="fill-notes" {...form.register('notes')} placeholder="Optional..." />
+            <Label htmlFor="fill-notes">{t('pos.field.notes')}</Label>
+            <Textarea
+              id="fill-notes"
+              {...form.register('notes')}
+              placeholder={t('pos.notes.placeholder')}
+            />
           </div>
 
           <div className="flex justify-end gap-2">
@@ -357,10 +427,14 @@ export function FillDialog({
               className="cursor-pointer"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t('action.cancel')}
             </Button>
             <Button type="submit" className="cursor-pointer" disabled={isPending}>
-              {isPending ? 'Saving...' : isEdit ? 'Save' : 'Add'}
+              {isPending
+                ? t('pos.fill.saving')
+                : isEdit
+                  ? t('pos.action.save')
+                  : t('pos.action.add')}
             </Button>
           </div>
         </form>

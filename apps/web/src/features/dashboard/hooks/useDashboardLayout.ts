@@ -7,7 +7,7 @@ import {
   type DashboardLayoutResponse,
   type PutDashboardLayoutRequest,
   type Theme,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { api, resolveApiUrl } from '../../../lib/api';
 import { DEBOUNCE_PUT_MS } from '../grid.constants';

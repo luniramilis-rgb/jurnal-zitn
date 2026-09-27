@@ -45,12 +45,12 @@ function makeWin(origin = 'https://app.example') {
 
 // Set the boot version appVersion() reads, restoring the previous config after.
 function withBootVersion(version: string | undefined, fn: () => void) {
-  const prev = window.__TRADR_CONFIG__;
-  window.__TRADR_CONFIG__ = version === undefined ? undefined : { appVersion: version };
+  const prev = window.__JURNAL_ZITN_CONFIG__;
+  window.__JURNAL_ZITN_CONFIG__ = version === undefined ? undefined : { appVersion: version };
   try {
     fn();
   } finally {
-    window.__TRADR_CONFIG__ = prev;
+    window.__JURNAL_ZITN_CONFIG__ = prev;
   }
 }
 
@@ -128,7 +128,7 @@ describe('attemptAutomaticReload guard', () => {
     withBootVersion('v1.0.0', () => {
       installChunkRecovery({
         nudge: vi.fn(),
-        storage: makeStorage({ 'tradr.chunk-reload.v1.0.0': '1' }),
+        storage: makeStorage({ 'jurnal-zitn.chunk-reload.v1.0.0': '1' }),
       });
       expect(attemptAutomaticReload()).toBe(false);
     });
@@ -168,7 +168,7 @@ describe('attemptAutomaticReload guard', () => {
       installChunkRecovery({ nudge: vi.fn(), storage });
       expect(attemptAutomaticReload()).toBe(true);
       const set = (storage as unknown as { setItem: ReturnType<typeof vi.fn> }).setItem;
-      expect(set.mock.calls[0][0]).toBe('tradr.chunk-reload.v9.9.9');
+      expect(set.mock.calls[0][0]).toBe('jurnal-zitn.chunk-reload.v9.9.9');
     });
   });
 
@@ -182,17 +182,17 @@ describe('attemptAutomaticReload guard', () => {
     });
   });
 
-  it('prunes other tradr.chunk-reload.* keys on install', () => {
+  it('prunes other jurnal-zitn.chunk-reload.* keys on install', () => {
     withBootVersion('v2.0.0', () => {
       const storage = makeStorage({
-        'tradr.chunk-reload.v1.0.0': '1',
-        'tradr.chunk-reload.v2.0.0': '2',
+        'jurnal-zitn.chunk-reload.v1.0.0': '1',
+        'jurnal-zitn.chunk-reload.v2.0.0': '2',
         'other.key': 'keep',
       });
       installChunkRecovery({ nudge: vi.fn(), storage });
       const map = (storage as unknown as { map: Map<string, string> }).map;
-      expect(map.has('tradr.chunk-reload.v1.0.0')).toBe(false); // stale, removed
-      expect(map.has('tradr.chunk-reload.v2.0.0')).toBe(true); // current, kept
+      expect(map.has('jurnal-zitn.chunk-reload.v1.0.0')).toBe(false); // stale, removed
+      expect(map.has('jurnal-zitn.chunk-reload.v2.0.0')).toBe(true); // current, kept
       expect(map.has('other.key')).toBe(true); // unrelated, kept
     });
   });

@@ -1,11 +1,9 @@
 import { ChevronDown, Loader2, Receipt } from 'lucide-react';
 import { Fragment, useMemo, useState } from 'react';
 
-import {
-  EXPENSE_CATEGORY_LABELS,
-  type ExpenseCategory,
-} from '@tradr/shared/constants/expense-categories';
-import type { TaxJurisdiction } from '@tradr/shared/schemas/expense';
+import type { MessageKey } from '@jurnal-zitn/shared';
+import type { ExpenseCategory } from '@jurnal-zitn/shared/constants/expense-categories';
+import type { TaxJurisdiction } from '@jurnal-zitn/shared/schemas/expense';
 
 import { EmptyState } from '@/components/EmptyState';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -32,11 +30,22 @@ import {
   useTaxJurisdictionQuery,
 } from '@/features/expenses/hooks/useTaxJurisdiction';
 import { useTaxSummary } from '@/features/expenses/hooks/useTaxSummary';
+import { useT } from '@/hooks/useLocale';
 import { formatCurrency } from '@/lib/format';
+
+const EXPENSE_CATEGORY_KEYS: Record<ExpenseCategory, MessageKey> = {
+  data_subscription: 'expense.cat.data_subscription',
+  platform_fee: 'expense.cat.platform_fee',
+  software: 'expense.cat.software',
+  education: 'expense.cat.education',
+  hardware: 'expense.cat.hardware',
+  other: 'expense.cat.other',
+};
 
 const JURISDICTION_LABELS: Record<TaxJurisdiction, string> = {
   US: 'United States',
   CA: 'Canada',
+  ID: 'Indonesia',
   other: 'Other',
 };
 
@@ -102,6 +111,7 @@ function DisclaimerBody({ text }: { text: string }) {
 }
 
 export function TaxSummaryPage() {
+  const t = useT();
   const currentYear = new Date().getUTCFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const yearOptions = useMemo(() => buildYearOptions(currentYear), [currentYear]);
@@ -134,16 +144,14 @@ export function TaxSummaryPage() {
   return (
     <div className="space-y-6">
       <div>
-        <PageHeader page="Tax Summary" className="mb-2" />
-        <p className="text-sm text-muted-foreground">
-          Realised P&amp;L, tracked expenses, and flagged positions for the selected year.
-        </p>
+        <PageHeader page={t('tax.page.title')} className="mb-2" />
+        <p className="text-sm text-muted-foreground">{t('tax.subtitle')}</p>
       </div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex items-end gap-3">
           <div className="space-y-1">
             <label htmlFor="tax-summary-year" className="text-xs text-muted-foreground">
-              Year
+              {t('tax.field.year')}
             </label>
             <Select
               value={String(selectedYear)}
@@ -163,7 +171,7 @@ export function TaxSummaryPage() {
           </div>
           <div className="space-y-1">
             <label htmlFor="tax-summary-jurisdiction" className="text-xs text-muted-foreground">
-              Jurisdiction
+              {t('tax.field.jurisdiction')}
             </label>
             <div className="flex items-center gap-2">
               <Select
@@ -179,7 +187,7 @@ export function TaxSummaryPage() {
                 <SelectContent>
                   {(Object.keys(JURISDICTION_LABELS) as TaxJurisdiction[]).map((j) => (
                     <SelectItem key={j} value={j}>
-                      {JURISDICTION_LABELS[j]}
+                      {j === 'other' ? t('tax.jurisdiction.other') : JURISDICTION_LABELS[j]}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -199,7 +207,7 @@ export function TaxSummaryPage() {
           <Accordion type="single" collapsible defaultValue="disclaimer" className="px-4">
             <AccordionItem value="disclaimer" className="border-b-0">
               <AccordionTrigger className="text-warning">
-                Disclaimer — please read before using these figures
+                {t('tax.disclaimer.trigger')}
               </AccordionTrigger>
               <AccordionContent>
                 <DisclaimerBody text={data.disclaimer} />
@@ -211,7 +219,7 @@ export function TaxSummaryPage() {
 
       {data && data.missingRates.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 rounded-md border border-warning/30 bg-warning/10 p-3 text-sm text-foreground">
-          <span className="font-medium text-warning">Missing exchange rate(s):</span>
+          <span className="font-medium text-warning">{t('tax.missingRates')}</span>
           <ul className="flex flex-wrap gap-x-3 gap-y-1">
             {data.missingRates.map((p) => (
               <li key={`${p.base}-${p.quote}`}>
@@ -224,7 +232,7 @@ export function TaxSummaryPage() {
               href={deeplinkTo}
               className="cursor-pointer text-primary underline-offset-4 hover:underline"
             >
-              Enter rate
+              {t('tax.enterRate')}
             </a>
           )}
         </div>
@@ -237,29 +245,27 @@ export function TaxSummaryPage() {
           <Skeleton className="h-10 w-full" />
         </div>
       ) : isError ? (
-        <div className="py-8 text-center text-sm text-destructive">
-          Failed to load tax summary. Please try again.
-        </div>
+        <div className="py-8 text-center text-sm text-destructive">{t('tax.loadFailed')}</div>
       ) : !data ? null : isEmpty ? (
         <EmptyState
           icon={<Receipt className="h-10 w-10" />}
-          title={`No realised P&L or tracked expenses for ${selectedYear}`}
-          description="Close positions or record expenses to see them aggregated here."
+          title={t('tax.emptyTitle', { year: selectedYear })}
+          description={t('tax.emptyDesc')}
         />
       ) : (
         <>
           {(data.ratesAsOf || data.excludedCurrencies.length > 0) && (
             <div className="rounded-md border p-3 text-xs text-muted-foreground">
-              {data.ratesAsOf && <span>Rates as of {data.ratesAsOf}. </span>}
+              {data.ratesAsOf && <span>{t('tax.ratesAsOf', { date: data.ratesAsOf })}</span>}
               {data.excludedCurrencies.length > 0 && (
-                <span>Excluded (missing rate): {data.excludedCurrencies.join(', ')}.</span>
+                <span>{t('tax.excluded', { list: data.excludedCurrencies.join(', ') })}</span>
               )}
             </div>
           )}
 
           <section className="space-y-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="text-lg font-semibold">Realised P&amp;L</h2>
+              <h2 className="text-lg font-semibold">{t('tax.realisedPnl')}</h2>
               {data.realisedPnl.total !== null && (
                 <span className="text-xl font-bold">
                   {displayCurrency
@@ -271,7 +277,9 @@ export function TaxSummaryPage() {
 
             {data.realisedPnl.perCurrency.length > 0 && (
               <div>
-                <h3 className="mb-1 text-sm font-medium text-muted-foreground">Per currency</h3>
+                <h3 className="mb-1 text-sm font-medium text-muted-foreground">
+                  {t('tax.perCurrency')}
+                </h3>
                 <div className="flex flex-wrap gap-4 rounded-md border p-3">
                   {data.realisedPnl.perCurrency.map((row) => (
                     <div key={row.currency} className="text-sm">
@@ -287,7 +295,7 @@ export function TaxSummaryPage() {
             {showShortLong && (
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-md border p-3">
-                  <div className="text-xs text-muted-foreground">Short-term</div>
+                  <div className="text-xs text-muted-foreground">{t('tax.shortTerm')}</div>
                   <div className="mt-1 text-base font-medium">
                     {data.realisedPnl.shortTerm !== null && displayCurrency
                       ? formatCurrency(parseFloat(data.realisedPnl.shortTerm), displayCurrency)
@@ -295,7 +303,7 @@ export function TaxSummaryPage() {
                   </div>
                 </div>
                 <div className="rounded-md border p-3">
-                  <div className="text-xs text-muted-foreground">Long-term</div>
+                  <div className="text-xs text-muted-foreground">{t('tax.longTerm')}</div>
                   <div className="mt-1 text-base font-medium">
                     {data.realisedPnl.longTerm !== null && displayCurrency
                       ? formatCurrency(parseFloat(data.realisedPnl.longTerm), displayCurrency)
@@ -310,7 +318,7 @@ export function TaxSummaryPage() {
 
           <section className="space-y-3">
             <div className="flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="text-lg font-semibold">Tracked Expenses</h2>
+              <h2 className="text-lg font-semibold">{t('tax.trackedExpenses')}</h2>
               {data.trackedExpenses.total !== null && (
                 <span className="text-xl font-bold">
                   {displayCurrency
@@ -322,7 +330,9 @@ export function TaxSummaryPage() {
 
             {data.trackedExpenses.perCategory.length > 0 && (
               <div>
-                <h3 className="mb-1 text-sm font-medium text-muted-foreground">Per category</h3>
+                <h3 className="mb-1 text-sm font-medium text-muted-foreground">
+                  {t('tax.perCategory')}
+                </h3>
                 <div className="rounded-md border p-3">
                   <ul className="space-y-1 text-sm">
                     {data.trackedExpenses.perCategory.map((row, i) => (
@@ -330,7 +340,7 @@ export function TaxSummaryPage() {
                         key={`${row.category}-${row.currency}-${i}`}
                         className="flex justify-between gap-3"
                       >
-                        <span>{EXPENSE_CATEGORY_LABELS[row.category as ExpenseCategory]}</span>
+                        <span>{t(EXPENSE_CATEGORY_KEYS[row.category as ExpenseCategory])}</span>
                         <span className="font-medium">
                           {formatCurrency(parseFloat(row.total), row.currency)}
                         </span>
@@ -342,12 +352,45 @@ export function TaxSummaryPage() {
             )}
           </section>
 
+          {/* PPh final IDX (ZITN-TECH-017 Fase 2b): 0,1% dari nilai penjualan. */}
+          {data.pphFinal && (
+            <>
+              <Separator />
+              <section className="space-y-3">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <h2 className="text-lg font-semibold">
+                    {t('tax.pphTitle', { rate: data.pphFinal.rate })}
+                  </h2>
+                </div>
+                <div className="rounded-md border p-3">
+                  <ul className="space-y-1 text-sm">
+                    {data.pphFinal.perCurrency.map((row) => (
+                      <li key={row.currency} className="flex justify-between gap-3">
+                        <span>{t('tax.pphSell', { currency: row.currency })}</span>
+                        <span className="text-muted-foreground">
+                          {formatCurrency(parseFloat(row.sellProceeds), row.currency)}
+                        </span>
+                        <span className="font-medium">
+                          {formatCurrency(parseFloat(row.amount), row.currency)}
+                        </span>
+                      </li>
+                    ))}
+                    {data.pphFinal.perCurrency.length === 0 && (
+                      <li className="text-muted-foreground">{t('tax.pphEmpty')}</li>
+                    )}
+                  </ul>
+                </div>
+                <p className="text-xs text-muted-foreground">{t('tax.pphNote')}</p>
+              </section>
+            </>
+          )}
+
           {/* Wash-sale / superficial-loss collapsibles — omitted entirely
               when jurisdiction === 'other' per Req 4.4. */}
           {showFlags && data.flags.washSales.length > 0 && (
             <Collapsible>
               <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between rounded-md border p-3 text-left text-sm font-medium hover:bg-muted/50 [&[data-state=open]>svg]:rotate-180">
-                <span>Wash sales ({data.flags.washSales.length})</span>
+                <span>{t('tax.washSales', { n: data.flags.washSales.length })}</span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-2">
@@ -363,7 +406,7 @@ export function TaxSummaryPage() {
           {showFlags && data.flags.superficialLosses.length > 0 && (
             <Collapsible>
               <CollapsibleTrigger className="flex w-full cursor-pointer items-center justify-between rounded-md border p-3 text-left text-sm font-medium hover:bg-muted/50 [&[data-state=open]>svg]:rotate-180">
-                <span>Superficial losses ({data.flags.superficialLosses.length})</span>
+                <span>{t('tax.superficial', { n: data.flags.superficialLosses.length })}</span>
                 <ChevronDown className="h-4 w-4 text-muted-foreground transition-transform" />
               </CollapsibleTrigger>
               <CollapsibleContent className="mt-2">

@@ -231,13 +231,13 @@ describe('a held step disables Next and says what it wants', () => {
   // WHAT THE USER CAN SEE, not what is in the DOM. The hint is rendered with
   // every step that has one — that is what lets driver.js measure it before
   // placing the popover — and shown only while the step is held, via the
-  // `tradr-tour-held` class. jsdom applies no stylesheet, so asking for the node
+  // `jurnal-zitn-tour-held` class. jsdom applies no stylesheet, so asking for the node
   // would report a hint the user is not being shown.
   const isHeld = () =>
-    document.querySelector('.driver-popover')?.classList.contains('tradr-tour-held') ?? false;
+    document.querySelector('.driver-popover')?.classList.contains('jurnal-zitn-tour-held') ?? false;
   const hint = () =>
     isHeld()
-      ? (document.querySelector('.tradr-tour-action-hint')?.textContent ?? undefined)
+      ? (document.querySelector('.jurnal-zitn-tour-action-hint')?.textContent ?? undefined)
       : undefined;
 
   it('disables "Next" and shows the gesture', async () => {
@@ -334,7 +334,7 @@ describe('a held step disables Next and says what it wants', () => {
 
     expect(isActive()).toBe(true);
     expect(nextBtn()?.disabled).toBe(true);
-    expect(document.querySelectorAll('.tradr-tour-action-hint')).toHaveLength(1);
+    expect(document.querySelectorAll('.jurnal-zitn-tour-action-hint')).toHaveLength(1);
     expect(isHeld()).toBe(true);
   });
 });

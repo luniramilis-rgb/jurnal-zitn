@@ -1,6 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 
-import { CLASSIFICATIONS } from '@tradr/shared';
+import { CLASSIFICATIONS } from '@jurnal-zitn/shared';
+import type { MessageKey } from '@jurnal-zitn/shared';
 
 import {
   Select,
@@ -9,20 +10,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useT } from '@/hooks/useLocale';
 
 type Classification = (typeof CLASSIFICATIONS)[number];
 
-const RESULT_LABELS: Record<Classification, string> = {
-  winning: 'Winning',
-  losing: 'Losing',
-  breakeven: 'Breakeven',
+const RESULT_KEYS: Record<Classification, MessageKey> = {
+  winning: 'pos.filter.winning',
+  losing: 'pos.filter.losing',
+  breakeven: 'pos.filter.breakeven',
 };
-
-// "All" plus one entry per classification, in the enum's order.
-const RESULT_OPTIONS: { value: string; label: string }[] = [
-  { value: 'all', label: 'All' },
-  ...CLASSIFICATIONS.map((c) => ({ value: c, label: RESULT_LABELS[c] })),
-];
 
 interface Props {
   /** The active classification, or 'all' when the result filter is unset. */
@@ -35,7 +31,15 @@ interface Props {
  * `...prev`, so it composes with the status tabs and the tag filter (REQ-9.5).
  */
 export function ClassificationFilter({ value }: Props) {
+  const t = useT();
   const navigate = useNavigate();
+
+  // "All" plus one entry per classification, in the enum's order.
+  const resultOptions: { value: string; label: string }[] = [
+    { value: 'all', label: t('pos.filter.all') },
+    ...CLASSIFICATIONS.map((c) => ({ value: c, label: t(RESULT_KEYS[c]) })),
+  ];
+
   return (
     <Select
       value={value}
@@ -49,11 +53,11 @@ export function ClassificationFilter({ value }: Props) {
         })
       }
     >
-      <SelectTrigger className="cursor-pointer" aria-label="Result">
+      <SelectTrigger className="cursor-pointer" aria-label={t('pos.filter.result')}>
         <SelectValue />
       </SelectTrigger>
       <SelectContent>
-        {RESULT_OPTIONS.map((opt) => (
+        {resultOptions.map((opt) => (
           <SelectItem key={opt.value} value={opt.value} className="cursor-pointer">
             {opt.label}
           </SelectItem>

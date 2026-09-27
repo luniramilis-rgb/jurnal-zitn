@@ -1,3 +1,5 @@
+import { resolveLocale, translate, type AppLocale } from '@jurnal-zitn/shared';
+
 import { config } from './config';
 
 // Template content for the two transactional emails (Component 3, REQ-3.1).
@@ -11,7 +13,7 @@ import { config } from './config';
 // (REQ-3.9); the raw token appears nowhere but the link.
 //
 // Invariants the unit tests pin (email-templates.test.ts) and the design honors:
-//   - no <img> (the wordmark is live text `[▴] Tradr`, not a hosted image),
+//   - no <img> (the wordmark is live text `[▴] Jurnal ZITN`, not a hosted image),
 //   - the link is the ONLY url — the CTA button and the paste-in link share the
 //     same href, and there is no other http(s) reference (no `http-equiv`, no
 //     `xmlns="http…"`, no footer link),
@@ -35,7 +37,6 @@ type EmailParts = {
   expiry: string;
   notice: string;
 };
-
 // Font stacks: brand faces (Inter / JetBrains Mono) are a bonus that only loads
 // in a few clients (Apple Mail, some webmail); Outlook and Gmail fall back to the
 // system stacks below, so the design is built to read on the fallback.
@@ -44,8 +45,11 @@ const MONO = "ui-monospace,'SF Mono','JetBrains Mono',Menlo,Consolas,monospace";
 
 // One shared rendering for both kinds: the plain-text body and the branded HTML
 // layout are built from the same parts, so the two variants cannot drift.
-function render(parts: EmailParts): EmailContent {
+function render(parts: EmailParts, locale: AppLocale): EmailContent {
   const { subject, preheader, heading, intro, link, cta, expiry, notice } = parts;
+  const pasteLink = translate(locale, 'email.pasteLink');
+  const footerTagline = translate(locale, 'email.footer.tagline');
+  const footerAuto = translate(locale, 'email.footer.auto');
 
   // The instance's own web host for the footer — a self-host shows its own domain,
   // never a hardcoded hosted brand. WEB_BASE_URL is origin-only + validated, so
@@ -57,7 +61,7 @@ function render(parts: EmailParts): EmailContent {
   const text = `${intro}\n\n${link}\n\n${expiry}\n\n${notice}\n`;
 
   const html = `<!DOCTYPE html>
-<html lang="en">
+<html lang="${locale}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -88,7 +92,7 @@ function render(parts: EmailParts): EmailContent {
 <tr><td style="height:3px;background:#e6a23c;font-size:0;line-height:0;">&nbsp;</td></tr>
 <tr><td style="padding:28px 32px 0;">
   <span style="font-family:${MONO};font-size:20px;font-weight:700;color:#e6a23c;letter-spacing:-0.02em;">[&#9652;]</span>
-  <span class="t-wordmark" style="font-family:${SANS};font-size:19px;font-weight:700;color:#191c22;padding-left:6px;">Tradr</span>
+  <span class="t-wordmark" style="font-family:${SANS};font-size:19px;font-weight:700;color:#191c22;padding-left:6px;">Jurnal ZITN</span>
 </td></tr>
 <tr><td style="padding:20px 32px 0;"><div class="t-hair" style="border-top:1px solid #e6e7ea;font-size:0;line-height:0;">&nbsp;</div></td></tr>
 <tr><td style="padding:24px 32px 0;">
@@ -100,7 +104,7 @@ function render(parts: EmailParts): EmailContent {
   <!--[if !mso]><!-- --><a href="${link}" style="display:inline-block;background:#e6a23c;color:#1c1608;font-family:${SANS};font-size:15px;font-weight:700;text-decoration:none;padding:13px 26px;border-radius:8px;">${cta}</a><!--<![endif]-->
 </td></tr>
 <tr><td style="padding:22px 32px 0;">
-  <p class="t-muted" style="margin:0 0 8px;font-family:${SANS};font-size:14px;color:#5c626b;">Or paste this link into your browser:</p>
+  <p class="t-muted" style="margin:0 0 8px;font-family:${SANS};font-size:14px;color:#5c626b;">${pasteLink}</p>
   <div class="t-box" style="border:1px solid #e6e7ea;background:#f7f7f8;border-radius:8px;padding:12px 14px;">
     <a href="${link}" class="t-link" style="font-family:${MONO};font-size:13px;color:#935608;text-decoration:none;word-break:break-all;">${link}</a>
   </div>
@@ -115,8 +119,8 @@ function render(parts: EmailParts): EmailContent {
 </table>
 <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="width:600px;max-width:600px;">
 <tr><td style="padding:20px 32px;">
-  <p class="t-muted" style="margin:0;font-family:${SANS};font-size:13px;color:#5c626b;">Tradr &mdash; the open-source trading journal${webHost ? ` &middot; ${webHost}` : ''}</p>
-  <p class="t-muted" style="margin:6px 0 0;font-family:${SANS};font-size:12px;color:#8b919b;">This is an automated, transactional message about your Tradr account.</p>
+  <p class="t-muted" style="margin:0;font-family:${SANS};font-size:13px;color:#5c626b;">${footerTagline}${webHost ? ` &middot; ${webHost}` : ''}</p>
+  <p class="t-muted" style="margin:6px 0 0;font-family:${SANS};font-size:12px;color:#8b919b;">${footerAuto}</p>
 </td></tr>
 </table>
 </td></tr>
@@ -135,28 +139,39 @@ function render(parts: EmailParts): EmailContent {
  * is true, so WEB_BASE_URL is always present on real sends; the `?? ''`
  * fallback merely keeps the type narrow.
  */
-export function buildEmail(kind: EmailKind, rawToken: string): EmailContent {
+export function buildEmail(
+  kind: EmailKind,
+  rawToken: string,
+  locale: unknown = 'id',
+): EmailContent {
   const base = config.WEB_BASE_URL ?? '';
+  const loc = resolveLocale(locale);
   if (kind === 'password_reset') {
-    return render({
-      subject: 'Reset your Tradr password',
-      preheader: 'Reset your Tradr password — this link expires in 60 minutes.',
-      heading: 'Reset your password',
-      intro: 'We received a request to reset the password for your Tradr account.',
-      link: `${base}/reset-password#token=${rawToken}`,
-      cta: 'Reset password',
-      expiry: 'This link expires in 60 minutes.',
-      notice: "If you didn't request this, you can ignore this email — your password is unchanged.",
-    });
+    return render(
+      {
+        subject: translate(loc, 'email.reset.subject'),
+        preheader: translate(loc, 'email.reset.preheader'),
+        heading: translate(loc, 'email.reset.heading'),
+        intro: translate(loc, 'email.reset.intro'),
+        link: `${base}/reset-password#token=${rawToken}`,
+        cta: translate(loc, 'email.reset.cta'),
+        expiry: translate(loc, 'email.reset.expiry'),
+        notice: translate(loc, 'email.reset.notice'),
+      },
+      loc,
+    );
   }
-  return render({
-    subject: 'Verify your email address',
-    preheader: 'Verify your email address to finish setting up Tradr.',
-    heading: 'Confirm your email address',
-    intro: 'Confirm this email address for your Tradr account by opening the link below.',
-    link: `${base}/verify-email#token=${rawToken}`,
-    cta: 'Verify email address',
-    expiry: 'This link expires in 24 hours.',
-    notice: "If you didn't request this, you can ignore this email.",
-  });
+  return render(
+    {
+      subject: translate(loc, 'email.verify.subject'),
+      preheader: translate(loc, 'email.verify.preheader'),
+      heading: translate(loc, 'email.verify.heading'),
+      intro: translate(loc, 'email.verify.intro'),
+      link: `${base}/verify-email#token=${rawToken}`,
+      cta: translate(loc, 'email.verify.cta'),
+      expiry: translate(loc, 'email.verify.expiry'),
+      notice: translate(loc, 'email.verify.notice'),
+    },
+    loc,
+  );
 }

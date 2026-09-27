@@ -22,12 +22,14 @@ import type {
   PerformanceQueryInput,
   PerformanceResponse,
   WidgetPlacement,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { useDisplayCurrencyQuery } from '@/features/accounting/hooks/useDisplayCurrency';
 import { usePerformance } from '@/features/performance/hooks/usePerformance';
+import { setAppLocale } from '@/lib/locale';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+setAppLocale('en');
 
 vi.mock('@/features/accounting/hooks/useDisplayCurrency', () => ({
   useDisplayCurrencyQuery: vi.fn(),

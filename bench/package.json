@@ -1,11 +1,11 @@
 {
-  "name": "@tradr/bench",
+  "name": "@jurnal-zitn/bench",
   "version": "0.15.0",
   "private": true,
   "type": "module",
   "description": "Performance benchmark harness (run via apps/api script `pnpm bench:performance`).",
   "dependencies": {
-    "@tradr/shared": "workspace:*",
+    "@jurnal-zitn/shared": "workspace:*",
     "drizzle-orm": "^0.38",
     "postgres": "^3.4"
   },

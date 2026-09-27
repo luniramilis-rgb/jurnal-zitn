@@ -1,7 +1,7 @@
 #!/usr/bin/env node
-// Generates the `tradr` CLI reference from the CLI's own usage block.
+// Generates the `jurnal-zitn` CLI reference from the CLI's own usage block.
 //
-// The synopsis lines come from `USAGE` in apps/api/src/cli/tradr.ts — the same
+// The synopsis lines come from `USAGE` in apps/api/src/cli/jurnal-zitn.ts — the same
 // array the binary prints — so the documented commands and the real ones cannot
 // disagree. What a command MEANS is prose, and prose cannot be derived from a
 // usage string, so it lives in DETAILS below.
@@ -24,7 +24,7 @@ import { fileURLToPath } from 'node:url';
 
 const scriptDir = dirname(fileURLToPath(import.meta.url));
 const repoRoot = join(scriptDir, '../../..');
-const CLI_SOURCE = join(repoRoot, 'apps/api/src/cli/tradr.ts');
+const CLI_SOURCE = join(repoRoot, 'apps/api/src/cli/jurnal-zitn.ts');
 const OUT = join(scriptDir, '../src/content/docs/self-hosting/reference/cli.mdx');
 
 /** Keyed by the command word(s) preceding any <placeholder> or --flag. */
@@ -38,7 +38,7 @@ const DETAILS = {
       'lock, so it is safe to run against a live instance.',
       '',
       '```bash',
-      'docker compose exec api tradr migrate --status',
+      'docker compose exec api jurnal-zitn migrate --status',
       '```',
       '',
       '**Expected result:** exit code 0, ending in `Schema is up to date.`',
@@ -63,7 +63,7 @@ const DETAILS = {
       'reaching the CLI already means shell access to the server.',
       '',
       '```bash',
-      'docker compose exec api tradr create-user someone@example.com',
+      'docker compose exec api jurnal-zitn create-user someone@example.com',
       '```',
       '',
       '**Expected result:** exit code 0, and a generated password printed to stdout.',
@@ -95,7 +95,7 @@ const DETAILS = {
       'is no self-service reset, so the operator sets the password directly.',
       '',
       '```bash',
-      'docker compose exec api tradr reset-password someone@example.com',
+      'docker compose exec api jurnal-zitn reset-password someone@example.com',
       '```',
       '',
       '**Expected result:** exit code 0, and a generated password printed to stdout.',
@@ -119,7 +119,7 @@ const DETAILS = {
       'the backend can be disabled without stranding an image.',
       '',
       '```bash',
-      'docker compose exec api tradr storage migrate-to-inline',
+      'docker compose exec api jurnal-zitn storage migrate-to-inline',
       '```',
       '',
       'The command is idempotent and resumable — run it again after a failure. An',
@@ -139,7 +139,7 @@ const DETAILS = {
       'configured.',
       '',
       '```bash',
-      'docker compose exec api tradr storage gc',
+      'docker compose exec api jurnal-zitn storage gc',
       '```',
       '',
       'The sweep is age-guarded: it never reaps an object young enough to belong to a',
@@ -148,13 +148,17 @@ const DETAILS = {
   },
 };
 
-/** Extract the `tradr …` synopsis lines from the CLI's USAGE array. */
+/** Extract the `jurnal-zitn …` synopsis lines from the CLI's USAGE array. */
 function parseUsage(source) {
   const block = source.match(/const USAGE = \[([\s\S]*?)\];/);
   if (!block) {
-    throw new Error('gen-cli: could not find the USAGE array in tradr.ts — generator is stale');
+    throw new Error(
+      'gen-cli: could not find the USAGE array in jurnal-zitn.ts — generator is stale',
+    );
   }
-  const commands = [...block[1].matchAll(/^\s*'\s*tradr (.+?)',?\s*$/gm)].map((m) => m[1].trim());
+  const commands = [...block[1].matchAll(/^\s*'\s*jurnal-zitn (.+?)',?\s*$/gm)].map((m) =>
+    m[1].trim(),
+  );
   if (commands.length === 0) {
     throw new Error('gen-cli: parsed no commands from USAGE — generator is stale');
   }
@@ -186,34 +190,34 @@ const keys = commands.map(keyFor);
 const undocumented = keys.filter((k) => !(k in DETAILS));
 if (undocumented.length > 0) {
   throw new Error(
-    `gen-cli: these commands exist in tradr.ts but have no DETAILS entry: ${undocumented.join(', ')}. ` +
+    `gen-cli: these commands exist in jurnal-zitn.ts but have no DETAILS entry: ${undocumented.join(', ')}. ` +
       'Document them in apps/docs/scripts/gen-cli.mjs.',
   );
 }
 const orphaned = Object.keys(DETAILS).filter((k) => !keys.includes(k));
 if (orphaned.length > 0) {
   throw new Error(
-    `gen-cli: these DETAILS entries no longer exist in tradr.ts: ${orphaned.join(', ')}.`,
+    `gen-cli: these DETAILS entries no longer exist in jurnal-zitn.ts: ${orphaned.join(', ')}.`,
   );
 }
 
 const out = [];
 out.push('---');
-out.push('title: CLI reference (tradr)');
+out.push('title: CLI reference (jurnal-zitn)');
 out.push(
-  'description: The tradr command-line tool that ships inside the api container — migration status, account creation, password recovery, and object-storage maintenance.',
+  'description: The jurnal-zitn command-line tool that ships inside the api container — migration status, account creation, password recovery, and object-storage maintenance.',
 );
 out.push('---');
 out.push('');
 out.push('{/* GENERATED FILE — do not edit.');
-out.push('    Source: apps/api/src/cli/tradr.ts · Generator: apps/docs/scripts/gen-cli.mjs');
+out.push('    Source: apps/api/src/cli/jurnal-zitn.ts · Generator: apps/docs/scripts/gen-cli.mjs');
 out.push('    Command descriptions live in the generator. */}');
 out.push('');
-out.push('The api image ships a `tradr` command for the jobs that need a server, not a');
+out.push('The api image ships a `jurnal-zitn` command for the jobs that need a server, not a');
 out.push('browser. Run it inside the running container:');
 out.push('');
 out.push('```bash');
-out.push('docker compose exec api tradr --help');
+out.push('docker compose exec api jurnal-zitn --help');
 out.push('```');
 out.push('');
 out.push(`**Expected result:** exit code 0, and the ${commands.length} commands below.`);
@@ -222,7 +226,7 @@ out.push('| Command | Does |');
 out.push('| --- | --- |');
 for (const command of commands) {
   const detail = DETAILS[keyFor(command)];
-  out.push(`| \`tradr ${command}\` | ${detail.summary} |`);
+  out.push(`| \`jurnal-zitn ${command}\` | ${detail.summary} |`);
 }
 out.push('');
 out.push('Every command exits **2** when it cannot reach the database, so a wrapper script');

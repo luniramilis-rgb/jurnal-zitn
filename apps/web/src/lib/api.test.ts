@@ -251,20 +251,20 @@ describe('resolveApiUrl', () => {
     vi.unstubAllGlobals();
   });
 
-  it('falls back to /api when window.__TRADR_CONFIG__ is undefined', async () => {
+  it('falls back to /api when window.__JURNAL_ZITN_CONFIG__ is undefined', async () => {
     vi.stubGlobal('window', {});
     const { resolveApiUrl } = await importApi();
     expect(resolveApiUrl('/perf')).toBe('/api/perf');
   });
 
   it('falls back to /api when config has no apiBaseUrl', async () => {
-    vi.stubGlobal('window', { __TRADR_CONFIG__: {} });
+    vi.stubGlobal('window', { __JURNAL_ZITN_CONFIG__: {} });
     const { resolveApiUrl } = await importApi();
     expect(resolveApiUrl('/perf')).toBe('/api/perf');
   });
 
   it('uses apiBaseUrl when set', async () => {
-    vi.stubGlobal('window', { __TRADR_CONFIG__: { apiBaseUrl: 'https://api.example.com' } });
+    vi.stubGlobal('window', { __JURNAL_ZITN_CONFIG__: { apiBaseUrl: 'https://api.example.com' } });
     const { resolveApiUrl } = await importApi();
     expect(resolveApiUrl('/perf')).toBe('https://api.example.com/perf');
   });
@@ -285,7 +285,7 @@ describe('runtime-config seam (C3 / Req 8.5)', () => {
 
   // The /config.js script must be a CLASSIC blocking script: a classic script
   // always runs before deferred module scripts regardless of DOM position, so
-  // window.__TRADR_CONFIG__ is set before the module entry reads it. The
+  // window.__JURNAL_ZITN_CONFIG__ is set before the module entry reads it. The
   // load-bearing guarantee is the script TYPE — no type=module / async / defer.
   it('index.html config.js script is a classic (non-defer) script', () => {
     const html = readFileSync(fileURLToPath(new URL('../../index.html', import.meta.url)), 'utf8');

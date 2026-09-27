@@ -1,9 +1,9 @@
-import { ReportingTimezoneField } from '@tradr/shared';
+import { ReportingTimezoneField } from '@jurnal-zitn/shared';
 
 /**
  * The app's ONLY browser timezone detection. Every render-time read of the
  * reporting zone goes through `useUserTimezone` instead, because a per-device
- * guess is what moves a trade between calendar days when the user opens Tradr
+ * guess is what moves a trade between calendar days when the user opens Jurnal ZITN
  * elsewhere.
  *
  * It has exactly three callers, all of them writes or last resorts, never a

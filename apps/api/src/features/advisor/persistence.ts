@@ -10,7 +10,7 @@
 
 import { sql } from 'drizzle-orm';
 
-import type { ProviderId, StoredContentPart } from '@tradr/shared';
+import type { ProviderId, StoredContentPart } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import {

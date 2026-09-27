@@ -186,29 +186,30 @@ afterEach(() => {
 
 describe('parseServedVersion', () => {
   it('reads the production printf shape', () => {
-    const text = 'window.__TRADR_CONFIG__={"advisorImageMaxBytes":4500000,"appVersion":"v0.13.0"};';
+    const text =
+      'window.__JURNAL_ZITN_CONFIG__={"advisorImageMaxBytes":4500000,"appVersion":"v0.13.0"};';
     expect(parseServedVersion(text)).toBe('v0.13.0');
   });
 
   it('returns undefined for the entrypoint all-unset literal', () => {
-    const text = 'window.__TRADR_CONFIG__={"advisorImageMaxBytes":4500000};';
+    const text = 'window.__JURNAL_ZITN_CONFIG__={"advisorImageMaxBytes":4500000};';
     expect(parseServedVersion(text)).toBeUndefined();
   });
 
   it('is not confused by json_str-escaped quotes in another field', () => {
-    const text = 'window.__TRADR_CONFIG__={"note":"a\\"b","appVersion":"v0.13.0"};';
+    const text = 'window.__JURNAL_ZITN_CONFIG__={"note":"a\\"b","appVersion":"v0.13.0"};';
     expect(parseServedVersion(text)).toBe('v0.13.0');
   });
 
   it('decodes escaped quotes in the value, then charset-gates it away', () => {
     // json_str escapes are honoured (JSON.parse decodes `v1\"2` → `v1"2`), and
     // the decoded value fails VERSION_SHAPE because it contains a quote.
-    const text = 'window.__TRADR_CONFIG__={"appVersion":"v1\\"2"};';
+    const text = 'window.__JURNAL_ZITN_CONFIG__={"appVersion":"v1\\"2"};';
     expect(parseServedVersion(text)).toBeUndefined();
   });
 
   it('returns undefined for the single-quoted dev object shape', () => {
-    const text = "window.__TRADR_CONFIG__ = { appVersion: 'v9.9.9' };";
+    const text = "window.__JURNAL_ZITN_CONFIG__ = { appVersion: 'v9.9.9' };";
     expect(parseServedVersion(text)).toBeUndefined();
   });
 
@@ -236,7 +237,7 @@ describe('fetchServedVersion', () => {
   it('returns the parsed version on a 200 with a config body', async () => {
     const fetchMock = vi
       .fn()
-      .mockResolvedValue(makeResponse('window.__TRADR_CONFIG__={"appVersion":"v1.2.3"};'));
+      .mockResolvedValue(makeResponse('window.__JURNAL_ZITN_CONFIG__={"appVersion":"v1.2.3"};'));
     await expect(fetchServedVersion({ fetch: fetchMock as unknown as typeof fetch })).resolves.toBe(
       'v1.2.3',
     );
@@ -283,7 +284,7 @@ describe('fetchServedVersion', () => {
   it('requests GET /config.js with cache no-store, credentials omit — not via resolveApiUrl', async () => {
     const fetchMock = vi
       .fn()
-      .mockResolvedValue(makeResponse('window.__TRADR_CONFIG__={"appVersion":"v1.2.3"};'));
+      .mockResolvedValue(makeResponse('window.__JURNAL_ZITN_CONFIG__={"appVersion":"v1.2.3"};'));
     await fetchServedVersion({ fetch: fetchMock as unknown as typeof fetch });
     const [url, init] = fetchMock.mock.calls[0];
     expect(url).toBe('/config.js');

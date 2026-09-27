@@ -1,4 +1,4 @@
-import type { CsvPreviewResponse, ProposedPosition } from '@tradr/shared';
+import type { CsvPreviewResponse, ProposedPosition } from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import { Badge } from '@/components/ui/badge';

@@ -1,11 +1,11 @@
 # Security Policy
 
-Tradr handles sensitive data — trading history, brokerage connections, and (when configured) LLM/market-data
+Jurnal ZITN handles sensitive data — trading history, brokerage connections, and (when configured) LLM/market-data
 API keys and payment details. We take security reports seriously and appreciate responsible disclosure.
 
 ## Supported versions
 
-Tradr is pre-1.0 and moves quickly. Security fixes are made against the **latest release** and `main`.
+Jurnal ZITN is pre-1.0 and moves quickly. Security fixes are made against the **latest release** and `main`.
 Self-hosters should track the latest published image tag; fixes are not backported to older versions.
 
 | Version                 | Supported                  |
@@ -43,14 +43,14 @@ We ask that you give us reasonable time to remediate before any public disclosur
 
 ## Scope
 
-- **The Tradr software** (this repository) — anything affecting self-hosted or hosted deployments:
+- **The Jurnal ZITN software** (this repository) — anything affecting self-hosted or hosted deployments:
   authentication/session handling, authorization/row-scoping, injection, secret handling (BYOK key
   encryption), the Stripe webhook path, the IBKR OAuth flow, trade-data access paths, etc.
 - **The hosted platform (`tradr.cloud`)** — report platform-specific issues the same way.
 
 Out of scope: findings that require a fully compromised host or physical access (a self-hosted single-server
 deployment inherently trusts its own environment — see the threat-model notes in the docs), best-practice
-suggestions without a concrete vulnerability, and reports against third-party services Tradr integrates with
+suggestions without a concrete vulnerability, and reports against third-party services Jurnal ZITN integrates with
 (report those to the respective vendor).
 
 ## Safe harbor
@@ -60,4 +60,4 @@ support legal action against researchers who: report privately and promptly, avo
 service disruption, don't access or modify other users' data beyond the minimum needed to demonstrate the
 issue, and give us reasonable time to respond before disclosing.
 
-Thank you for helping keep Tradr and its users safe.
+Thank you for helping keep Jurnal ZITN and its users safe.

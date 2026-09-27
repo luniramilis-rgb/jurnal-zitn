@@ -11,6 +11,7 @@ import { render, screen, cleanup, act } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 
 import { markSessionEnded, markSessionStarted, setRouter } from '@/lib/api';
+import { setAppLocale } from '@/lib/locale';
 
 import { Route as LoginRoute } from './login';
 import { Route as RegisterRoute } from './register';
@@ -108,10 +109,10 @@ const NEWSLETTER_URL = 'https://newsletter.example.test/subscribe';
 /** Put a newsletter URL on the runtime-config seam, the way /config.js does. */
 function setNewsletterUrl(url: string | undefined) {
   if (url === undefined) {
-    delete window.__TRADR_CONFIG__;
+    delete window.__JURNAL_ZITN_CONFIG__;
     return;
   }
-  window.__TRADR_CONFIG__ = { ...window.__TRADR_CONFIG__, newsletterUrl: url };
+  window.__JURNAL_ZITN_CONFIG__ = { ...window.__JURNAL_ZITN_CONFIG__, newsletterUrl: url };
 }
 
 /**
@@ -161,6 +162,8 @@ function recordRenderSequence() {
 }
 
 beforeEach(() => {
+  // Salinan halaman login dikunci berbahasa Inggris (default produk = id).
+  setAppLocale('en');
   // lib/api's redirect latch and session flag are module-scoped and a fresh page
   // load is what normally resets them; this pair is that reset.
   markSessionStarted();
@@ -172,6 +175,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  setAppLocale('id');
   fetchSpy.mockRestore();
   setRouter(null);
   setNewsletterUrl(undefined);

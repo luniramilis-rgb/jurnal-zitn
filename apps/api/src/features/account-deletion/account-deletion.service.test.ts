@@ -55,7 +55,7 @@ import {
   requestSelfDeletion,
 } from './account-deletion.service';
 
-// executeDeletion + emailHash (design C5) against real tradr_test, each test
+// executeDeletion + emailHash (design C5) against real jurnal_zitn_test, each test
 // rolled back by the single-connection harness (test-setup.ts). Nothing optional
 // is configured, so the post-commit purge and PostHog steps take their
 // graceful-absence no-op path and the purge outcome is `not_applicable` (Req 9.1).

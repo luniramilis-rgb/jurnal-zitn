@@ -15,11 +15,11 @@ import { expect, test, type APIRequestContext } from '@playwright/test';
  *   • NO telemetry-related console errors occur.
  *
  * Why the default stack already IS the unconfigured stack: frontend telemetry
- * is delivered at runtime via /config.js → window.__TRADR_CONFIG__
+ * is delivered at runtime via /config.js → window.__JURNAL_ZITN_CONFIG__
  * (apps/web/src/lib/telemetry/config.ts). The container entrypoint rewrites
  * /config.js on start, but Vite dev (what the e2e webServer boots) serves no
  * /config.js (public/config.js is git-ignored and absent in dev). So
- * window.__TRADR_CONFIG__ is undefined, isPostHogClientConfigured() is false,
+ * window.__JURNAL_ZITN_CONFIG__ is undefined, isPostHogClientConfigured() is false,
  * and initPostHogClient (main.tsx) no-ops: posthog-js is never dynamically
  * imported (its gate returns before the await import). This test proves that
  * absence end-to-end — no new webServer entry, no apiEnv change.

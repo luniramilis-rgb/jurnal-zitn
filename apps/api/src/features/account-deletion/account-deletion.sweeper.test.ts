@@ -9,7 +9,7 @@ import { claimDueSchedules, claimForCancel } from './account-deletion.query';
 import { cancelScheduledDeletion } from './account-deletion.service';
 import { DELETION_LEASE_MS, runDeletionSweep } from './account-deletion.sweeper';
 
-// runDeletionSweep + fireScheduledDeletion (design C6) against real tradr_test,
+// runDeletionSweep + fireScheduledDeletion (design C6) against real jurnal_zitn_test,
 // each test rolled back by the single-connection harness (test-setup.ts). Nothing
 // optional is configured, so the fire's post-commit purge and PostHog steps take
 // their graceful-absence no-op path (Req 9.1).
@@ -149,14 +149,12 @@ describe('runDeletionSweep — a cancelled row is never fired', () => {
 describe('cancel after a fire claim', () => {
   it('answers 409 DELETION_IN_PROGRESS and makes no Stripe call', async () => {
     const user = await seedUser();
-    await db
-      .insert(accountDeletionSchedules)
-      .values({
-        userId: user.id,
-        state: 'scheduled',
-        dueAt: FUTURE,
-        stripeSubscriptionIds: ['sub_A'],
-      });
+    await db.insert(accountDeletionSchedules).values({
+      userId: user.id,
+      state: 'scheduled',
+      dueAt: FUTURE,
+      stripeSubscriptionIds: ['sub_A'],
+    });
 
     // The fire's claim step moves the row to `firing`.
     const due = await claimDueSchedules(

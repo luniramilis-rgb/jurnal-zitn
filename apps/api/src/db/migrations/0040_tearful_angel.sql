@@ -1,0 +1,2 @@
+ALTER TABLE "fee_schedules" ADD COLUMN "stock_percent_buy" numeric(18, 8) DEFAULT '0' NOT NULL;--> statement-breakpoint
+ALTER TABLE "fee_schedules" ADD COLUMN "stock_percent_sell" numeric(18, 8) DEFAULT '0' NOT NULL;

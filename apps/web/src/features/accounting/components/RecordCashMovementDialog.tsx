@@ -3,8 +3,8 @@ import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import type { Account } from '@tradr/shared';
-import { CreateCashMovementInputSchema } from '@tradr/shared/schemas/accounting';
+import type { Account } from '@jurnal-zitn/shared';
+import { CreateCashMovementInputSchema } from '@jurnal-zitn/shared/schemas/accounting';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -85,7 +85,7 @@ function parseAmount(raw: string | undefined): number | null {
  * The user picks the direction and enters a positive magnitude; the server
  * derives the ledger row's direction, entry type and resulting balance. The
  * resulting-balance figure here is a preview only. An overdraw is accepted with
- * a warning, not blocked (Req 6.4) — Tradr's balance is cash only and carries no
+ * a warning, not blocked (Req 6.4) — Jurnal ZITN's balance is cash only and carries no
  * mark-to-market for open positions.
  */
 export function RecordCashMovementDialog({ account, open, onOpenChange }: Props) {
@@ -122,8 +122,8 @@ export function RecordCashMovementDialog({ account, open, onOpenChange }: Props)
         <DialogHeader>
           <DialogTitle>Record a deposit or withdrawal</DialogTitle>
           <DialogDescription>
-            Record money you moved into or out of this brokerage account. Tradr adds one ledger
-            entry in the account&apos;s currency and moves the balance by the amount.
+            Record money you moved into or out of this brokerage account. Jurnal ZITN adds one
+            ledger entry in the account&apos;s currency and moves the balance by the amount.
           </DialogDescription>
         </DialogHeader>
 
@@ -188,8 +188,8 @@ export function RecordCashMovementDialog({ account, open, onOpenChange }: Props)
 
           {resulting !== null && resulting < 0 && (
             <p className="text-sm text-warning" data-testid="cash-movement-negative-warning">
-              The balance will go below zero. Tradr&apos;s balance is cash only and does not include
-              the market value of open positions.
+              The balance will go below zero. Jurnal ZITN&apos;s balance is cash only and does not
+              include the market value of open positions.
             </p>
           )}
 

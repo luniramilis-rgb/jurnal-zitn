@@ -1,4 +1,4 @@
-import { CSV_IMPORT_PRESETS } from '@tradr/shared';
+import { CSV_IMPORT_PRESETS } from '@jurnal-zitn/shared';
 import type {
   ContractForm,
   DateFormat,
@@ -6,7 +6,7 @@ import type {
   Mapping,
   NumberFormat,
   RowShape,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { Label } from '@/components/ui/label';
 import {

@@ -5,8 +5,8 @@ import { fileURLToPath } from 'node:url';
 import { eq, sql } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
 
-import { OnboardingStateSchema } from '@tradr/shared';
-import type { StoredOnboardingState } from '@tradr/shared';
+import { OnboardingStateSchema } from '@jurnal-zitn/shared';
+import type { StoredOnboardingState } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { accounts, positions, users } from '@/db/schema';
@@ -86,7 +86,7 @@ describe('migration 0028 — onboarding backfill for pre-existing users', () => 
   it('marks a user with history as done, so the zero-state cannot come back', async () => {
     // The user this backfill exists for: years of history, and `{}` in the
     // column because the 0027 fast default put every existing row at 'pending'.
-    // Left alone, deleting their last account shows them "Welcome to Tradr".
+    // Left alone, deleting their last account shows them "Welcome to Jurnal ZITN".
     const user = await makeUser();
     const accountId = await makeAccount(user.id);
     await makePosition(user.id, accountId);

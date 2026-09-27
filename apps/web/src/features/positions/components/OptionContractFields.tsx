@@ -1,6 +1,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useT } from '@/hooks/useLocale';
 
 import type { OptionContractInputs } from '../utils/occForm';
 
@@ -17,6 +18,7 @@ export interface OptionContractFieldsProps {
 }
 
 export function OptionContractFields({ value, onChange, errors }: OptionContractFieldsProps) {
+  const t = useT();
   return (
     <div className="space-y-3">
       {errors?.form && (
@@ -26,12 +28,12 @@ export function OptionContractFields({ value, onChange, errors }: OptionContract
       )}
 
       <div className="space-y-2">
-        <Label htmlFor="occ-underlying">Underlying</Label>
+        <Label htmlFor="occ-underlying">{t('pos.occ.underlying')}</Label>
         <Input
           id="occ-underlying"
           type="text"
           autoComplete="off"
-          placeholder="AAPL"
+          placeholder={t('pos.occ.underlying')}
           value={value.underlying}
           onChange={(e) => onChange({ ...value, underlying: e.target.value })}
           aria-invalid={errors?.underlying ? true : undefined}
@@ -45,7 +47,7 @@ export function OptionContractFields({ value, onChange, errors }: OptionContract
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="occ-expiry">Expiry</Label>
+        <Label htmlFor="occ-expiry">{t('pos.occ.expiry')}</Label>
         <Input
           id="occ-expiry"
           type="date"
@@ -64,24 +66,24 @@ export function OptionContractFields({ value, onChange, errors }: OptionContract
       </div>
 
       <div className="space-y-2">
-        <Label>Type</Label>
+        <Label>{t('pos.occ.type')}</Label>
         <Tabs
           value={value.type}
           onValueChange={(v) => onChange({ ...value, type: v as 'call' | 'put' })}
         >
           <TabsList>
             <TabsTrigger value="call" className="cursor-pointer">
-              Call
+              {t('pos.occ.call')}
             </TabsTrigger>
             <TabsTrigger value="put" className="cursor-pointer">
-              Put
+              {t('pos.occ.put')}
             </TabsTrigger>
           </TabsList>
         </Tabs>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="occ-strike">Strike</Label>
+        <Label htmlFor="occ-strike">{t('pos.occ.strike')}</Label>
         <Input
           id="occ-strike"
           type="text"

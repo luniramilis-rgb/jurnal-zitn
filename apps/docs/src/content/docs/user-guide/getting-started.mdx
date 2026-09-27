@@ -8,11 +8,11 @@ import SelfHosted from '@/components/SelfHosted.astro';
 import Screenshot from '@/components/Screenshot.astro';
 
 This is a hand-held first session. By the end you will have a brokerage account
-(an **account** in Tradr) and one position taken from draft to closed. You will
+(an **account** in Jurnal ZITN) and one position taken from draft to closed. You will
 also have read your own figures back. It takes about ten minutes, and every step
 tells you what you should see.
 
-Tradr walks you through the same four steps inside the app. Choose **Walk me
+Jurnal ZITN walks you through the same four steps inside the app. Choose **Walk me
 through it** on your first dashboard and the product guides you through them in
 order. This page is that same route, written down.
 
@@ -30,7 +30,7 @@ instance, the screens are identical. The few differences are called out in
 You need:
 
 - An email address and a browser. Use the latest Chrome, Firefox, Safari, or Edge.
-- Nothing else. Tradr works as a plain manual journal. This tutorial needs no
+- Nothing else. Jurnal ZITN works as a plain manual journal. This tutorial needs no
   broker connection, no API keys, and no payment.
 
 ## Step 1 — Register
@@ -40,12 +40,12 @@ You need:
 3. Enter your email and a password, then confirm the password.
 4. Choose **Register** again.
 
-**Expected result:** you land on a setup screen headed **Welcome to Tradr**. It is
+**Expected result:** you land on a setup screen headed **Welcome to Jurnal ZITN**. It is
 not an empty dashboard. Below it sits a **Get set up** checklist of four items.
 
 <Screenshot
   name="dashboard-first-login"
-  alt="The Tradr dashboard on first login. A Welcome to Tradr card offers Create my first account, Walk me through it, and Add sample data, above a Get set up checklist of four items."
+  alt="The Jurnal ZITN dashboard on first login. A Welcome to Jurnal ZITN card offers Create my first account, Walk me through it, and Add sample data, above a Get set up checklist of four items."
 />
 
 The welcome card offers three ways forward:
@@ -62,17 +62,17 @@ The welcome card offers three ways forward:
 <SelfHosted>
   Email verification is active only if the operator configured SMTP. If it is
   off, your account is usable immediately. If you forget your password on an
-  instance without email, the operator can reset it from the server with `tradr
+  instance without email, the operator can reset it from the server with `jurnal-zitn
   reset-password <your-email>`.
 </SelfHosted>
 
 ## Step 2 — Create a brokerage account
 
 Every position, fill and ledger entry is booked against an account. Nothing else
-in Tradr works until one exists.
+in Jurnal ZITN works until one exists.
 
-A Tradr account mirrors a real brokerage account: the same currency, the same
-starting balance, the same trades. It is not connected to your broker. Tradr
+A Jurnal ZITN account mirrors a real brokerage account: the same currency, the same
+starting balance, the same trades. It is not connected to your broker. Jurnal ZITN
 never places or executes trades. You record trades you have already made.
 
 1. Choose **Create my first account**.
@@ -99,7 +99,7 @@ day. It is not your reporting timezone — see [the next
 section](#your-reporting-timezone-is-a-separate-setting).
 
 **Starting balance.** The account's opening cash, and the baseline every later
-figure is measured against. Set it once, here. The balance Tradr shows you is
+figure is measured against. Set it once, here. The balance Jurnal ZITN shows you is
 this figure plus every ledger entry. Editing it later would move every historical
 balance with it, so **it cannot be changed once the account exists**. Leave it
 empty and the account starts at zero.
@@ -111,7 +111,7 @@ one shows what ten losing trades in a row would cost, and **2%** is chosen for
 you. **No rule** sets none, and leaves the calculator's risk percent empty.
 Unlike the starting balance, you can change this whenever you want.
 
-**Brokerage.** Choose a brokerage and Tradr records this account's fees from that
+**Brokerage.** Choose a brokerage and Jurnal ZITN records this account's fees from that
 brokerage's fee schedule. Leaving it on **None** is valid. You then enter fees
 yourself on each fill, and you can attach a brokerage later.
 
@@ -131,17 +131,17 @@ Balances** widget.
 The figure above carries the sample account rather than one of your own, so the
 sample-data banner sits above it.
 
-Tradr supports **multiple accounts in different currencies** and consolidates
+Jurnal ZITN supports **multiple accounts in different currencies** and consolidates
 them into a single view. One account is enough for this tutorial. See [Accounts &
 the multi-currency ledger](/user-guide/accounts/) when you are ready to add more.
 
 ### Your reporting timezone is a separate setting
 
-Separately from the account, Tradr stores one **reporting timezone** for you. It
+Separately from the account, Jurnal ZITN stores one **reporting timezone** for you. It
 is the zone your P&L is bucketed into by day, week and month. It follows you, so
-those figures stay the same wherever you open Tradr.
+those figures stay the same wherever you open Jurnal ZITN.
 
-Tradr stored one from your browser when you registered. Confirm or correct it
+Jurnal ZITN stored one from your browser when you registered. Confirm or correct it
 under **Settings → Profile**.
 
 Setting one zone never sets the other. Changing your reporting timezone leaves
@@ -157,7 +157,7 @@ reporting timezone untouched.
 
 ### Prefer to look around first?
 
-Choose **Add sample data** on the welcome screen. Tradr creates one sample
+Choose **Add sample data** on the welcome screen. Jurnal ZITN creates one sample
 account with a fixed set of positions in it. A banner then marks every figure on
 screen as sample data.
 
@@ -171,7 +171,7 @@ Open **Calculator**. There is nothing to submit, the results recompute as you
 type, and no trade is created. Neither your entries nor the figures they produce
 are stored.
 
-Tradr records one fact here, the first time a calculation succeeds: a timestamp.
+Jurnal ZITN records one fact here, the first time a calculation succeeds: a timestamp.
 That is how the **Get set up** checklist can tell this step is done. Nothing
 about the calculation itself is kept.
 
@@ -218,7 +218,7 @@ and the options mode.
 
 ## Step 4 — Log the position
 
-A position in Tradr is one trade and every fill that belongs to it. It moves
+A position in Jurnal ZITN is one trade and every fill that belongs to it. It moves
 through three states.
 
 | State      | Meaning                                                                                            |
@@ -265,13 +265,13 @@ against the account as position value.
 3. Enter the exit **Price**, the **Quantity**, any **Fees**, and the **Date & Time**.
 4. Choose **Add**.
 
-Partial exits are ordinary. Add one fill per exit, and Tradr averages them for
+Partial exits are ordinary. Add one fill per exit, and Jurnal ZITN averages them for
 you.
 
 **Realized P&L does not wait for the close.** Each exit fill posts its share to
 your account balance as it lands, which is the moment your balance moves.
 
-When your exits balance the entered quantity, Tradr closes the position itself.
+When your exits balance the entered quantity, Jurnal ZITN closes the position itself.
 **Close Position** stays disabled while any quantity is still open, with the
 tooltip _Exit the full quantity first_. The button covers the cases the automatic
 path does not.

@@ -2,6 +2,8 @@
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { setAppLocale } from '@/lib/locale';
+
 import { DeleteAccountSection } from './DeleteAccountSection';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
@@ -31,6 +33,7 @@ vi.mock('./DeleteAccountDialog', () => ({
 /* eslint-enable @typescript-eslint/no-explicit-any */
 
 beforeEach(() => {
+  setAppLocale('en');
   statusState = {
     isLoading: false,
     isError: false,
@@ -41,6 +44,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  setAppLocale('id');
   cleanup();
   vi.clearAllMocks();
 });

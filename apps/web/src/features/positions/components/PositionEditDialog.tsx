@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 
-import { parseOccSymbol, type PositionDetail, type UpdatePositionInput } from '@tradr/shared';
+import { parseOccSymbol, type PositionDetail, type UpdatePositionInput } from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { useT } from '@/hooks/useLocale';
 
 import { useUpdatePosition } from '../hooks/usePosition';
 import {
@@ -50,6 +51,7 @@ interface Props {
  * API change.
  */
 export function PositionEditDialog({ open, onOpenChange, position }: Props) {
+  const t = useT();
   const updatePosition = useUpdatePosition(position.id);
 
   const isDraftOption = position.status === 'draft' && position.assetType === 'option';
@@ -139,7 +141,7 @@ export function PositionEditDialog({ open, onOpenChange, position }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit Position</DialogTitle>
+          <DialogTitle>{t('pos.dialog.editPosition')}</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           {mode === 'structured' && (
@@ -155,7 +157,7 @@ export function PositionEditDialog({ open, onOpenChange, position }: Props) {
 
           {mode === 'legacy' && (
             <div className="space-y-2">
-              <Label htmlFor="edit-symbol">Symbol</Label>
+              <Label htmlFor="edit-symbol">{t('pos.col.symbol')}</Label>
               <Input
                 id="edit-symbol"
                 type="text"
@@ -177,7 +179,7 @@ export function PositionEditDialog({ open, onOpenChange, position }: Props) {
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="edit-target-price">Target Price</Label>
+            <Label htmlFor="edit-target-price">{t('pos.detail.targetPrice')}</Label>
             <Input
               id="edit-target-price"
               type="text"
@@ -189,7 +191,7 @@ export function PositionEditDialog({ open, onOpenChange, position }: Props) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-stop-loss">Stop Loss</Label>
+            <Label htmlFor="edit-stop-loss">{t('pos.field.stopLoss')}</Label>
             <Input
               id="edit-stop-loss"
               type="text"
@@ -201,7 +203,7 @@ export function PositionEditDialog({ open, onOpenChange, position }: Props) {
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="edit-notes">Notes</Label>
+            <Label htmlFor="edit-notes">{t('pos.field.notes')}</Label>
             <Textarea id="edit-notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
           </div>
 
@@ -211,14 +213,14 @@ export function PositionEditDialog({ open, onOpenChange, position }: Props) {
               className="cursor-pointer"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t('action.cancel')}
             </Button>
             <Button
               className="cursor-pointer"
               onClick={handleSave}
               disabled={updatePosition.isPending}
             >
-              {updatePosition.isPending ? 'Saving...' : 'Save'}
+              {updatePosition.isPending ? t('pos.fill.saving') : t('pos.action.save')}
             </Button>
           </div>
         </div>

@@ -3,7 +3,7 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { ProposedPosition } from '@tradr/shared';
+import type { ProposedPosition } from '@jurnal-zitn/shared';
 
 import { ProposedPositions } from './ProposedPositions';
 

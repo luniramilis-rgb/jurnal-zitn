@@ -21,6 +21,9 @@ export const FeeScheduleSchema = z.object({
   stockPerShareCommission: feeField,
   stockMinPerFill: feeField,
   stockMaxPerFill: feeField,
+  // Persentase komisi IDX (beli/jual) — 0 berarti model per-saham dipakai.
+  stockPercentBuy: feeField,
+  stockPercentSell: feeField,
   optionsPerContractCommission: feeField,
   optionsPerContractExchangeFee: feeField,
   optionsMinPerFill: feeField,

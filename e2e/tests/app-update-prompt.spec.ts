@@ -35,7 +35,7 @@ import { mockAppShell, SESSION_RESPONSE, test } from './fixtures/performance-fix
 const BOOT = 'v0.0.1-e2e';
 const SERVED = 'v0.0.2-e2e';
 const MONO_LINE = `${BOOT} → ${SERVED}`;
-const TITLE = 'Tradr has been updated';
+const TITLE = 'Jurnal ZITN has been updated';
 
 // A minimal free-tier TierState (gating off, no usage) — self-host parity, so
 // no gated surface renders. Shape mirrors packages/shared TierStateSchema.
@@ -86,7 +86,7 @@ async function routeVersionedConfig(
     await route.fulfill({
       status: 200,
       contentType: 'application/javascript',
-      body: `window.__TRADR_CONFIG__={"appVersion":"${version}"};`,
+      body: `window.__JURNAL_ZITN_CONFIG__={"appVersion":"${version}"};`,
     });
   });
 }

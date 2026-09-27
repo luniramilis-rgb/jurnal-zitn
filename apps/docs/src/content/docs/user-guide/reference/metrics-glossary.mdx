@@ -1,9 +1,9 @@
 ---
 title: Methodology
-description: Exact definitions of every figure Tradr computes — gross and net P&L, return percentage, both risk/reward ratios, win rate, profit factor, expectancy, and how the breakdowns and calendar group your closed positions.
+description: Exact definitions of every figure Jurnal ZITN computes — gross and net P&L, return percentage, both risk/reward ratios, win rate, profit factor, expectancy, and how the breakdowns and calendar group your closed positions.
 ---
 
-Every number in Tradr is derived from your fills. Nothing is stored as a running
+Every number in Jurnal ZITN is derived from your fills. Nothing is stored as a running
 total, so correcting a fill corrects every figure that depends on it.
 
 This page gives the exact definition of each one, including the parts that are
@@ -54,7 +54,7 @@ net P&L ÷ (average entry × quantity exited × contract size + allocated entry 
 
 The denominator is what the closed portion cost you. For a short position it is
 the proceeds of the sale, not the margin you posted — margin varies by broker and
-Tradr does not know yours.
+Jurnal ZITN does not know yours.
 
 ### Target R/R
 
@@ -174,10 +174,10 @@ Null when nothing has closed in range.
 
 ### Sharpe ratio
 
-Tradr does not report a Sharpe ratio.
+Jurnal ZITN does not report a Sharpe ratio.
 
 A Sharpe ratio is built from a series of period returns measured against a
-capital base, and Tradr keeps neither. Return is measured per position, against
+capital base, and Jurnal ZITN keeps neither. Return is measured per position, against
 what the closed portion cost — see Return % above — not against your account
 over time. Balances are current, not historical, so there is no record of what
 the account was worth period by period to take a mean and a standard deviation
@@ -215,7 +215,7 @@ contract on the same stock shares one row; a stock groups under its own symbol.
 Both read **the moment the position went flat**, expressed in your reporting
 timezone — the same instant that places the position on the calendar. A position
 that went flat late on a Friday evening is a Friday, and stays a Friday wherever
-you open Tradr.
+you open Jurnal ZITN.
 
 ### Rows that add up, and rows that overlap
 
@@ -325,7 +325,7 @@ Canada and every other jurisdiction leave the split empty.
 
 Losses can raise a flag. A **US wash sale** or a **Canadian superficial loss**
 is flagged when a matching trade sits within 30 days either side of the loss.
-The flag is a note only — **Tradr never adjusts your cost basis** — and
+The flag is a note only — **Jurnal ZITN never adjusts your cost basis** — and
 jurisdiction "other" raises no flags.
 
 ### Black-Scholes
@@ -355,10 +355,10 @@ balance. The performance statistics above are a different question — they coun
 positions that have gone flat, which is why a half-closed position appears in your
 balance but not yet in your win rate.
 
-**Day, week and month come from your reporting timezone.** Tradr buckets P&L in
+**Day, week and month come from your reporting timezone.** Jurnal ZITN buckets P&L in
 the zone stored against your user, not the zone of the browser you are reading
 from. A fill late in the evening lands in the same bucket wherever you open
-Tradr. Set the zone under **Settings → Profile**.
+Jurnal ZITN. Set the zone under **Settings → Profile**.
 
 That zone is not an account's trading-day timezone, and neither is derived from
 the other. The trading-day timezone belongs to one account and decides whether a
@@ -366,7 +366,7 @@ position can be re-entered the same day. The reporting timezone belongs to you
 and decides how these figures are cut.
 
 **Currencies are never mixed.** Statistics are computed per currency. Positions in
-a currency Tradr has no rate for are excluded and reported as excluded rather than
+a currency Jurnal ZITN has no rate for are excluded and reported as excluded rather than
 silently dropped.
 
 **A reopened position keeps its last flat figures** until it goes flat again.

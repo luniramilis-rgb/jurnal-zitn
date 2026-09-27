@@ -71,7 +71,7 @@ describe('runCheck — minor tags', () => {
     const dir = newRepo();
     writeFileSync(
       join(dir, 'docs/release-notes/v0.16.0.md'),
-      'Tradr v0.16.0 tidies up the ledger.\n\nA short paragraph of prose that a reader would understand.\n',
+      'Jurnal ZITN v0.16.0 tidies up the ledger.\n\nA short paragraph of prose that a reader would understand.\n',
     );
     commit(dir, 'chore(release): v0.16.0');
     tag(dir, 'v0.16.0');

@@ -5,7 +5,7 @@
 
 import { useInfiniteQuery } from '@tanstack/react-query';
 
-import type { WalletHistoryItem } from '@tradr/shared';
+import type { WalletHistoryItem } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

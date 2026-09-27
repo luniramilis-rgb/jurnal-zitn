@@ -13,7 +13,7 @@
 
 import { Hono } from 'hono';
 
-import { VerifyEmailSchema } from '@tradr/shared/schemas/auth';
+import { VerifyEmailSchema } from '@jurnal-zitn/shared/schemas/auth';
 
 import { validate } from '@/lib/validation';
 import { authMiddleware } from '@/middleware/auth.middleware';

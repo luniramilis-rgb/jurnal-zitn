@@ -7,7 +7,7 @@ import type {
   AccountDeletionStatus,
   AdminDeleteUserResult,
   PurgeOutcome,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import {

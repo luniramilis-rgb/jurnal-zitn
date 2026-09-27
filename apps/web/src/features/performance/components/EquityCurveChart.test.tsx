@@ -4,7 +4,7 @@ import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { EquityCurvePoint } from '@tradr/shared';
+import type { EquityCurvePoint } from '@jurnal-zitn/shared';
 
 // ResponsiveContainer measures via ResizeObserver (never fires in jsdom); mock
 // it to a fixed-size passthrough so the SVG axes render for assertion.

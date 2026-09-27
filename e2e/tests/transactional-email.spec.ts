@@ -16,7 +16,7 @@ import { expect, test, type APIRequestContext, type Page } from '@playwright/tes
  * To arm a run, export the .env.example dev-Mailpit values first:
  *
  *   SMTP_HOST=localhost SMTP_PORT=1025 SMTP_TLS_MODE=none \
- *   EMAIL_FROM=dev@tradr.local pnpm --filter @tradr/e2e test
+ *   EMAIL_FROM=dev@jurnal-zitn.local pnpm --filter @jurnal-zitn/e2e test
  *
  * (WEB_BASE_URL is defaulted to the Playwright web origin by the config's
  * arming conditional — the emailed links must land on THIS stack's pages.)
@@ -214,7 +214,7 @@ test.describe('transactional-email', () => {
     await expect(page.getByText(/a reset link is on its way/)).toBeVisible();
 
     // Fetch the mail via Mailpit REST and assert the fragment link shape.
-    const mailText = await waitForEmailText(page.request, email, 'Reset your Tradr password');
+    const mailText = await waitForEmailText(page.request, email, 'Reset your Jurnal ZITN password');
     const resetLink = extractLink(mailText, '/reset-password');
     assertTokenFragmentLink(resetLink, '/reset-password');
 

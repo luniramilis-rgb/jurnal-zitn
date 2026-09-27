@@ -6,14 +6,14 @@ import type {
   LocatedError,
   LocatedWarning,
   NumberFormat,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import type { MappedRow } from './csv-mapping';
 
 /**
  * Normalizer — pure leaf module (no HTTP, no DB).
  *
- * Turns a {@link MappedRow}'s broker/locale representation into Tradr canonical
+ * Turns a {@link MappedRow}'s broker/locale representation into Jurnal ZITN canonical
  * values (REQ-5.1), implementing design Component 3:
  *
  *  - Dates ({@link DateFormat}) are normalized to ISO-8601 with offset. The
@@ -52,14 +52,14 @@ export interface NormalizeOptions {
 }
 
 /**
- * One normalized row: Tradr field -> canonical value. Numeric fields hold a
+ * One normalized row: Jurnal ZITN field -> canonical value. Numeric fields hold a
  * plain decimal string quantized to 8 dp; `filledAt`/`entryDate`/`exitDate` hold
  * ISO-8601 with offset; enum/text fields pass through unchanged.
  */
 export interface NormalizedRow {
   /** 1-based source row number; the header counts as row 1. */
   sourceRow: number;
-  /** Tradr field -> normalized value. */
+  /** Jurnal ZITN field -> normalized value. */
   values: Record<string, string>;
 }
 
@@ -111,7 +111,7 @@ const COLUMN_SCALE = 8;
 const MAGNITUDE_BOUND = new Decimal('1e10');
 
 /**
- * Normalize one mapped row to Tradr canonical values (design Component 3).
+ * Normalize one mapped row to Jurnal ZITN canonical values (design Component 3).
  *
  * Returns either `{ row, warnings }` on success (warnings may be empty) or a
  * non-empty `LocatedError[]` on failure. All errors for the row are collected so
@@ -135,7 +135,7 @@ export function normalizeRow(
       if ('error' in result) {
         errors.push({
           rowNumber: sourceRow,
-          tradrField: field,
+          journalField: field,
           code: result.error,
           message: result.message,
         });
@@ -166,7 +166,7 @@ export function normalizeRow(
       if (quantized.abs().greaterThanOrEqualTo(MAGNITUDE_BOUND)) {
         errors.push({
           rowNumber: sourceRow,
-          tradrField: field,
+          journalField: field,
           code: 'NUMBER_MAGNITUDE_TOO_LARGE',
           message: `Value "${raw}" for field "${field}" exceeds the maximum representable magnitude.`,
         });
@@ -179,7 +179,7 @@ export function normalizeRow(
       if ('error' in result) {
         errors.push({
           rowNumber: sourceRow,
-          tradrField: field,
+          journalField: field,
           code: result.error,
           message: result.message,
         });
@@ -191,7 +191,7 @@ export function normalizeRow(
       if ('error' in result) {
         errors.push({
           rowNumber: sourceRow,
-          tradrField: 'expiry',
+          journalField: 'expiry',
           code: result.error,
           message: result.message,
         });
@@ -203,7 +203,7 @@ export function normalizeRow(
       if ('error' in result) {
         errors.push({
           rowNumber: sourceRow,
-          tradrField: field,
+          journalField: field,
           code: result.error,
           message: result.message,
         });
@@ -228,7 +228,7 @@ export function normalizeRow(
       if (action !== quantityDirection) {
         errors.push({
           rowNumber: sourceRow,
-          tradrField: 'quantity',
+          journalField: 'quantity',
           code: 'QUANTITY_SIGN_CONTRADICTION',
           message: `Row ${sourceRow} has quantity ${mappedRow.values.quantity} but action ${action.toUpperCase()}; under this preset a negative quantity is a sell.`,
         });

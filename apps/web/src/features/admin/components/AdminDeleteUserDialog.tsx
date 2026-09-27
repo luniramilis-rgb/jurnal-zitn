@@ -15,7 +15,8 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import type { AdminUserListItem } from '@tradr/shared/schemas/admin';
+import type { MessageKey } from '@jurnal-zitn/shared';
+import type { AdminUserListItem } from '@jurnal-zitn/shared/schemas/admin';
 
 import { RetentionSummary } from '@/components/account-deletion/RetentionSummary';
 import { Button } from '@/components/ui/button';
@@ -29,31 +30,34 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useT } from '@/hooks/useLocale';
 
 import { useAdminDeleteUser } from '../hooks/useAdminDeleteUser';
 import { useAdminUser } from '../hooks/useAdminUser';
 
 // One message per code the delete route returns (Req 6.4); anything unmapped
 // falls back to the neutral line. Every case here left the account intact.
-const DELETE_ERROR_MESSAGES: Record<string, string> = {
-  VALIDATION_ERROR: 'The typed email does not match the account. Nothing was deleted.',
-  NOT_FOUND: 'This user no longer exists. Nothing was deleted.',
-  LAST_ADMIN: 'Cannot delete the last admin.',
-  SUBSCRIPTION_UNRESOLVED:
-    'Their subscription cannot be resolved right now — billing is unavailable. Nothing was deleted; try again later.',
-  RATE_LIMITED: 'Too many attempts. Try again in a few minutes.',
-  STRIPE_CANCEL_FAILED:
-    'Their subscription could not be cancelled. Nothing was deleted — try again.',
+
+const DELETE_ERROR_KEYS: Record<string, MessageKey> = {
+  VALIDATION_ERROR: 'adm.error.validation',
+  NOT_FOUND: 'adm.error.notFound',
+  LAST_ADMIN: 'adm.error.lastAdmin',
+  SUBSCRIPTION_UNRESOLVED: 'adm.error.subscription',
+  RATE_LIMITED: 'auth.error.rateLimited',
+  STRIPE_CANCEL_FAILED: 'adm.error.stripe',
 };
 
-const FALLBACK_DELETE_ERROR = 'Something went wrong. Nothing was deleted — try again.';
+const FALLBACK_DELETE_ERROR_KEY: MessageKey = 'adm.error.fallback';
 
-function deleteErrorMessage(err: unknown): string {
+function deleteErrorMessage(
+  err: unknown,
+  t: (k: MessageKey, v?: Record<string, string | number>) => string,
+): string {
   const code =
     typeof err === 'object' && err !== null
       ? (err as { error?: { code?: string } }).error?.code
       : undefined;
-  return (code && DELETE_ERROR_MESSAGES[code]) || FALLBACK_DELETE_ERROR;
+  return t((code && DELETE_ERROR_KEYS[code]) || FALLBACK_DELETE_ERROR_KEY);
 }
 
 interface AdminDeleteUserDialogProps {
@@ -63,6 +67,7 @@ interface AdminDeleteUserDialogProps {
 }
 
 export function AdminDeleteUserDialog({ user, onClose }: AdminDeleteUserDialogProps) {
+  const t = useT();
   const [typedEmail, setTypedEmail] = useState('');
   const detail = useAdminUser(user?.id);
   const del = useAdminDeleteUser();
@@ -102,18 +107,16 @@ export function AdminDeleteUserDialog({ user, onClose }: AdminDeleteUserDialogPr
     >
       <DialogContent data-testid="admin-delete-user-dialog">
         <DialogHeader>
-          <DialogTitle>Delete {user?.email}</DialogTitle>
-          <DialogDescription>
-            This permanently deletes the user and all their data. It cannot be undone, and no backup
-            is taken.
-          </DialogDescription>
+          <DialogTitle>{t('adm.delete.title', { email: user?.email ?? '' })}</DialogTitle>
+          <DialogDescription>{t('adm.delete.desc')}</DialogDescription>
         </DialogHeader>
 
         <RetentionSummary creditBalance={detail.data?.walletBalance} />
 
         <div className="space-y-2">
           <Label htmlFor="confirm-delete-email">
-            Type <span className="font-mono">{user?.email}</span> to confirm
+            {t('adm.delete.typePrefix')} <span className="font-mono">{user?.email}</span>{' '}
+            {t('adm.delete.typeSuffix')}
           </Label>
           <Input
             id="confirm-delete-email"
@@ -126,7 +129,7 @@ export function AdminDeleteUserDialog({ user, onClose }: AdminDeleteUserDialogPr
 
         {del.isError && (
           <p className="text-destructive text-sm" role="alert" data-testid="admin-delete-error">
-            {deleteErrorMessage(del.error)}
+            {deleteErrorMessage(del.error, t)}
           </p>
         )}
 

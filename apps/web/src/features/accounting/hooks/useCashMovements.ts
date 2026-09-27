@@ -5,7 +5,7 @@ import type {
   CashMovementResponse,
   CreateCashMovementInput,
   ReverseCashMovementResponse,
-} from '@tradr/shared/schemas/accounting';
+} from '@jurnal-zitn/shared/schemas/accounting';
 
 import { api } from '@/lib/api';
 

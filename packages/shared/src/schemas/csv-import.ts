@@ -13,7 +13,7 @@ export const ExpiryFormatSchema = z.enum(['iso', 'yyyymmdd', 'dd-mon-yy']);
 
 export const MappingSchema = z.object({
   rowShape: RowShapeSchema,
-  // Tradr field -> CSV column name. Fields vary by row shape (Component 2),
+  // Jurnal ZITN field -> CSV column name. Fields vary by row shape (Component 2),
   // so this is a free record validated structurally; the mapping/transform
   // layer enforces the per-shape required-field set.
   columns: z.record(z.string(), z.string()),
@@ -43,7 +43,7 @@ export const CsvPreviewRequestSchema = z.object({
 export const LocatedErrorSchema = z.object({
   rowNumber: z.number().int(),
   csvColumn: z.string().optional(),
-  tradrField: z.string().optional(),
+  journalField: z.string().optional(),
   code: z.string(),
   message: z.string(),
 });

@@ -6,7 +6,7 @@
 // boots the API before any spec can register a user, and the harness has no
 // restart seam. So this helper runs the documented promotion statement directly
 // against the stack's Postgres, using the SAME driver the API uses (porsager
-// `postgres`, devDependency of @tradr/e2e) and the SAME `DATABASE_URL`
+// `postgres`, devDependency of @jurnal-zitn/e2e) and the SAME `DATABASE_URL`
 // resolution as playwright.config.ts `apiEnv` — env first, then the CI-safe
 // default — so the helper always hits the database the booted API is using.
 //
@@ -26,7 +26,7 @@ import postgres from 'postgres';
 // either way because the workflow exports DATABASE_URL explicitly.
 const DATABASE_URL =
   // eslint-disable-next-line no-restricted-syntax
-  process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5433/tradr_test';
+  process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test';
 
 /**
  * Promote a registered user to admin — the documented bootstrap statement:

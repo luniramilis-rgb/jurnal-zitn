@@ -17,6 +17,7 @@ import { initProviderRegistry } from '@/features/advisor/providers/registry';
 import { applyBuiltinPersonaOverrides, runDecryptCanary } from '@/features/advisor/startup';
 import auth, { userPreferencesRouter } from '@/features/auth/auth.route';
 import passwordResetRouter from '@/features/auth/password-reset.route';
+import ssoRouter from '@/features/auth/sso.route';
 import verificationRouter from '@/features/auth/verification.route';
 import { billingRouter, billingWebhookRouter } from '@/features/billing/billing.route';
 import brokeragesRouter from '@/features/brokerages/brokerages.route';
@@ -30,6 +31,7 @@ import csvImport from '@/features/csv-import/csv-import.route';
 import { dashboardRoute } from '@/features/dashboard/dashboard.route';
 import { initDashboardCache } from '@/features/dashboard/dashboard.service';
 import expensesRouter from '@/features/expenses/expenses.route';
+import exportRouter from '@/features/export/export.route';
 import health from '@/features/health/health.route';
 import optionsRouter from '@/features/options/options.route';
 import performance from '@/features/performance/performance.route';
@@ -115,6 +117,9 @@ app.route('/api/auth', passwordResetRouter);
 // Email verification: a THIRD router on the same /api/auth base (same
 // precedent) — verify-email is public, verify-email/resend is authed (D11).
 app.route('/api/auth', verificationRouter);
+// ZITN SSO: a FOURTH router on the same /api/auth base (same precedent) — public,
+// fail-closed behind JOURNAL_SSO_SECRET (ZITN-TECH-017).
+app.route('/api/auth', ssoRouter);
 app.route('/api/accounts', accounts);
 // Admin: gating (auth → admin → rate limit) is router-level inside adminRouter
 // (admin-platform design Component 1, REQ-1.4).
@@ -148,6 +153,8 @@ app.route('/api', userPreferencesRouter);
 // Self-service account deletion: mounted at its absolute path so the router's
 // three handlers own `/` (design C7). Router-level authMiddleware gates it.
 app.route('/api/users/me/deletion', accountDeletionRouter);
+// Self-service data export (ZITN-TECH-017, Gerbang #7/#9): same absolute-path mount.
+app.route('/api/users/me/export', exportRouter);
 
 // Error handler
 app.onError(errorHandler);

@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import { setCookie } from 'hono/cookie';
 
-import { AccountDeletionRequestSchema } from '@tradr/shared';
+import { AccountDeletionRequestSchema } from '@jurnal-zitn/shared';
 
 import { sessionCookieOptions } from '@/lib/cookie-policy';
 import { validate } from '@/lib/validation';

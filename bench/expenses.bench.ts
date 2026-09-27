@@ -11,7 +11,7 @@
 // `expenses.test.ts` authenticates after `registerAndGetCookie`).
 //
 // Per the design's bench convention (see `bench/accounting.bench.ts`):
-//   - Reuses the existing `tradr_test_migrate` database — drops + recreates the
+//   - Reuses the existing `jurnal_zitn_test_migrate` database — drops + recreates the
 //     `public` schema, re-applies migrations + post-migrations, seeds once.
 //   - Uses `it()` with manual sampling + `expect(stats.p95).toBeLessThan(...)`
 //     so the harness runs under `vitest --run` (the existing `pnpm bench:

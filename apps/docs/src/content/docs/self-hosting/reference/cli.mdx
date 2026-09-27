@@ -1,28 +1,28 @@
 ---
-title: CLI reference (tradr)
-description: The tradr command-line tool that ships inside the api container — migration status, account creation, password recovery, and object-storage maintenance.
+title: CLI reference (jurnal-zitn)
+description: The jurnal-zitn command-line tool that ships inside the api container — migration status, account creation, password recovery, and object-storage maintenance.
 ---
 
 {/* GENERATED FILE — do not edit.
-    Source: apps/api/src/cli/tradr.ts · Generator: apps/docs/scripts/gen-cli.mjs
+    Source: apps/api/src/cli/jurnal-zitn.ts · Generator: apps/docs/scripts/gen-cli.mjs
     Command descriptions live in the generator. */}
 
-The api image ships a `tradr` command for the jobs that need a server, not a
+The api image ships a `jurnal-zitn` command for the jobs that need a server, not a
 browser. Run it inside the running container:
 
 ```bash
-docker compose exec api tradr --help
+docker compose exec api jurnal-zitn --help
 ```
 
 **Expected result:** exit code 0, and the 5 commands below.
 
 | Command | Does |
 | --- | --- |
-| `tradr migrate --status` | Report whether the database schema is current. |
-| `tradr storage migrate-to-inline` | Pull stored images out of object storage and back into the database. |
-| `tradr storage gc` | Delete bucket objects no position or conversation references any more. |
-| `tradr create-user <email> [--password <value>]` | Create an account from the server, without opening registration. |
-| `tradr reset-password <email> [--password <value>]` | Set a user's password from the server. |
+| `jurnal-zitn migrate --status` | Report whether the database schema is current. |
+| `jurnal-zitn storage migrate-to-inline` | Pull stored images out of object storage and back into the database. |
+| `jurnal-zitn storage gc` | Delete bucket objects no position or conversation references any more. |
+| `jurnal-zitn create-user <email> [--password <value>]` | Create an account from the server, without opening registration. |
+| `jurnal-zitn reset-password <email> [--password <value>]` | Set a user's password from the server. |
 
 Every command exits **2** when it cannot reach the database, so a wrapper script
 can tell "it failed" from "it could not run".
@@ -34,7 +34,7 @@ It opens its own read-only connection and never takes the migration advisory
 lock, so it is safe to run against a live instance.
 
 ```bash
-docker compose exec api tradr migrate --status
+docker compose exec api jurnal-zitn migrate --status
 ```
 
 **Expected result:** exit code 0, ending in `Schema is up to date.`
@@ -55,7 +55,7 @@ It rewrites every image that lives as a bucket pointer back to inline data, so
 the backend can be disabled without stranding an image.
 
 ```bash
-docker compose exec api tradr storage migrate-to-inline
+docker compose exec api jurnal-zitn storage migrate-to-inline
 ```
 
 The command is idempotent and resumable — run it again after a failure. An
@@ -72,7 +72,7 @@ Reclaims objects orphaned by deleted records and retried uploads. Like
 configured.
 
 ```bash
-docker compose exec api tradr storage gc
+docker compose exec api jurnal-zitn storage gc
 ```
 
 The sweep is age-guarded: it never reaps an object young enough to belong to a
@@ -86,7 +86,7 @@ instance that runs with `DISABLE_REGISTRATION=true` — the flag closes
 reaching the CLI already means shell access to the server.
 
 ```bash
-docker compose exec api tradr create-user someone@example.com
+docker compose exec api jurnal-zitn create-user someone@example.com
 ```
 
 **Expected result:** exit code 0, and a generated password printed to stdout.
@@ -115,7 +115,7 @@ The recovery path on an instance with no email configured. Without SMTP there
 is no self-service reset, so the operator sets the password directly.
 
 ```bash
-docker compose exec api tradr reset-password someone@example.com
+docker compose exec api jurnal-zitn reset-password someone@example.com
 ```
 
 **Expected result:** exit code 0, and a generated password printed to stdout.

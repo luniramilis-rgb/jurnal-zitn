@@ -11,7 +11,7 @@
 import { Hono } from 'hono';
 import { describe, it, expect } from 'vitest';
 
-import type { StoredContentPart } from '@tradr/shared';
+import type { StoredContentPart } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { advisorConversations, advisorMessages, users } from '@/db/schema';

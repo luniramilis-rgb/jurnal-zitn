@@ -7,16 +7,16 @@ import {
   type PerformanceResponse,
   type SeriesBucket,
   PerformanceResponseSchema,
-} from '@tradr/shared';
-import type { BreakdownPosition } from '@tradr/shared/lib/breakdown';
+} from '@jurnal-zitn/shared';
+import type { BreakdownPosition } from '@jurnal-zitn/shared/lib/breakdown';
 import {
   buildCumulativeSeries,
   classifyPosition,
   computePositionSetStatistics,
   generateBucketSeries,
   type ClassifiedPosition,
-} from '@tradr/shared/lib/performance';
-import { resolveTimezone } from '@tradr/shared/schemas/performance';
+} from '@jurnal-zitn/shared/lib/performance';
+import { resolveTimezone } from '@jurnal-zitn/shared/schemas/performance';
 
 import type { Database } from '@/db';
 import {

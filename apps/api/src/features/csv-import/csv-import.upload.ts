@@ -1,5 +1,5 @@
-import type { CsvPreviewRequest } from '@tradr/shared';
-import { CsvPreviewRequestSchema } from '@tradr/shared';
+import type { CsvPreviewRequest } from '@jurnal-zitn/shared';
+import { CsvPreviewRequestSchema } from '@jurnal-zitn/shared';
 
 import { config } from '@/lib/config';
 import { AppError, ValidationError } from '@/lib/errors';

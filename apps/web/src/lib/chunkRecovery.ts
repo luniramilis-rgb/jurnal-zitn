@@ -15,7 +15,7 @@ import { getUpdateMonitor } from '@/lib/updateMonitor';
 // nudges; the boundary that actually caught the failure decides whether to
 // reload, through this module's guard and helper.
 
-export const RELOAD_GUARD_PREFIX = 'tradr.chunk-reload.'; // + bootVersion
+export const RELOAD_GUARD_PREFIX = 'jurnal-zitn.chunk-reload.'; // + bootVersion
 
 // The four browser/Vite wordings a vanished lazy chunk produces. The first two
 // are Chromium/Firefox and Safari (the original PerformancePage pair); the last

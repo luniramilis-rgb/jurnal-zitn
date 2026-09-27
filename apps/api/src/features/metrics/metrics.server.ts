@@ -51,7 +51,7 @@ export function createMetricsApp(): Hono {
       //
       // Its OWN catch, nested rather than folded into the outer one, because the
       // two failures degrade differently. `refreshDbMetrics()` never throws by
-      // contract — it publishes `tradr_db_up 0` and omits the connection series
+      // contract — it publishes `jurnal_zitn_db_up 0` and omits the connection series
       // instead — and this is the second line of defence: a collector failure
       // must still leave the process, runtime and build-info series to serve,
       // which is exactly REQ-4.6's PARTIAL exposition. Folded into the outer
@@ -98,7 +98,7 @@ export function createMetricsApp(): Hono {
  * before `initMetrics()` has run: an `async` variant would return at its first
  * `await` with the listener already accepting connections and the registry not
  * yet seeded, so an unlucky first scrape would report neither
- * `tradr_build_info` nor any `process_*` series.
+ * `jurnal_zitn_build_info` nor any `process_*` series.
  *
  * `initMetrics()` is called here rather than in `app.ts` because this is the
  * only place the metric VALUES are ever read; `app.ts` only needs the metric

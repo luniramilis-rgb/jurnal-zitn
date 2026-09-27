@@ -1,5 +1,5 @@
 // apps/web/src/features/options/lib/formToWireInput.ts
-import { BlackScholesInputSchema, type BlackScholesInput } from '@tradr/shared';
+import { BlackScholesInputSchema, type BlackScholesInput } from '@jurnal-zitn/shared';
 
 export type FormStringState = {
   S: string;

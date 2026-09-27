@@ -28,9 +28,9 @@ export default {
   customizeTheme: (theme) => {
     theme.styleOverrides.frames = {
       ...theme.styleOverrides.frames,
-      editorBackground: 'var(--tradr-code-bg)',
-      terminalBackground: 'var(--tradr-code-bg)',
-      editorActiveTabBackground: 'var(--tradr-code-bg)',
+      editorBackground: 'var(--jurnal-zitn-code-bg)',
+      terminalBackground: 'var(--jurnal-zitn-code-bg)',
+      editorActiveTabBackground: 'var(--jurnal-zitn-code-bg)',
     };
     theme.colors['titleBar.activeBackground'] = 'var(--popover)';
     theme.colors['editorGroupHeader.tabsBackground'] = 'var(--popover)';

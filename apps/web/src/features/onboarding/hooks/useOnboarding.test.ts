@@ -5,7 +5,12 @@ import { createElement, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { Account, OnboardingPatch, OnboardingState, PositionListItem } from '@tradr/shared';
+import type {
+  Account,
+  OnboardingPatch,
+  OnboardingState,
+  PositionListItem,
+} from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

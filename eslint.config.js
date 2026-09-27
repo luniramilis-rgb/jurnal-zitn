@@ -23,15 +23,15 @@ const positionsInsertSelectors = [
 ];
 
 const webSharedLibPath = {
-  name: '@tradr/shared/lib/performance',
+  name: '@jurnal-zitn/shared/lib/performance',
   message:
-    'apps/web must not import from @tradr/shared/lib/* — performance computation primitives live in @tradr/shared/schemas/* or are backend-only.',
+    'apps/web must not import from @jurnal-zitn/shared/lib/* — performance computation primitives live in @jurnal-zitn/shared/schemas/* or are backend-only.',
 };
 
 const webSharedLibPattern = {
-  group: ['@tradr/shared/lib/*'],
+  group: ['@jurnal-zitn/shared/lib/*'],
   message:
-    'apps/web must not import from @tradr/shared/lib/* — import schemas or expose a new api entry in @tradr/shared/src/index.ts instead.',
+    'apps/web must not import from @jurnal-zitn/shared/lib/* — import schemas or expose a new api entry in @jurnal-zitn/shared/src/index.ts instead.',
 };
 
 // Scoped to TS/JS module imports on purpose: ESLint lints no CSS, so the
@@ -77,7 +77,7 @@ export default tseslint.config(
           groups: ['builtin', 'external', 'internal', 'parent', 'sibling', 'index'],
           pathGroups: [
             {
-              pattern: '@tradr/**',
+              pattern: '@jurnal-zitn/**',
               group: 'internal',
               position: 'before',
             },

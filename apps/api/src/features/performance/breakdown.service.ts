@@ -4,9 +4,9 @@ import {
   type BreakdownResponse,
   type BreakdownRow,
   BreakdownResponseSchema,
-} from '@tradr/shared';
-import { groupPositions, orderGroups } from '@tradr/shared/lib/breakdown';
-import { computePositionSetStatistics } from '@tradr/shared/lib/performance';
+} from '@jurnal-zitn/shared';
+import { groupPositions, orderGroups } from '@jurnal-zitn/shared/lib/breakdown';
+import { computePositionSetStatistics } from '@jurnal-zitn/shared/lib/performance';
 
 import type { Database } from '@/db';
 import { config } from '@/lib/config';

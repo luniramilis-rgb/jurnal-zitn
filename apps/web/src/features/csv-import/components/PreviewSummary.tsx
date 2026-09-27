@@ -1,4 +1,4 @@
-import type { CsvPreviewResponse } from '@tradr/shared';
+import type { CsvPreviewResponse } from '@jurnal-zitn/shared';
 
 import { Card, CardContent } from '@/components/ui/card';
 

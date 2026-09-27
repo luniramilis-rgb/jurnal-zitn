@@ -1,4 +1,4 @@
-import { STARTER_TAGS, TAG_LIMITS } from '@tradr/shared/constants/tags';
+import { STARTER_TAGS, TAG_LIMITS } from '@jurnal-zitn/shared/constants/tags';
 import type {
   CreateTagInput,
   StarterAnswer,
@@ -6,7 +6,7 @@ import type {
   Tag,
   TagWithCount,
   UpdateTagInput,
-} from '@tradr/shared/schemas/tag';
+} from '@jurnal-zitn/shared/schemas/tag';
 
 import type { Database, Transaction } from '@/db';
 import { findPositionById } from '@/features/positions/positions.query';

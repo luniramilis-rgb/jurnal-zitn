@@ -11,7 +11,7 @@
 
 import { useState } from 'react';
 
-import type { Persona } from '@tradr/shared/schemas/advisor';
+import type { Persona } from '@jurnal-zitn/shared/schemas/advisor';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

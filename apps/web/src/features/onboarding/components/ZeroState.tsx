@@ -30,8 +30,8 @@
 // expecting either a broker connection or an execution platform, and the
 // account form asks for a starting balance and a currency without ever saying
 // what the thing it is creating IS. The card states both halves plainly: a
-// Tradr account MIRRORS a real brokerage account, and it is NOT connected to
-// one — Tradr never places or executes trades. Say it here, once, before the
+// Jurnal ZITN account MIRRORS a real brokerage account, and it is NOT connected to
+// one — Jurnal ZITN never places or executes trades. Say it here, once, before the
 // user types a balance into a form and wonders whose money it is.
 //
 // EXACTLY ONE PRIMARY (AMBER) ACTION PER STAGE. The design system reserves
@@ -213,7 +213,7 @@ export function ZeroState() {
       <Card>
         <CardHeader className="px-4 sm:px-6">
           <h2 className="text-xl leading-none font-semibold">
-            {hasOwnAccount ? 'Your account is ready' : 'Welcome to Tradr'}
+            {hasOwnAccount ? 'Your account is ready' : 'Welcome to Jurnal ZITN'}
           </h2>
           <CardDescription>
             {hasOwnAccount
@@ -230,9 +230,9 @@ export function ZeroState() {
               the second the user has met that form and typed the balance. */}
           {!hasOwnAccount && (
             <p data-testid="zero-state-not-connected" className="text-sm text-muted-foreground">
-              A Tradr account mirrors a real brokerage account: the same currency, the same starting
-              balance, the same trades. It is not connected to your broker. Tradr never places or
-              executes trades — you record trades you have already made.
+              A Jurnal ZITN account mirrors a real brokerage account: the same currency, the same
+              starting balance, the same trades. It is not connected to your broker. Jurnal ZITN
+              never places or executes trades — you record trades you have already made.
             </p>
           )}
 

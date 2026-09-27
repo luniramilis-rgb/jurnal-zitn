@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-import type { CsvCommitRequest, CsvCommitResponse } from '@tradr/shared';
+import type { CsvCommitRequest, CsvCommitResponse } from '@jurnal-zitn/shared';
 
 import { billingKeys } from '@/features/billing/useWalletBalance';
 import { api } from '@/lib/api';

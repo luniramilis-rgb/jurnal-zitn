@@ -9,6 +9,8 @@
 
 import { useState } from 'react';
 
+import type { MessageKey } from '@jurnal-zitn/shared';
+
 import { RetentionSummary } from '@/components/account-deletion/RetentionSummary';
 import { Button } from '@/components/ui/button';
 import {
@@ -23,31 +25,23 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTierState } from '@/features/billing/useTierState';
 import { useWalletBalance } from '@/features/billing/useWalletBalance';
+import { useT } from '@/hooks/useLocale';
 
 import { useDeleteAccount } from '../hooks/useAccountDeletion';
 
 // One message per code in Req 8.2, plus 409 DELETION_IN_PROGRESS. Anything else
 // (a bare 500, an unmapped code) falls back to the neutral line below.
-const DELETE_ERROR_MESSAGES: Record<string, string> = {
-  VALIDATION_ERROR: 'That password is not valid. Check it and try again.',
-  INVALID_PASSWORD: 'That password is incorrect.',
-  LAST_ADMIN: 'You are the last admin. Make another user an admin before deleting your account.',
-  SUBSCRIPTION_UNRESOLVED:
-    'Your subscription cannot be resolved right now — billing is unavailable. Try again later.',
-  RATE_LIMITED: 'Too many attempts. Try again in a few minutes.',
-  STRIPE_CANCEL_FAILED: 'Your subscription could not be updated. Nothing was deleted — try again.',
-  DELETION_IN_PROGRESS: 'A deletion is already in progress.',
+const DELETE_ERROR_KEYS: Record<string, MessageKey> = {
+  VALIDATION_ERROR: 'settings.delete.error.validation',
+  INVALID_PASSWORD: 'settings.delete.error.invalidPassword',
+  LAST_ADMIN: 'settings.delete.error.lastAdmin',
+  SUBSCRIPTION_UNRESOLVED: 'settings.delete.error.subscription',
+  RATE_LIMITED: 'settings.delete.error.rateLimited',
+  STRIPE_CANCEL_FAILED: 'settings.delete.error.stripe',
+  DELETION_IN_PROGRESS: 'settings.delete.error.inProgress',
 };
 
-const FALLBACK_DELETE_ERROR = 'Something went wrong. Nothing was deleted — try again.';
-
-function deleteErrorMessage(err: unknown): string {
-  const code =
-    typeof err === 'object' && err !== null
-      ? (err as { error?: { code?: string } }).error?.code
-      : undefined;
-  return (code && DELETE_ERROR_MESSAGES[code]) || FALLBACK_DELETE_ERROR;
-}
+const FALLBACK_DELETE_ERROR_KEY: MessageKey = 'settings.delete.error.fallback';
 
 interface DeleteAccountDialogProps {
   /** Called on a scheduled outcome or when the user dismisses the dialog. */
@@ -55,10 +49,19 @@ interface DeleteAccountDialogProps {
 }
 
 export function DeleteAccountDialog({ onClose }: DeleteAccountDialogProps) {
+  const t = useT();
   const [password, setPassword] = useState('');
   const balance = useWalletBalance();
   const tier = useTierState();
   const del = useDeleteAccount();
+
+  function deleteErrorMessage(err: unknown): string {
+    const code =
+      typeof err === 'object' && err !== null
+        ? (err as { error?: { code?: string } }).error?.code
+        : undefined;
+    return t((code && DELETE_ERROR_KEYS[code]) || FALLBACK_DELETE_ERROR_KEY);
+  }
 
   // Timing (design §C11): a live subscription whose paid period ends in the
   // future defers the delete to that date; otherwise it fires immediately.
@@ -66,8 +69,8 @@ export function DeleteAccountDialog({ onClose }: DeleteAccountDialogProps) {
   const periodEnd = subscription ? new Date(subscription.currentPeriodEnd) : null;
   const timingLine =
     periodEnd !== null && periodEnd.getTime() > Date.now()
-      ? `Your account will be deleted on ${periodEnd.toLocaleDateString()}, when your paid period ends. It stays usable until then, and you can cancel before it fires.`
-      : 'Your account will be deleted immediately. This cannot be undone.';
+      ? t('settings.delete.timingScheduled', { date: periodEnd.toLocaleDateString() })
+      : t('settings.delete.timingImmediate');
 
   const submit = () => {
     if (password.length === 0 || del.isPending) return;
@@ -93,14 +96,14 @@ export function DeleteAccountDialog({ onClose }: DeleteAccountDialogProps) {
     >
       <DialogContent data-testid="delete-account-dialog">
         <DialogHeader>
-          <DialogTitle>Delete account</DialogTitle>
+          <DialogTitle>{t('settings.delete.dialogTitle')}</DialogTitle>
           <DialogDescription>{timingLine}</DialogDescription>
         </DialogHeader>
 
         <RetentionSummary creditBalance={balance.data?.balance} />
 
         <div className="space-y-2">
-          <Label htmlFor="delete-account-password">Confirm your password</Label>
+          <Label htmlFor="delete-account-password">{t('settings.delete.confirmPassword')}</Label>
           <Input
             id="delete-account-password"
             type="password"
@@ -123,7 +126,7 @@ export function DeleteAccountDialog({ onClose }: DeleteAccountDialogProps) {
             onClick={onClose}
             disabled={del.isPending}
           >
-            Cancel
+            {t('settings.delete.cancelButton')}
           </Button>
           <Button
             variant="destructive"
@@ -131,7 +134,7 @@ export function DeleteAccountDialog({ onClose }: DeleteAccountDialogProps) {
             disabled={password.length === 0 || del.isPending}
             onClick={submit}
           >
-            {del.isPending ? 'Deleting…' : 'Delete my account'}
+            {del.isPending ? t('settings.delete.submitting') : t('settings.delete.submit')}
           </Button>
         </DialogFooter>
       </DialogContent>

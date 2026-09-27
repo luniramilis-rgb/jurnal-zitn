@@ -2,11 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
-import type { Account } from '@tradr/shared';
+import type { Account } from '@jurnal-zitn/shared';
 import {
   ReconcileBalanceInputSchema,
   type ReconcileBalanceInput,
-} from '@tradr/shared/schemas/accounting';
+} from '@jurnal-zitn/shared/schemas/accounting';
 
 import { Button } from '@/components/ui/button';
 import {
@@ -56,12 +56,12 @@ function parseTarget(raw: string | undefined): number | null {
 /**
  * Cash balance reconciliation (Req 8.11).
  *
- * The user states what the account's cash balance actually is; Tradr posts one
+ * The user states what the account's cash balance actually is; Jurnal ZITN posts one
  * adjusting ledger entry for the difference. The delta shown here is a preview
  * — the server recomputes it inside its own transaction, so what gets written
  * is correct even if a position closes while this dialog is open.
  *
- * The disclosure copy is required, not decorative: Tradr's balance is starting
+ * The disclosure copy is required, not decorative: Jurnal ZITN's balance is starting
  * balance plus realized P&L and carries no mark-to-market, so the user needs to
  * know which figure to type. Open positions deliberately do not block or warn.
  */
@@ -95,10 +95,10 @@ export function ReconcileBalanceDialog({ account, open, onOpenChange }: Props) {
         <DialogHeader>
           <DialogTitle>Reconcile cash balance</DialogTitle>
           <DialogDescription>
-            Tradr tracks this account&apos;s cash balance: your starting balance plus realized
+            Jurnal ZITN tracks this account&apos;s cash balance: your starting balance plus realized
             P&amp;L from closed trades. It does not include the market value of open positions.
-            Enter the cash balance this account should show — Tradr posts a single adjusting entry
-            for the difference.
+            Enter the cash balance this account should show — Jurnal ZITN posts a single adjusting
+            entry for the difference.
           </DialogDescription>
         </DialogHeader>
 

@@ -8,7 +8,7 @@ import {
   type LocatedWarning,
   type NumberFormat,
   type OccComponents,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { normalizeNumber, type NormalizedRow } from './csv-normalize';
 
@@ -33,7 +33,7 @@ export interface ContractOptions {
   contractForm?: ContractForm;
   /** Number format for the descriptor's strike token. */
   numberFormat: NumberFormat;
-  /** Tradr field -> CSV column name, to set `csvColumn` on located errors. */
+  /** Jurnal ZITN field -> CSV column name, to set `csvColumn` on located errors. */
   columns: Record<string, string>;
 }
 
@@ -48,7 +48,7 @@ export interface ResolveResult {
 const CONTRACT_FIELDS = ['expiry', 'strike', 'right'] as const;
 
 /**
- * IBKR lifecycle codes Tradr cannot yet import, mapped to the kind named in the
+ * IBKR lifecycle codes Jurnal ZITN cannot yet import, mapped to the kind named in the
  * refusal message (REQ-4.2). `A` is an assignment; `EX`/`AEX`/`MEX` an exercise;
  * `EP`/`GEA` an expiration or assignment. Other codes (`O`, `C`, `P`, …) import.
  */
@@ -82,9 +82,9 @@ export function resolveContracts(rows: NormalizedRow[], opts: ContractOptions): 
     const rowErrors: LocatedError[] = [];
 
     // Locate an error to the row and, when the field was mapped, its column.
-    const push = (tradrField: string, code: string, message: string): void => {
-      const error: LocatedError = { rowNumber: sourceRow, tradrField, code, message };
-      const column = opts.columns[tradrField];
+    const push = (journalField: string, code: string, message: string): void => {
+      const error: LocatedError = { rowNumber: sourceRow, journalField, code, message };
+      const column = opts.columns[journalField];
       if (column !== undefined) error.csvColumn = column;
       rowErrors.push(error);
     };
@@ -125,12 +125,12 @@ export function resolveContracts(rows: NormalizedRow[], opts: ContractOptions): 
       continue;
     }
 
-    // (3) Multiplier (REQ-4.1): Tradr represents only 100-share contracts.
+    // (3) Multiplier (REQ-4.1): Jurnal ZITN represents only 100-share contracts.
     if (values.multiplier !== undefined && !new Decimal(values.multiplier).equals(100)) {
       push(
         'multiplier',
         'OPTION_MULTIPLIER_UNSUPPORTED',
-        `Tradr represents only 100-share option contracts; row ${sourceRow} declares a multiplier of ${values.multiplier}.`,
+        `Jurnal ZITN represents only 100-share option contracts; row ${sourceRow} declares a multiplier of ${values.multiplier}.`,
       );
     }
 
@@ -252,7 +252,7 @@ export function resolveContracts(rows: NormalizedRow[], opts: ContractOptions): 
           push(
             'descriptor',
             'OPTION_MULTIPLIER_UNSUPPORTED',
-            `Row ${sourceRow} · descriptor "${values.descriptor}" is a mini (non-100-share) contract, which Tradr does not represent.`,
+            `Row ${sourceRow} · descriptor "${values.descriptor}" is a mini (non-100-share) contract, which Jurnal ZITN does not represent.`,
           );
         } else {
           push(

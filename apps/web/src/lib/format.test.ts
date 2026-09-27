@@ -11,11 +11,15 @@ import {
   formatSigned,
   moneyDirection,
 } from './format';
+import { setAppLocale } from './locale';
+
+// Suite ini mengunci format id-ID (default produk); setup uji memakai `en`.
+setAppLocale('id');
 
 describe('formatCurrency', () => {
-  it('formats USD amounts WITHOUT a trailing currency-code suffix', () => {
+  it('formats USD amounts in id-ID WITHOUT a trailing currency-code suffix', () => {
     const out = formatCurrency(1234.5, 'USD');
-    expect(out).toMatch(/^\$1,234\.50$/);
+    expect(out).toMatch(/^US\$1\.234,50$/);
     // The legacy ` USD` tail was dropped — canonical on-screen money is suffix-less.
     expect(out).not.toMatch(/USD$/);
   });
@@ -49,23 +53,23 @@ describe('formatSigned', () => {
 
   it('forwards Intl options (currency style)', () => {
     const out = formatSigned(1234.5, { style: 'currency', currency: 'USD' });
-    expect(out).toMatch(/^\+\$1,234\.50$/);
+    expect(out).toMatch(/^\+US\$1\.234,50$/);
   });
 });
 
 describe('formatAccounting', () => {
-  it('parenthesizes negative amounts', () => {
-    expect(formatAccounting(-1240, 'USD')).toMatch(/^\(\$?1,240\.00\)$/);
+  it('renders a negative amount (id-ID uses a minus, not parentheses)', () => {
+    expect(formatAccounting(-1240, 'USD')).toMatch(/^-US\$1\.240,00$/);
   });
 
   it('keeps a leading + on gains', () => {
-    expect(formatAccounting(1240, 'USD')).toMatch(/^\+\$1,240\.00$/);
+    expect(formatAccounting(1240, 'USD')).toMatch(/^\+US\$1\.240,00$/);
   });
 
   it('renders zero with no sign or parentheses', () => {
     const out = formatAccounting(0, 'USD');
     expect(out).not.toMatch(/^[(+]/);
-    expect(out).toContain('0.00');
+    expect(out).toContain('0,00');
   });
 });
 
@@ -117,7 +121,7 @@ describe('formatProfitFactor', () => {
 describe('formatMoney', () => {
   it('formats a decimal string as currency WITHOUT the duplicated code suffix', () => {
     const out = formatMoney('1234.50', 'USD');
-    expect(out).toContain('1,234.50');
+    expect(out).toContain('1.234,50');
     // Must NOT double-print the currency code — regression guard for review finding.
     expect(out).not.toMatch(/USD$/);
   });
@@ -136,34 +140,34 @@ describe('formatMoney', () => {
 describe('formatRelativeTime', () => {
   const now = new Date('2026-05-27T12:00:00Z');
 
-  it('returns "just now" for diffs under 60s', () => {
+  it('returns "baru saja" for diffs under 60s', () => {
     const then = new Date(now.getTime() - 30 * 1000).toISOString();
-    expect(formatRelativeTime(then, now)).toBe('just now');
+    expect(formatRelativeTime(then, now)).toBe('baru saja');
   });
 
-  it('returns "5m ago" at the 5-minute boundary', () => {
+  it('returns "5 mnt lalu" at the 5-minute boundary', () => {
     const then = new Date(now.getTime() - 5 * 60 * 1000).toISOString();
-    expect(formatRelativeTime(then, now)).toBe('5m ago');
+    expect(formatRelativeTime(then, now)).toBe('5 mnt lalu');
   });
 
-  it('returns "5h ago" at the 5-hour boundary', () => {
+  it('returns "5 jam lalu" at the 5-hour boundary', () => {
     const then = new Date(now.getTime() - 5 * 3600 * 1000).toISOString();
-    expect(formatRelativeTime(then, now)).toBe('5h ago');
+    expect(formatRelativeTime(then, now)).toBe('5 jam lalu');
   });
 
-  it('returns "yesterday" at the 25-hour boundary', () => {
+  it('returns "kemarin" at the 25-hour boundary', () => {
     const then = new Date(now.getTime() - 25 * 3600 * 1000).toISOString();
-    expect(formatRelativeTime(then, now)).toBe('yesterday');
+    expect(formatRelativeTime(then, now)).toBe('kemarin');
   });
 
-  it('returns "3d ago" at the 3-day boundary', () => {
+  it('returns "3 hari lalu" at the 3-day boundary', () => {
     const then = new Date(now.getTime() - 3 * 86_400 * 1000).toISOString();
-    expect(formatRelativeTime(then, now)).toBe('3d ago');
+    expect(formatRelativeTime(then, now)).toBe('3 hari lalu');
   });
 
-  it('returns an absolute "Mon D" date for diffs older than 7 days', () => {
+  it('returns an id-ID "D Mon" date for diffs older than 7 days', () => {
     const then = new Date(now.getTime() - 8 * 86_400 * 1000).toISOString();
-    expect(formatRelativeTime(then, now)).toMatch(/^[A-Z][a-z]{2} \d{1,2}$/);
+    expect(formatRelativeTime(then, now)).toMatch(/^\d{1,2} [A-Z][a-z]+$/);
   });
 
   it('returns an empty string for invalid or empty input', () => {
@@ -171,8 +175,8 @@ describe('formatRelativeTime', () => {
     expect(formatRelativeTime('', now)).toBe('');
   });
 
-  it('clamps future timestamps to "just now"', () => {
+  it('clamps future timestamps to "baru saja"', () => {
     const then = new Date(now.getTime() + 30 * 1000).toISOString();
-    expect(formatRelativeTime(then, now)).toBe('just now');
+    expect(formatRelativeTime(then, now)).toBe('baru saja');
   });
 });

@@ -1,4 +1,4 @@
-import type { PositionListItem } from '@tradr/shared';
+import type { PositionListItem } from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import { Alert } from '@/components/ui/alert';

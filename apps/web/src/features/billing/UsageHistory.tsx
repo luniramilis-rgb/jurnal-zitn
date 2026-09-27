@@ -4,7 +4,7 @@
 // debit entries with their per-turn usage detail (provider/model/tokens) when
 // joined. Credits are shown as a credit COUNT (never labeled displayCurrency).
 
-import type { WalletHistoryItem } from '@tradr/shared';
+import type { WalletHistoryItem } from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import { Button } from '@/components/ui/button';

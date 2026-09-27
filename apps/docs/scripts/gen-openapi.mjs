@@ -6,7 +6,7 @@
 // colocated with every route in `apps/api/src/features/**/*.route.ts`, governed by
 // the CLAUDE.md rule "when adding/modifying API endpoints, keep their Swagger
 // definition up to date". This script assembles those blocks into one OpenAPI
-// document with `swagger-jsdoc` and writes it to `src/openapi/tradr-api.json`,
+// document with `swagger-jsdoc` and writes it to `src/openapi/jurnal-zitn-api.json`,
 // which `starlight-openapi` renders as native /docs pages (astro.config.mjs).
 //
 // It reads apps/api and does NOT modify it (no route, no runtime, no
@@ -20,7 +20,7 @@
 // non-empty `git diff`, so a route change that skips the `@swagger` block is
 // caught in the same PR (.github/workflows/ci.yml).
 //
-//   Regenerate:  pnpm --filter @tradr/docs openapi:generate
+//   Regenerate:  pnpm --filter @jurnal-zitn/docs openapi:generate
 //                (or, from apps/docs:  node scripts/gen-openapi.mjs)
 
 import { mkdirSync, writeFileSync } from 'node:fs';
@@ -36,7 +36,7 @@ const require = createRequire(import.meta.url);
 // apps/docs/scripts -> apps/api
 const apiRoot = resolve(scriptDir, '../../api');
 const apiPkg = require(resolve(apiRoot, 'package.json'));
-const outFile = resolve(scriptDir, '../src/openapi/tradr-api.json');
+const outFile = resolve(scriptDir, '../src/openapi/jurnal-zitn-api.json');
 
 const spec = swaggerJSDoc({
   // Throw on a `@swagger` block that does not parse. Without this, swagger-jsdoc
@@ -48,10 +48,10 @@ const spec = swaggerJSDoc({
   definition: {
     openapi: '3.0.3',
     info: {
-      title: 'Tradr API',
+      title: 'Jurnal ZITN API',
       version: apiPkg.version ?? '0.0.0',
       description:
-        'HTTP API for Tradr — the open-source trading journal.\n\n' +
+        'HTTP API for Jurnal ZITN — the open-source trading journal.\n\n' +
         'This reference is generated from the `@swagger` JSDoc blocks that live next to ' +
         'each route in the API source, so it always matches the endpoints the app actually ' +
         'serves. All routes are mounted under `/api`. The same API backs both the hosted ' +

@@ -1,5 +1,5 @@
 # Keep the build context slim. The API bundle is produced in-builder and
-# inlines @tradr/* workspace source, so we must NOT exclude apps/*/src,
+# inlines @jurnal-zitn/* workspace source, so we must NOT exclude apps/*/src,
 # packages/shared, or pnpm-lock.yaml.
 
 .env

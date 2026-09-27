@@ -24,7 +24,7 @@ import { Check, Info } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import type { AdminUserListItem } from '@tradr/shared/schemas/admin';
+import type { AdminUserListItem } from '@jurnal-zitn/shared/schemas/admin';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

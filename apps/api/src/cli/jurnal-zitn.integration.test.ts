@@ -1,11 +1,11 @@
 /**
- * Integration tests for `tradr migrate --status` against a real Postgres.
+ * Integration tests for `jurnal-zitn migrate --status` against a real Postgres.
  *
  * These tests follow the repo's real-Postgres pattern (dedicated `max:1`
  * connections, scratch databases for destructive/never-migrated cases) rather
  * than the per-test transaction-rollback harness in `src/test-setup.ts`:
  *   - the never-migrated case needs a DB with NO drizzle table, which the
- *     shared `tradr_test` DB (already migrated by the setup file) cannot offer;
+ *     shared `jurnal_zitn_test` DB (already migrated by the setup file) cannot offer;
  *   - the cross-session lock case REQUIRES two distinct connections, so a
  *     single shared transaction is unusable;
  *   - advisory locks and `to_regclass` are not transactional in a way the
@@ -32,7 +32,7 @@ import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import postgres from 'postgres';
 import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 
-import { PASSWORD_MAX_LENGTH } from '@tradr/shared';
+import { PASSWORD_MAX_LENGTH } from '@jurnal-zitn/shared';
 
 import * as dbModule from '@/db';
 import { MIGRATIONS_LOCK_KEY, POST_MIGRATIONS_LOCK_KEY } from '@/db/migrate';
@@ -40,13 +40,13 @@ import * as schema from '@/db/schema';
 import { loginUser } from '@/features/auth/auth.service';
 import { config } from '@/lib/config';
 
-import { createUser, gatherStatus, resetPassword, runCreateUser } from './tradr';
+import { createUser, gatherStatus, resetPassword, runCreateUser } from './jurnal-zitn';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const MIGRATIONS_FOLDER = path.resolve(__dirname, '../db/migrations');
 
 const BASE_URL =
-  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/tradr_test';
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test';
 const ADMIN_URL = BASE_URL.replace(/\/[^/]+$/, '/postgres');
 const BASE_NO_DB = BASE_URL.replace(/\/[^/]+$/, '');
 
@@ -86,7 +86,7 @@ async function applyStandardMigrations(url: string): Promise<void> {
 }
 
 describe('Req 6.3 — never-migrated DB is reported all-pending and stays untouched (read-only)', () => {
-  const DB = `tradr_test_cli_never_${Date.now()}`;
+  const DB = `jurnal_zitn_test_cli_never_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -134,7 +134,7 @@ describe('Req 6.3 — never-migrated DB is reported all-pending and stays untouc
 });
 
 describe('Req 6.4 — a fully migrated DB reports exit 0', () => {
-  const DB = `tradr_test_cli_migrated_${Date.now()}`;
+  const DB = `jurnal_zitn_test_cli_migrated_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -182,7 +182,7 @@ describe('Req 6.4 — a fully migrated DB reports exit 0', () => {
 });
 
 describe('Req 7.5 — SKIP_POST_MIGRATIONS leaves the post track reported pending', () => {
-  const DB = `tradr_test_cli_skippost_${Date.now()}`;
+  const DB = `jurnal_zitn_test_cli_skippost_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -217,7 +217,7 @@ describe('Req 7.5 — SKIP_POST_MIGRATIONS leaves the post track reported pendin
 });
 
 describe('REQ-8 — reset-password directly sets a bcrypt hash that authenticates', () => {
-  const DB = `tradr_test_cli_resetpw_${Date.now()}`;
+  const DB = `jurnal_zitn_test_cli_resetpw_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -261,7 +261,7 @@ describe('REQ-8 — reset-password directly sets a bcrypt hash that authenticate
 });
 
 describe('REQ-4.4 / D15 — reset-password atomically invalidates outstanding reset tokens', () => {
-  const DB = `tradr_test_cli_resettok_${Date.now()}`;
+  const DB = `jurnal_zitn_test_cli_resettok_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -377,7 +377,7 @@ describe('REQ-4.4 / D15 — reset-password atomically invalidates outstanding re
 });
 
 describe('Req 6.8 — cross-session advisory-lock detection (connection A holds, connection B observes)', () => {
-  const DB = `tradr_test_cli_locks_${Date.now()}`;
+  const DB = `jurnal_zitn_test_cli_locks_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -461,7 +461,7 @@ describe('Req 6.8 — cross-session advisory-lock detection (connection A holds,
 });
 
 describe('REQ-8.3 — create-user makes an account that logs in through the real auth path', () => {
-  const DB = `tradr_test_cli_createuser_${Date.now()}`;
+  const DB = `jurnal_zitn_test_cli_createuser_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {
@@ -609,7 +609,7 @@ describe('REQ-8.3 — create-user makes an account that logs in through the real
  * the same lockout with a louder message.
  */
 describe('REQ-8.3 — create-user refuses a password the login path would reject', () => {
-  const DB = `tradr_test_cli_pwbounds_${Date.now()}`;
+  const DB = `jurnal_zitn_test_cli_pwbounds_${Date.now()}`;
   let url: string;
 
   beforeAll(async () => {

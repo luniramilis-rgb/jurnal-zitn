@@ -1,6 +1,6 @@
 import { and, eq, inArray, isNotNull, lte, or, sql } from 'drizzle-orm';
 
-import type { PurgeOutcome } from '@tradr/shared';
+import type { PurgeOutcome } from '@jurnal-zitn/shared';
 
 import type { Database, Transaction } from '@/db';
 import { accountDeletions, accountDeletionSchedules, adminAuditLog, users } from '@/db/schema';

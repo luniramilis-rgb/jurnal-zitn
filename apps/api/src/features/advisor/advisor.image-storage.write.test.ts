@@ -25,7 +25,7 @@ import { and, eq } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { CanonicalMessage, ProviderModel } from '@tradr/shared';
+import type { CanonicalMessage, ProviderModel } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import {

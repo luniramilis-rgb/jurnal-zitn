@@ -4,7 +4,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { createElement, type ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { Persona } from '@tradr/shared/schemas/advisor';
+import type { Persona } from '@jurnal-zitn/shared/schemas/advisor';
 
 import { api } from '@/lib/api';
 

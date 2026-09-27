@@ -6,7 +6,7 @@
  * guard, and the conditional `prepare:false` are asserted directly.
  *   - `resolveMigrationUrl`  — migration connection routing + fail-loud guard
  *   - `poolerDriverOptions`  — app-pool `prepare:false` only when the flag is on
- *   - `statusConnectionArgs` — `tradr migrate --status` pooler-safe routing
+ *   - `statusConnectionArgs` — `jurnal-zitn migrate --status` pooler-safe routing
  *
  * Plus a driver-level check that the constructed `postgres` client reflects the
  * gate at `sql.options.prepare` (the key must be OMITTED — not `undefined` —
@@ -15,7 +15,7 @@
 import postgres from 'postgres';
 import { describe, it, expect } from 'vitest';
 
-import { statusConnectionArgs } from '@/cli/tradr';
+import { statusConnectionArgs } from '@/cli/jurnal-zitn';
 import { poolerDriverOptions } from '@/db';
 import { resolveMigrationUrl } from '@/db/migrate';
 
@@ -80,7 +80,7 @@ describe('app-pool driver prepare mode (REQ-9.2/1.2, driver-level)', () => {
   });
 });
 
-describe('statusConnectionArgs — pooler-safe `tradr migrate --status` (SF-5)', () => {
+describe('statusConnectionArgs — pooler-safe `jurnal-zitn migrate --status` (SF-5)', () => {
   it('routes over DIRECT when set, DATABASE_URL when unset', () => {
     expect(statusConnectionArgs(DIRECT, POOLED).url).toBe(DIRECT);
     expect(statusConnectionArgs(undefined, POOLED).url).toBe(POOLED);

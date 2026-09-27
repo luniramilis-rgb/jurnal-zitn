@@ -2,7 +2,7 @@ import Decimal from 'decimal.js';
 import { sql } from 'drizzle-orm';
 import { describe, it, expect } from 'vitest';
 
-import { PerformanceResponseSchema, type PerformanceQueryInput } from '@tradr/shared';
+import { PerformanceResponseSchema, type PerformanceQueryInput } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { accounts, fills, positions, users } from '@/db/schema';

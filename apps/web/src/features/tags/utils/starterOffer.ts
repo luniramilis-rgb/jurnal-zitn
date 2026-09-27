@@ -1,4 +1,4 @@
-import { STARTER_TAGS, TAG_CATEGORIES, type TagCategory } from '@tradr/shared';
+import { STARTER_TAGS, TAG_CATEGORIES, type TagCategory } from '@jurnal-zitn/shared';
 
 // The starter offer state (design Component 14; REQ-5 truth table). One pure
 // decision the picker (REQ-4.4) and the Settings tab (REQ-5.5/5.6) both read,

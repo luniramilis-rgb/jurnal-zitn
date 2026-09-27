@@ -44,7 +44,7 @@ export function AuthScreen({ children }: { children: ReactNode }) {
             <span aria-hidden="true" className="text-sm text-primary">
               ▴
             </span>
-            Tradr
+            Jurnal ZITN
           </p>
           <p className="font-mono text-xs text-muted-foreground">the open-source trading journal</p>
         </div>

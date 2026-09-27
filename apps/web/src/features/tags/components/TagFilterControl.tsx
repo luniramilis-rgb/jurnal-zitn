@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Fragment } from 'react';
 
-import { TAG_CATEGORIES, TAG_CATEGORY_LABELS, type TagWithCount } from '@tradr/shared';
+import { TAG_CATEGORIES, TAG_CATEGORY_LABELS, type TagWithCount } from '@jurnal-zitn/shared';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

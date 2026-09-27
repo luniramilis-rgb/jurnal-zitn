@@ -1,16 +1,16 @@
-# Tradr in-repo documentation
+# Jurnal ZITN in-repo documentation
 
-References that live with the code. A change to how Tradr is built, configured, or
+References that live with the code. A change to how Jurnal ZITN is built, configured, or
 operated lands in the same pull request as the change itself.
 
 The polished, task-oriented documentation is on the docs site:
 **[User guide](https://docs.tradr.cloud/user-guide/getting-started/)** ·
 **[Self-hosting](https://docs.tradr.cloud/self-hosting/docker-compose/)**.
-Start there if you want to _use_ or _install_ Tradr. Start here if you want to know
+Start there if you want to _use_ or _install_ Jurnal ZITN. Start here if you want to know
 how something works, or what it promises.
 
 That site is built from [`apps/docs`](../apps/docs) in this repository, so a doc fix
-is an ordinary pull request. Run it locally with `pnpm --filter @tradr/docs dev`.
+is an ordinary pull request. Run it locally with `pnpm --filter @jurnal-zitn/docs dev`.
 
 ## For operators
 
@@ -18,7 +18,7 @@ is an ordinary pull request. Run it locally with `pnpm --filter @tradr/docs dev`
 | -------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | [`versioning.md`](versioning.md)                   | Can I pull the new image and restart without reading anything first? What counts as a breaking change, and when to pin a tag.                                    |
 | [`external-services.md`](external-services.md)     | What does a running instance talk to over the network, and which setting turns each connection on? (Nothing, by default.)                                        |
-| [`analytics.md`](analytics.md)                     | What does Tradr capture if I enable PostHog, and what does it deliberately never capture? Off unless you set a key.                                              |
+| [`analytics.md`](analytics.md)                     | What does Jurnal ZITN capture if I enable PostHog, and what does it deliberately never capture? Off unless you set a key.                                        |
 | [`runbooks/deployment.md`](runbooks/deployment.md) | Day-two operations: health and migration status, upgrades, backups, the coupled timeout/upload settings, and diagnosing an `ENCRYPTION_KEY` mismatch crash-loop. |
 
 First-time install is not here — it is [`../docker/quickstart.sh`](../docker/quickstart.sh)

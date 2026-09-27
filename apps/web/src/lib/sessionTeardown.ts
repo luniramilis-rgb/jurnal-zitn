@@ -22,7 +22,7 @@ import { eventBus } from '@/stores/event-bus.store';
  * Three kinds of state, because clearing the query cache only reaches the
  * first:
  *  - SERVER state — the query cache, `['auth','me']` among it.
- *  - STORED state — `tradr_drawer_state` in localStorage, which is global
+ *  - STORED state — `jurnal_zitn_drawer_state` in localStorage, which is global
  *    rather than per-user, AND the live `useDrawerStore` it seeded. Both, or
  *    neither: the store hydrates from that key once at module import, and a
  *    login is a client-side navigation rather than a page load, so dropping the

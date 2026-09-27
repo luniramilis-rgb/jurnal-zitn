@@ -1,4 +1,4 @@
-# Tradr
+# Jurnal ZITN
 
 Self-hostable trading journal and analysis platform.
 

@@ -11,7 +11,7 @@ import starlightLinksValidator from 'starlight-links-validator';
 import starlightOpenAPI, { createOpenAPISidebarGroup } from 'starlight-openapi';
 import sitemap from '@astrojs/sitemap';
 
-// The Tradr documentation site. It lives in the product repo, next to the code
+// The Jurnal ZITN documentation site. It lives in the product repo, next to the code
 // it documents, so a doc change ships in the same PR as the change it describes
 // and one CI run gates both.
 //
@@ -98,18 +98,18 @@ export default defineConfig({
   image: { service: passthroughImageService() },
   vite: {
     define: {
-      __TRADR_VERSION__: JSON.stringify(APP_VERSION),
+      __JURNAL_ZITN_VERSION__: JSON.stringify(APP_VERSION),
     },
   },
   integrations: [
     starlight({
-      title: 'Tradr docs',
+      title: 'Jurnal ZITN docs',
       description:
-        'Documentation for Tradr — the open-source trading journal. User guide for the hosted app plus self-hosting and development guides.',
+        'Documentation for Jurnal ZITN — the open-source trading journal. User guide for the hosted app plus self-hosting and development guides.',
       pagefind: true,
       // Says which version these pages describe, on every page. Starlight 0.41
       // has no site-wide banner option, so this overrides the per-page one —
-      // see the component for why. SiteTitle renders the `▴ Tradr docs`
+      // see the component for why. SiteTitle renders the `▴ Jurnal ZITN docs`
       // wordmark, whose three differently-styled parts CSS cannot carve out of
       // the default single-text-node title.
       components: {
@@ -138,7 +138,7 @@ export default defineConfig({
         starlightOpenAPI([
           {
             base: 'self-hosting/reference/api',
-            schema: './src/openapi/tradr-api.json',
+            schema: './src/openapi/jurnal-zitn-api.json',
             sidebar: {
               label: 'API reference',
               collapsed: true,
@@ -200,7 +200,7 @@ export default defineConfig({
               label: 'Operational metrics (Prometheus)',
               slug: 'self-hosting/reference/operational-metrics',
             },
-            { label: 'CLI reference (tradr)', slug: 'self-hosting/reference/cli' },
+            { label: 'CLI reference (jurnal-zitn)', slug: 'self-hosting/reference/cli' },
             openAPISidebarGroup,
           ],
         },

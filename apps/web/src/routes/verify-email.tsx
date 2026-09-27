@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { AuthScreen } from '@/components/layout/AuthScreen';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useT } from '@/hooks/useLocale';
 import { api } from '@/lib/api';
 
 // SF-3: this page is public and MUST NOT call useAuth() or mount the
@@ -26,6 +27,7 @@ function readTokenFromHash(): string {
 }
 
 function VerifyEmailPage() {
+  const t = useT();
   const [token] = useState(readTokenFromHash);
   const [state, setState] = useState<'idle' | 'success' | 'expired'>('idle');
   const [apiError, setApiError] = useState('');
@@ -45,9 +47,9 @@ function VerifyEmailPage() {
       if (code === 'INVALID_OR_EXPIRED_TOKEN') {
         setState('expired');
       } else if (code === 'RATE_LIMITED') {
-        setApiError('Too many requests — try again later.');
+        setApiError(t('auth.error.rateLimited'));
       } else {
-        setApiError('Something went wrong. Please try again.');
+        setApiError(t('auth.error.generic'));
       }
     } finally {
       setIsSubmitting(false);
@@ -58,15 +60,14 @@ function VerifyEmailPage() {
     <AuthScreen>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Verify your email</CardTitle>
+          <CardTitle>{t('auth.verify.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           {!token && (
             <p className="text-sm text-muted-foreground">
-              This link is missing its verification token. Open the link from your email again, or
-              resend a verification email from your{' '}
+              {t('auth.verify.missingToken')} {t('auth.verify.resendPrefix')}{' '}
               <Link to="/settings/account" className="underline">
-                account settings
+                {t('auth.verify.accountSettings')}
               </Link>
               .
             </p>
@@ -74,10 +75,10 @@ function VerifyEmailPage() {
 
           {token && state === 'success' && (
             <>
-              <p className="text-sm text-muted-foreground">Email verified.</p>
+              <p className="text-sm text-muted-foreground">{t('auth.verify.success')}</p>
               <p className="mt-4 text-center text-sm text-muted-foreground">
                 <Link to="/dashboard" className="underline">
-                  Go to dashboard
+                  {t('auth.verify.goDashboard')}
                 </Link>
               </p>
             </>
@@ -85,9 +86,9 @@ function VerifyEmailPage() {
 
           {token && state === 'expired' && (
             <p className="text-sm text-muted-foreground">
-              This link is invalid or has expired. You can resend a verification email from your{' '}
+              {t('auth.link.expired')} {t('auth.verify.resendPrefix')}{' '}
               <Link to="/settings/account" className="underline">
-                account settings
+                {t('auth.verify.accountSettings')}
               </Link>
               .
             </p>
@@ -103,7 +104,7 @@ function VerifyEmailPage() {
                 disabled={isSubmitting}
                 onClick={onVerify}
               >
-                {isSubmitting ? 'Verifying...' : 'Verify my email'}
+                {isSubmitting ? t('auth.verify.submitting') : t('auth.verify.submit')}
               </Button>
             </>
           )}

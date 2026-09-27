@@ -159,11 +159,11 @@ test.describe('changelog', () => {
     await expect(links).toHaveCount(2);
     await expect(links.nth(0)).toHaveAttribute(
       'href',
-      'https://github.com/e2e-fixtures/tradr-changelog/releases/tag/v0.2.0',
+      'https://github.com/e2e-fixtures/jurnal-zitn-changelog/releases/tag/v0.2.0',
     );
     await expect(links.nth(1)).toHaveAttribute(
       'href',
-      'https://github.com/e2e-fixtures/tradr-changelog/releases/tag/v0.1.0',
+      'https://github.com/e2e-fixtures/jurnal-zitn-changelog/releases/tag/v0.1.0',
     );
     await expect(links.nth(0)).toHaveAttribute('target', '_blank');
   });

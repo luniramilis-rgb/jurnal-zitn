@@ -3,10 +3,13 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, screen, fireEvent, waitFor, cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
-import type { DashboardLayoutResponse, WidgetPlacement } from '@tradr/shared';
+
+import { setAppLocale } from '@/lib/locale';
+import type { DashboardLayoutResponse, WidgetPlacement } from '@jurnal-zitn/shared';
 import type { GridItemHTMLElement } from 'gridstack';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+setAppLocale('en');
 
 // ---- Mocks ----------------------------------------------------------------
 
@@ -29,8 +32,8 @@ vi.mock('sonner', () => ({
 }));
 
 // uuidv5Batch — case 5 asserts it's called and its output zipped into placements.
-vi.mock('@tradr/shared', async () => {
-  const actual = await vi.importActual<typeof import('@tradr/shared')>('@tradr/shared');
+vi.mock('@jurnal-zitn/shared', async () => {
+  const actual = await vi.importActual<typeof import('@jurnal-zitn/shared')>('@jurnal-zitn/shared');
   return {
     ...actual,
     uuidv5Batch: vi.fn(async (names: string[]) =>
@@ -94,8 +97,8 @@ vi.mock('@/features/accounts/components/AccountDialog', () => ({
 }));
 
 import { toast } from 'sonner';
-import { uuidv5Batch, DEFAULT_WIDGETS } from '@tradr/shared';
-import type { OnboardingState, OnboardingStatus } from '@tradr/shared';
+import { uuidv5Batch, DEFAULT_WIDGETS } from '@jurnal-zitn/shared';
+import type { OnboardingState, OnboardingStatus } from '@jurnal-zitn/shared';
 import { TooltipProvider } from '@/components/ui/tooltip';
 import type { UseOnboardingResult } from '@/features/onboarding/hooks/useOnboarding';
 import { deriveChecklist } from '@/features/onboarding/lib/derive-checklist';

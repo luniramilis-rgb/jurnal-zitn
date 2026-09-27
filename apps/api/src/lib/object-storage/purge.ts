@@ -7,7 +7,7 @@
  * to finish. A null store — object storage unconfigured, self-host parity — is
  * `not_applicable`: there is nothing to purge.
  */
-import type { PurgeOutcome } from '@tradr/shared';
+import type { PurgeOutcome } from '@jurnal-zitn/shared';
 
 import { logger } from '../logger';
 

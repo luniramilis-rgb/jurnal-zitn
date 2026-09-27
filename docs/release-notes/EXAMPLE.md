@@ -7,12 +7,12 @@ reference for what a completed docs/release-notes/vX.Y.Z.md should look like.
 
 Defensible cost basis, and a CSV importer for the brokers that don't have an API.
 
-Tradr v0.9.0 focuses on getting historical trades into the ledger accurately, however they were made. It adds configurable cost-basis accounting, a CSV importer for brokerages without a direct API integration, and a new dashboard widget for reviewing realized P&L by strategy. This release also closes two edges of the ledger reconciliation logic reported since v0.8.0's onboarding and options work landed, both involving same-day round trips being counted twice under certain fee-timing conditions.
+Jurnal ZITN v0.9.0 focuses on getting historical trades into the ledger accurately, however they were made. It adds configurable cost-basis accounting, a CSV importer for brokerages without a direct API integration, and a new dashboard widget for reviewing realized P&L by strategy. This release also closes two edges of the ledger reconciliation logic reported since v0.8.0's onboarding and options work landed, both involving same-day round trips being counted twice under certain fee-timing conditions.
 
 ## Highlights
 
 - Cost-basis method (FIFO, LIFO, or specific-lot) is now configurable per account in Settings → Accounts, and is applied retroactively to realized P&L on every account, not just new fills.
-- CSV import is available for brokerages without an API integration. Map your export's columns once and Tradr will de-duplicate against any fills already synced through a connected broker, so linking a CSV import to an existing API-synced account is safe.
+- CSV import is available for brokerages without an API integration. Map your export's columns once and Jurnal ZITN will de-duplicate against any fills already synced through a connected broker, so linking a CSV import to an existing API-synced account is safe.
 - A new "Realized P&L by Strategy" dashboard widget groups closed trades by the tag assigned at entry, so a swing-trading and a scalping book kept in the same account can be evaluated separately.
 - Same-day round trips (a contract bought and sold within the same session) no longer double-count in the realized P&L ledger — the underlying issue was a fee applied before the closing fill was fully reconciled.
 - Options expiry dates are now resolved in the contract's listed timezone rather than the server's, which had been shifting some Friday expiries to Thursday for accounts running outside US market hours.

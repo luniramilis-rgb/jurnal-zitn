@@ -4,7 +4,7 @@
 -- the reasoning that '{}' parses to status 'pending' and 'pending' is "exactly
 -- where a brand-new user is". That is true of a brand-new user and false of
 -- everyone else: the fast default put EVERY pre-existing row at 'pending' too,
--- including people who have been trading in Tradr for years.
+-- including people who have been trading in Jurnal ZITN for years.
 --
 -- It matters because 'pending' is what the zero-state gate keys on. The
 -- zero-state must not reappear for a returning user who deletes their last
@@ -13,7 +13,7 @@
 -- reached by completing all four checklist items, and item 2 needs
 -- `calculatorFirstUsedAt`, which nothing wrote before this feature existed. So
 -- without this backfill a user with years of history who deletes their last
--- account is shown "Welcome to Tradr". This is the one-time correction.
+-- account is shown "Welcome to Jurnal ZITN". This is the one-time correction.
 --
 -- WHY A MIGRATION AND NOT A READ-TIME DERIVATION. The alternative — resolving
 -- 'pending' to 'done' on every GET /users/me/onboarding when the user has

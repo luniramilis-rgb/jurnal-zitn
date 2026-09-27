@@ -11,7 +11,7 @@ import {
   jsonb,
 } from 'drizzle-orm/pg-core';
 
-import type { StoredOnboardingState } from '@tradr/shared';
+import type { StoredOnboardingState } from '@jurnal-zitn/shared';
 
 export const users = pgTable(
   'users',
@@ -19,6 +19,10 @@ export const users = pgTable(
     id: uuid('id').primaryKey().defaultRandom(),
     email: varchar('email', { length: 255 }).notNull().unique(),
     passwordHash: varchar('password_hash', { length: 255 }).notNull(),
+    // Stable external identity from ZITN (SSO bridge, ZITN-TECH-017). NULL for accounts
+    // created through email/password. Unique so one ZITN user maps to exactly one journal
+    // account; email is only a fallback link and may change on the ZITN side.
+    zitnUserId: varchar('zitn_user_id', { length: 64 }).unique(),
     isAdmin: boolean('is_admin').notNull().default(false),
     // Default TRUE = the REQ-6.1 grandfathering (PostgreSQL fast-default backfills all
     // existing rows as verified, D10). Registration always writes the value explicitly.
@@ -35,6 +39,9 @@ export const users = pgTable(
     // is decided by resolveTimezone, and a hardcoded list would reject legitimate
     // Etc/* zones.
     timezone: varchar('timezone', { length: 64 }),
+    // Preferensi bahasa UI (ZITN-TECH-017 A0: 'id' | 'en'). NULL pada baris lama →
+    // diresolve ke DEFAULT_LOCALE ('id') saat dibaca; validitas dijaga skema Zod.
+    locale: varchar('locale', { length: 5 }),
     taxJurisdiction: varchar('tax_jurisdiction', { length: 8 }),
     theme: varchar('theme', { length: 8 }).notNull().default('system'),
     // Which account figure the position-sizing calculator's buying-power cap is
@@ -80,7 +87,7 @@ export const users = pgTable(
   (t) => [
     check(
       'users_tax_jurisdiction_chk',
-      sql`${t.taxJurisdiction} IS NULL OR ${t.taxJurisdiction} IN ('US', 'CA', 'other')`,
+      sql`${t.taxJurisdiction} IS NULL OR ${t.taxJurisdiction} IN ('US', 'CA', 'ID', 'other')`,
     ),
     check('users_theme_chk', sql`${t.theme} IN ('light','dark','system')`),
     check('users_buying_power_basis_chk', sql`${t.buyingPowerBasis} IN ('cash','balance')`),

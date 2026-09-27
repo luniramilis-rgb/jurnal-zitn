@@ -66,7 +66,6 @@ vi.mock('@/lib/updateMonitor', () => ({
   getUpdateMonitor: () => monitorState.monitor,
 }));
 
-
 import { UPDATE_TOAST_ID, UpdatePrompt } from './UpdatePrompt';
 
 // ---------------------------------------------------------------------------
@@ -149,7 +148,7 @@ describe('UpdatePrompt', () => {
     render(<UpdatePrompt />);
 
     expect(toastMock).toHaveBeenCalledTimes(1);
-    expect(toastMock.mock.calls[0][0]).toBe('Tradr has been updated');
+    expect(toastMock.mock.calls[0][0]).toBe('Jurnal ZITN has been updated');
     const opts = toastOpts();
     expect(opts.id).toBe(UPDATE_TOAST_ID);
     expect(opts.duration).toBe(Infinity);

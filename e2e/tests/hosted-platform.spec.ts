@@ -18,7 +18,7 @@ import { expect, test, type APIRequestContext } from '@playwright/test';
  * (REQ-7.3) and the reset-password-email-unconfigured (REQ-8) legs are proved by
  * their real-service integration tests
  * (apps/api/src/middleware/rate-limit.redis-store.test.ts,
- * apps/api/src/cli/tradr.integration.test.ts).
+ * apps/api/src/cli/jurnal-zitn.integration.test.ts).
  */
 
 const PASSWORD = 'test-password-1234';

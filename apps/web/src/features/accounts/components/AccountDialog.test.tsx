@@ -126,7 +126,7 @@ vi.mock('@/lib/telemetry/posthog', () => ({
   captureClientEvent: vi.fn(),
 }));
 
-import type { Account } from '@tradr/shared';
+import type { Account } from '@jurnal-zitn/shared';
 
 import { AccountDialog } from './AccountDialog';
 

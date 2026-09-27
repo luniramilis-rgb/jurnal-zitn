@@ -3,7 +3,7 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Message } from '@tradr/shared/schemas/advisor';
+import type { Message } from '@jurnal-zitn/shared/schemas/advisor';
 
 // eslint-disable-next-line import-x/order -- import-x/order miscounts groups in this file because the component import is intentionally placed after vi.mock() (hoisting).
 import type {
@@ -393,7 +393,7 @@ describe('Transcript', () => {
   });
 
   it('renders an object-pointer image via the proxy, keyed by conversation/message/index, no crossOrigin same-origin', () => {
-    delete window.__TRADR_CONFIG__;
+    delete window.__JURNAL_ZITN_CONFIG__;
     conversationMessages = [
       userPartsMessage('u1', [
         { type: 'text', text: 'chart' },
@@ -410,7 +410,7 @@ describe('Transcript', () => {
   });
 
   it('sets crossOrigin=use-credentials on the proxy image only when the API is cross-origin', () => {
-    window.__TRADR_CONFIG__ = { apiBaseUrl: 'https://api.example.com' };
+    window.__JURNAL_ZITN_CONFIG__ = { apiBaseUrl: 'https://api.example.com' };
     conversationMessages = [
       userPartsMessage('u1', [{ type: 'image', format: 'jpeg', storage: 'object' }]),
     ];
@@ -421,7 +421,7 @@ describe('Transcript', () => {
       'https://api.example.com/advisor/conversations/conv-1/messages/u1/images/0',
     );
     expect(img.getAttribute('crossorigin')).toBe('use-credentials');
-    delete window.__TRADR_CONFIG__;
+    delete window.__JURNAL_ZITN_CONFIG__;
   });
 
   it('renders an unrecoverable image as a non-crashing placeholder, never a broken <img>', () => {
@@ -438,7 +438,7 @@ describe('Transcript', () => {
   });
 
   it('renders a conversation mixing all three image states with no broken img or exception', () => {
-    delete window.__TRADR_CONFIG__;
+    delete window.__JURNAL_ZITN_CONFIG__;
     conversationMessages = [
       userPartsMessage('u1', [
         { type: 'text', text: 'here are three' },

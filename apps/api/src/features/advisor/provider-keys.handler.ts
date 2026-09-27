@@ -12,8 +12,12 @@
 
 import type { Context } from 'hono';
 
-import { ProviderIdSchema, ProviderKeyInputSchema, ProviderKeyPatchSchema } from '@tradr/shared';
-import type { ProviderId, ProviderKeyListItem, ProviderModel } from '@tradr/shared';
+import {
+  ProviderIdSchema,
+  ProviderKeyInputSchema,
+  ProviderKeyPatchSchema,
+} from '@jurnal-zitn/shared';
+import type { ProviderId, ProviderKeyListItem, ProviderModel } from '@jurnal-zitn/shared';
 
 import { encrypt, ENCRYPTION_KEY_VERSION_CURRENT } from '@/lib/encryption';
 import { ValidationError } from '@/lib/errors';

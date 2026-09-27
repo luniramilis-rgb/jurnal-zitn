@@ -44,7 +44,7 @@ async function load(options: { configured: boolean }): Promise<AnalyticsModule> 
   initSpy.mockClear();
 
   if (options.configured) {
-    window.__TRADR_CONFIG__ = { posthogPublicKey: 'phc_test' };
+    window.__JURNAL_ZITN_CONFIG__ = { posthogPublicKey: 'phc_test' };
     const analytics = await import('./analytics');
     const { initPostHogClient } = await import('@/lib/telemetry/posthog');
     await initPostHogClient(idleRouter);
@@ -89,7 +89,7 @@ function captured(): [string, Record<string, unknown>][] {
 }
 
 afterEach(() => {
-  delete window.__TRADR_CONFIG__;
+  delete window.__JURNAL_ZITN_CONFIG__;
 });
 
 // --- nothing configured, nothing emitted ------------------------------------

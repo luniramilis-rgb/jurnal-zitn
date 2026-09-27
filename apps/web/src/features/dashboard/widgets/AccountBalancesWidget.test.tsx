@@ -10,13 +10,15 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Account } from '@tradr/shared';
+import type { Account } from '@jurnal-zitn/shared';
 
 import { useDashboardTotalQuery } from '@/features/accounting/hooks/useDashboardTotal';
 import { useMissingRatePrompt } from '@/features/accounting/hooks/useMissingRatePrompt';
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
+import { setAppLocale } from '@/lib/locale';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+setAppLocale('en');
 
 vi.mock('@/features/accounts/hooks/useAccounts', () => ({
   useAccounts: vi.fn(),

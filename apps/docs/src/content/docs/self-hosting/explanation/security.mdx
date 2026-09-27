@@ -1,22 +1,22 @@
 ---
 title: Security model
-description: What Tradr protects, how — sessions, password storage, encryption of provider keys, rate limiting, and network exposure — and what it deliberately leaves to you.
+description: What Jurnal ZITN protects, how — sessions, password storage, encryption of provider keys, rate limiting, and network exposure — and what it deliberately leaves to you.
 ---
 
 import SelfHosted from '@/components/SelfHosted.astro';
 
-This page is for someone deciding whether to trust Tradr with their trading
+This page is for someone deciding whether to trust Jurnal ZITN with their trading
 history. It states what the application does, and — more usefully — what it does
 not do and leaves to you.
 
 ## What is at stake
 
-Tradr holds your **trading history**: positions, fills, account balances, and
+Jurnal ZITN holds your **trading history**: positions, fills, account balances, and
 whatever you wrote in your notes. It may also hold **API keys** you have pasted
 in, which can spend money.
 
 It does **not** hold brokerage credentials, and it cannot place orders. There is
-no broker connection — trades arrive by CSV or by hand. A compromised Tradr
+no broker connection — trades arrive by CSV or by hand. A compromised Jurnal ZITN
 instance exposes a record of your trading; it does not expose your brokerage
 account.
 
@@ -109,7 +109,7 @@ instance behaves as a plain journal.
 That is the design rule: a capability you have not configured is **absent, not
 disabled**. It makes no outbound calls and logs no errors.
 
-## What Tradr does not do
+## What Jurnal ZITN does not do
 
 Stated plainly, because a security page that only lists strengths is not useful:
 

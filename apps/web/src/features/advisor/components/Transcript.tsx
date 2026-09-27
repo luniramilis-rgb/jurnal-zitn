@@ -39,7 +39,7 @@ import type {
   Message,
   ResponseMessageContentPart,
   ToolResultPart,
-} from '@tradr/shared/schemas/advisor';
+} from '@jurnal-zitn/shared/schemas/advisor';
 
 import { Button } from '@/components/ui/button';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';

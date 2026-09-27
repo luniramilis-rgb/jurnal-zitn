@@ -46,7 +46,7 @@ export type OnboardingStatus = z.infer<typeof OnboardingStatusSchema>;
 // wire-body schemas in expense.ts / accounting.ts / dashboard.ts that call
 // .strict(). Those guard payloads arriving from a client. This one also parses
 // rows that were WRITTEN by another deployment: a key added by a newer version
-// of Tradr must not make an older one throw on read of its own users table.
+// of Jurnal ZITN must not make an older one throw on read of its own users table.
 // The PATCH body schema is the place to be strict about what a client may send.
 export const OnboardingStateSchema = z.object({
   status: OnboardingStatusSchema.default('pending'),

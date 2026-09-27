@@ -6,7 +6,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import type { BillingConfig, WalletBalance } from '@tradr/shared';
+import type { BillingConfig, WalletBalance } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

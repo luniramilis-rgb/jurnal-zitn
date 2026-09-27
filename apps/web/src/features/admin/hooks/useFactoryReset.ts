@@ -5,7 +5,7 @@ import {
   AdminResetPreviewSchema,
   type AdminResetRequest,
   type AdminResetResult,
-} from '@tradr/shared/schemas/admin';
+} from '@jurnal-zitn/shared/schemas/admin';
 
 import { api } from '@/lib/api';
 

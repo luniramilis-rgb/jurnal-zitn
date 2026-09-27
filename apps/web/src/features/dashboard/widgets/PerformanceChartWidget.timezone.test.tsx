@@ -7,7 +7,7 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { WidgetPlacement } from '@tradr/shared';
+import type { WidgetPlacement } from '@jurnal-zitn/shared';
 
 import { useDisplayCurrencyQuery } from '@/features/accounting/hooks/useDisplayCurrency';
 import { usePerformance } from '@/features/performance/hooks/usePerformance';

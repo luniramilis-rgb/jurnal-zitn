@@ -62,6 +62,18 @@ export function FeeScheduleFields<T extends FieldValues>({
           label="Max Per Fill"
           disabled={disabled}
         />
+        <FeeField
+          control={control}
+          name={'feeSchedule.stockPercentBuy' as Path<T>}
+          label="% Commission (Buy)"
+          disabled={disabled}
+        />
+        <FeeField
+          control={control}
+          name={'feeSchedule.stockPercentSell' as Path<T>}
+          label="% Commission (Sell)"
+          disabled={disabled}
+        />
       </fieldset>
 
       <fieldset className="space-y-3 rounded-md border p-4">

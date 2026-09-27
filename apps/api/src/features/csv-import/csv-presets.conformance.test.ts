@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest';
 
-import { CSV_IMPORT_PRESETS, type CsvPreviewRequest } from '@tradr/shared';
+import { CSV_IMPORT_PRESETS, type CsvPreviewRequest } from '@jurnal-zitn/shared';
 import {
   CSV_IMPORT_SAMPLE_FILES,
   readCsvImportSample,
-} from '@tradr/shared/node/csv-import-samples';
+} from '@jurnal-zitn/shared/node/csv-import-samples';
 
 import { parseCsv } from './csv-parse';
 import { runPipeline } from './csv-pipeline';

@@ -1,4 +1,4 @@
-import type { Granularity, SeriesBucket } from '@tradr/shared';
+import type { Granularity, SeriesBucket } from '@jurnal-zitn/shared';
 
 import { EmptyState } from '@/components/EmptyState';
 import { Numeric } from '@/components/Numeric';

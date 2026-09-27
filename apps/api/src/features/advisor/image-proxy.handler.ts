@@ -12,7 +12,7 @@
 
 import type { Context } from 'hono';
 
-import type { StoredContentPart } from '@tradr/shared';
+import type { StoredContentPart } from '@jurnal-zitn/shared';
 
 import { NotFoundError } from '@/lib/errors';
 import {

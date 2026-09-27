@@ -5,26 +5,26 @@
  * §Testing Strategy ("Migration test").
  *
  * Mirrors `accounting.migration.test.ts`: runs in the `migrations` vitest
- * project against `tradr_test_migrate` (migrations applied, no SAVEPOINT
+ * project against `jurnal_zitn_test_migrate` (migrations applied, no SAVEPOINT
  * wrapping), connects directly like `migrate.test.ts`, and does NOT use
  * `apps/api/src/test-setup.ts`.
  *
  * Tuple sources (`EXPENSE_CATEGORIES`, `CURRENCY_CODES`) are imported from
- * `@tradr/shared` so the assertions stay in sync with the runtime constants
+ * `@jurnal-zitn/shared` so the assertions stay in sync with the runtime constants
  * — the whole point of this test is to catch tuple-vs-CHECK drift.
  */
 import postgres from 'postgres';
 import { describe, it, expect, afterAll, beforeAll } from 'vitest';
 
-import { CURRENCY_CODES } from '@tradr/shared/constants/currencies';
-import { EXPENSE_CATEGORIES } from '@tradr/shared/constants/expense-categories';
+import { CURRENCY_CODES } from '@jurnal-zitn/shared/constants/currencies';
+import { EXPENSE_CATEGORIES } from '@jurnal-zitn/shared/constants/expense-categories';
 
 import { runMigrations, runPostMigrations } from './migrate';
 
 const DATABASE_URL =
   process.env.MIGRATE_TEST_DATABASE_URL ||
   process.env.DATABASE_URL ||
-  'postgresql://postgres:postgres@localhost:5433/tradr_test_migrate';
+  'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test_migrate';
 
 let sql: ReturnType<typeof postgres>;
 
@@ -107,10 +107,10 @@ describe('expenses migration — constraints', () => {
     }
   });
 
-  it('users_tax_jurisdiction_chk lists US, CA, other', async () => {
+  it('users_tax_jurisdiction_chk lists US, CA, ID, other', async () => {
     const def = await getConstraintDef('users_tax_jurisdiction_chk');
     expect(def, 'Expected users_tax_jurisdiction_chk in pg_constraint').not.toBeNull();
-    for (const value of ['US', 'CA', 'other']) {
+    for (const value of ['US', 'CA', 'ID', 'other']) {
       expect(
         def!.includes(`'${value}'`),
         `Expected users_tax_jurisdiction_chk def to contain '${value}'. ` + `Actual:\n  ${def}`,

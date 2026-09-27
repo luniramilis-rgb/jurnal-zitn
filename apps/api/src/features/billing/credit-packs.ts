@@ -1,4 +1,4 @@
-import type { CreditPack } from '@tradr/shared';
+import type { CreditPack } from '@jurnal-zitn/shared';
 
 // Server-authoritative credit-pack catalog (design.md §Component 2, REQ-2.2/2.3).
 //

@@ -10,11 +10,13 @@ import { useEffect, useRef } from 'react';
 import { EmptyState } from '@/components/EmptyState';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useT } from '@/hooks/useLocale';
 
 import { ReleaseCard } from '../components/ReleaseCard';
 import { useChangelogReleases, useMarkChangelogViewed } from '../hooks/useChangelog';
 
 export function ChangelogPage() {
+  const t = useT();
   const releases = useChangelogReleases();
   const { mutate: markViewed } = useMarkChangelogViewed();
 
@@ -54,12 +56,12 @@ export function ChangelogPage() {
         description={
           unavailable
             ? 'We could not reach the release feed. Please check back later.'
-            : 'Something went wrong loading release notes. Please check back later.'
+            : t('changelog.error')
         }
       />
     );
   } else if (releases.data.releases.length === 0) {
-    body = <EmptyState title="No releases yet" />;
+    body = <EmptyState title={t('changelog.empty')} />;
   } else {
     body = (
       <>

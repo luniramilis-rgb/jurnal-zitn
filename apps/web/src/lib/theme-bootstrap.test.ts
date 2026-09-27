@@ -7,11 +7,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { applyBootTheme, INLINE_BOOT_SCRIPT_SOURCE } from './theme-bootstrap';
 
 function setCookie(value: string): void {
-  document.cookie = `tradr_theme=${value}; path=/`;
+  document.cookie = `jurnal_zitn_theme=${value}; path=/`;
 }
 
 function clearCookie(): void {
-  document.cookie = 'tradr_theme=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  document.cookie = 'jurnal_zitn_theme=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
 }
 
 function mockMatchMedia(matches: boolean): void {
@@ -106,8 +106,8 @@ describe('applyBootTheme', () => {
     const indexHtmlPath = path.resolve(__dirname, '../../index.html');
     const html = readFileSync(indexHtmlPath, 'utf8');
 
-    const startSentinel = '<!-- tradr:boot-theme -->';
-    const endSentinel = '<!-- /tradr:boot-theme -->';
+    const startSentinel = '<!-- jurnal-zitn:boot-theme -->';
+    const endSentinel = '<!-- /jurnal-zitn:boot-theme -->';
     const startIdx = html.indexOf(startSentinel);
     const endIdx = html.indexOf(endSentinel);
     expect(startIdx).toBeGreaterThanOrEqual(0);

@@ -210,7 +210,7 @@ describe('bootstrap ordering (partial-order assertions, v4-4)', () => {
 // undecryptable row cannot poison a later canary run.
 async function cleanupHarnessRows(): Promise<void> {
   const databaseUrl =
-    process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/tradr_test';
+    process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test';
   const sql = postgres(databaseUrl, { max: 1 });
   try {
     await sql`DELETE FROM users WHERE email LIKE ${HARNESS_USER_EMAIL_PREFIX + '%'}`;

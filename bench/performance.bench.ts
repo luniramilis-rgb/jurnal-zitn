@@ -6,8 +6,8 @@ import { drizzle } from 'drizzle-orm/postgres-js';
 import postgres from 'postgres';
 import { afterAll, beforeAll, describe, it } from 'vitest';
 
-import type { Granularity, PerformanceQueryInput } from '@tradr/shared';
-import { generateBucketSeries } from '@tradr/shared/lib/performance';
+import type { Granularity, PerformanceQueryInput } from '@jurnal-zitn/shared';
+import { generateBucketSeries } from '@jurnal-zitn/shared/lib/performance';
 
 import { runMigrations, runPostMigrations } from '@/db/migrate';
 import * as schema from '@/db/schema';
@@ -251,7 +251,7 @@ beforeAll(async () => {
   // table doesn't exist until migrations run. Bench-owned reset + migrate +
   // post-migrate runs against the URL the bench config injected into env.
   // Read DATABASE_URL directly from env: the bench config injects it (so the
-  // bench can target tradr_test_migrate without depending on apps/api's
+  // bench can target jurnal_zitn_test_migrate without depending on apps/api's
   // config.ts boot path). No @/lib/config indirection here.
   // eslint-disable-next-line no-restricted-syntax
   benchSql = postgres(process.env.DATABASE_URL!, { max: 5 });

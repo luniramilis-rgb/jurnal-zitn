@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
-import type { LedgerEntry } from '@tradr/shared/schemas/accounting';
+import type { LedgerEntry } from '@jurnal-zitn/shared/schemas/accounting';
 
 import { EmptyState } from '@/components/EmptyState';
 import {
@@ -234,7 +234,7 @@ export function LedgerView({ accountId, currency }: Props) {
             <AlertDialogDescription>
               {deleteTarget && (
                 <>
-                  Tradr adds a reversal entry for{' '}
+                  Jurnal ZITN adds a reversal entry for{' '}
                   {formatMoney(deleteTarget.amount, deleteTarget.currency)} and keeps the original.
                   The balance returns to what it was before this{' '}
                   {cashMovementLabel(deleteTarget.entryType)}.

@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type { BreakdownQueryInput, BreakdownResponse } from '@tradr/shared';
+import type { BreakdownQueryInput, BreakdownResponse } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 import { clearRejectedTimezone, isTimezoneRejected } from '@/lib/invalidTimezone';

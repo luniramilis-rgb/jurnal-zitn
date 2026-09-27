@@ -1,7 +1,10 @@
 import { Hono } from 'hono';
 import { z } from 'zod';
 
-import { CreateBrokerageSchema, UpdateBrokerageSchema } from '@tradr/shared/schemas/brokerage';
+import {
+  CreateBrokerageSchema,
+  UpdateBrokerageSchema,
+} from '@jurnal-zitn/shared/schemas/brokerage';
 
 import { db } from '@/db';
 import { validate } from '@/lib/validation';
@@ -39,7 +42,7 @@ const ParamSchema = z.object({ id: z.string().uuid() });
  *       Authed. Returns the user's own brokerages plus the built-in system
  *       ones, each with its fee schedule. A brokerage is a name and a fee
  *       schedule that accounts and positions reference so commissions are
- *       computed consistently. Tradr does not connect to any broker; nothing
+ *       computed consistently. Jurnal ZITN does not connect to any broker; nothing
  *       here holds credentials.
  *     tags: [Brokerages]
  *     responses:

@@ -13,7 +13,7 @@
 import { Hono } from 'hono';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { MAX_IMAGE_BYTES_DEFAULT } from '@tradr/shared';
+import { MAX_IMAGE_BYTES_DEFAULT } from '@jurnal-zitn/shared';
 
 // eslint-disable-next-line import-x/order -- import-x/order miscounts groups in this file because some imports are intentionally placed after vi.mock() (hoisting); see the matching disable below.
 import { errorHandler } from '@/middleware/error.middleware';

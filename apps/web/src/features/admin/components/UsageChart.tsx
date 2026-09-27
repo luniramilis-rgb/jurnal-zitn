@@ -9,7 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import type { AdminUsage } from '@tradr/shared/schemas/admin';
+import type { AdminUsage } from '@jurnal-zitn/shared/schemas/admin';
 
 import { formatMoney } from '@/lib/format';
 

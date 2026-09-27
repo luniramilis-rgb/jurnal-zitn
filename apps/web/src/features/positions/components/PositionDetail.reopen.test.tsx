@@ -2,7 +2,7 @@
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { PositionDetail } from '@tradr/shared';
+import type { PositionDetail } from '@jurnal-zitn/shared';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 

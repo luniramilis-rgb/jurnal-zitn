@@ -1,7 +1,8 @@
-import type { PositionImage } from '@tradr/shared';
+import type { PositionImage } from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogTitle } from '@/components/ui/dialog';
+import { useT } from '@/hooks/useLocale';
 import { isApiCrossOrigin } from '@/lib/api';
 
 import { positionImageUrl } from '../hooks/usePositionImages';
@@ -43,6 +44,7 @@ export function PositionImageLightbox({
   index,
   onIndexChange,
 }: PositionImageLightboxProps) {
+  const t = useT();
   const open = index !== null;
   const current = open ? images[index] : undefined;
   const total = images.length;
@@ -71,15 +73,15 @@ export function PositionImageLightbox({
       }}
     >
       <DialogContent onKeyDown={handleKeyDown} className="max-w-[95vw] p-2 sm:max-w-[95vw]">
-        <DialogTitle className="sr-only">{`Screenshot ${position} of ${total}`}</DialogTitle>
-        <DialogDescription className="sr-only">
-          Use the arrow keys or the Previous and Next buttons to move between screenshots.
-        </DialogDescription>
+        <DialogTitle className="sr-only">
+          {t('pos.lightbox.title', { n: position, total })}
+        </DialogTitle>
+        <DialogDescription className="sr-only">{t('pos.lightbox.desc')}</DialogDescription>
         {current ? (
           current.unavailable ? (
             <div
               role="img"
-              aria-label="Image no longer available"
+              aria-label={t('pos.lightbox.unavailable')}
               data-testid="image-unavailable"
               className="mx-auto flex h-48 w-64 items-center justify-center rounded-md border border-dashed border-border bg-muted text-xs text-muted-foreground"
             >

@@ -1,12 +1,15 @@
-import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
+﻿import { lazy, type ComponentType, type LazyExoticComponent } from 'react';
 import { z, type ZodTypeAny } from 'zod';
 
-import { WidgetDefaultSize } from '@tradr/shared/constants/dashboard-defaults';
-import { PerWidgetMinSize, type WidgetType } from '@tradr/shared/schemas/dashboard';
+import type { MessageKey } from '@jurnal-zitn/shared';
+import { WidgetDefaultSize } from '@jurnal-zitn/shared/constants/dashboard-defaults';
+import { PerWidgetMinSize, type WidgetType } from '@jurnal-zitn/shared/schemas/dashboard';
 
 export interface WidgetDefinition {
   type: WidgetType;
   displayName: string;
+  /** Kunci kamus untuk judul yang tampil (A2); `displayName` tetap untuk uji/stabil. */
+  displayNameKey: MessageKey;
   // `any` props: individual widgets declare their own prop shapes (e.g.
   // PerformanceChartWidget takes `{ placement, onUpdateConfig }`). The route
   // (Task 43) is responsible for passing the right props per widget type.
@@ -22,6 +25,7 @@ export const widgetRegistry: Record<WidgetType, WidgetDefinition> = {
   'stats-summary': {
     type: 'stats-summary',
     displayName: 'Stats Summary',
+    displayNameKey: 'widget.statsSummary',
     component: lazy(() => import('./StatsSummaryWidget')),
     minSize: PerWidgetMinSize['stats-summary'],
     defaultSize: WidgetDefaultSize['stats-summary'],
@@ -29,6 +33,7 @@ export const widgetRegistry: Record<WidgetType, WidgetDefinition> = {
   'open-positions': {
     type: 'open-positions',
     displayName: 'Open Positions',
+    displayNameKey: 'widget.openPositions',
     component: lazy(() => import('./OpenPositionsWidget')),
     minSize: PerWidgetMinSize['open-positions'],
     defaultSize: WidgetDefaultSize['open-positions'],
@@ -36,6 +41,7 @@ export const widgetRegistry: Record<WidgetType, WidgetDefinition> = {
   'performance-chart': {
     type: 'performance-chart',
     displayName: 'Performance Chart',
+    displayNameKey: 'widget.performanceChart',
     component: lazy(() => import('./PerformanceChartWidget')),
     minSize: PerWidgetMinSize['performance-chart'],
     defaultSize: WidgetDefaultSize['performance-chart'],
@@ -49,6 +55,7 @@ export const widgetRegistry: Record<WidgetType, WidgetDefinition> = {
   'account-balances': {
     type: 'account-balances',
     displayName: 'Account Balances',
+    displayNameKey: 'widget.accountBalances',
     component: lazy(() => import('./AccountBalancesWidget')),
     minSize: PerWidgetMinSize['account-balances'],
     defaultSize: WidgetDefaultSize['account-balances'],
@@ -56,6 +63,7 @@ export const widgetRegistry: Record<WidgetType, WidgetDefinition> = {
   'position-sizing': {
     type: 'position-sizing',
     displayName: 'Position Sizing',
+    displayNameKey: 'widget.positionSizing',
     component: lazy(() => import('./PositionSizingWidget')),
     minSize: PerWidgetMinSize['position-sizing'],
     defaultSize: WidgetDefaultSize['position-sizing'],
@@ -63,6 +71,7 @@ export const widgetRegistry: Record<WidgetType, WidgetDefinition> = {
   'equity-curve': {
     type: 'equity-curve',
     displayName: 'Equity Curve',
+    displayNameKey: 'widget.equityCurve',
     component: lazy(() => import('./EquityCurveWidget')),
     minSize: PerWidgetMinSize['equity-curve'],
     defaultSize: WidgetDefaultSize['equity-curve'],

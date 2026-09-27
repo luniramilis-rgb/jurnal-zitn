@@ -1,6 +1,6 @@
 import Decimal from 'decimal.js';
 
-import { getCurrencyMinorUnits } from '@tradr/shared';
+import { getCurrencyMinorUnits } from '@jurnal-zitn/shared';
 
 import type { CloseHook, FillHook, ReverseHook } from '@/features/positions/positions.service';
 import { InvariantViolationError } from '@/lib/errors';

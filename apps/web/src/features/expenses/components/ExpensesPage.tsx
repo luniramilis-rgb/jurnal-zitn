@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 import {
   EXPENSE_CATEGORY_LABELS,
   type ExpenseCategory,
-} from '@tradr/shared/constants/expense-categories';
-import type { Expense } from '@tradr/shared/schemas/expense';
+} from '@jurnal-zitn/shared/constants/expense-categories';
+import type { Expense } from '@jurnal-zitn/shared/schemas/expense';
 
 import { EmptyState } from '@/components/EmptyState';
 import { PageHeader } from '@/components/layout/PageHeader';
@@ -39,6 +39,7 @@ import {
 } from '@/components/ui/table';
 import { ExpenseFormDialog } from '@/features/expenses/components/ExpenseFormDialog';
 import { useDeleteExpense, useExpenses } from '@/features/expenses/hooks/useExpenses';
+import { useT } from '@/hooks/useLocale';
 import { formatCurrency } from '@/lib/format';
 
 const ALL_YEARS = 'all';
@@ -71,6 +72,7 @@ function notesPreview(notes: string | null): string {
 }
 
 export function ExpensesPage() {
+  const t = useT();
   const currentYear = new Date().getUTCFullYear();
 
   const [selectedYear, setSelectedYear] = useState<string>(String(currentYear));
@@ -132,7 +134,7 @@ export function ExpensesPage() {
   return (
     <div className="space-y-6">
       <div>
-        <PageHeader page="Expenses" className="mb-2" />
+        <PageHeader page={t('exp.page.title')} className="mb-2" />
         <p className="text-sm text-muted-foreground">
           Track deductible expenses for your tax summary.
         </p>
@@ -141,14 +143,14 @@ export function ExpensesPage() {
         <div className="flex items-end gap-3">
           <div className="space-y-1">
             <label htmlFor="expense-year" className="text-xs text-muted-foreground">
-              Year
+              {t('tax.field.year')}
             </label>
             <Select value={selectedYear} onValueChange={handleYearChange}>
               <SelectTrigger id="expense-year" className="w-36 cursor-pointer">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value={ALL_YEARS}>All years</SelectItem>
+                <SelectItem value={ALL_YEARS}>{t('exp.allYears')}</SelectItem>
                 {yearOptions.map((y) => (
                   <SelectItem key={y} value={String(y)}>
                     {y}
@@ -162,14 +164,14 @@ export function ExpensesPage() {
             className="cursor-pointer"
             onClick={() => setDialogState({ mode: 'create' })}
           >
-            Add expense
+            {t('exp.action.add')}
           </Button>
         </div>
       </div>
 
       {filterTotals && filterTotals.perCurrency.length > 0 && (
         <div className="rounded-md border p-4">
-          <h2 className="mb-2 text-sm font-semibold text-muted-foreground">Totals</h2>
+          <h2 className="mb-2 text-sm font-semibold text-muted-foreground">{t('exp.totals')}</h2>
           <div className="flex flex-wrap gap-4">
             {filterTotals.perCurrency.map((row) => (
               <div key={row.currency} className="text-sm">
@@ -195,15 +197,15 @@ export function ExpensesPage() {
       ) : expenses.length === 0 ? (
         <EmptyState
           icon={<Receipt className="h-10 w-10" />}
-          title="No expenses recorded yet"
-          description="Track data subscriptions, platform fees, education, and other trading costs here."
+          title={t('exp.emptyTitle')}
+          description={t('exp.emptyDesc')}
           action={
             <Button
               type="button"
               className="cursor-pointer"
               onClick={() => setDialogState({ mode: 'create' })}
             >
-              Add expense
+              {t('exp.action.add')}
             </Button>
           }
         />
@@ -212,12 +214,12 @@ export function ExpensesPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Date</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Description</TableHead>
-                <TableHead className="text-right">Amount</TableHead>
-                <TableHead>Notes</TableHead>
-                <TableHead className="w-40 text-right">Actions</TableHead>
+                <TableHead>{t('pos.col.date')}</TableHead>
+                <TableHead>{t('exp.col.category')}</TableHead>
+                <TableHead>{t('exp.col.description')}</TableHead>
+                <TableHead className="text-right">{t('exp.col.amount')}</TableHead>
+                <TableHead>{t('pos.field.notes')}</TableHead>
+                <TableHead className="w-40 text-right">{t('pos.col.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -243,7 +245,7 @@ export function ExpensesPage() {
                         size="sm"
                         className="cursor-pointer"
                         onClick={() => setDialogState({ mode: 'edit', expense: row })}
-                        aria-label="Edit expense"
+                        aria-label={t('exp.action.editAria')}
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -253,7 +255,7 @@ export function ExpensesPage() {
                         size="sm"
                         className="cursor-pointer text-destructive"
                         onClick={() => setDeleteTarget(row)}
-                        aria-label="Delete expense"
+                        aria-label={t('exp.action.deleteAria')}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
@@ -313,21 +315,20 @@ export function ExpensesPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete expense</AlertDialogTitle>
+            <AlertDialogTitle>{t('exp.deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {deleteTarget && (
-                <>
-                  Delete &quot;{deleteTarget.description}&quot; (
-                  {formatCurrency(parseFloat(deleteTarget.amount), deleteTarget.currency)}) from{' '}
-                  {deleteTarget.occurredAt}? This cannot be undone.
-                </>
-              )}
+              {deleteTarget &&
+                t('exp.deleteBody', {
+                  description: deleteTarget.description,
+                  amount: formatCurrency(parseFloat(deleteTarget.amount), deleteTarget.currency),
+                  date: deleteTarget.occurredAt,
+                })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
             <AlertDialogAction className="cursor-pointer" onClick={onConfirmDelete}>
-              Delete
+              {t('pos.action.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

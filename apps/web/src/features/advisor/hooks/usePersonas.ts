@@ -8,7 +8,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type { Persona, PersonaInput } from '@tradr/shared/schemas/advisor';
+import type { Persona, PersonaInput } from '@jurnal-zitn/shared/schemas/advisor';
 
 import { api } from '@/lib/api';
 

@@ -1,5 +1,5 @@
 {
-  "name": "@tradr/web",
+  "name": "@jurnal-zitn/web",
   "version": "0.15.0",
   "private": true,
   "type": "module",
@@ -14,7 +14,7 @@
     "@hookform/resolvers": "^3",
     "@tanstack/react-query": "^5",
     "@tanstack/react-router": "^1",
-    "@tradr/shared": "workspace:*",
+    "@jurnal-zitn/shared": "workspace:*",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2",
     "date-fns": "^4.1.0",

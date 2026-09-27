@@ -1,7 +1,7 @@
 import { sql } from 'drizzle-orm';
 import { jsonb, pgTable, timestamp, uuid } from 'drizzle-orm/pg-core';
 
-import type { WidgetPlacement } from '@tradr/shared';
+import type { WidgetPlacement } from '@jurnal-zitn/shared';
 
 import { users } from './users.schema';
 

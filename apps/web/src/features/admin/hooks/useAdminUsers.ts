@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import {
   type AdminUserListResponse,
   AdminUserListResponseSchema,
-} from '@tradr/shared/schemas/admin';
+} from '@jurnal-zitn/shared/schemas/admin';
 
 import { api } from '@/lib/api';
 

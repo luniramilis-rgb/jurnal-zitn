@@ -227,19 +227,19 @@ body.driver-active:has([data-slot='dialog-content'][data-state='open'])
 /* See `narrow` in tour-engine.ts: the one step whose anchor has no room for a
    300px popover on any side. 240px is what lets it sit to the left of "Add Fill"
    while still clearing the fill dialog centred beside it. */
-.driver-popover.tradr-tour-narrow {
+.driver-popover.jurnal-zitn-tour-narrow {
   max-width: 240px;
 }
 
 /* Rendered with every step that has one, shown only while the step is actually
-   held — the engine toggles `tradr-tour-held` on the popover. It is rendered
+   held — the engine toggles `jurnal-zitn-tour-held` on the popover. It is rendered
    rather than injected so driver.js measures it before placing the popover; see
    `toDriveStep` in tour-engine.ts. */
-.driver-popover:not(.tradr-tour-held) .tradr-tour-action-hint {
+.driver-popover:not(.jurnal-zitn-tour-held) .jurnal-zitn-tour-action-hint {
   display: none;
 }
 
-.tradr-tour-action-hint {
+.jurnal-zitn-tour-action-hint {
   /* TIGHT ON PURPOSE, AND THE NUMBER IS MEASURED. driver.js pins a top-placed
      popover's TOP and lets it grow downward, so every pixel this block adds is a
      pixel closer to the control below it. The close set's first step is the

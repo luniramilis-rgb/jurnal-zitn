@@ -3,6 +3,7 @@ import { Link } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
+import type { MessageKey } from '@jurnal-zitn/shared';
 import {
   type Account,
   calculateTrade,
@@ -11,7 +12,7 @@ import {
   type CalculatorOutput,
   FeeScheduleSchema,
   parseOccSymbol,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { SymbolAutocomplete } from '@/components/SymbolAutocomplete';
 import { Button } from '@/components/ui/button';
@@ -38,6 +39,7 @@ import { useBuyingPowerBasisQuery } from '@/features/calculator/hooks/useBuyingP
 import { useOnboardingPatch, useOnboardingQuery } from '@/features/onboarding/hooks/useOnboarding';
 import { OptionsChainViewer } from '@/features/options/components/OptionsChainViewer';
 import type { OptionContract } from '@/features/options/hooks/useOptionsChain';
+import { useT } from '@/hooks/useLocale';
 import { useStockQuote } from '@/hooks/useStockQuote';
 import { useStockQuoteConfig } from '@/hooks/useStockQuoteConfig';
 import { formatMoney } from '@/lib/format';
@@ -49,23 +51,28 @@ export type RiskBasis = 'dollar' | 'percent';
 
 // Pull-quote error copy per REQ-4.3's three caller-distinguishable codes (design
 // §stock-quote.client error mapping). Unknown codes fall back to a generic note.
-const QUOTE_ERROR_MESSAGES: Record<string, string> = {
-  NOT_FOUND: 'Symbol not found.',
-  QUOTE_PROVIDER_UNAVAILABLE: 'Quote service is temporarily unavailable. Try again shortly.',
-  QUOTE_PROVIDER_MISCONFIGURED: 'Quote service is misconfigured.',
+const QUOTE_ERROR_KEYS: Record<string, MessageKey> = {
+  NOT_FOUND: 'calc.error.notFound',
+  QUOTE_PROVIDER_UNAVAILABLE: 'calc.error.providerUnavailable',
+  QUOTE_PROVIDER_MISCONFIGURED: 'calc.error.providerMisconfigured',
 };
+const FALLBACK_QUOTE_ERROR_KEY: MessageKey = 'calc.error.fetchFailed';
 
 /** Read the coded reason from a thrown API error envelope (`{ error: { code } }`). */
-function quoteErrorMessage(err: unknown): string {
+function quoteErrorMessage(
+  err: unknown,
+  t: (k: MessageKey, v?: Record<string, string | number>) => string,
+): string {
   let code: string | undefined;
   if (typeof err === 'object' && err !== null) {
     const e = err as { error?: { code?: string }; code?: string };
     code = e.error?.code ?? e.code;
   }
-  return (code && QUOTE_ERROR_MESSAGES[code]) || 'Could not fetch the last price.';
+  return t((code && QUOTE_ERROR_KEYS[code]) || FALLBACK_QUOTE_ERROR_KEY);
 }
 
 export function CalculatorForm() {
+  const t = useT();
   const form = useForm<CalculatorInput>({
     resolver: zodResolver(CalculatorInputSchema),
     mode: 'onBlur',
@@ -199,7 +206,7 @@ export function CalculatorForm() {
     try {
       result = calculateTrade({ ...values, buyingPower });
     } catch (e) {
-      error = e instanceof Error ? e.message : 'Calculation error';
+      error = e instanceof Error ? e.message : t('calc.error.calculation');
     }
   }
 
@@ -234,9 +241,7 @@ export function CalculatorForm() {
   const currency = selectedAccount ? selectedAccount.currency : 'USD';
 
   const brokerageHint =
-    feeMode === 'brokerage' && !values.feeSchedule
-      ? 'Select a brokerage to see fee estimates'
-      : undefined;
+    feeMode === 'brokerage' && !values.feeSchedule ? t('calc.fees.selectBrokerage') : undefined;
 
   const handleFeeModeChange = (next: string) => {
     const nextMode = next as FeeMode;
@@ -282,7 +287,7 @@ export function CalculatorForm() {
         }
       },
       // Surface the distinct coded message; existing entry is left untouched.
-      onError: (err) => setQuoteError(quoteErrorMessage(err)),
+      onError: (err) => setQuoteError(quoteErrorMessage(err, t)),
     });
   };
 
@@ -462,11 +467,11 @@ export function CalculatorForm() {
   // and the steps are data, so they cannot match on structure.
   const accountPicker = (
     <div className="space-y-2 pt-2" data-tour="calculator-account">
-      <Label>Account</Label>
+      <Label>{t('calc.field.account')}</Label>
       {accountsQuery.isLoading ? (
         <Select disabled>
           <SelectTrigger className="w-full cursor-pointer">
-            <SelectValue placeholder="Loading accounts…" />
+            <SelectValue placeholder={t('calc.accounts.loading')} />
           </SelectTrigger>
           <SelectContent />
         </Select>
@@ -474,11 +479,11 @@ export function CalculatorForm() {
         <>
           <Select disabled>
             <SelectTrigger className="w-full cursor-pointer">
-              <SelectValue placeholder="Failed to load accounts" />
+              <SelectValue placeholder={t('calc.accounts.failed')} />
             </SelectTrigger>
             <SelectContent />
           </Select>
-          <p className="mt-1 text-sm text-destructive">Failed to load accounts</p>
+          <p className="mt-1 text-sm text-destructive">{t('calc.accounts.failed')}</p>
         </>
       ) : accounts.length === 0 ? (
         <p className="text-sm text-muted-foreground">
@@ -490,7 +495,7 @@ export function CalculatorForm() {
       ) : (
         <Select value={selectedAccount?.id ?? ''} onValueChange={handleAccountSelect}>
           <SelectTrigger className="w-full cursor-pointer">
-            <SelectValue placeholder="Select an account" />
+            <SelectValue placeholder={t('calc.field.selectAccount')} />
           </SelectTrigger>
           <SelectContent>
             {accounts.map((a) => (
@@ -528,7 +533,7 @@ export function CalculatorForm() {
     <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
       <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
         <div className="space-y-2">
-          <Label htmlFor="direction">Direction</Label>
+          <Label htmlFor="direction">{t('calc.field.direction')}</Label>
           <Tabs
             value={direction}
             onValueChange={(v) =>
@@ -547,7 +552,7 @@ export function CalculatorForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="mode">Mode</Label>
+          <Label htmlFor="mode">{t('calc.field.mode')}</Label>
           <Tabs value={mode} onValueChange={handleModeChange}>
             <TabsList>
               <TabsTrigger value="stock" className="cursor-pointer">
@@ -562,12 +567,12 @@ export function CalculatorForm() {
 
         {mode === 'stock' ? (
           <div className="space-y-2">
-            <Label htmlFor="symbol">Symbol</Label>
+            <Label htmlFor="symbol">{t('calc.field.symbol')}</Label>
             <SymbolAutocomplete
               id="symbol"
               value={symbol}
               onChange={setSymbol}
-              placeholder="AAPL"
+              placeholder={t('calc.field.symbolPlaceholder')}
             />
             {quoteConfig.data?.stockQuoteConfigured === true && symbol.trim() !== '' && (
               <Button
@@ -578,7 +583,7 @@ export function CalculatorForm() {
                 disabled={stockQuote.isPending}
                 onClick={handlePullQuote}
               >
-                {stockQuote.isPending ? 'Pulling…' : 'Pull last price'}
+                {stockQuote.isPending ? t('calc.quote.pulling') : t('calc.quote.pull')}
               </Button>
             )}
             {pulledDisclaimer && (
@@ -588,7 +593,7 @@ export function CalculatorForm() {
           </div>
         ) : (
           <div className="space-y-2">
-            <Label>Contract</Label>
+            <Label>{t('calc.field.contract')}</Label>
             <Dialog open={chainOpen} onOpenChange={setChainOpen}>
               <Button
                 type="button"
@@ -600,7 +605,7 @@ export function CalculatorForm() {
               </Button>
               <DialogContent className="max-w-3xl">
                 <DialogHeader>
-                  <DialogTitle>Select an options contract</DialogTitle>
+                  <DialogTitle>{t('calc.dialog.selectContract')}</DialogTitle>
                   <DialogDescription>
                     Pick a contract to use its premium as the entry price.
                   </DialogDescription>
@@ -626,7 +631,7 @@ export function CalculatorForm() {
         )}
 
         <div className="space-y-2">
-          <Label htmlFor="entryPrice">Entry price</Label>
+          <Label htmlFor="entryPrice">{t('calc.field.entryPrice')}</Label>
           <Input
             id="entryPrice"
             type="text"
@@ -640,7 +645,7 @@ export function CalculatorForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="stopLoss">Stop loss</Label>
+          <Label htmlFor="stopLoss">{t('calc.field.stopLoss')}</Label>
           <Input
             id="stopLoss"
             type="text"
@@ -652,7 +657,7 @@ export function CalculatorForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="targetPrice">Target price (optional)</Label>
+          <Label htmlFor="targetPrice">{t('calc.field.targetPrice')}</Label>
           <Input
             id="targetPrice"
             type="text"
@@ -668,7 +673,7 @@ export function CalculatorForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Risk</Label>
+          <Label>{t('calc.field.risk')}</Label>
           {/* `data-tour` sits on the BASIS CHOOSER, not on the block: the block
               also holds the balance/risk fields and the account picker, so the
               walkthrough's "Risk" step would otherwise highlight three separate
@@ -686,7 +691,7 @@ export function CalculatorForm() {
 
           {riskBasis === 'dollar' && (
             <div className="space-y-2 pt-2">
-              <Label htmlFor="dollarRisk">Dollar risk</Label>
+              <Label htmlFor="dollarRisk">{t('calc.field.dollarRisk')}</Label>
               <Input
                 id="dollarRisk"
                 type="text"
@@ -705,7 +710,7 @@ export function CalculatorForm() {
           {riskBasis === 'percent' && (
             <div className="space-y-2 pt-2">
               <div className="space-y-2">
-                <Label htmlFor="balance">Balance</Label>
+                <Label htmlFor="balance">{t('calc.field.balance')}</Label>
                 <Input
                   id="balance"
                   type="text"
@@ -724,7 +729,7 @@ export function CalculatorForm() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="riskPercent">Risk percent</Label>
+                <Label htmlFor="riskPercent">{t('calc.field.riskPercent')}</Label>
                 <Input
                   id="riskPercent"
                   type="text"
@@ -745,7 +750,7 @@ export function CalculatorForm() {
         </div>
 
         <div className="space-y-2">
-          <Label>Fees</Label>
+          <Label>{t('calc.field.fees')}</Label>
           <Tabs value={feeMode} onValueChange={handleFeeModeChange}>
             <TabsList>
               <TabsTrigger value="none" className="cursor-pointer">
@@ -765,7 +770,7 @@ export function CalculatorForm() {
               {brokeragesQuery.isLoading ? (
                 <Select disabled>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Loading brokerages…" />
+                    <SelectValue placeholder={t('calc.brokerages.loading')} />
                   </SelectTrigger>
                   <SelectContent />
                 </Select>
@@ -773,11 +778,11 @@ export function CalculatorForm() {
                 <>
                   <Select disabled>
                     <SelectTrigger className="w-full">
-                      <SelectValue placeholder="Failed to load brokerages" />
+                      <SelectValue placeholder={t('calc.brokerages.failed')} />
                     </SelectTrigger>
                     <SelectContent />
                   </Select>
-                  <p className="mt-1 text-sm text-destructive">Failed to load brokerages</p>
+                  <p className="mt-1 text-sm text-destructive">{t('calc.brokerages.failed')}</p>
                 </>
               ) : brokerages.length === 0 ? (
                 <p className="text-sm text-muted-foreground">
@@ -789,7 +794,7 @@ export function CalculatorForm() {
               ) : (
                 <Select value={selectedBrokerageId} onValueChange={handleBrokerageSelect}>
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a brokerage" />
+                    <SelectValue placeholder={t('calc.field.selectBrokerage')} />
                   </SelectTrigger>
                   <SelectContent>
                     {brokerages.map((b) => (
@@ -805,7 +810,7 @@ export function CalculatorForm() {
 
           {feeMode === 'manual' && (
             <div className="space-y-2 pt-2">
-              <Label htmlFor="manualFees">Manual fees</Label>
+              <Label htmlFor="manualFees">{t('calc.field.manualFees')}</Label>
               <Input
                 id="manualFees"
                 type="text"

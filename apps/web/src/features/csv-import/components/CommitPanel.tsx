@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
-import type { CsvCommitResponse, CsvPreviewResponse } from '@tradr/shared';
+import type { CsvCommitResponse, CsvPreviewResponse } from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

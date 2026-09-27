@@ -10,9 +10,10 @@
 // client may legitimately send a zone that does not appear in this array.
 export const IANA_TIMEZONES: readonly string[] = Intl.supportedValuesOf('timeZone');
 
-// Default account trading-day zone (position-lifecycle R1 amendment) — mirrors
-// the `accounts.timezone` column default.
-export const DEFAULT_ACCOUNT_TIMEZONE = 'America/New_York';
+// Default account trading-day zone — mirrors the `accounts.timezone` column default.
+// Diubah ke `Asia/Jakarta` (lokalisasi IDX, ZITN-TECH-017 Fase 1); produk menyasar IDX,
+// jadi hari perdagangan mengikuti WIB.
+export const DEFAULT_ACCOUNT_TIMEZONE = 'Asia/Jakarta';
 
 // Default user REPORTING zone. Used on two paths that must agree: the
 // registration write when the client sends no browser-detected zone, and the
@@ -27,3 +28,11 @@ export const DEFAULT_ACCOUNT_TIMEZONE = 'America/New_York';
 // have produced anyway rather than silently rebucketing that user's history.
 // Any other zone would be an unfounded claim about the user's location.
 export const DEFAULT_REPORTING_TIMEZONE = 'UTC';
+
+/**
+ * Zona reporting untuk **pengguna baru** (keputusan pemilik 2026-09-26): produk menyasar
+ * Indonesia, jadi pendaftaran/SSO menyemai `Asia/Jakarta` ketika klien tidak mengirim zona.
+ * Berbeda dari `DEFAULT_REPORTING_TIMEZONE` yang tetap `UTC` sebagai pembacaan baris
+ * pra-migrasi — menaikkan fallback itu akan menyetel ulang (rebucket) riwayat pengguna lama.
+ */
+export const DEFAULT_SIGNUP_TIMEZONE = 'Asia/Jakarta';

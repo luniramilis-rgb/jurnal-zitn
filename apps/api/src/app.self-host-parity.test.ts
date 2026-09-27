@@ -13,7 +13,7 @@
 import { eq } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_REPORTING_TIMEZONE } from '@tradr/shared';
+import { DEFAULT_REPORTING_TIMEZONE } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db, poolerDriverOptions } from '@/db';

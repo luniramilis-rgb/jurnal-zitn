@@ -5,8 +5,8 @@ import {
   CreateAccountSchema,
   SetDefaultAccountSchema,
   UpdateAccountSchema,
-} from '@tradr/shared/schemas/account';
-import { SetWritableAccountSchema } from '@tradr/shared/schemas/tier';
+} from '@jurnal-zitn/shared/schemas/account';
+import { SetWritableAccountSchema } from '@jurnal-zitn/shared/schemas/tier';
 
 import { db } from '@/db';
 import { captureServerEvent } from '@/lib/posthog';

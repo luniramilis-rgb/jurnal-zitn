@@ -12,8 +12,10 @@ import { createElement, type ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { api } from '@/lib/api';
+import { setAppLocale } from '@/lib/locale';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+setAppLocale('id');
 
 vi.mock('@/lib/api', () => ({
   api: { get: vi.fn() },

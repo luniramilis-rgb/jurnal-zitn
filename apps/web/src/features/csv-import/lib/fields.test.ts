@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { describe, expect, it } from 'vitest';
 
-import { CSV_IMPORT_PRESETS, type Mapping } from '@tradr/shared';
+import { CSV_IMPORT_PRESETS, type Mapping } from '@jurnal-zitn/shared';
 
 import { isRequiredFieldSatisfied, targetFieldsForShape } from './fields';
 

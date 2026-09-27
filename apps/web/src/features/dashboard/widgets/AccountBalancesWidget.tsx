@@ -7,6 +7,7 @@ import { useDashboardTotalQuery } from '@/features/accounting/hooks/useDashboard
 import { useMissingRatePrompt } from '@/features/accounting/hooks/useMissingRatePrompt';
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { CrossCurrencyTotal } from '@/features/dashboard/components/CrossCurrencyTotal';
+import { useT } from '@/hooks/useLocale';
 import { formatMoney } from '@/lib/format';
 
 export const ACCOUNT_BALANCES_ROW_CAP = 4;
@@ -21,6 +22,7 @@ export const ACCOUNT_BALANCES_ROW_CAP = 4;
  * A missing-rate banner is shown when `useMissingRatePrompt` reports a prompt.
  */
 function AccountBalancesWidget() {
+  const t = useT();
   const { data: accounts, isLoading: accountsLoading } = useAccounts();
   const { data: total, isLoading: totalLoading } = useDashboardTotalQuery();
   const { shouldPrompt, missingPairs, deeplinkTo } = useMissingRatePrompt();
@@ -38,14 +40,14 @@ function AccountBalancesWidget() {
   if (accounts.length === 0) {
     return (
       <EmptyState
-        title="No accounts yet."
-        description="Create an account to start tracking balances."
+        title={t('w.balances.empty')}
+        description={t('w.balances.emptyDesc')}
         action={
           <Link
             to="/accounts"
             className="cursor-pointer text-sm text-primary underline-offset-4 hover:underline"
           >
-            Go to accounts
+            {t('w.balances.goToAccounts')}
           </Link>
         }
       />
@@ -59,8 +61,7 @@ function AccountBalancesWidget() {
   const banner = shouldPrompt ? (
     <div className="flex flex-wrap items-center gap-2 rounded-md border border-dashed border-warning/50 bg-warning/10 px-3 py-2 text-sm">
       <span>
-        Missing exchange rate
-        {missingPairs.length > 1 ? 's' : ''}:{' '}
+        {missingPairs.length > 1 ? t('w.balances.missingRatePlural') : t('w.balances.missingRate')}:{' '}
         {missingPairs.map((p) => `${p.baseCurrency} → ${p.quoteCurrency}`).join(', ')}
       </span>
       {deeplinkTo && (
@@ -68,7 +69,7 @@ function AccountBalancesWidget() {
           href={deeplinkTo}
           className="cursor-pointer text-sm text-primary underline-offset-4 hover:underline"
         >
-          Enter rate
+          {t('w.balances.enterRate')}
         </a>
       )}
     </div>
@@ -119,7 +120,7 @@ function AccountBalancesWidget() {
       </ul>
       {totalCurrency && !totalLoading && total?.total != null ? (
         <div className="flex items-center justify-between border-t pt-3">
-          <span className="text-sm text-muted-foreground">Total</span>
+          <span className="text-sm text-muted-foreground">{t('w.balances.total')}</span>
           <Numeric
             value={total.total}
             kind="money"
@@ -135,7 +136,7 @@ function AccountBalancesWidget() {
             to="/accounts"
             className="cursor-pointer text-sm text-primary underline-offset-4 hover:underline"
           >
-            View all {accounts.length} accounts
+            {t('w.balances.viewAll', { n: accounts.length })}
           </Link>
         </div>
       )}
@@ -145,9 +146,9 @@ function AccountBalancesWidget() {
             to="/settings"
             className="cursor-pointer text-primary underline-offset-4 hover:underline"
           >
-            Set display currency
+            {t('w.balances.setDisplayCurrency')}
           </Link>{' '}
-          to see your total.
+          {t('w.balances.setDisplayCurrencySuffix')}
         </div>
       )}
     </div>

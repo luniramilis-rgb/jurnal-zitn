@@ -149,7 +149,7 @@ describe('drawer store — position inspect', () => {
   const row = {
     id: 'pos-1',
     symbol: 'PLTR',
-  } as unknown as import('@tradr/shared').PositionListItem;
+  } as unknown as import('@jurnal-zitn/shared').PositionListItem;
 
   it('inspectPosition opens the drawer straight onto the position', () => {
     useDrawerStore.setState({ isOpen: false, inspectedPosition: null });

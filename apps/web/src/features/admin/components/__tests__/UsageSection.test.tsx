@@ -13,11 +13,13 @@ import userEvent from '@testing-library/user-event';
 import { createElement, type ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { AdminUsage } from '@tradr/shared/schemas/admin';
+import type { AdminUsage } from '@jurnal-zitn/shared/schemas/admin';
 
 import { api } from '@/lib/api';
+import { setAppLocale } from '@/lib/locale';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+setAppLocale('id');
 
 vi.mock('@/lib/api', () => ({
   api: { get: vi.fn() },

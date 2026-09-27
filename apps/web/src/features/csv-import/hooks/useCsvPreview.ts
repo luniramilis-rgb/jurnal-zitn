@@ -1,6 +1,6 @@
 import { useMutation } from '@tanstack/react-query';
 
-import type { CsvPreviewRequest, CsvPreviewResponse } from '@tradr/shared';
+import type { CsvPreviewRequest, CsvPreviewResponse } from '@jurnal-zitn/shared';
 
 import { announceSessionExpired, isLoggingOut, resolveApiUrl, setIsLoggingOut } from '@/lib/api';
 

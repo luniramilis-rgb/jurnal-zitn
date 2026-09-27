@@ -1,4 +1,4 @@
-import type { BreakdownQueryInput, PerformanceStats } from '@tradr/shared';
+import type { BreakdownQueryInput, PerformanceStats } from '@jurnal-zitn/shared';
 
 import { EmptyState } from '@/components/EmptyState';
 import { Numeric } from '@/components/Numeric';

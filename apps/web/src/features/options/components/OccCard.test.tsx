@@ -4,15 +4,15 @@ import userEvent from '@testing-library/user-event';
 import { act } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-// v3-8 ESM-safe mock: passthrough everything from @tradr/shared, but wrap
+// v3-8 ESM-safe mock: passthrough everything from @jurnal-zitn/shared, but wrap
 // `encodeOccSymbol` and `parseOccSymbol` as `vi.fn(actual.*)` so call-count
 // assertions and per-call overrides (`mockReturnValueOnce`) work against the
 // named imports inside `OccCard.tsx`. The real implementations still run on
 // every invocation (the wrappers default to calling the originals) — this is
 // the only ESM-safe way to spy on named-import call sites, since `vi.spyOn`
 // against the module namespace does not intercept them.
-vi.mock('@tradr/shared', async (importOriginal) => {
-  const actual = await importOriginal<typeof import('@tradr/shared')>();
+vi.mock('@jurnal-zitn/shared', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@jurnal-zitn/shared')>();
   return {
     ...actual,
     encodeOccSymbol: vi.fn(actual.encodeOccSymbol),
@@ -20,7 +20,7 @@ vi.mock('@tradr/shared', async (importOriginal) => {
   };
 });
 
-import { encodeOccSymbol, parseOccSymbol } from '@tradr/shared';
+import { encodeOccSymbol, parseOccSymbol } from '@jurnal-zitn/shared';
 
 import { OccCard } from './OccCard';
 

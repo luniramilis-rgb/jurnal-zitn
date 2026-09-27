@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { Fill } from '@tradr/shared';
+import type { Fill } from '@jurnal-zitn/shared';
 
 import {
   AlertDialog,
@@ -28,6 +28,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useT } from '@/hooks/useLocale';
 
 import { useDeleteFill } from '../hooks/usePosition';
 
@@ -40,6 +41,7 @@ interface Props {
 }
 
 export function FillTable({ fills, positionId, positionStatus }: Props) {
+  const t = useT();
   const deleteFill = useDeleteFill(positionId);
   const [editFill, setEditFill] = useState<Fill | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<Fill | null>(null);
@@ -50,12 +52,12 @@ export function FillTable({ fills, positionId, positionStatus }: Props) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Type</TableHead>
-            <TableHead className="text-right">Price</TableHead>
-            <TableHead className="text-right">Qty</TableHead>
-            <TableHead className="text-right">Fees</TableHead>
-            <TableHead>Date</TableHead>
-            <TableHead>Notes</TableHead>
+            <TableHead>{t('pos.field.type')}</TableHead>
+            <TableHead className="text-right">{t('pos.field.price')}</TableHead>
+            <TableHead className="text-right">{t('pos.col.qty')}</TableHead>
+            <TableHead className="text-right">{t('pos.field.fees')}</TableHead>
+            <TableHead>{t('pos.col.date')}</TableHead>
+            <TableHead>{t('pos.field.notes')}</TableHead>
             <TableHead className="w-12" />
           </TableRow>
         </TableHeader>
@@ -98,7 +100,7 @@ export function FillTable({ fills, positionId, positionStatus }: Props) {
                           className="cursor-pointer text-destructive"
                           onClick={() => setDeleteTarget(fill)}
                         >
-                          Delete
+                          {t('pos.action.delete')}
                         </DropdownMenuItem>
                       )}
                     </DropdownMenuContent>
@@ -124,13 +126,13 @@ export function FillTable({ fills, positionId, positionStatus }: Props) {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete fill</AlertDialogTitle>
+            <AlertDialogTitle>{t('pos.fill.deleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete this {deleteTarget?.type} fill?
+              {t('pos.fill.deleteBody', { type: deleteTarget?.type ?? '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="cursor-pointer"
               onClick={() => {
@@ -140,7 +142,7 @@ export function FillTable({ fills, positionId, positionStatus }: Props) {
                 }
               }}
             >
-              Delete
+              {t('pos.action.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

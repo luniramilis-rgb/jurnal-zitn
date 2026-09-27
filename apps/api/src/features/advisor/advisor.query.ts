@@ -8,7 +8,7 @@
 
 import { and, asc, desc, eq, lt, or, sql } from 'drizzle-orm';
 
-import type { ResponseMessageContentPart, StoredContentPart } from '@tradr/shared';
+import type { ResponseMessageContentPart, StoredContentPart } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import type { Transaction } from '@/db';

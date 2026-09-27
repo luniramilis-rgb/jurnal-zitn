@@ -2,7 +2,7 @@ import { clearClientSessionState } from '@/lib/sessionTeardown';
 
 declare global {
   interface Window {
-    __TRADR_CONFIG__?: {
+    __JURNAL_ZITN_CONFIG__?: {
       apiBaseUrl?: string; // pre-existing
       advisorImageMaxBytes?: number; // per-image encoded-byte cap for the client pre-upload check (hosted-platform REQ-4.6); always emitted by the runtime-config seam
       posthogPublicKey?: string; // publishable phc_… project key
@@ -16,7 +16,8 @@ declare global {
 }
 
 export function resolveApiUrl(path: string): string {
-  const base = (typeof window !== 'undefined' && window.__TRADR_CONFIG__?.apiBaseUrl) || '/api';
+  const base =
+    (typeof window !== 'undefined' && window.__JURNAL_ZITN_CONFIG__?.apiBaseUrl) || '/api';
   return base + path;
 }
 
@@ -30,7 +31,7 @@ export const LOCALDEV = 'localdev';
 // The deploy workflows write it into config.js; nothing writes it in local dev,
 // so absence reads as LOCALDEV.
 export function appVersion(): string {
-  return (typeof window !== 'undefined' && window.__TRADR_CONFIG__?.appVersion) || LOCALDEV;
+  return (typeof window !== 'undefined' && window.__JURNAL_ZITN_CONFIG__?.appVersion) || LOCALDEV;
 }
 
 // Whether the configured API origin differs from the page origin (split-origin).
@@ -40,7 +41,7 @@ export function appVersion(): string {
 // must NOT set it.
 export function isApiCrossOrigin(): boolean {
   if (typeof window === 'undefined') return false;
-  const base = window.__TRADR_CONFIG__?.apiBaseUrl;
+  const base = window.__JURNAL_ZITN_CONFIG__?.apiBaseUrl;
   if (!base) return false;
   try {
     return new URL(base, window.location.href).origin !== window.location.origin;

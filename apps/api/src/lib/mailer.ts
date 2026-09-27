@@ -92,7 +92,12 @@ export function initMailer(transportOverride?: Transporter): void {
  * The mandatory .catch keeps a failed send from becoming an unhandled
  * rejection (Node dies on those); the log carries neither token nor address.
  */
-export function dispatchEmail(kind: EmailKind, to: string, rawToken: string): void {
+export function dispatchEmail(
+  kind: EmailKind,
+  to: string,
+  rawToken: string,
+  locale: unknown = 'id',
+): void {
   if (!isEmailConfigured() || !transporter) return;
   if (inFlight.size >= MAX_IN_FLIGHT) {
     logger.warn('email_send_dropped_capacity', {
@@ -101,7 +106,7 @@ export function dispatchEmail(kind: EmailKind, to: string, rawToken: string): vo
     });
     return;
   }
-  const { subject, text, html } = buildEmail(kind, rawToken);
+  const { subject, text, html } = buildEmail(kind, rawToken, locale);
   const send: Promise<void> = transporter
     .sendMail({
       from: { name: config.EMAIL_FROM_NAME ?? '', address: config.EMAIL_FROM! },

@@ -23,7 +23,7 @@ import {
   upsertPendingSchedule,
 } from './account-deletion.query';
 
-// Design C3 queries against real tradr_test, each test rolled back by the
+// Design C3 queries against real jurnal_zitn_test, each test rolled back by the
 // single-connection harness (test-setup.ts). Inside that one transaction `now()`
 // is frozen (probe /tmp/scratchpad/acct-del-now-probe.sh), so every test that
 // leans on a token or a lease seeds and passes EXPLICIT timestamps rather than

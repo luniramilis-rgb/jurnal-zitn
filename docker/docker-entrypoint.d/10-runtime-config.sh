@@ -3,7 +3,7 @@
 # regenerate /config.js on every container start so the served SPA reads its
 # API base AND frontend telemetry keys from the environment, not the build.
 #
-# window.__TRADR_CONFIG__ gets a "key":<json-value> pair for each PRESENT,
+# window.__JURNAL_ZITN_CONFIG__ gets a "key":<json-value> pair for each PRESENT,
 # non-empty container env var. An unset/empty var yields an ABSENT field
 # (never ""), which the SPA reads as that surface being absent. Mapping:
 #   API_BASE_URL         -> apiBaseUrl
@@ -28,8 +28,8 @@
 # (4500000, packages/shared/src/schemas/advisor.ts).
 #   ADVISOR_IMAGE_MAX_BYTES -> advisorImageMaxBytes (default 4500000)
 #
-# All-unset         -> window.__TRADR_CONFIG__={"advisorImageMaxBytes":4500000};
-# API_BASE_URL only -> window.__TRADR_CONFIG__={"apiBaseUrl":"<value>","advisorImageMaxBytes":4500000};
+# All-unset         -> window.__JURNAL_ZITN_CONFIG__={"advisorImageMaxBytes":4500000};
+# API_BASE_URL only -> window.__JURNAL_ZITN_CONFIG__={"apiBaseUrl":"<value>","advisorImageMaxBytes":4500000};
 # advisorImageMaxBytes is ALWAYS emitted (the default when unset), so the output
 # is no longer byte-for-byte identical to the previous API_BASE_URL-only/unset script.
 #
@@ -37,7 +37,7 @@
 # (served at /metrics), but ONLY when METRICS_ENABLED=true (observability REQ-7.1).
 # Additional vars read for that half:
 #   METRICS_ENABLED      -> gates the /metrics file entirely (default false => absent)
-#   APP_VERSION          -> the version/commit labels on tradr_web_build_info (REQ-7.4)
+#   APP_VERSION          -> the version/commit labels on jurnal_zitn_web_build_info (REQ-7.4)
 #
 # Runs under the official nginx:alpine entrypoint, which sources/execs
 # /docker-entrypoint.d/*.sh before launching nginx. nginx serves this file
@@ -90,7 +90,7 @@ case "$advisor_image_max_bytes" in
 esac
 emit_num advisorImageMaxBytes "$advisor_image_max_bytes"
 
-printf 'window.__TRADR_CONFIG__={%s};\n' "$body" > "$config_file"
+printf 'window.__JURNAL_ZITN_CONFIG__={%s};\n' "$body" > "$config_file"
 
 # ---------------------------------------------------------------------------
 # Prometheus exposition for the SPA's build identity (observability REQ-7).
@@ -104,8 +104,8 @@ printf 'window.__TRADR_CONFIG__={%s};\n' "$body" > "$config_file"
 # (apps/api/src/features/metrics/metrics.registry.ts): version is APP_VERSION
 # verbatim ("unknown" when unset/empty), commit is the text after its final
 # "-", or "unknown" when there is no "-". The two halves must agree on VALUES,
-# not just label names, or joining tradr_web_build_info against
-# tradr_build_info reports drift where there is none (REQ-3.6, REQ-7.4).
+# not just label names, or joining jurnal_zitn_web_build_info against
+# jurnal_zitn_build_info reports drift where there is none (REQ-3.6, REQ-7.4).
 # ---------------------------------------------------------------------------
 metrics_file="/usr/share/nginx/html/metrics"
 rm -f "$metrics_file"
@@ -117,9 +117,9 @@ if [ "${METRICS_ENABLED:-false}" = "true" ]; then
     *)   commit="unknown" ;;
   esac
   {
-    printf '# HELP tradr_web_build_info Deployed web (SPA) build information.\n'
-    printf '# TYPE tradr_web_build_info gauge\n'
-    printf 'tradr_web_build_info{version="%s",commit="%s"} 1\n' \
+    printf '# HELP jurnal_zitn_web_build_info Deployed web (SPA) build information.\n'
+    printf '# TYPE jurnal_zitn_web_build_info gauge\n'
+    printf 'jurnal_zitn_web_build_info{version="%s",commit="%s"} 1\n' \
       "$(json_str "$app_version")" "$(json_str "$commit")"
   } > "$metrics_file"
 fi

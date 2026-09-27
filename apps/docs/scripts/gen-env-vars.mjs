@@ -39,7 +39,7 @@ const COMMENT_RE = /^#\s?(.*)$/;
  * A second `KEY=` on the same line means this is an inline example, not a
  * declaration — e.g.
  *
- *   # SMTP_TLS_MODE=none EMAIL_FROM=dev@tradr.local WEB_BASE_URL=http://…
+ *   # SMTP_TLS_MODE=none EMAIL_FROM=dev@jurnal-zitn.local WEB_BASE_URL=http://…
  *
  * which is a dev-loop recipe. Read as a declaration it produced a duplicate
  * SMTP_TLS_MODE row whose "default" was the rest of the command line.
@@ -180,16 +180,16 @@ function render(sections, required) {
   out.push('---');
   out.push('title: Environment variables');
   out.push(
-    'description: Every environment variable Tradr reads, its default, and what it does — generated from .env.example so it cannot drift from the template you copy.',
+    'description: Every environment variable Jurnal ZITN reads, its default, and what it does — generated from .env.example so it cannot drift from the template you copy.',
   );
   out.push('---');
   out.push('');
   out.push('{/* GENERATED FILE — do not edit.');
   out.push('    Source: .env.example · Generator: apps/docs/scripts/gen-env-vars.mjs');
-  out.push('    Run `pnpm --filter @tradr/docs env-vars:generate` after changing .env.example. */}');
+  out.push('    Run `pnpm --filter @jurnal-zitn/docs env-vars:generate` after changing .env.example. */}');
   out.push('');
   out.push(
-    `Tradr reads **${total} environment variables**, of which **${required.size} are required** —`,
+    `Jurnal ZITN reads **${total} environment variables**, of which **${required.size} are required** —`,
   );
   out.push('everything else has a working default or turns a feature off when unset.');
   out.push('');

@@ -4,7 +4,7 @@ import { act } from 'react';
 import { createRoot } from 'react-dom/client';
 import { describe, expect, it, vi } from 'vitest';
 
-import type { SeriesBucket } from '@tradr/shared';
+import type { SeriesBucket } from '@jurnal-zitn/shared';
 
 // Recharts' ResponsiveContainer measures via ResizeObserver, which never fires
 // in jsdom — the SVG would never mount. Mock it to a fixed-size passthrough so

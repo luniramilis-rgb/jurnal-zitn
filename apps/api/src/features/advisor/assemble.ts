@@ -1,4 +1,4 @@
-import type { CanonicalMessage, CanonicalPart } from '@tradr/shared';
+import type { CanonicalMessage, CanonicalPart } from '@jurnal-zitn/shared';
 
 /**
  * Inputs to {@link assembleCanonicalMessages}.

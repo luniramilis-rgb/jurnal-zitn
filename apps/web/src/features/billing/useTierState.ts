@@ -8,7 +8,7 @@
 
 import { useQuery } from '@tanstack/react-query';
 
-import type { TierState } from '@tradr/shared';
+import type { TierState } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

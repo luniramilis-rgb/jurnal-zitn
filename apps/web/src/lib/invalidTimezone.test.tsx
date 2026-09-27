@@ -11,7 +11,7 @@ import { act, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { PerformanceQueryInput, PerformanceResponse } from '@tradr/shared';
+import type { PerformanceQueryInput, PerformanceResponse } from '@jurnal-zitn/shared';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { STARTER_TAGS, type TagCategory } from '@tradr/shared';
+import { STARTER_TAGS, type TagCategory } from '@jurnal-zitn/shared';
 
 import { groupTagsByCategory, starterOfferState } from './starterOffer';
 

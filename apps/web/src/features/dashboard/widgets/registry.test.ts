@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
-import { PerWidgetMinSize, WidgetDefaultSize, WidgetTypeSchema } from '@tradr/shared';
+import { PerWidgetMinSize, WidgetDefaultSize, WidgetTypeSchema } from '@jurnal-zitn/shared';
 
 import { GRID_COLUMNS, GRID_MAX_ROWS } from '../grid.constants';
 

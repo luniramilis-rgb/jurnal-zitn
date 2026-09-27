@@ -59,7 +59,7 @@ exclude = [
   "^https?://127\\.0\\.0\\.1",
   "^https?://0\\.0\\.0\\.0",
   "^https?://.*\\.example\\.com",
-  "^https?://tradr\\.example\\.com",
+  "^https?://jurnal-zitn\\.example\\.com",
   "^https?://.*\\.local",
   # Placeholders in configuration snippets.
   "^https?://<",
@@ -68,7 +68,7 @@ exclude = [
   "src-host",
   "staging-host",
   # The app's own hostname is not public yet — it 404s on purpose.
-  "^https://app\\.tradr\\.cloud",
+  "^https://app\\.jurnal-zitn\\.cloud",
   # Vendor endpoints that answer only to an authenticated client.
   "^https://api\\.github\\.com",
   "^https://us\\.i\\.posthog\\.com",

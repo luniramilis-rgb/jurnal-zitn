@@ -19,7 +19,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
-import { type ProviderId, ProviderKeyInputSchema, type ProviderModel } from '@tradr/shared';
+import { type ProviderId, ProviderKeyInputSchema, type ProviderModel } from '@jurnal-zitn/shared';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

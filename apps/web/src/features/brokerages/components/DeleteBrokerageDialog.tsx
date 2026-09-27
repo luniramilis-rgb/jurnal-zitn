@@ -1,4 +1,4 @@
-import type { Brokerage } from '@tradr/shared';
+import type { Brokerage } from '@jurnal-zitn/shared';
 
 import {
   AlertDialog,

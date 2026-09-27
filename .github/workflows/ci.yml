@@ -14,9 +14,9 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 env:
-  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tradr_test
-  MIGRATE_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/tradr_test_migrate
-  MIGRATE_TEST_USER_DATABASE_URL: postgresql://tradr_test_user:tradr_test_user@localhost:5432/tradr_test_migrate
+  DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jurnal_zitn_test
+  MIGRATE_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/jurnal_zitn_test_migrate
+  MIGRATE_TEST_USER_DATABASE_URL: postgresql://jurnal_zitn_test_user:jurnal_zitn_test_user@localhost:5432/jurnal_zitn_test_migrate
   SESSION_SECRET: ci-test-secret-that-is-at-least-32-characters-long
   NODE_ENV: test
   TRUSTED_PROXIES: '127.0.0.1'
@@ -50,10 +50,10 @@ jobs:
 
       - name: Migration drift check (drizzle-kit)
         run: |
-          if pnpm --filter @tradr/api exec drizzle-kit check --help 2>&1 | grep -q '^  check\b\|drizzle-kit check'; then
-            pnpm --filter @tradr/api exec drizzle-kit check
+          if pnpm --filter @jurnal-zitn/api exec drizzle-kit check --help 2>&1 | grep -q '^  check\b\|drizzle-kit check'; then
+            pnpm --filter @jurnal-zitn/api exec drizzle-kit check
           else
-            pnpm --filter @tradr/api exec drizzle-kit generate
+            pnpm --filter @jurnal-zitn/api exec drizzle-kit generate
             git diff --exit-code apps/api/src/db/migrations
           fi
 
@@ -67,8 +67,8 @@ jobs:
       # rather than silently dropping that endpoint from the reference.
       - name: Check the OpenAPI artifact is up to date
         run: |
-          pnpm --filter @tradr/docs openapi:generate
-          git diff --exit-code apps/docs/src/openapi/tradr-api.json
+          pnpm --filter @jurnal-zitn/docs openapi:generate
+          git diff --exit-code apps/docs/src/openapi/jurnal-zitn-api.json
 
       # The same argument for the four generated reference PAGES: env vars from
       # .env.example, the CLI from its own usage block, plan limits from the cap
@@ -78,16 +78,16 @@ jobs:
       # wrong-but-stable artifact matches itself.
       - name: Check the generated reference pages are up to date
         run: |
-          pnpm --filter @tradr/docs reference:generate
+          pnpm --filter @jurnal-zitn/docs reference:generate
           git diff --exit-code apps/docs/src/content/docs
 
       - name: Build frontend
-        run: pnpm --filter @tradr/web build
+        run: pnpm --filter @jurnal-zitn/web build
 
       # Builds the docs site. starlightLinksValidator() fails the build on any
       # broken internal doc link, so this is also the link check.
       - name: Build docs
-        run: pnpm --filter @tradr/docs build
+        run: pnpm --filter @jurnal-zitn/docs build
 
       - name: Check bundle size (total + dashboard entry + per-widget budgets)
         run: node apps/web/scripts/check-bundle-size.mjs
@@ -137,9 +137,9 @@ jobs:
       # postgres service is published on host 5433 and every DB URL / psql here
       # targets 5433 to match. docker-smoke and e2e keep the workflow-level
       # :5432 (they run their own stacks).
-      DATABASE_URL: postgresql://postgres:postgres@localhost:5433/tradr_test
-      MIGRATE_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5433/tradr_test_migrate
-      MIGRATE_TEST_USER_DATABASE_URL: postgresql://tradr_test_user:tradr_test_user@localhost:5433/tradr_test_migrate
+      DATABASE_URL: postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test
+      MIGRATE_TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test_migrate
+      MIGRATE_TEST_USER_DATABASE_URL: postgresql://jurnal_zitn_test_user:jurnal_zitn_test_user@localhost:5433/jurnal_zitn_test_migrate
 
     services:
       postgres:
@@ -147,7 +147,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: tradr_test
+          POSTGRES_DB: jurnal_zitn_test
         ports:
           # Published on host 5433 to match the vitest api/migrations pin.
           - 5433:5432
@@ -184,10 +184,10 @@ jobs:
           PGPASSWORD: postgres
           PGPORT: 5433
         run: |
-          psql -h localhost -U postgres -d postgres -c "CREATE DATABASE tradr_test_migrate;"
-          psql -h localhost -U postgres -d postgres -c "CREATE ROLE tradr_test_user NOINHERIT NOSUPERUSER LOGIN PASSWORD 'tradr_test_user';"
-          psql -h localhost -U postgres -d postgres -c "GRANT CONNECT ON DATABASE tradr_test_migrate TO tradr_test_user;"
-          psql -h localhost -U postgres -d tradr_test_migrate -c "GRANT USAGE ON SCHEMA public TO tradr_test_user;"
+          psql -h localhost -U postgres -d postgres -c "CREATE DATABASE jurnal_zitn_test_migrate;"
+          psql -h localhost -U postgres -d postgres -c "CREATE ROLE jurnal_zitn_test_user NOINHERIT NOSUPERUSER LOGIN PASSWORD 'jurnal_zitn_test_user';"
+          psql -h localhost -U postgres -d postgres -c "GRANT CONNECT ON DATABASE jurnal_zitn_test_migrate TO jurnal_zitn_test_user;"
+          psql -h localhost -U postgres -d jurnal_zitn_test_migrate -c "GRANT USAGE ON SCHEMA public TO jurnal_zitn_test_user;"
 
       - name: Run api + migrations tests
         run: pnpm exec vitest run --project api --project migrations
@@ -233,7 +233,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: tradr_test
+          POSTGRES_DB: jurnal_zitn_test
         ports:
           - 5432:5432
         options: >-
@@ -258,10 +258,10 @@ jobs:
         # webkit is required by the `Mobile Chrome` + `iphone-13` projects, which
         # use the iPhone 13 device (defaultBrowserType: webkit). Installing only
         # chromium left those projects failing with "Executable doesn't exist".
-        run: pnpm --filter @tradr/e2e exec playwright install --with-deps chromium webkit
+        run: pnpm --filter @jurnal-zitn/e2e exec playwright install --with-deps chromium webkit
 
       - name: Run e2e suite (Playwright boots web + api + UW stub)
-        run: pnpm --filter @tradr/e2e test
+        run: pnpm --filter @jurnal-zitn/e2e test
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
@@ -289,9 +289,9 @@ jobs:
     # the DATABASE_URL the base compose builds in api.environment; they are not
     # app secrets. WEB_PORT avoids the runner's other dev ports.
     env:
-      POSTGRES_USER: tradr
+      POSTGRES_USER: jurnal-zitn
       POSTGRES_PASSWORD: smoke
-      POSTGRES_DB: tradr
+      POSTGRES_DB: jurnal-zitn
       SESSION_SECRET: ci-smoke-secret-that-is-at-least-32-characters-long
       ENCRYPTION_KEY: '0000000000000000000000000000000000000000000000000000000000000000'
       WEB_PORT: 8088
@@ -352,7 +352,7 @@ jobs:
       # fails here. The drizzle table name is drizzle.__drizzle_migrations.
       - name: Assert compiled migrations applied from empty (a)
         run: |
-          docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T api tradr migrate --status
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T api jurnal-zitn migrate --status
           count=$(docker compose -f docker-compose.yml -f docker-compose.ci.yml exec -T postgres \
             psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -tAc \
             "SELECT count(*) FROM drizzle.__drizzle_migrations")
@@ -466,7 +466,7 @@ jobs:
           api_image=$(docker compose -f docker-compose.yml -f docker-compose.ci.yml config --images \
             | grep -E '(^|[-/])api$' | head -n1)
           echo "api image: $api_image"
-          net=$(docker network ls --format '{{.Name}}' | grep -E 'tradr$' | head -n1)
+          net=$(docker network ls --format '{{.Name}}' | grep -E 'jurnal-zitn$' | head -n1)
           # No trailing command: the image ENTRYPOINT is the server entry
           # (node dist/index.js), which runs bootstrap() and thus the gate.
           set +e
@@ -499,7 +499,7 @@ jobs:
       # (j) Runtime-config wired end-to-end (Req 8.5; design C9.5/D2). Three
       # assertions, all against the BUILT web image this job built+loaded:
       #   1. With API_BASE_URL UNSET, the main smoke stack's web serves
-      #      /config.js = `window.__TRADR_CONFIG__={"advisorImageMaxBytes":4500000};`
+      #      /config.js = `window.__JURNAL_ZITN_CONFIG__={"advisorImageMaxBytes":4500000};`
       #      — apiBaseUrl absent (resolveApiUrl falls back to /api), and the
       #      always-on image byte cap (hosted-platform REQ-4.6) emitted with its
       #      default. Asserted against the already-running stack.
@@ -511,7 +511,7 @@ jobs:
       #      loads /config.js via a CLASSIC <script> — no type=module, no async,
       #      no defer. This is the load-bearing guarantee: a classic blocking
       #      script always runs before deferred module scripts regardless of DOM
-      #      position, so window.__TRADR_CONFIG__ is set before the module entry
+      #      position, so window.__JURNAL_ZITN_CONFIG__ is set before the module entry
       #      reads it. We assert the script TYPE (not a brittle positional grep)
       #      and verify Vite did not rewrite the classic script into a module.
       # No cross-origin credentialed request is asserted (split-origin
@@ -526,8 +526,8 @@ jobs:
           # always-on image byte cap (hosted-platform REQ-4.6), apiBaseUrl absent.
           unset_cfg=$(curl -fsS "http://localhost:${WEB_PORT}/config.js")
           echo "unset config.js: $unset_cfg"
-          echo "$unset_cfg" | grep -q 'window.__TRADR_CONFIG__={"advisorImageMaxBytes":4500000};' || {
-            echo 'expected config.js = window.__TRADR_CONFIG__={"advisorImageMaxBytes":4500000}; when API_BASE_URL is unset'
+          echo "$unset_cfg" | grep -q 'window.__JURNAL_ZITN_CONFIG__={"advisorImageMaxBytes":4500000};' || {
+            echo 'expected config.js = window.__JURNAL_ZITN_CONFIG__={"advisorImageMaxBytes":4500000}; when API_BASE_URL is unset'
             exit 1
           }
 
@@ -680,12 +680,12 @@ jobs:
 
           body=$(curl -s "http://localhost:${WEB_PORT}/metrics" || true)
           echo "$body"
-          echo "$body" | grep -q '^# TYPE tradr_web_build_info gauge$' || {
-            echo "exposition is missing its '# TYPE tradr_web_build_info gauge' line"
+          echo "$body" | grep -q '^# TYPE jurnal_zitn_web_build_info gauge$' || {
+            echo "exposition is missing its '# TYPE jurnal_zitn_web_build_info gauge' line"
             exit 1
           }
-          echo "$body" | grep -q '^tradr_web_build_info[{]' || {
-            echo "exposition is missing a tradr_web_build_info{...} sample line"
+          echo "$body" | grep -q '^jurnal_zitn_web_build_info[{]' || {
+            echo "exposition is missing a jurnal_zitn_web_build_info{...} sample line"
             exit 1
           }
 

@@ -3,7 +3,7 @@ title: Architecture overview
 description: React SPA + Hono API + PostgreSQL — static frontend, stateless API, all state in Postgres, forward-only auto-migrations, and a single published port.
 ---
 
-Tradr is deliberately small: a static React SPA, a stateless Hono API, and one
+Jurnal ZITN is deliberately small: a static React SPA, a stateless Hono API, and one
 PostgreSQL database. There is no Redis, queue, or background worker in the default
 self-hosted stack — the three containers in [Self-host with Docker
 Compose](/self-hosting/docker-compose/) are the whole system.
@@ -40,7 +40,7 @@ The source is one pnpm workspace. `pnpm-workspace.yaml` declares the members:
 
 | Path              | What it is                                                          |
 | ----------------- | ------------------------------------------------------------------- |
-| `apps/api`        | The Hono API and the `tradr` CLI                                    |
+| `apps/api`        | The Hono API and the `jurnal-zitn` CLI                              |
 | `apps/web`        | The React SPA                                                       |
 | `apps/docs`       | This documentation site (Astro + Starlight)                         |
 | `packages/shared` | Zod schemas, constants, and pure calculation code used by both apps |

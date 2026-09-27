@@ -11,8 +11,9 @@ import { render, screen, fireEvent, waitFor, cleanup, act } from '@testing-libra
 import { toast } from 'sonner';
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest';
 
-import type { User } from '@tradr/shared';
+import type { User } from '@jurnal-zitn/shared';
 
+import { setAppLocale } from '@/lib/locale';
 import { DRAWER_STORAGE_KEY, useDrawerStore } from '@/stores/drawer.store';
 import { eventBus } from '@/stores/event-bus.store';
 
@@ -123,6 +124,8 @@ function registerBody(): Record<string, unknown> {
 }
 
 beforeEach(() => {
+  // Salinan halaman register dikunci berbahasa Inggris (default produk = id).
+  setAppLocale('en');
   registered = { id: 'u1', email: 'new@user.dev', isAdmin: false, emailVerified: false };
   resendResponse = () => jsonResponse(200, { success: true });
 
@@ -142,6 +145,7 @@ beforeEach(() => {
 
 afterEach(() => {
   cleanup();
+  setAppLocale('id');
   fetchSpy?.mockRestore();
   fetchSpy = null;
   intlSpy?.mockRestore();

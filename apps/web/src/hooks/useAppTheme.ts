@@ -13,7 +13,7 @@ type ThemeValue = 'light' | 'dark' | 'system';
 // §C / §C-r3: tombstone lives in sessionStorage, so a full page reload preserves the
 // 60s failure window. Tab-close-and-reopen does NOT (sessionStorage is per-tab).
 // writeTombstone is wrapped in try/catch (Safari Private Browsing throws on setItem).
-const TOMBSTONE_KEY = 'tradr_theme_pending';
+const TOMBSTONE_KEY = 'jurnal_zitn_theme_pending';
 type Tombstone = {
   lastPendingAt: number;
   lastFailedAt: number;
@@ -50,12 +50,9 @@ function writeTombstone(patch: Partial<Tombstone>): void {
 // (a single boot per page-load).
 let didBootForReact = false;
 
-function resolveEffective(
-  theme: string | undefined,
-  systemTheme: string | undefined,
-): ThemeValue {
-  if (theme === 'system') return ((systemTheme as ThemeValue | undefined) ?? 'light');
-  return ((theme as ThemeValue | undefined) ?? 'system');
+function resolveEffective(theme: string | undefined, systemTheme: string | undefined): ThemeValue {
+  if (theme === 'system') return (systemTheme as ThemeValue | undefined) ?? 'light';
+  return (theme as ThemeValue | undefined) ?? 'system';
 }
 
 function useBootThemeReconciliation(nextThemeSetTheme: (t: string) => void): void {
@@ -129,7 +126,7 @@ function useCrossTabThemeSync(
 
   useEffect(() => {
     if (typeof BroadcastChannel === 'undefined') return;
-    const channel = new BroadcastChannel('tradr-theme');
+    const channel = new BroadcastChannel('jurnal-zitn-theme');
     channelRef.current = channel;
     const onMessage = (event: MessageEvent) => {
       const data = event.data as
@@ -191,10 +188,7 @@ export function useAppTheme() {
   });
 
   useBootThemeReconciliation(nextTheme.setTheme);
-  const { channelRef, lastBroadcastTsRef } = useCrossTabThemeSync(
-    nextTheme.setTheme,
-    user?.id,
-  );
+  const { channelRef, lastBroadcastTsRef } = useCrossTabThemeSync(nextTheme.setTheme, user?.id);
 
   const broadcastTheme = useCallback(
     (value: ThemeValue, userId: string | undefined) =>

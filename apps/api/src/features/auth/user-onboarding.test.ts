@@ -1,8 +1,8 @@
 import { eq } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
 
-import { MAX_COACH_MARKS_SEEN } from '@tradr/shared';
-import type { StoredOnboardingState } from '@tradr/shared';
+import { MAX_COACH_MARKS_SEEN } from '@jurnal-zitn/shared';
+import type { StoredOnboardingState } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db } from '@/db';

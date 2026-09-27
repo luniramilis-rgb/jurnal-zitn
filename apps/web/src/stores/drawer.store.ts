@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 
-import type { PositionListItem } from '@tradr/shared';
+import type { PositionListItem } from '@jurnal-zitn/shared';
 
 export type DrawerTab = 'open-positions' | 'quick-stats' | 'options-pricing' | 'recently-created';
 
@@ -11,7 +11,7 @@ export const DRAWER_TABS: readonly DrawerTab[] = [
   'recently-created',
 ] as const;
 
-export const DRAWER_STORAGE_KEY = 'tradr_drawer_state';
+export const DRAWER_STORAGE_KEY = 'jurnal_zitn_drawer_state';
 
 export interface PersistedDrawerState {
   isOpen: boolean;

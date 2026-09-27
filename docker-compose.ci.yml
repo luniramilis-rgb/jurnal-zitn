@@ -18,7 +18,7 @@ services:
       dockerfile: docker/Dockerfile.api
 
   # CI-only SSE drip stub for the streaming liveness probe (task 12, Req 8.4). A
-  # plain node:22-slim running the bind-mounted server on the tradr network as
+  # plain node:22-slim running the bind-mounted server on the jurnal-zitn network as
   # `sse-stub`, so nginx's _probe.inc location can proxy to it by DNS name. NOT
   # a Playwright webServer.
   sse-stub:
@@ -33,7 +33,7 @@ services:
       timeout: 3s
       retries: 5
     networks:
-      - tradr
+      - jurnal-zitn
 
   web:
     build:

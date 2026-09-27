@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
- 
+
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -34,7 +34,7 @@ import { FeedbackSurface, feedbackMainGutterClasses } from './FeedbackSurface';
 const IDS = { surveyId: 'survey-1', ratingQuestionId: 'rating-q', textQuestionId: 'text-q' };
 
 function configure() {
-  window.__TRADR_CONFIG__ = {
+  window.__JURNAL_ZITN_CONFIG__ = {
     posthogPublicKey: 'phc_test',
     feedbackSurvey: `${IDS.surveyId}:${IDS.ratingQuestionId}:${IDS.textQuestionId}`,
   };
@@ -66,14 +66,14 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
-  window.__TRADR_CONFIG__ = undefined;
+  window.__JURNAL_ZITN_CONFIG__ = undefined;
 });
 
 const tab = () => screen.getByTestId('feedback-tab');
 
 describe('FeedbackSurface — gate', () => {
   it('renders nothing and yields undefined gutter classes when unconfigured', () => {
-    window.__TRADR_CONFIG__ = undefined;
+    window.__JURNAL_ZITN_CONFIG__ = undefined;
     const { container } = render(<FeedbackSurface />);
     expect(container.firstChild).toBeNull();
     expect(feedbackMainGutterClasses(false)).toBeUndefined();

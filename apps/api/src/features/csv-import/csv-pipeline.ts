@@ -6,7 +6,7 @@ import {
   type LocatedError,
   type LocatedWarning,
   type ProposedPosition,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { aggregateFills, computePnlFromTotals } from '@/features/positions/pnl';
 import {
@@ -62,7 +62,7 @@ export function runPipeline(
     errors.push({
       rowNumber: 0,
       csvColumn: e.csvColumn,
-      tradrField: e.tradrField,
+      journalField: e.journalField,
       code: e.code,
       message: e.message,
     });
@@ -74,7 +74,7 @@ export function runPipeline(
     errors.push({
       rowNumber: e.rowNumber,
       csvColumn: e.csvColumn,
-      tradrField: e.tradrField,
+      journalField: e.journalField,
       code: e.code,
       message: e.message,
     });
@@ -174,7 +174,7 @@ export function validateSegment(seg: Segment, errors: LocatedError[]): void {
     const issue = positionCheck.error.issues[0];
     errors.push({
       rowNumber: seg.executions[0]?.sourceRow ?? 0,
-      tradrField: 'symbol',
+      journalField: 'symbol',
       code: 'FIELD_INVALID',
       message: issue.message,
     });
@@ -192,7 +192,7 @@ export function validateSegment(seg: Segment, errors: LocatedError[]): void {
       for (const issue of fillCheck.error.issues) {
         errors.push({
           rowNumber: exec.sourceRow,
-          tradrField: String(issue.path[0] ?? ''),
+          journalField: String(issue.path[0] ?? ''),
           code: 'FIELD_INVALID',
           message: issue.message,
         });

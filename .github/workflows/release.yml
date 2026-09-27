@@ -1,6 +1,6 @@
 name: Release
 
-# Build + push multi-arch (amd64 + arm64) tradr-api and tradr-web images to
+# Build + push multi-arch (amd64 + arm64) jurnal-zitn-api and jurnal-zitn-web images to
 # GHCR on tagged releases, then publish the SPA bundle + GitHub Release.
 #
 # Each architecture builds NATIVELY on its own runner (arm64 uses GitHub's
@@ -91,25 +91,25 @@ jobs:
       matrix:
         include:
           - {
-              image: tradr-api,
+              image: jurnal-zitn-api,
               dockerfile: docker/Dockerfile.api,
               arch: amd64,
               runner: ubuntu-latest,
             }
           - {
-              image: tradr-api,
+              image: jurnal-zitn-api,
               dockerfile: docker/Dockerfile.api,
               arch: arm64,
               runner: ubuntu-24.04-arm,
             }
           - {
-              image: tradr-web,
+              image: jurnal-zitn-web,
               dockerfile: docker/Dockerfile.web,
               arch: amd64,
               runner: ubuntu-latest,
             }
           - {
-              image: tradr-web,
+              image: jurnal-zitn-web,
               dockerfile: docker/Dockerfile.web,
               arch: arm64,
               runner: ubuntu-24.04-arm,
@@ -154,8 +154,8 @@ jobs:
           file: ${{ matrix.dockerfile }}
           platforms: linux/${{ matrix.arch }}
           # APP_VERSION is consumed by BOTH images: Dockerfile.api bakes it for
-          # GET /api/health and tradr_build_info, Dockerfile.web bakes it for the
-          # SPA's version badge and tradr_web_build_info in /metrics.
+          # GET /api/health and jurnal_zitn_build_info, Dockerfile.web bakes it for the
+          # SPA's version badge and jurnal_zitn_web_build_info in /metrics.
           build-args: |
             APP_VERSION=${{ github.ref_name }}
           labels: ${{ steps.meta.outputs.labels }}
@@ -170,9 +170,9 @@ jobs:
       # any tag points at it. --entrypoint node overrides the server entrypoint,
       # which validates env and would reject -e as a server arg.
       - name: Verify arm64 bcrypt
-        if: matrix.image == 'tradr-api' && matrix.arch == 'arm64'
+        if: matrix.image == 'jurnal-zitn-api' && matrix.arch == 'arm64'
         env:
-          IMAGE: ${{ env.REGISTRY }}/${{ steps.ns.outputs.owner }}/tradr-api@${{ steps.build.outputs.digest }}
+          IMAGE: ${{ env.REGISTRY }}/${{ steps.ns.outputs.owner }}/jurnal-zitn-api@${{ steps.build.outputs.digest }}
         run: |
           docker run --rm --entrypoint node "$IMAGE" \
             -e "const h=require('bcrypt').hashSync('x',10); if(!h||h.length<20){console.error('bcrypt produced no hash');process.exit(1);} if(process.arch!=='arm64'){console.error('not arm64:',process.arch);process.exit(1);} console.log('arm64 bcrypt OK:', h.slice(0,7))"
@@ -202,7 +202,7 @@ jobs:
       packages: write
     strategy:
       matrix:
-        image: [tradr-api, tradr-web]
+        image: [jurnal-zitn-api, jurnal-zitn-web]
     steps:
       - name: Resolve GHCR namespace (lowercased owner)
         id: ns
@@ -284,7 +284,7 @@ jobs:
       # build output, matching what the previous `pnpm build` produced.
       - name: Extract the SPA bundle from the released web image
         env:
-          IMAGE_REF: ${{ env.REGISTRY }}/${{ steps.ns.outputs.owner }}/tradr-web
+          IMAGE_REF: ${{ env.REGISTRY }}/${{ steps.ns.outputs.owner }}/jurnal-zitn-web
           VERSION: ${{ github.ref_name }}
         run: |
           set -euo pipefail
@@ -294,7 +294,7 @@ jobs:
           docker cp "${cid}:/usr/share/nginx/html/." spa/
           docker rm "$cid" >/dev/null
           test -f spa/index.html || { echo "::error::no index.html in the extracted SPA"; exit 1; }
-          tar -C spa -czf "tradr-web-dist-${VERSION}.tar.gz" .
+          tar -C spa -czf "jurnal-zitn-web-dist-${VERSION}.tar.gz" .
 
       # release-notes-gate has already passed for this tag: a minor tag (vX.Y.0)
       # cannot reach this job without a valid docs/release-notes/vX.Y.Z.md. A
@@ -305,4 +305,4 @@ jobs:
         with:
           body_path: docs/release-notes/${{ github.ref_name }}.md
           generate_release_notes: true
-          files: tradr-web-dist-${{ github.ref_name }}.tar.gz
+          files: jurnal-zitn-web-dist-${{ github.ref_name }}.tar.gz

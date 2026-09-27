@@ -18,7 +18,7 @@
 //     with a stub loader (injecting a fetcher into `syncSymbolsIfStale` would
 //     not bypass the test-env guard, which fires first).
 
-import type { SymbolSearchItem } from '@tradr/shared';
+import type { SymbolSearchItem } from '@jurnal-zitn/shared';
 
 import { db, type Database } from '@/db';
 import { config } from '@/lib/config';

@@ -1,6 +1,6 @@
 ---
 name: Bug report
-about: Report a reproducible problem in Tradr
+about: Report a reproducible problem in Jurnal ZITN
 title: ''
 labels: bug
 ---

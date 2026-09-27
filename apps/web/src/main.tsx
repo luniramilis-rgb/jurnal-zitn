@@ -4,6 +4,7 @@ import { ThemeProvider } from 'next-themes';
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 
+import { LocaleProvider } from './hooks/useLocale';
 import { setRouter } from './lib/api';
 import { installChunkRecovery } from './lib/chunkRecovery';
 import { queryClient } from './lib/queryClient';
@@ -32,9 +33,11 @@ void initPostHogClient(router);
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
-      <ThemeProvider attribute="class" defaultTheme="system" storageKey="theme">
-        <RouterProvider router={router} />
-      </ThemeProvider>
+      <LocaleProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" storageKey="theme">
+          <RouterProvider router={router} />
+        </ThemeProvider>
+      </LocaleProvider>
     </QueryClientProvider>
   </StrictMode>,
 );

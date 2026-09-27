@@ -1,4 +1,4 @@
-import { STARTER_TAGS, TAG_CATEGORY_LABELS } from '@tradr/shared';
+import { STARTER_TAGS, TAG_CATEGORY_LABELS } from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

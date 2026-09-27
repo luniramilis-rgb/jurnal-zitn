@@ -6,7 +6,7 @@ import {
   CreateExchangeRateInputSchema,
   PreviewRateChangeInputSchema,
   ReconcileBalanceInputSchema,
-} from '@tradr/shared/schemas/accounting';
+} from '@jurnal-zitn/shared/schemas/accounting';
 
 import { db } from '@/db';
 import { validate } from '@/lib/validation';
@@ -38,7 +38,7 @@ const accountingRouter = new Hono<AuthEnv>();
 accountingRouter.use(authMiddleware);
 
 // ---------------------------------------------------------------------------
-// Schemas (local — request shapes only; response schemas live in @tradr/shared)
+// Schemas (local — request shapes only; response schemas live in @jurnal-zitn/shared)
 // ---------------------------------------------------------------------------
 
 const AccountIdParamSchema = z.object({ accountId: z.string().uuid() });
@@ -146,8 +146,8 @@ accountingRouter.get(
  *       the difference inside the transaction that writes the row, behind a row
  *       lock on the account, so a concurrent position close cannot race it.
  *
- *       The balance being reconciled is Tradr's cash balance for the account:
- *       starting balance plus realized P&L from closed trades. Tradr holds no
+ *       The balance being reconciled is Jurnal ZITN's cash balance for the account:
+ *       starting balance plus realized P&L from closed trades. Jurnal ZITN holds no
  *       mark-to-market, so it excludes the market value of open positions. Open
  *       positions do not block or alter this operation.
  *
@@ -216,7 +216,7 @@ accountingRouter.post(
  *       into or out of this brokerage account, and moves the balance by the
  *       amount — a `deposit` credits it, a `withdrawal` debits it.
  *
- *       `occurredAt` defaults to now and may be in the past. Tradr's balance is
+ *       `occurredAt` defaults to now and may be in the past. Jurnal ZITN's balance is
  *       cash only and holds no mark-to-market, so a withdrawal larger than the
  *       balance is accepted and the balance goes negative rather than being
  *       blocked.
@@ -340,7 +340,7 @@ accountingRouter.delete(
  *   get:
  *     summary: List the user's exchange rates.
  *     description: >
- *       Authed. Tradr does not fetch rates from any market feed — you supply
+ *       Authed. Jurnal ZITN does not fetch rates from any market feed — you supply
  *       them. Each rate is a base/quote pair with a value and an effective
  *       date, and conversions use the latest rate on or before the date being
  *       converted.

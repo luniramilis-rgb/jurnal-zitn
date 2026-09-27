@@ -27,7 +27,7 @@
 
 import { z } from 'zod';
 
-import { GranularitySchema, PerformanceQuerySchema } from '@tradr/shared';
+import { GranularitySchema, PerformanceQuerySchema } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { selectAccountSummaries } from '@/features/accounts/accounts.query';

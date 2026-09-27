@@ -24,7 +24,7 @@ import type {
   PerformanceCurrency,
   PerformanceQueryInput,
   PerformanceResponse,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { useDisplayCurrencyQuery } from '@/features/accounting/hooks/useDisplayCurrency';
 import { usePerformance } from '@/features/performance/hooks/usePerformance';

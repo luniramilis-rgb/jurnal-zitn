@@ -1,5 +1,5 @@
 ---
-// The `▴ Tradr docs` wordmark — brand triangle, product name, muted qualifier.
+// The `▴ Jurnal ZITN docs` wordmark — brand triangle, product name, muted qualifier.
 //
 // Overrides Starlight's SiteTitle, which renders the whole configured title as
 // one accent-colored string. The wordmark is a designed lockup with three
@@ -7,13 +7,13 @@
 // so this is a component override (astro.config `components.SiteTitle`).
 //
 // The ▴ is decorative (aria-hidden), so the link's accessible name stays
-// "Tradr docs" — the configured site title.
+// "Jurnal ZITN docs" — the configured site title.
 const { siteTitleHref } = Astro.locals.starlightRoute;
 ---
 
 <a href={siteTitleHref} class="site-title sl-flex">
   <span class="mark" aria-hidden="true">▴</span>
-  <span class="wordmark" translate="no">Tradr <span class="qualifier">docs</span></span>
+  <span class="wordmark" translate="no">Jurnal ZITN <span class="qualifier">docs</span></span>
 </a>
 
 <style>

@@ -3,7 +3,7 @@ import { createHash, randomBytes, randomUUID } from 'node:crypto';
 import { eq, sql } from 'drizzle-orm';
 import { beforeEach, describe, expect, it } from 'vitest';
 
-import { BODY_LIMIT_BYTES, DEFAULT_WIDGETS, PerWidgetMinSize } from '@tradr/shared';
+import { BODY_LIMIT_BYTES, DEFAULT_WIDGETS, PerWidgetMinSize } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db } from '@/db';
@@ -180,9 +180,9 @@ describe('dashboard routes', () => {
     expect(layoutRow.updatedAt.toISOString()).toBe(body.updatedAt);
 
     // Set-Cookie assertions
-    const setCookie = getSetCookieHeader(res, 'tradr_theme');
+    const setCookie = getSetCookieHeader(res, 'jurnal_zitn_theme');
     expect(setCookie).toBeDefined();
-    expect(setCookie).toContain('tradr_theme=dark');
+    expect(setCookie).toContain('jurnal_zitn_theme=dark');
     expect(setCookie).toContain('Path=/');
     expect(setCookie).toContain('SameSite=Lax');
     expect(setCookie).toContain('Max-Age=31536000');
@@ -196,7 +196,7 @@ describe('dashboard routes', () => {
     const res = await authedRequest('PUT', '/api/dashboard/layout', cookie, { widgets });
     expect(res.status).toBe(200);
 
-    expect(getSetCookieHeader(res, 'tradr_theme')).toBeUndefined();
+    expect(getSetCookieHeader(res, 'jurnal_zitn_theme')).toBeUndefined();
 
     const [layoutRow] = await db
       .select({ widgets: dashboardLayouts.widgets })
@@ -543,7 +543,7 @@ describe('dashboard routes', () => {
     const body = (await res.json()) as { theme: string };
     expect(['light', 'dark', 'system']).toContain(body.theme);
     expect(res.headers.get('cache-control')).toBe('no-store');
-    expect(getSetCookieHeader(res, 'tradr_theme')).toBeUndefined();
+    expect(getSetCookieHeader(res, 'jurnal_zitn_theme')).toBeUndefined();
 
     // No mutation
     const [userRow] = await db
@@ -562,9 +562,9 @@ describe('dashboard routes', () => {
     const res = await authedRequest('POST', '/api/dashboard/theme-cookie', cookie);
     expect(res.status).toBe(204);
 
-    const setCookie = getSetCookieHeader(res, 'tradr_theme');
+    const setCookie = getSetCookieHeader(res, 'jurnal_zitn_theme');
     expect(setCookie).toBeDefined();
-    expect(setCookie).toContain('tradr_theme=dark');
+    expect(setCookie).toContain('jurnal_zitn_theme=dark');
     expect(setCookie).toContain('Path=/');
     expect(setCookie).toContain('SameSite=Lax');
     expect(setCookie).toContain('Max-Age=31536000');

@@ -1,6 +1,9 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { type TaxSummaryResponse, TaxSummaryResponseSchema } from '@tradr/shared/schemas/expense';
+import {
+  type TaxSummaryResponse,
+  TaxSummaryResponseSchema,
+} from '@jurnal-zitn/shared/schemas/expense';
 
 import { api } from '@/lib/api';
 

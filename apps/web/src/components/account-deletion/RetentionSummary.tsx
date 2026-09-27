@@ -12,6 +12,7 @@
 // this component stays presentation-only and testable without either query.
 
 import { Numeric } from '@/components/Numeric';
+import { useT } from '@/hooks/useLocale';
 import { docsUrl } from '@/lib/docs';
 
 export interface RetentionSummaryProps {
@@ -25,32 +26,30 @@ export interface RetentionSummaryProps {
 }
 
 export function RetentionSummary({ creditBalance }: RetentionSummaryProps) {
+  const t = useT();
   return (
     <div className="space-y-3 text-sm" data-testid="retention-summary">
       <div>
-        <p className="font-medium">What deletion keeps</p>
+        <p className="font-medium">{t('retention.title')}</p>
         <ul className="text-muted-foreground mt-1 list-disc space-y-1 pl-6">
-          <li>Stripe keeps its customer and invoice records.</li>
-          <li>An audit-log row stays, with the user reference nulled and the email hashed.</li>
-          <li>One tombstone row stays, so the account cannot be deleted a second time.</li>
-          <li>Backups keep a copy of the account until each backup expires.</li>
+          <li>{t('retention.item.stripe')}</li>
+          <li>{t('retention.item.audit')}</li>
+          <li>{t('retention.item.tombstone')}</li>
+          <li>{t('retention.item.backups')}</li>
         </ul>
       </div>
 
       <div>
-        <p className="font-medium">Your money</p>
+        <p className="font-medium">{t('retention.moneyTitle')}</p>
         <ul className="text-muted-foreground mt-1 list-disc space-y-1 pl-6">
-          <li>
-            Deletion is not refunded. A scheduled deletion keeps the paid tier until the period
-            ends, without a refund.
-          </li>
+          <li>{t('retention.money.notRefunded')}</li>
           <li data-testid="retention-credits">
             {creditBalance === undefined ? (
-              'Unused wallet credits are deleted with the account, not refunded.'
+              t('retention.money.creditsPlain')
             ) : (
               <>
-                <Numeric value={creditBalance} kind="integer" direction="none" /> unused wallet
-                credits are deleted with the account, not refunded.
+                <Numeric value={creditBalance} kind="integer" direction="none" />{' '}
+                {t('retention.money.creditsSuffix')}
               </>
             )}
           </li>
@@ -64,7 +63,7 @@ export function RetentionSummary({ creditBalance }: RetentionSummaryProps) {
           rel="noopener noreferrer"
           className="underline"
         >
-          What deletion removes and what it keeps
+          {t('retention.docsLink')}
         </a>
       </p>
     </div>

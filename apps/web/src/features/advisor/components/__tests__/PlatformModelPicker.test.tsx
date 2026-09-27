@@ -9,7 +9,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { BillingModel } from '@tradr/shared';
+import type { BillingModel } from '@jurnal-zitn/shared';
 
 import { PlatformModelPicker } from '../PlatformModelPicker';
 

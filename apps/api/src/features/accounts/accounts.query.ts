@@ -408,7 +408,7 @@ export function clearDisplayCurrency(tx: Transaction, userId: string) {
 //
 // It rides in the existing onboarding jsonb rather than taking a column of its
 // own, and it is deliberately NOT part of the onboarding schema in
-// `@tradr/shared`. That schema describes the user's onboarding PREFERENCE — what
+// `@jurnal-zitn/shared`. That schema describes the user's onboarding PREFERENCE — what
 // the onboarding endpoints read and write — and this is neither; it is internal
 // bookkeeping shared between the seed and its inverse. The column carries it
 // safely on both counts: unknown keys are stripped when the preference is read,

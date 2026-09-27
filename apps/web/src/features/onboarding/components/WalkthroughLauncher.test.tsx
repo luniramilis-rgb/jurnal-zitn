@@ -13,7 +13,7 @@ import userEvent from '@testing-library/user-event';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { OnboardingState } from '@tradr/shared';
+import type { OnboardingState } from '@jurnal-zitn/shared';
 
 import { Toaster } from '@/components/ui/sonner';
 import { api } from '@/lib/api';

@@ -2,13 +2,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { SUPPORTED_CURRENCIES } from '@tradr/shared';
+import { SUPPORTED_CURRENCIES } from '@jurnal-zitn/shared';
 import {
   CreateExchangeRateInputSchema,
   type CreateExchangeRateInput,
   type ExchangeRate,
   type PreviewRateChangeResponse,
-} from '@tradr/shared/schemas/accounting';
+} from '@jurnal-zitn/shared/schemas/accounting';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import {

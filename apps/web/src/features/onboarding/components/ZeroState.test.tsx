@@ -25,7 +25,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { OnboardingState, OnboardingStatus } from '@tradr/shared';
+import type { OnboardingState, OnboardingStatus } from '@jurnal-zitn/shared';
 
 import { DOCS_BASE_URL, docsUrl } from '@/lib/docs';
 
@@ -448,7 +448,7 @@ describe('ZeroState — what the screen says', () => {
     expect(text).toContain('booked against one');
   });
 
-  it('states that Tradr accounts mirror real ones but are not connected to them', () => {
+  it('states that Jurnal ZITN accounts mirror real ones but are not connected to them', () => {
     useHook();
     render(<ZeroState />);
 
@@ -457,7 +457,7 @@ describe('ZeroState — what the screen says', () => {
     expect(statement).toContain('not connected to your broker');
   });
 
-  it('states that Tradr never places or executes trades', () => {
+  it('states that Jurnal ZITN never places or executes trades', () => {
     useHook();
     render(<ZeroState />);
 

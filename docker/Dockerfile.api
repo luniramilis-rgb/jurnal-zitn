@@ -34,17 +34,17 @@ RUN apt-get update \
   && apt-get install -y --no-install-recommends python3 make g++ \
   && rm -rf /var/lib/apt/lists/*
 
-# Copy the whole repo (the bundle inlines @tradr/* workspace source, so we
+# Copy the whole repo (the bundle inlines @jurnal-zitn/* workspace source, so we
 # need the full monorepo, not just apps/api). .dockerignore keeps the context
 # slim (no node_modules, no .git, no .env).
 COPY . .
 
 # Install all workspace deps reproducibly, then build the API prod bundle
-# (dist/index.js + dist/tradr.js) with the external-set assertion from task 5.
+# (dist/index.js + dist/jurnal-zitn.js) with the external-set assertion from task 5.
 # Remove any stale dist carried in from the build context first so the runner
 # ships ONLY the fresh esbuild output (the bundle is produced here, in-builder).
 RUN pnpm install --frozen-lockfile
-RUN rm -rf apps/api/dist && pnpm --filter @tradr/api build:prod
+RUN rm -rf apps/api/dist && pnpm --filter @jurnal-zitn/api build:prod
 
 # Assemble the native runtime node_modules in a scratch project. npm yields a
 # flat node_modules (no symlinks), so it is safely COPY-able into the runner.
@@ -53,7 +53,7 @@ RUN rm -rf apps/api/dist && pnpm --filter @tradr/api build:prod
 WORKDIR /native
 RUN printf '%s\n' \
   '{' \
-  '  "name": "tradr-native",' \
+  '  "name": "jurnal-zitn-native",' \
   '  "private": true,' \
   '  "dependencies": {' \
   '    "bcrypt": "5.1.1",' \
@@ -97,7 +97,7 @@ ENV APP_VERSION=${APP_VERSION}
 WORKDIR /app
 ENV NODE_ENV=production
 
-# The esbuild bundle (index.js = server entry, tradr.js = CLI).
+# The esbuild bundle (index.js = server entry, jurnal-zitn.js = CLI).
 COPY --from=builder /repo/apps/api/dist ./dist
 
 # The flat, copyable native node_modules (bcrypt + tiktoken + transitive deps).
@@ -109,9 +109,9 @@ COPY --from=builder /native/node_modules ./node_modules
 COPY --from=builder /repo/apps/api/src/db/migrations ./dist/migrations
 COPY --from=builder /repo/apps/api/src/db/post-migrations ./dist/post-migrations
 
-# `tradr` CLI shim on PATH -> the bundled CLI.
-RUN printf '%s\n' '#!/bin/sh' 'exec node /app/dist/tradr.js "$@"' > /usr/local/bin/tradr \
-  && chmod +x /usr/local/bin/tradr
+# `jurnal-zitn` CLI shim on PATH -> the bundled CLI.
+RUN printf '%s\n' '#!/bin/sh' 'exec node /app/dist/jurnal-zitn.js "$@"' > /usr/local/bin/jurnal-zitn \
+  && chmod +x /usr/local/bin/jurnal-zitn
 
 EXPOSE 3100
 

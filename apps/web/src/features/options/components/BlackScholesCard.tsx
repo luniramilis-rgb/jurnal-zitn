@@ -1,7 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { blackScholes, type BlackScholesInput, type BlackScholesOutput } from '@tradr/shared';
+import { blackScholes, type BlackScholesInput, type BlackScholesOutput } from '@jurnal-zitn/shared';
 
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';

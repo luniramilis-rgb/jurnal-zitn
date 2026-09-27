@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import type { Mapping } from '@tradr/shared';
+import type { Mapping } from '@jurnal-zitn/shared';
 
 import { applyMapping, validateMappingShape } from './csv-mapping';
 import type { ParsedCsv } from './csv-parse';
@@ -60,7 +60,7 @@ describe('validateMappingShape', () => {
       m,
     );
     expect(errors).toContainEqual(
-      expect.objectContaining({ code: 'MAPPING_FIELD_MISSING', tradrField: 'price' }),
+      expect.objectContaining({ code: 'MAPPING_FIELD_MISSING', journalField: 'price' }),
     );
   });
 
@@ -98,7 +98,7 @@ describe('validateMappingShape', () => {
     expect(errors).toContainEqual(
       expect.objectContaining({
         code: 'MAPPING_COLUMN_ABSENT',
-        tradrField: 'filledAt',
+        journalField: 'filledAt',
         csvColumn: 'FilledAt',
       }),
     );
@@ -134,10 +134,10 @@ describe('validateMappingShape', () => {
     ];
     const errors = validateMappingShape(headers, m);
     expect(errors).toContainEqual(
-      expect.objectContaining({ code: 'MAPPING_FIELD_MISSING', tradrField: 'exitDate' }),
+      expect.objectContaining({ code: 'MAPPING_FIELD_MISSING', journalField: 'exitDate' }),
     );
     expect(errors).toContainEqual(
-      expect.objectContaining({ code: 'MAPPING_FIELD_MISSING', tradrField: 'exitPrice' }),
+      expect.objectContaining({ code: 'MAPPING_FIELD_MISSING', journalField: 'exitPrice' }),
     );
   });
 
@@ -157,7 +157,7 @@ describe('validateMappingShape', () => {
     const headers = ['Symbol', 'Descriptor', 'Action', 'Quantity', 'Price', 'FilledAt'];
     const errors = validateMappingShape(headers, m);
     expect(
-      errors.some((e) => e.code === 'MAPPING_FIELD_MISSING' && e.tradrField === 'assetType'),
+      errors.some((e) => e.code === 'MAPPING_FIELD_MISSING' && e.journalField === 'assetType'),
     ).toBe(false);
   });
 
@@ -177,7 +177,7 @@ describe('validateMappingShape', () => {
     const headers = ['Symbol', 'AssetType', 'Action', 'Quantity', 'Price', 'FilledAt'];
     const errors = validateMappingShape(headers, m);
     expect(errors).toContainEqual(
-      expect.objectContaining({ code: 'MAPPING_FIELD_MISSING', tradrField: 'descriptor' }),
+      expect.objectContaining({ code: 'MAPPING_FIELD_MISSING', journalField: 'descriptor' }),
     );
   });
 
@@ -221,7 +221,7 @@ describe('validateMappingShape', () => {
       const headers = ['Symbol', 'Descriptor', 'Action', 'Quantity', 'Price', 'FilledAt'];
       const errors = validateMappingShape(headers, m);
       expect(errors).toContainEqual(
-        expect.objectContaining({ code: 'MAPPING_FIELD_MISSING', tradrField: 'assetType' }),
+        expect.objectContaining({ code: 'MAPPING_FIELD_MISSING', journalField: 'assetType' }),
       );
     }
   });
@@ -264,7 +264,7 @@ describe('applyMapping transforms', () => {
       expect.objectContaining({
         code: 'TRANSFORM_NO_MATCH',
         rowNumber: 2,
-        tradrField: 'side',
+        journalField: 'side',
         csvColumn: 'Side',
       }),
     );
@@ -304,7 +304,7 @@ describe('applyMapping transforms', () => {
       expect.objectContaining({
         code: 'TRANSFORM_NO_MATCH',
         rowNumber: 2,
-        tradrField: 'right',
+        journalField: 'right',
         csvColumn: 'Right',
       }),
     );
@@ -345,7 +345,7 @@ describe('applyMapping row conformance', () => {
       expect.objectContaining({
         code: 'ROW_MISSING_REQUIRED_FIELD',
         rowNumber: 3,
-        tradrField: 'price',
+        journalField: 'price',
       }),
     );
   });
@@ -373,7 +373,7 @@ describe('applyMapping row conformance', () => {
         expect.objectContaining({
           code: 'ROW_MISSING_REQUIRED_FIELD',
           rowNumber: 2,
-          tradrField: field,
+          journalField: field,
         }),
       );
     }
@@ -448,7 +448,7 @@ describe('applyMapping descriptor-derived assetType', () => {
     expect(validateMappingShape(headers, m)).toContainEqual(
       expect.objectContaining({
         code: 'MAPPING_COLUMN_ABSENT',
-        tradrField: 'descriptor',
+        journalField: 'descriptor',
         csvColumn: 'Descriptor',
       }),
     );
@@ -459,7 +459,7 @@ describe('applyMapping descriptor-derived assetType', () => {
       expect.objectContaining({
         code: 'ROW_MISSING_REQUIRED_FIELD',
         rowNumber: 2,
-        tradrField: 'assetType',
+        journalField: 'assetType',
       }),
     );
     expect(rows[0].values.assetType).toBeUndefined();

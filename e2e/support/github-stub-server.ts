@@ -57,7 +57,7 @@ const FIXTURE_RELEASES = [
     ].join('\n'),
     published_at: '2026-01-15T09:00:00Z',
     created_at: '2026-01-15T08:00:00Z',
-    html_url: 'https://github.com/e2e-fixtures/tradr-changelog/releases/tag/v0.1.0',
+    html_url: 'https://github.com/e2e-fixtures/jurnal-zitn-changelog/releases/tag/v0.1.0',
     prerelease: false,
   },
   {
@@ -74,7 +74,7 @@ const FIXTURE_RELEASES = [
     ].join('\n'),
     published_at: '2026-02-20T10:00:00Z',
     created_at: '2026-02-20T09:00:00Z',
-    html_url: 'https://github.com/e2e-fixtures/tradr-changelog/releases/tag/v0.2.0',
+    html_url: 'https://github.com/e2e-fixtures/jurnal-zitn-changelog/releases/tag/v0.2.0',
     prerelease: true,
   },
 ];

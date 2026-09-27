@@ -3,7 +3,7 @@ import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it } from 'vitest';
 
-import type { ProposedPosition } from '@tradr/shared';
+import type { ProposedPosition } from '@jurnal-zitn/shared';
 
 import { ProposedPositions } from './ProposedPositions';
 
@@ -34,7 +34,14 @@ function makeProposed(overrides: Partial<ProposedPosition> = {}): ProposedPositi
     side: 'long',
     closes: true,
     fills: [
-      { type: 'entry', price: '150', quantity: '10', fees: '0', filledAt: '2026-05-01', sourceRow: 2 },
+      {
+        type: 'entry',
+        price: '150',
+        quantity: '10',
+        fees: '0',
+        filledAt: '2026-05-01',
+        sourceRow: 2,
+      },
     ],
     proposedPnl: 0,
     ...overrides,

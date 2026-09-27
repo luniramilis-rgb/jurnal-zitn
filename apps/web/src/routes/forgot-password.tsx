@@ -6,13 +6,14 @@ import { useForm } from 'react-hook-form';
 import {
   PasswordResetRequestSchema,
   type PasswordResetRequestInput,
-} from '@tradr/shared/schemas/auth';
+} from '@jurnal-zitn/shared/schemas/auth';
 
 import { AuthScreen } from '@/components/layout/AuthScreen';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useT } from '@/hooks/useLocale';
 import { api } from '@/lib/api';
 
 // SF-3: this page is public and MUST NOT call useAuth() or mount the
@@ -27,6 +28,7 @@ function errorCode(err: unknown): string | undefined {
 }
 
 function ForgotPasswordPage() {
+  const t = useT();
   const [state, setState] = useState<'form' | 'sent' | 'unavailable'>('form');
   const [apiError, setApiError] = useState('');
 
@@ -50,9 +52,9 @@ function ForgotPasswordPage() {
       if (code === 'EMAIL_NOT_CONFIGURED') {
         setState('unavailable');
       } else if (code === 'RATE_LIMITED') {
-        setApiError('Too many requests — try again later.');
+        setApiError(t('auth.error.rateLimited'));
       } else {
-        setApiError('Something went wrong. Please try again.');
+        setApiError(t('auth.error.generic'));
       }
     }
   };
@@ -61,19 +63,16 @@ function ForgotPasswordPage() {
     <AuthScreen>
       <Card className="w-full max-w-sm">
         <CardHeader>
-          <CardTitle>Reset your password</CardTitle>
+          <CardTitle>{t('auth.forgot.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           {state === 'sent' && (
-            <p className="text-sm text-muted-foreground">
-              If an account exists for that address, a reset link is on its way — check your inbox.
-            </p>
+            <p className="text-sm text-muted-foreground">{t('auth.forgot.sent')}</p>
           )}
 
           {state === 'unavailable' && (
             <p className="text-sm text-muted-foreground">
-              This instance has no email configured. Self-service reset is unavailable — ask your
-              operator to reset your password (<code>tradr reset-password</code>).
+              {t('auth.forgot.unavailable')} (<code>jurnal-zitn reset-password</code>).
             </p>
           )}
 
@@ -83,7 +82,7 @@ function ForgotPasswordPage() {
 
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="email">Email</Label>
+                  <Label htmlFor="email">{t('auth.field.email')}</Label>
                   <Input
                     id="email"
                     type="email"
@@ -99,7 +98,7 @@ function ForgotPasswordPage() {
                 </div>
 
                 <Button type="submit" className="w-full cursor-pointer" disabled={isSubmitting}>
-                  {isSubmitting ? 'Sending...' : 'Send reset link'}
+                  {isSubmitting ? t('auth.forgot.submitting') : t('auth.forgot.submit')}
                 </Button>
               </form>
             </>
@@ -107,7 +106,7 @@ function ForgotPasswordPage() {
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
             <Link to="/login" className="underline">
-              Back to log in
+              {t('auth.forgot.back')}
             </Link>
           </p>
         </CardContent>

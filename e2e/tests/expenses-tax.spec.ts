@@ -33,7 +33,7 @@ import { expect, test, type APIRequestContext } from '@playwright/test';
  * be running. Tests `test.skip` early when /api/auth/me responds 5xx or the
  * register endpoint is unreachable, so CI without the stack does not fail
  * spuriously. The CI workflow boots the stack via docker-compose + `pnpm dev`
- * before invoking `pnpm --filter @tradr/e2e test` (mirrors
+ * before invoking `pnpm --filter @jurnal-zitn/e2e test` (mirrors
  * `ledger-balances.spec.ts`'s assumption).
  *
  * NOTE on wash-sale fixtures: the only way to produce realised-loss flags in

@@ -4,10 +4,12 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DeleteAccountSection } from '@/features/account-deletion/components/DeleteAccountSection';
 import { useAuth } from '@/hooks/useAuth';
+import { useT } from '@/hooks/useLocale';
 import { useResendVerification } from '@/hooks/useResendVerification';
 
 function SettingsAccount() {
   const { user, logout } = useAuth();
+  const t = useT();
   // Shared code-keyed resend handling (design Component 9, SF-2/MN-4):
   // 200 → toast; EMAIL_NOT_CONFIGURED / ALREADY_VERIFIED → `info` (the
   // latter also invalidates ['auth','me'] so a stale badge self-cures);
@@ -17,8 +19,8 @@ function SettingsAccount() {
   return (
     <div className="space-y-6" data-slot="settings-account">
       <div>
-        <h2 className="text-lg font-medium">Account</h2>
-        <p className="text-sm text-muted-foreground">Manage your account and session.</p>
+        <h2 className="text-lg font-medium">{t('settings.account.title')}</h2>
+        <p className="text-sm text-muted-foreground">{t('settings.account.subtitle')}</p>
       </div>
 
       {user && (
@@ -28,10 +30,10 @@ function SettingsAccount() {
             {/* REQ-5.1: unverified is informational, never a problem state —
                 neutral tokens only (no destructive). */}
             {user.emailVerified ? (
-              <Badge variant="secondary">Verified</Badge>
+              <Badge variant="secondary">{t('settings.account.verified')}</Badge>
             ) : (
               <Badge variant="outline" className="text-muted-foreground">
-                Not verified
+                {t('settings.account.notVerified')}
               </Badge>
             )}
           </div>
@@ -48,7 +50,7 @@ function SettingsAccount() {
               onClick={() => resend.mutate()}
               disabled={resend.isPending}
             >
-              {resend.isPending ? 'Sending...' : 'Resend verification email'}
+              {resend.isPending ? t('settings.account.resending') : t('settings.account.resend')}
             </Button>
           )}
         </div>
@@ -60,7 +62,7 @@ function SettingsAccount() {
         onClick={() => logout.mutate()}
         disabled={logout.isPending}
       >
-        Log out
+        {t('settings.logout')}
       </Button>
 
       <DeleteAccountSection />

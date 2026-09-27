@@ -125,7 +125,7 @@ const out = [];
 out.push('---');
 out.push('title: Database schema');
 out.push(
-  'description: Every table Tradr creates, its columns, and how they reference each other — generated from the Drizzle migration snapshot.',
+  'description: Every table Jurnal ZITN creates, its columns, and how they reference each other — generated from the Drizzle migration snapshot.',
 );
 out.push('---');
 out.push('');
@@ -135,7 +135,7 @@ out.push(
 );
 out.push('');
 out.push(
-  `Tradr's schema is **${tables.length} tables**, created by **${count} migrations** that run`,
+  `Jurnal ZITN's schema is **${tables.length} tables**, created by **${count} migrations** that run`,
 );
 out.push('automatically when the api boots. This page is generated from the Drizzle snapshot');
 out.push(
@@ -143,7 +143,7 @@ out.push(
 );
 out.push('actually produce.');
 out.push('');
-out.push('You do not need any of this to run Tradr. It is here for writing queries against');
+out.push('You do not need any of this to run Jurnal ZITN. It is here for writing queries against');
 out.push('your own data, and for reading the code.');
 out.push('');
 out.push(':::caution');

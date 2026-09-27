@@ -10,7 +10,7 @@ import {
   TAG_NAME_MAX_LENGTH,
   type CreateTagInput,
   type Tag,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import {

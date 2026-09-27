@@ -1,6 +1,6 @@
 # Versioning policy
 
-What Tradr's version number promises, and what counts as a breaking change.
+What Jurnal ZITN's version number promises, and what counts as a breaking change.
 This is the policy; for how a version actually gets built and published, see the
 [release runbook](runbooks/release.md).
 
@@ -9,7 +9,7 @@ the new image and restart without reading anything first?**
 
 ## Current status: pre-1.0
 
-Tradr is in the `0.y.z` series. Under semantic versioning that means the
+Jurnal ZITN is in the `0.y.z` series. Under semantic versioning that means the
 compatibility contract below is **not yet stable** — anything in it may change
 in a release. Concretely, while on `0.y.z`:
 
@@ -19,12 +19,12 @@ in a release. Concretely, while on `0.y.z`:
 
 `1.0.0` is not a quality milestone; it is the point at which the contract stops
 moving. It will be cut when the HTTP API and the database schema have settled,
-and when instances other than the maintainer's run Tradr in production. From
+and when instances other than the maintainer's run Jurnal ZITN in production. From
 `1.0.0` on, the normal semver rules apply and breaking changes wait for a major.
 
 ## The compatibility contract
 
-Tradr is an application, not a library, so its "public API" is the set of
+Jurnal ZITN is an application, not a library, so its "public API" is the set of
 surfaces an operator or client depends on:
 
 | Surface                                      | In the contract | A breaking change looks like                                                                                                           |
@@ -114,7 +114,7 @@ instance that hasn't.
 - **Pin `:X.Y.Z`** to control when you move. `:latest` always points at the most
   recent release and moves on every one — fine for tracking head, unsuitable if
   you want to choose your upgrade window.
-- **Read the release notes before a minor bump** while Tradr is pre-1.0; that is
+- **Read the release notes before a minor bump** while Jurnal ZITN is pre-1.0; that is
   where breaking changes are announced.
 - **Recovering from a bad upgrade** means redeploying the previous image tag.
   That works as long as no contract release sits between the two versions —

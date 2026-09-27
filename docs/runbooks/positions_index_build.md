@@ -15,7 +15,7 @@ The index is created by `runPostMigrations()` in
 `apps/api/src/db/migrate.ts`. It runs:
 
 - automatically on API boot, after `runMigrations()` and before `serve()`, and
-- on demand via `pnpm --filter @tradr/api migrate:post`
+- on demand via `pnpm --filter @jurnal-zitn/api migrate:post`
   (entry: `apps/api/src/db/migrate-post.ts`).
 
 The post-migration runner is independent from Drizzle's migrator because
@@ -95,7 +95,7 @@ one-off shell / job with the production `DATABASE_URL` exported. The advisory
 lock prevents concurrent builds; idempotent against re-runs.
 
 ```sh
-pnpm --filter @tradr/api migrate:post
+pnpm --filter @jurnal-zitn/api migrate:post
 ```
 
 Expected output (last line):
@@ -151,7 +151,7 @@ The post-migration runner handles this automatically:
 To trigger recovery, just re-run the runner (boot or CLI):
 
 ```sh
-pnpm --filter @tradr/api migrate:post
+pnpm --filter @jurnal-zitn/api migrate:post
 ```
 
 Verify after recovery:
@@ -194,7 +194,7 @@ psql "$DATABASE_URL" -c "DELETE FROM _post_migrations_journal WHERE filename = '
 Then re-run the runner so the journal is updated through the normal path:
 
 ```sh
-pnpm --filter @tradr/api migrate:post
+pnpm --filter @jurnal-zitn/api migrate:post
 ```
 
 Final verification:

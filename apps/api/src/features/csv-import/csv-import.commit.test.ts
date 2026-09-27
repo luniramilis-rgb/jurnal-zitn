@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { afterAll, afterEach, beforeAll, describe, it, expect } from 'vitest';
 
-import { parseOccSymbol } from '@tradr/shared';
+import { parseOccSymbol } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db } from '@/db';

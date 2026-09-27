@@ -30,23 +30,23 @@ export const DURATION_BUCKETS = [
 
 /**
  * Deployed build identity as labels on a constant `1` (REQ-3.1, REQ-3.5).
- * The label set is IDENTICAL to `tradr_web_build_info` so the two join cleanly
+ * The label set is IDENTICAL to `jurnal_zitn_web_build_info` so the two join cleanly
  * for drift detection after a two-half deploy (REQ-3.6, REQ-7.4).
  */
 export const buildInfo = new Gauge<'version' | 'commit'>({
-  name: 'tradr_build_info',
+  name: 'jurnal_zitn_build_info',
   help:
     'Deployed build identity, always the constant 1 — the information is in the labels. ' +
     'version is APP_VERSION as baked into the image at build time (the same value GET /api/health reports); ' +
     'commit is the text after its final "-", or "unknown". ' +
-    'Join on version+commit against tradr_web_build_info to detect API/SPA drift after a partial deploy.',
+    'Join on version+commit against jurnal_zitn_web_build_info to detect API/SPA drift after a partial deploy.',
   labelNames: ['version', 'commit'],
   registers: [registry],
 });
 
 /** Request counter (REQ-5.1). `route` is the matched PATTERN, never the raw path (REQ-5.5). */
 export const httpRequestsTotal = new Counter<'method' | 'route' | 'status'>({
-  name: 'tradr_http_requests_total',
+  name: 'jurnal_zitn_http_requests_total',
   help:
     'Total HTTP requests handled by the API, by method, matched route pattern and numeric status. ' +
     'route is the registered pattern (e.g. /api/positions/:positionId), never the raw request path, ' +
@@ -62,12 +62,12 @@ export const httpRequestsTotal = new Counter<'method' | 'route' | 'status'>({
  * per-route LATENCY is the accepted sacrifice.
  */
 export const httpRequestDuration = new Histogram<'method'>({
-  name: 'tradr_http_request_duration_seconds',
+  name: 'jurnal_zitn_http_request_duration_seconds',
   help:
     'HTTP request latency in seconds, measured to response start (headers flushed), not to connection close — ' +
     'for the SSE advisor streams those differ by minutes and only response start is meaningful. ' +
     'Labelled by method only, not by route: a per-route histogram would not fit the series budget, ' +
-    'so use tradr_http_requests_total for per-route error rate.',
+    'so use jurnal_zitn_http_requests_total for per-route error rate.',
   labelNames: ['method'],
   buckets: DURATION_BUCKETS,
   registers: [registry],
@@ -75,20 +75,20 @@ export const httpRequestDuration = new Histogram<'method'>({
 
 /** Database liveness (REQ-4.1). */
 export const dbUp = new Gauge({
-  name: 'tradr_db_up',
+  name: 'jurnal_zitn_db_up',
   help:
     'Database liveness: 1 when the scrape-time SELECT 1 succeeded, 0 when it failed or timed out. ' +
     'A scrape that finds a probe already in flight joins it rather than opening a second transaction, ' +
     "so a concurrent scrape publishes ANOTHER scrape's SELECT 1 result rather than one it took itself — " +
-    "exactly as tradr_db_connections may publish another scrape's row counts. " +
-    'This is also the discriminator for absent tradr_db_connections: absent with tradr_db_up 0 means ' +
-    'the database is down; absent with no tradr_db_up at all means the instance is not scrapeable.',
+    "exactly as jurnal_zitn_db_connections may publish another scrape's row counts. " +
+    'This is also the discriminator for absent jurnal_zitn_db_connections: absent with jurnal_zitn_db_up 0 means ' +
+    'the database is down; absent with no jurnal_zitn_db_up at all means the instance is not scrapeable.',
   registers: [registry],
 });
 
 /** Probe latency (REQ-4.2) — a gauge, because one sample per scrape supports no quantiles. */
 export const dbProbeDuration = new Gauge({
-  name: 'tradr_db_probe_duration_seconds',
+  name: 'jurnal_zitn_db_probe_duration_seconds',
   help:
     'Duration in seconds of the scrape-time database probe. This is WIDER than the SELECT 1 alone: ' +
     'it is measured from before the transaction opens, so it includes the BEGIN and the SET LOCAL statement_timeout ' +
@@ -99,12 +99,12 @@ export const dbProbeDuration = new Gauge({
 
 /** Connection load from `pg_stat_activity` (REQ-4.3). */
 export const dbConnections = new Gauge<'state'>({
-  name: 'tradr_db_connections',
+  name: 'jurnal_zitn_db_connections',
   help:
     'Backend connections to the current database by state, from pg_stat_activity. ' +
     'DATABASE-GLOBAL, NOT PROCESS-LOCAL: every API instance reports the same counts, and those counts also include ' +
     'the CLI, running migrations and any psql session — so a dashboard that SUMS this across instances over-counts ' +
-    'by the replica factor. Compare a single instance against tradr_db_pool_max instead. ' +
+    'by the replica factor. Compare a single instance against jurnal_zitn_db_pool_max instead. ' +
     "A scrape that finds a probe already in flight publishes that probe's row counts rather than sampling again, " +
     'and the series is omitted entirely (rather than reported stale) when the probe fails.',
   labelNames: ['state'],
@@ -113,10 +113,10 @@ export const dbConnections = new Gauge<'state'>({
 
 /** The saturation denominator (REQ-4.4) — without it the connection gauge cannot express pressure. */
 export const dbPoolMax = new Gauge({
-  name: 'tradr_db_pool_max',
+  name: 'jurnal_zitn_db_pool_max',
   help:
     "Configured maximum size of this instance's database connection pool (DB_POOL_SIZE). " +
-    'The denominator for tradr_db_connections — postgres.js exposes no pool statistics of its own, ' +
+    'The denominator for jurnal_zitn_db_connections — postgres.js exposes no pool statistics of its own, ' +
     'so this is the only saturation reference available.',
   registers: [registry],
 });

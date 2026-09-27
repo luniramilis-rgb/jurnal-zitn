@@ -15,7 +15,7 @@ export const TokenField = z.string().regex(/^[0-9a-f]{64}$/);
 // The password length rule, in ONE place. 8 is the minimum the sign-up form has
 // always asked for; 72 is bcrypt's byte ceiling, past which the hash silently
 // ignores the tail. Every path that accepts a password — login, register, reset
-// completion, and the `tradr create-user` / `tradr reset-password` CLI commands —
+// completion, and the `jurnal-zitn create-user` / `jurnal-zitn reset-password` CLI commands —
 // reads these, so a password one path accepts is a password the others accept.
 // Duplicating the numbers is how the CLI came to create accounts that could not
 // log in.

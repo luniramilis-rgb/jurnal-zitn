@@ -11,7 +11,7 @@ import {
   PASSWORD_MAX_LENGTH,
   PASSWORD_MIN_LENGTH,
   PasswordField,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import {
   MIGRATIONS_DIR,
@@ -250,7 +250,7 @@ function printReport(report: StatusReport): void {
 // ---------------------------------------------------------------------------
 
 /**
- * Pooler-safe connection args for `tradr migrate --status` (SF-5, design C7).
+ * Pooler-safe connection args for `jurnal-zitn migrate --status` (SF-5, design C7).
  * Prefer `DIRECT_DATABASE_URL` (the non-pooled connection) when configured, and
  * ALWAYS `prepare:false` so the status read is safe even when pointed straight
  * at a transaction pooler — the Task 20 backup drill depends on this. This is a
@@ -402,7 +402,7 @@ export async function runResetPassword(argv: string[]): Promise<number> {
   const parsed = parseEmailPasswordArgs(argv);
   if (parsed.error || !parsed.email) {
     console.error(parsed.error ?? 'An email is required');
-    console.error('Usage: tradr reset-password <email> [--password <value>]');
+    console.error('Usage: jurnal-zitn reset-password <email> [--password <value>]');
     return 2;
   }
   // Checked before the connection opens: a password the login path would refuse
@@ -514,7 +514,7 @@ export async function runCreateUser(argv: string[]): Promise<number> {
   const parsed = parseEmailPasswordArgs(argv);
   if (parsed.error || !parsed.email) {
     console.error(parsed.error ?? 'An email is required');
-    console.error('Usage: tradr create-user <email> [--password <value>]');
+    console.error('Usage: jurnal-zitn create-user <email> [--password <value>]');
     return 2;
   }
   const email = normalizeEmail(parsed.email);
@@ -545,7 +545,7 @@ export async function runCreateUser(argv: string[]): Promise<number> {
     const created = await createUser(sql, email, newPassword);
     if (!created) {
       console.error(`An account already exists for ${email}. Nothing was changed.`);
-      console.error('Use `tradr reset-password` to set its password instead.');
+      console.error('Use `jurnal-zitn reset-password` to set its password instead.');
       return 1;
     }
     console.log(`Created ${email}.`);
@@ -566,11 +566,11 @@ export async function runCreateUser(argv: string[]): Promise<number> {
 
 const USAGE = [
   'Usage:',
-  '  tradr migrate --status',
-  '  tradr storage migrate-to-inline',
-  '  tradr storage gc',
-  '  tradr create-user <email> [--password <value>]',
-  '  tradr reset-password <email> [--password <value>]',
+  '  jurnal-zitn migrate --status',
+  '  jurnal-zitn storage migrate-to-inline',
+  '  jurnal-zitn storage gc',
+  '  jurnal-zitn create-user <email> [--password <value>]',
+  '  jurnal-zitn reset-password <email> [--password <value>]',
 ];
 
 /**
@@ -578,7 +578,7 @@ const USAGE = [
  *
  * `asError` distinguishes the two callers. An unrecognised command is a failure:
  * usage goes to stderr and the process exits non-zero. An explicit `--help` is a
- * success: it goes to stdout and exits 0, so `tradr --help | less` works and a
+ * success: it goes to stdout and exits 0, so `jurnal-zitn --help | less` works and a
  * shell script asking for help does not see a failure.
  */
 function usage(asError = true): void {

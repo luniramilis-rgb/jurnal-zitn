@@ -1,4 +1,4 @@
-import type { PositionListItem } from '@tradr/shared';
+import type { PositionListItem } from '@jurnal-zitn/shared';
 
 /**
  * Deterministic builder for PositionListItem used across web tests.

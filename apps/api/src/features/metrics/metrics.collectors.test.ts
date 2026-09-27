@@ -115,8 +115,8 @@ async function readConnections(): Promise<Array<{ state: string; value: number }
  * Drive ONE successful probe, and assert it landed.
  *
  * Every failure case must start here. `prom-client` seeds a label-free gauge to
- * `0` at construction and a labelled one to `values: []`, so `tradr_db_up 0`
- * with zero `tradr_db_connections` samples is EXACTLY the state of a registry
+ * `0` at construction and a labelled one to `values: []`, so `jurnal_zitn_db_up 0`
+ * with zero `jurnal_zitn_db_connections` samples is EXACTLY the state of a registry
  * the collector has never run against — an empty `refreshDbMetrics()` body
  * satisfies every failure assertion written the naive way. Only the transition
  * is evidence.
@@ -152,7 +152,7 @@ afterEach(async () => {
 });
 
 describe('refreshDbMetrics (REQ-4)', () => {
-  it('flips a healthy probe to tradr_db_up 0 with no connection samples when it rejects', async () => {
+  it('flips a healthy probe to jurnal_zitn_db_up 0 with no connection samples when it rejects', async () => {
     await driveSuccessfulProbe();
 
     withTransactionMock.mockRejectedValue(new Error('CONNECTION_ENDED'));
@@ -177,7 +177,7 @@ describe('refreshDbMetrics (REQ-4)', () => {
     expect(await readConnections()).toHaveLength(0);
   });
 
-  it('joins an in-flight probe and PUBLISHES its result, taking tradr_db_up 0 → 1', async () => {
+  it('joins an in-flight probe and PUBLISHES its result, taking jurnal_zitn_db_up 0 → 1', async () => {
     // The one shape that can fail. Asserting only the call count, or asserting
     // the exposition after both callers succeed, proves nothing: join-and-
     // publish and join-and-return produce byte-identical output there, because
@@ -264,7 +264,7 @@ describe('refreshDbMetrics (REQ-4)', () => {
     // makes the row set per-state at all, and the `::int` cast is what stops
     // Postgres returning `count(*)` as a bigint — which `postgres.js` delivers
     // as a STRING, so `dbConnections.set()` throws on a non-number and EVERY
-    // scrape reports `tradr_db_up 0` for a perfectly healthy database.
+    // scrape reports `jurnal_zitn_db_up 0` for a perfectly healthy database.
     const { execute } = stubTransaction(HEALTHY_ROWS);
     await refreshDbMetrics();
 
@@ -391,7 +391,7 @@ describe('refreshDbMetrics (REQ-4)', () => {
  */
 describe('pg_stat_activity vocabulary (live database)', () => {
   const DATABASE_URL =
-    process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5433/tradr_test';
+    process.env.DATABASE_URL ?? 'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test';
 
   it('maps the state strings Postgres ITSELF reports, not ones this file wrote', async () => {
     // `max: 3` — two parked backends plus the observer. Its own client, never

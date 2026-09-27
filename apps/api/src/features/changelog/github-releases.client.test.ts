@@ -57,7 +57,7 @@ describe('fetchReleases — request shape (REQ-1.2)', () => {
     const headers = init.headers as Record<string, string>;
     expect(headers.accept).toBe('application/vnd.github+json');
     expect(headers['x-github-api-version']).toBe('2022-11-28');
-    expect(headers['user-agent']).toBe('tradr-api');
+    expect(headers['user-agent']).toBe('jurnal-zitn-api');
     // No authorization header EVER (unauthenticated-only scope).
     expect(Object.keys(headers).map((k) => k.toLowerCase())).not.toContain('authorization');
   });

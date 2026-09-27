@@ -2,11 +2,13 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { z } from 'zod';
 
+import { TaxJurisdictionEnum } from '@jurnal-zitn/shared';
+
 import { api } from '@/lib/api';
 
 const TaxJurisdictionResponseSchema = z
   .object({
-    taxJurisdiction: z.enum(['US', 'CA', 'other']).nullable(),
+    taxJurisdiction: TaxJurisdictionEnum.nullable(),
   })
   .strict();
 

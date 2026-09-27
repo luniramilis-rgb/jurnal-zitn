@@ -1,11 +1,19 @@
+import { useT } from '@/hooks/useLocale';
 import { cn } from '@/lib/utils';
 
 // The desk chips (visual-redesign task 7). Both are NEUTRAL by design:
 // amber never encodes data, and green/red stay reserved for P&L figures.
 
+const STATUS_KEYS = {
+  draft: 'pos.status.draft',
+  open: 'pos.status.open',
+  closed: 'pos.status.closed',
+} as const;
+
 /** Status as a mono pill: open reads strongest, closed recedes, draft is a
  * dashed plan. */
 export function PositionStatusChip({ status }: { status: 'draft' | 'open' | 'closed' }) {
+  const t = useT();
   return (
     <span
       className={cn(
@@ -15,7 +23,7 @@ export function PositionStatusChip({ status }: { status: 'draft' | 'open' | 'clo
         status === 'draft' && 'border-dashed border-border text-muted-foreground',
       )}
     >
-      {status}
+      {t(STATUS_KEYS[status])}
     </span>
   );
 }

@@ -26,7 +26,7 @@ import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { OnboardingState } from '@tradr/shared';
+import type { OnboardingState } from '@jurnal-zitn/shared';
 
 import { docsUrl, DOCS, DOCS_BASE_URL } from '@/lib/docs';
 

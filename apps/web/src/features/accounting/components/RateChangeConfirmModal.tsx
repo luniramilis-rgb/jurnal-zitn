@@ -1,4 +1,4 @@
-import type { PreviewRateChangeResponse } from '@tradr/shared/schemas/accounting';
+import type { PreviewRateChangeResponse } from '@jurnal-zitn/shared/schemas/accounting';
 
 import { Button } from '@/components/ui/button';
 import {

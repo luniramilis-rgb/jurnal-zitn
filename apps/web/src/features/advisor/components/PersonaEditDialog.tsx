@@ -9,7 +9,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { PersonaInputSchema, type Persona, type PersonaInput } from '@tradr/shared/schemas/advisor';
+import {
+  PersonaInputSchema,
+  type Persona,
+  type PersonaInput,
+} from '@jurnal-zitn/shared/schemas/advisor';
 
 import { Button } from '@/components/ui/button';
 import {

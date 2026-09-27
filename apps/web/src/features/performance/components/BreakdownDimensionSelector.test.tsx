@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { BREAKDOWN_DIMENSIONS } from '@tradr/shared';
+import { BREAKDOWN_DIMENSIONS } from '@jurnal-zitn/shared';
 
 // React 19 requires this flag for act() to work in non-test-renderer envs.
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;

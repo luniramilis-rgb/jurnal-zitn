@@ -16,7 +16,7 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import type { TierLimits, TierState } from '@tradr/shared';
+import type { TierLimits, TierState } from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';

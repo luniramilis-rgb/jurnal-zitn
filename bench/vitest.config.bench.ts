@@ -12,7 +12,7 @@ const apiSrc = path.resolve(__dirname, '../apps/api/src');
 // with the seed-once / measure-many pattern this bench needs.
 //
 // `root: bench/` so vite/vitest resolves bare imports against
-// `bench/node_modules` (drizzle-orm, postgres, @tradr/shared, vitest), and
+// `bench/node_modules` (drizzle-orm, postgres, @jurnal-zitn/shared, vitest), and
 // each package then resolves its nested deps (date-fns-tz, decimal.js, zod)
 // from its own node_modules. The `bench` workspace entry in
 // pnpm-workspace.yaml is what wires up the symlinks.
@@ -42,7 +42,7 @@ export default defineConfig({
     env: {
       DATABASE_URL:
         process.env.MIGRATE_TEST_DATABASE_URL ||
-        'postgresql://postgres:postgres@localhost:5433/tradr_test_migrate',
+        'postgresql://postgres:postgres@localhost:5433/jurnal_zitn_test_migrate',
       SESSION_SECRET: 'bench-secret-that-is-at-least-32-characters-long',
       NODE_ENV: 'test',
       PORT: '3199',

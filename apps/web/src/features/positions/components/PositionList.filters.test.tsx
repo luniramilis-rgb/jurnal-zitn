@@ -13,7 +13,7 @@ import { render, screen, waitFor, cleanup } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { Tag } from '@tradr/shared';
+import type { Tag } from '@jurnal-zitn/shared';
 
 import { TooltipProvider } from '@/components/ui/tooltip';
 

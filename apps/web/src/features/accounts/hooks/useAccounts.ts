@@ -7,7 +7,7 @@ import type {
   SetDefaultAccountInput,
   SetWritableAccountInput,
   UpdateAccountInput,
-} from '@tradr/shared';
+} from '@jurnal-zitn/shared';
 
 import { billingKeys } from '@/features/billing/useWalletBalance';
 import { api } from '@/lib/api';

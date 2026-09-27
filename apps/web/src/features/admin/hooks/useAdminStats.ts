@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 
-import { type AdminStats, AdminStatsSchema } from '@tradr/shared/schemas/admin';
+import { type AdminStats, AdminStatsSchema } from '@jurnal-zitn/shared/schemas/admin';
 
 import { api } from '@/lib/api';
 

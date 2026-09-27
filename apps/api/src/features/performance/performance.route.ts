@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 
-import { BreakdownQuerySchema, PerformanceQuerySchema } from '@tradr/shared';
+import { BreakdownQuerySchema, PerformanceQuerySchema } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
 import { validate } from '@/lib/validation';

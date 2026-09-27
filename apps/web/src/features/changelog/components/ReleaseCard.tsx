@@ -10,7 +10,7 @@
 
 import { ExternalLink } from 'lucide-react';
 
-import type { ChangelogRelease } from '@tradr/shared';
+import type { ChangelogRelease } from '@jurnal-zitn/shared';
 
 import { Badge } from '@/components/ui/badge';
 import {

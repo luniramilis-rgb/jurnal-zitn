@@ -1,5 +1,5 @@
 // The ONLY place the SPA reads frontend telemetry config. Config is delivered
-// at runtime via /config.js → window.__TRADR_CONFIG__ (REQ-6.2). Frontend keys
+// at runtime via /config.js → window.__JURNAL_ZITN_CONFIG__ (REQ-6.2). Frontend keys
 // are *Public* to signal they are publishable, distinct from the api
 // container's secret-side names. Every field is optional: a missing field means
 // that surface is absent (REQ-1.2). The frontend PostHog surface gates
@@ -14,7 +14,7 @@ export interface TelemetryConfig {
 
 // Parsed shape of feedbackSurvey ("<surveyId>:<ratingQid>:<textQid>"). Derived
 // from config at read time, held in memory only — never persisted, never sent to
-// any Tradr endpoint; used solely as event-property values (user-feedback REQ-1.3).
+// any Jurnal ZITN endpoint; used solely as event-property values (user-feedback REQ-1.3).
 export interface FeedbackSurveyIds {
   surveyId: string;
   ratingQuestionId: string;
@@ -22,13 +22,13 @@ export interface FeedbackSurveyIds {
 }
 
 /**
- * Read the frontend telemetry fields from window.__TRADR_CONFIG__. Returns an
+ * Read the frontend telemetry fields from window.__JURNAL_ZITN_CONFIG__. Returns an
  * empty object when window or the config is absent (SSR-safe guard mirroring
  * resolveApiUrl in api.ts).
  */
 export function getTelemetryConfig(): TelemetryConfig {
   if (typeof window === 'undefined') return {};
-  const cfg = window.__TRADR_CONFIG__;
+  const cfg = window.__JURNAL_ZITN_CONFIG__;
   if (!cfg) return {};
   return {
     posthogPublicKey: cfg.posthogPublicKey,

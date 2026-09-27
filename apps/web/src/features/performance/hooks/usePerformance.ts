@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type { PerformanceQueryInput, PerformanceResponse } from '@tradr/shared';
+import type { PerformanceQueryInput, PerformanceResponse } from '@jurnal-zitn/shared';
 
 import { api, isUnauthorized } from '@/lib/api';
 import {

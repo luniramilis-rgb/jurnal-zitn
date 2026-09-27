@@ -1,7 +1,7 @@
 const ALLOWED = new Set(['light', 'dark', 'system']);
 
 export function applyBootTheme(): void {
-  const cookie = readCookie('tradr_theme');
+  const cookie = readCookie('jurnal_zitn_theme');
   const valid = cookie && ALLOWED.has(cookie) ? cookie : null;
   const resolved =
     valid === 'light'
@@ -30,7 +30,7 @@ export function readCookie(name: string): string | null {
 export const INLINE_BOOT_SCRIPT_SOURCE = `
 (function () {
   var ALLOWED = { light: 1, dark: 1, system: 1 };
-  var match = document.cookie.match(/(?:^|;\\s*)tradr_theme=([^;]*)/);
+  var match = document.cookie.match(/(?:^|;\\s*)jurnal_zitn_theme=([^;]*)/);
   var cookie = match ? decodeURIComponent(match[1]) : null;
   var valid = cookie && ALLOWED[cookie] ? cookie : null;
   var resolved =

@@ -2,7 +2,7 @@ import type { CsvPreset } from '../schemas/csv-import';
 
 /**
  * In-repo broker presets (REQ-3). NOT database rows — pure config shipped with
- * the app. Each preset pre-fills a {@link CsvPreset} mapping (Tradr field → CSV
+ * the app. Each preset pre-fills a {@link CsvPreset} mapping (Jurnal ZITN field → CSV
  * column) that a user can adopt and then adjust (REQ-3.4). Adding a preset =
  * a config entry here + a committed real-export sample fixture under
  * `__fixtures__/csv-import-samples/` + a test that resolves the mapping against
@@ -31,7 +31,7 @@ import type { CsvPreset } from '../schemas/csv-import';
  *     Strike, Call/Put, Commission, Fees).
  *   - tradervue: Tradervue generic import format
  *     (Time, Date, Quantity, Symbol, Side, Price, Option, Commission, …).
- *   - generic-execution: Tradr's own canonical one-row-per-fill template.
+ *   - generic-execution: Jurnal ZITN's own canonical one-row-per-fill template.
  */
 export const CSV_IMPORT_PRESETS: CsvPreset[] = [
   {

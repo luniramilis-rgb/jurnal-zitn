@@ -16,21 +16,24 @@ import { useState, type ReactNode } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useT } from '@/hooks/useLocale';
 
 import { useCancelDeletion, useDeletionStatus } from '../hooks/useAccountDeletion';
 
 import { DeleteAccountDialog } from './DeleteAccountDialog';
 
 function Section({ children }: { children: ReactNode }) {
+  const t = useT();
   return (
     <section className="space-y-3" data-slot="delete-account-section">
-      <h3 className="text-sm font-medium">Delete account</h3>
+      <h3 className="text-sm font-medium">{t('settings.delete.title')}</h3>
       {children}
     </section>
   );
 }
 
 export function DeleteAccountSection() {
+  const t = useT();
   const [dialogOpen, setDialogOpen] = useState(false);
   const status = useDeletionStatus();
   const cancel = useCancelDeletion();
@@ -46,9 +49,9 @@ export function DeleteAccountSection() {
   if (status.isError) {
     return (
       <Section>
-        <p className="text-destructive text-sm">Could not load your account-deletion status.</p>
+        <p className="text-destructive text-sm">{t('settings.delete.loadError')}</p>
         <Button variant="outline" className="cursor-pointer" onClick={() => void status.refetch()}>
-          Try again
+          {t('settings.delete.tryAgain')}
         </Button>
       </Section>
     );
@@ -61,15 +64,15 @@ export function DeleteAccountSection() {
     return (
       <Section>
         <p className="text-sm" data-testid="deletion-scheduled">
-          Deletion scheduled for{' '}
+          {t('settings.delete.scheduledPrefix')}{' '}
           {scheduledFor
             ? new Date(scheduledFor).toLocaleDateString()
-            : 'the end of your paid period'}
+            : t('settings.delete.scheduledFallback')}
           .
         </p>
         {cancel.isError && (
           <p className="text-destructive text-sm" role="alert">
-            Could not cancel the deletion. Try again.
+            {t('settings.delete.cancelError')}
           </p>
         )}
         <Button
@@ -78,7 +81,7 @@ export function DeleteAccountSection() {
           onClick={() => cancel.mutate()}
           disabled={cancel.isPending}
         >
-          {cancel.isPending ? 'Cancelling…' : 'Cancel deletion'}
+          {cancel.isPending ? t('settings.delete.cancelling') : t('settings.delete.cancel')}
         </Button>
       </Section>
     );
@@ -88,7 +91,7 @@ export function DeleteAccountSection() {
     return (
       <Section>
         <p className="text-muted-foreground text-sm" data-testid="deletion-in-progress">
-          Deletion in progress.
+          {t('settings.delete.inProgress')}
         </p>
       </Section>
     );
@@ -96,11 +99,9 @@ export function DeleteAccountSection() {
 
   return (
     <Section>
-      <p className="text-muted-foreground text-sm">
-        Permanently delete your account and its data. This cannot be undone.
-      </p>
+      <p className="text-muted-foreground text-sm">{t('settings.delete.warning')}</p>
       <Button variant="destructive" className="cursor-pointer" onClick={() => setDialogOpen(true)}>
-        Delete account
+        {t('settings.delete.cta')}
       </Button>
       {dialogOpen && <DeleteAccountDialog onClose={() => setDialogOpen(false)} />}
     </Section>

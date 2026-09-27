@@ -4,7 +4,7 @@ import { renderHook, waitFor } from '@testing-library/react';
 import { createElement, type ReactNode } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { ChangelogReleasesResponse } from '@tradr/shared';
+import type { ChangelogReleasesResponse } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 

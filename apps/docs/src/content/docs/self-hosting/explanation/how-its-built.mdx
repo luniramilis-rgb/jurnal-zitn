@@ -1,16 +1,16 @@
 ---
 title: "How it's built"
-description: 'How Tradr is developed and checked before it ships: spec-driven development, the test suites, migrations on real Postgres, a backup drill, and the gates that block a bad merge.'
+description: 'How Jurnal ZITN is developed and checked before it ships: spec-driven development, the test suites, migrations on real Postgres, a backup drill, and the gates that block a bad merge.'
 ---
 
 import figures from './_how-its-built.json';
 
-Here is how Tradr is planned, tested and gated, with every count pulled from the
+Here is how Jurnal ZITN is planned, tested and gated, with every count pulled from the
 repository so it stays honest.
 
 ## Specified before it is built
 
-Every part of Tradr is written down before it is built. A change starts as a
+Every part of Jurnal ZITN is written down before it is built. A change starts as a
 requirements document, then a design, then a task list. Each of those is
 reviewed by an adversarial pass that tries to break the reasoning before any
 code exists.
@@ -26,7 +26,7 @@ You can read the output of that process on the pages it produced. See the
 
 ## What the tests cover
 
-Tradr ships {figures.testFilesTotal} unit and integration test files, split
+Jurnal ZITN ships {figures.testFilesTotal} unit and integration test files, split
 across {figures.vitestProjects.length} Vitest projects:
 
 <ul>
@@ -43,12 +43,12 @@ pull request.
 
 ## Migrations run on real Postgres
 
-Tradr has {figures.migrations} database migrations, and each one is tested
+Jurnal ZITN has {figures.migrations} database migrations, and each one is tested
 against a real PostgreSQL server.
 
 The `migrations` Vitest project runs inside the `test-api` job against a
-throwaway `tradr_test_migrate` database. It applies the migrations under a
-restricted role (`tradr_test_user`) that has no superuser rights.
+throwaway `jurnal_zitn_test_migrate` database. It applies the migrations under a
+restricted role (`jurnal_zitn_test_user`) that has no superuser rights.
 
 The container smoke test goes further. It boots the published images with an
 empty database and asserts that the compiled migrations bring the schema up from
@@ -57,7 +57,7 @@ image is released.
 
 ## The backup is restored, not assumed
 
-You only know a backup works after you restore it. Tradr ships a drill that does
+You only know a backup works after you restore it. Jurnal ZITN ships a drill that does
 exactly that.
 
 The [Prove the backup restores](/self-hosting/backup-restore/#prove-the-backup-restores)
@@ -69,7 +69,7 @@ request, so the checker cannot rot.
 
 ## Self-hosting is the default, and a test says so
 
-Tradr is a self-hosted journal first. The hosted extras are opt-in: object
+Jurnal ZITN is a self-hosted journal first. The hosted extras are opt-in: object
 storage, Redis rate limiting, Stripe billing, plan gating. Each one stays off
 until you configure it.
 

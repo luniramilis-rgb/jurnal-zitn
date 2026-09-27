@@ -21,7 +21,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 
-import type { Account } from '@tradr/shared';
+import type { Account } from '@jurnal-zitn/shared';
 
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { api } from '@/lib/api';

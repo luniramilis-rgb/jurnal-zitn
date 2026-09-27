@@ -65,12 +65,12 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  delete window.__TRADR_CONFIG__;
+  delete window.__JURNAL_ZITN_CONFIG__;
 });
 
 describe('initPostHogClient', () => {
   it('calls init with autocapture/pageview/pageleave/session-recording neutralized and persistence memory', async () => {
-    window.__TRADR_CONFIG__ = {
+    window.__JURNAL_ZITN_CONFIG__ = {
       posthogPublicKey: 'phc_test',
       posthogPublicHost: 'https://eu.i.posthog.com',
     };
@@ -112,7 +112,7 @@ describe('initPostHogClient', () => {
   });
 
   it('enables exception autocapture for unhandled errors + rejections, console errors off', async () => {
-    window.__TRADR_CONFIG__ = { posthogPublicKey: 'phc_test' };
+    window.__JURNAL_ZITN_CONFIG__ = { posthogPublicKey: 'phc_test' };
     const { initPostHogClient } = await import('./posthog');
 
     await initPostHogClient(makeStubRouter([{ routeId: PATTERN }]));
@@ -126,7 +126,7 @@ describe('initPostHogClient', () => {
   });
 
   it('defaults api_host to PostHog US cloud when posthogPublicHost is absent', async () => {
-    window.__TRADR_CONFIG__ = { posthogPublicKey: 'phc_test' };
+    window.__JURNAL_ZITN_CONFIG__ = { posthogPublicKey: 'phc_test' };
     const { initPostHogClient } = await import('./posthog');
 
     await initPostHogClient(makeStubRouter([{ routeId: PATTERN }]));
@@ -135,7 +135,7 @@ describe('initPostHogClient', () => {
   });
 
   it('registers environment as a super property when posthogPublicEnvironment is set', async () => {
-    window.__TRADR_CONFIG__ = {
+    window.__JURNAL_ZITN_CONFIG__ = {
       posthogPublicKey: 'phc_test',
       posthogPublicEnvironment: 'staging',
     };
@@ -148,7 +148,7 @@ describe('initPostHogClient', () => {
   });
 
   it('registers nothing when posthogPublicEnvironment is absent (self-host default)', async () => {
-    window.__TRADR_CONFIG__ = { posthogPublicKey: 'phc_test' };
+    window.__JURNAL_ZITN_CONFIG__ = { posthogPublicKey: 'phc_test' };
     const { initPostHogClient } = await import('./posthog');
 
     await initPostHogClient(makeStubRouter([{ routeId: PATTERN }]));
@@ -157,7 +157,7 @@ describe('initPostHogClient', () => {
   });
 
   it('registers before the entry pageview, so the pageview carries the label', async () => {
-    window.__TRADR_CONFIG__ = {
+    window.__JURNAL_ZITN_CONFIG__ = {
       posthogPublicKey: 'phc_test',
       posthogPublicEnvironment: 'production',
     };
@@ -179,12 +179,12 @@ describe('scrubEvent', () => {
     const event = {
       event: 'position_create_dialog_opened',
       properties: {
-        $current_url: 'https://app.tradr.io/positions/abc123',
+        $current_url: 'https://app.jurnal-zitn.io/positions/abc123',
         $pathname: '/positions/abc123',
-        $host: 'app.tradr.io',
+        $host: 'app.jurnal-zitn.io',
         title: 'Position abc123',
-        $referrer: 'https://google.com/search?q=tradr',
-        $initial_referrer: 'https://google.com/search?q=tradr',
+        $referrer: 'https://google.com/search?q=jurnal-zitn',
+        $initial_referrer: 'https://google.com/search?q=jurnal-zitn',
         $ip: '203.0.113.7',
         $geoip_city_name: 'London',
         $geoip_country_code: 'GB',
@@ -207,9 +207,9 @@ describe('scrubEvent', () => {
     // URL properties keep their natural SHAPES. Overwriting all of them with one
     // masked URL is what broke web analytics: $host and $pathname expect a
     // hostname and a path, and both were receiving a full URL.
-    expect(out!.properties.$current_url).toBe('https://app.tradr.io/positions/abc123');
+    expect(out!.properties.$current_url).toBe('https://app.jurnal-zitn.io/positions/abc123');
     expect(out!.properties.$pathname).toBe('/positions/abc123');
-    expect(out!.properties.$host).toBe('app.tradr.io');
+    expect(out!.properties.$host).toBe('app.jurnal-zitn.io');
     expect(out!.properties.title).toBe('Position abc123');
 
     // Referrers are still dropped — an external origin is a different exposure
@@ -224,8 +224,8 @@ describe('scrubEvent', () => {
   // builds $current_url from window.location.href, which includes the fragment,
   // so sending the raw href would hand the token straight to the vendor.
   it.each([
-    ['reset-password', 'https://app.tradr.io/reset-password#token=deadbeefcafe1234'],
-    ['verify-email', 'https://app.tradr.io/verify-email#token=deadbeefcafe1234'],
+    ['reset-password', 'https://app.jurnal-zitn.io/reset-password#token=deadbeefcafe1234'],
+    ['verify-email', 'https://app.jurnal-zitn.io/verify-email#token=deadbeefcafe1234'],
   ])('strips the #token fragment from $current_url — %s', async (_route, href) => {
     const { scrubEvent } = await import('./posthog');
 
@@ -242,13 +242,13 @@ describe('scrubEvent', () => {
 
     const out = scrubEvent({
       properties: {
-        $current_url: 'https://app.tradr.io/login?expired=true',
+        $current_url: 'https://app.jurnal-zitn.io/login?expired=true',
       } as Record<string, unknown>,
     });
 
     // Query strings carry real analytics signal and no route puts a secret in
     // one (REQ-3.9), so they are deliberately kept.
-    expect(out!.properties!.$current_url).toBe('https://app.tradr.io/login?expired=true');
+    expect(out!.properties!.$current_url).toBe('https://app.jurnal-zitn.io/login?expired=true');
   });
 
   it('drops referrers even when no route has resolved', async () => {
@@ -256,14 +256,14 @@ describe('scrubEvent', () => {
 
     const out = scrubEvent({
       properties: {
-        $referrer: 'https://google.com/search?q=tradr',
-        $current_url: 'https://app.tradr.io/login',
+        $referrer: 'https://google.com/search?q=jurnal-zitn',
+        $current_url: 'https://app.jurnal-zitn.io/login',
       } as Record<string, unknown>,
     });
 
     expect(out!.properties!.$referrer).toBeUndefined();
     // The URL still goes through — it no longer depends on router state at all.
-    expect(out!.properties!.$current_url).toBe('https://app.tradr.io/login');
+    expect(out!.properties!.$current_url).toBe('https://app.jurnal-zitn.io/login');
   });
 
   it('redacts exception-autocapture payloads (message + nested stack) but keeps type/frames', async () => {
@@ -319,7 +319,7 @@ describe('captureClientEvent', () => {
   });
 
   it('captures with scrubProperties-scrubbed properties (secret/email masked) once initialized', async () => {
-    window.__TRADR_CONFIG__ = { posthogPublicKey: 'phc_test' };
+    window.__JURNAL_ZITN_CONFIG__ = { posthogPublicKey: 'phc_test' };
     const { initPostHogClient, captureClientEvent } = await import('./posthog');
     await initPostHogClient(makeStubRouter([{ routeId: PATTERN }]));
     // init emits an entry $pageview; clear it so this asserts only the event below.
@@ -350,7 +350,7 @@ describe('captureClientException', () => {
   });
 
   it('forwards the error and scrubs supplied context properties once initialized', async () => {
-    window.__TRADR_CONFIG__ = { posthogPublicKey: 'phc_test' };
+    window.__JURNAL_ZITN_CONFIG__ = { posthogPublicKey: 'phc_test' };
     const { initPostHogClient, captureClientException } = await import('./posthog');
     await initPostHogClient(makeStubRouter([{ routeId: PATTERN }]));
 
@@ -398,7 +398,7 @@ describe('scrubProperties', () => {
       emailFile: 'report@2024.csv',
       filename: 'attached chart-final.png please',
       jwt: 'raw eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhYmMifQ.sig here',
-      contact: 'ping ops@tradr.io now',
+      contact: 'ping ops@jurnal-zitn.io now',
     });
 
     expect(out).toEqual({
@@ -413,7 +413,7 @@ describe('scrubProperties', () => {
 
 describe('pageview capture', () => {
   it('emits an entry $pageview when the initial route already resolved at init', async () => {
-    window.__TRADR_CONFIG__ = { posthogPublicKey: 'phc_test' };
+    window.__JURNAL_ZITN_CONFIG__ = { posthogPublicKey: 'phc_test' };
     const { initPostHogClient } = await import('./posthog');
     const { router } = makeFireableRouter([{ routeId: PATTERN }]);
 
@@ -424,7 +424,7 @@ describe('pageview capture', () => {
   });
 
   it('emits a $pageview on each route resolve, with no eager entry capture when unresolved', async () => {
-    window.__TRADR_CONFIG__ = { posthogPublicKey: 'phc_test' };
+    window.__JURNAL_ZITN_CONFIG__ = { posthogPublicKey: 'phc_test' };
     const { initPostHogClient } = await import('./posthog');
     const matches: Array<{ routeId: string }> = [];
     const { router, fireResolved } = makeFireableRouter(matches);
@@ -470,8 +470,8 @@ describe('scrubEvent — depth-agnostic URL guards', () => {
         $session_entry_url: `${ORIGIN}/reset-password?src=email#token=deadbeefcafe1234`,
         $session_entry_referrer: 'https://mail.example.com/inbox/42',
         $session_entry_referring_domain: 'mail.example.com',
-        $session_entry_ph_keyword: 'tradr journal',
-        ph_keyword: 'tradr journal',
+        $session_entry_ph_keyword: 'jurnal-zitn journal',
+        ph_keyword: 'jurnal-zitn journal',
       } as Record<string, unknown>,
     });
 
@@ -584,7 +584,7 @@ describe('feedback captures (mocked SDK)', () => {
   const IDS = { surveyId: 'sv_1', ratingQuestionId: 'q_rate', textQuestionId: 'q_text' };
 
   async function initAndImport() {
-    window.__TRADR_CONFIG__ = { posthogPublicKey: 'phc_test' };
+    window.__JURNAL_ZITN_CONFIG__ = { posthogPublicKey: 'phc_test' };
     const mod = await import('./posthog');
     await mod.initPostHogClient(makeStubRouter([{ routeId: PATTERN }]));
     // init emits an entry $pageview; clear it so each test asserts only its capture.
