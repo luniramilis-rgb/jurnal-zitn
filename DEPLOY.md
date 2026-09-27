@@ -328,6 +328,10 @@ Syarat tetap yang menahan lonjakan: **swap 4 GB** (§7.2b), **batas log Docker**
 Postgres** (§7.4b). Dan **jangan build atau `pnpm test` di host** — build hanya di CI (itulah
 alasan "$7" pernah menyaratkan 4 GB; dengan `--no-build` angka itu tidak perlu).
 
+Override image **`docker-compose.ghcr.yml`** sudah ada di repo; pin tag `:sha-<commit>` di dua baris
+`image:`-nya, lalu tetap pakai `--no-build`. Bila paket GHCR privat (default repo privat), host
+perlu `docker login ghcr.io` (§7.4).
+
 ### 7.10 Update & rollback image
 
 ```bash
