@@ -11,6 +11,15 @@ name: Security
 # none of these are merge gates yet. Promote them to required checks in branch
 # protection once the existing backlog is triaged.
 #
+# CODE SCANNING ON A PRIVATE REPO. Publishing to the Security tab needs code
+# scanning, which on this private fork is NOT enabled (GitHub Advanced Security
+# is a paid feature there). Letting the SARIF upload fail would redden every
+# run for a missing paid feature, so uploading is driven by the repository
+# variable `CODE_SCANNING_ENABLED`: while it is absent or not "true", the
+# scanners still run and the job passes, and CodeQL's upload failure is
+# tolerated. Set the variable to "true" once GHAS is enabled and the uploads
+# (and CodeQL's strictness) come back — no workflow edit needed.
+#
 # None of them need a secret, so unlike the AI reviewer this replaces, they all
 # run on pull requests from forks too.
 #
@@ -65,8 +74,14 @@ jobs:
           languages: ${{ matrix.language }}
 
       # No build step: both languages are analysed from source.
+      #
+      # `continue-on-error` is driven by the same variable as the uploads: with
+      # code scanning unavailable the Analyze step cannot publish its SARIF, and
+      # we tolerate that rather than fail the run. When CODE_SCANNING_ENABLED is
+      # "true", the step is strict again.
       - name: Analyze
         uses: github/codeql-action/analyze@f205ea1c3313d32999d8d6a48b4f6530d4437b38 # v4.37.4
+        continue-on-error: ${{ vars.CODE_SCANNING_ENABLED != 'true' }}
         with:
           category: /language:${{ matrix.language }}
 
@@ -86,6 +101,9 @@ jobs:
     with:
       # Advisory: results reach the Security tab, the job still passes.
       fail-on-vuln: false
+      # Uploads only when code scanning is actually enabled; otherwise the
+      # reusable workflow's code-scanning step 403s (see the header note).
+      upload-sarif: ${{ vars.CODE_SCANNING_ENABLED == 'true' }}
 
   # Audits the workflows for the misconfigurations behind the recent Actions
   # supply-chain compromises — pwn requests, cache poisoning, credential
@@ -108,5 +126,7 @@ jobs:
         uses: zizmorcore/zizmor-action@6fc4b006235f201fdab3722e17240ab420d580e5 # v0.6.1
         with:
           # Emits SARIF and uploads it. zizmor always exits 0 in this mode,
-          # which is what keeps the job advisory.
-          advanced-security: true
+          # which is what keeps the job advisory. `advanced-security` is the
+          # upload switch — without code scanning it must be off, or the upload
+          # 403s (see the header note).
+          advanced-security: ${{ vars.CODE_SCANNING_ENABLED == 'true' }}
