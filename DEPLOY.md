@@ -222,8 +222,9 @@ services:
 ```
 
 Paket GHCR repo privat **tetap privat** (keputusan produk: image memuat aplikasi ter-build).
-Login di host dengan **fine-grained PAT** repo `jurnal-zitn`, permission **Packages: Read-only**
-(least privilege; jangan pakai token sesi `gh` pribadi):
+Host login dengan **classic PAT** scope **`read:packages`** saja — fine-grained token sering tidak
+mengekspos permission `Packages` untuk GHCR, jadi pakai classic; dan jangan pakai token sesi `gh`
+pribadi:
 
 ```bash
 echo "$GHCR_PAT" | docker login ghcr.io -u luniramilis-rgb --password-stdin
@@ -379,14 +380,14 @@ Referensi keputusan pemilik yang menunggu: jam backup, retensi, dan region hosti
 
 ### 8.3 Rotasi rahasia
 
-| Rahasia              | Cara rotasi                                                                                                                                                                                                                        |
-| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `JOURNAL_SSO_SECRET` | Ganti **kedua sisi bersamaan** (`.env` journal + Pages secret `trutova`); token TTL 120s → aman (§2)                                                                                                                               |
-| `TUNNEL_TOKEN`       | Zero Trust → rotate token → perbarui `.env` → `$COMPOSE up -d cloudflared`                                                                                                                                                         |
-| `SESSION_SECRET`     | Ganti di `.env` → `$COMPOSE up -d api`; semua sesi journal invalid (user masuk lagi via SSO) — lakukan di luar jam ramai                                                                                                           |
-| `POSTGRES_PASSWORD`  | Perbarui `.env` **dan** `ALTER USER` di DB → `$COMPOSE up -d`                                                                                                                                                                      |
-| `GHCR pull token`    | Fine-grained PAT (repo `jurnal-zitn`, **Packages: Read-only**). Rotasi: token baru → `docker login ghcr.io -u luniramilis-rgb --password-stdin` di host → cabut token lama. Hanya-baca paket; jangan pakai token sesi `gh` pribadi |
-| SSH                  | Key-only, nonaktifkan auth kata sandi, firewall hanya port 22                                                                                                                                                                      |
+| Rahasia              | Cara rotasi                                                                                                                                                                                                        |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `JOURNAL_SSO_SECRET` | Ganti **kedua sisi bersamaan** (`.env` journal + Pages secret `trutova`); token TTL 120s → aman (§2)                                                                                                               |
+| `TUNNEL_TOKEN`       | Zero Trust → rotate token → perbarui `.env` → `$COMPOSE up -d cloudflared`                                                                                                                                         |
+| `SESSION_SECRET`     | Ganti di `.env` → `$COMPOSE up -d api`; semua sesi journal invalid (user masuk lagi via SSO) — lakukan di luar jam ramai                                                                                           |
+| `POSTGRES_PASSWORD`  | Perbarui `.env` **dan** `ALTER USER` di DB → `$COMPOSE up -d`                                                                                                                                                      |
+| `GHCR pull token`    | **Classic PAT** scope **`read:packages`** saja. Rotasi: token baru → `docker login ghcr.io -u luniramilis-rgb --password-stdin` di host → cabut token lama. Hanya-baca paket; jangan pakai token sesi `gh` pribadi |
+| SSH                  | Key-only, nonaktifkan auth kata sandi, firewall hanya port 22                                                                                                                                                      |
 
 Aturan tetap: token Tunnel & SSO **jangan pernah** masuk git atau chat.
 
