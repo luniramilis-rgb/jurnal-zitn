@@ -16,9 +16,10 @@ name: Security
 # is a paid feature there). Letting the SARIF upload fail would redden every
 # run for a missing paid feature, so uploading is driven by the repository
 # variable `CODE_SCANNING_ENABLED`: while it is absent or not "true", the
-# scanners still run and the job passes, and CodeQL's upload failure is
-# tolerated. Set the variable to "true" once GHAS is enabled and the uploads
-# (and CodeQL's strictness) come back — no workflow edit needed.
+# scanners still run and the job passes (upload failures, and zizmor's
+# non-zero exit on findings outside Advanced Security mode, are tolerated).
+# Set the variable to "true" once GHAS is enabled and the uploads (and
+# CodeQL's strictness) come back — no workflow edit needed.
 #
 # None of them need a secret, so unlike the AI reviewer this replaces, they all
 # run on pull requests from forks too.
@@ -124,9 +125,14 @@ jobs:
 
       - name: Run zizmor
         uses: zizmorcore/zizmor-action@6fc4b006235f201fdab3722e17240ab420d580e5 # v0.6.1
+        # Without Advanced Security the action runs plain zizmor, which exits
+        # non-zero on findings (44 here: no `--no-exit-codes`). The audit is
+        # advisory, so tolerate that while GHAS is off; with the variable set to
+        # 'true' the upload path returns and zizmor exits 0, strict again.
+        continue-on-error: ${{ vars.CODE_SCANNING_ENABLED != 'true' }}
         with:
-          # Emits SARIF and uploads it. zizmor always exits 0 in this mode,
-          # which is what keeps the job advisory. `advanced-security` is the
-          # upload switch — without code scanning it must be off, or the upload
-          # 403s (see the header note).
+          # Emits SARIF and uploads it. In Advanced Security mode zizmor exits 0
+          # on findings, which is what keeps the job advisory. `advanced-security`
+          # is the upload switch — without code scanning it must be off, or the
+          # upload 403s (see the header note).
           advanced-security: ${{ vars.CODE_SCANNING_ENABLED == 'true' }}
