@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { DeleteAccountSection } from '@/features/account-deletion/components/DeleteAccountSection';
+import { ExportDataSection } from '@/features/account-export/components/ExportDataSection';
 import { useAuth } from '@/hooks/useAuth';
 import { useT } from '@/hooks/useLocale';
 import { useResendVerification } from '@/hooks/useResendVerification';
@@ -64,6 +65,8 @@ function SettingsAccount() {
       >
         {t('settings.logout')}
       </Button>
+
+      <ExportDataSection />
 
       <DeleteAccountSection />
     </div>

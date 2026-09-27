@@ -231,6 +231,33 @@ export interface RequestOptions {
   allowUnauthenticated?: boolean;
 }
 
+/**
+ * Handle a 401 that ended the session: tear client state down, navigate to
+ * /login once, and throw the shaped error every caller already expects. Shared
+ * by `request` (JSON calls) and `download` (the export attachment) so the two
+ * cannot drift.
+ */
+function redirectToLogin(): never {
+  redirecting = true;
+  // Before the navigation, so each owner tears its state down while the page
+  // it belongs to is still on screen.
+  announceSessionExpired();
+  if (router) {
+    // A BOOLEAN, not the string 'true'. The router JSON-encodes any string
+    // value that is itself parseable JSON, so `'true'` reaches the address bar
+    // as `?expired=%22true%22` — quotes and all — and /login, which reads the
+    // raw query, matched none of it. A boolean is written through bare, so
+    // this navigation lands on the same `?expired=true` as the two hard
+    // navigations below and in the CSV preview's own 401 handling.
+    router.navigate({ to: '/login', search: { expired: true }, replace: true });
+  } else {
+    window.location.href = '/login?expired=true';
+  }
+  const unauthorizedError = new Error('Unauthorized') as Error & { status?: number };
+  unauthorizedError.status = 401;
+  throw unauthorizedError;
+}
+
 async function request<T>(
   method: string,
   path: string,
@@ -256,24 +283,7 @@ async function request<T>(
   const response = await fetch(resolveApiUrl(path), options);
 
   if (response.status === 401 && !opts?.allowUnauthenticated && !isLoggingOut && !redirecting) {
-    redirecting = true;
-    // Before the navigation, so each owner tears its state down while the page
-    // it belongs to is still on screen.
-    announceSessionExpired();
-    if (router) {
-      // A BOOLEAN, not the string 'true'. The router JSON-encodes any string
-      // value that is itself parseable JSON, so `'true'` reaches the address bar
-      // as `?expired=%22true%22` — quotes and all — and /login, which reads the
-      // raw query, matched none of it. A boolean is written through bare, so
-      // this navigation lands on the same `?expired=true` as the two hard
-      // navigations below and in the CSV preview's own 401 handling.
-      router.navigate({ to: '/login', search: { expired: true }, replace: true });
-    } else {
-      window.location.href = '/login?expired=true';
-    }
-    const unauthorizedError = new Error('Unauthorized') as Error & { status?: number };
-    unauthorizedError.status = 401;
-    throw unauthorizedError;
+    redirectToLogin();
   }
 
   if (!response.ok) {
@@ -293,7 +303,36 @@ async function request<T>(
   return response.json() as Promise<T>;
 }
 
+/**
+ * Download an attachment (GET) with the same auth/401 handling as `request`, but
+ * the body is kept as a Blob instead of JSON-parsed, and the filename is read
+ * back from `Content-Disposition`. Used by the data-export button
+ * (ZITN-TECH-017, Gerbang #7/#9).
+ */
+async function download(path: string): Promise<{ blob: Blob; filename: string }> {
+  const response = await fetch(resolveApiUrl(path), { method: 'GET', credentials: 'include' });
+
+  if (response.status === 401 && !isLoggingOut && !redirecting) {
+    redirectToLogin();
+  }
+
+  if (!response.ok) {
+    const error = await response
+      .json()
+      .catch(() => ({ message: 'Request failed', status: response.status }));
+    if (typeof error === 'object' && error !== null) {
+      (error as { status?: number }).status = response.status;
+    }
+    throw error;
+  }
+
+  const disposition = response.headers.get('Content-Disposition') ?? '';
+  const match = /filename="?([^";]+)"?/i.exec(disposition);
+  return { blob: await response.blob(), filename: match?.[1] ?? 'download' };
+}
+
 export const api = {
+  download: (path: string) => download(path),
   get: <T>(path: string, opts?: RequestOptions) => request<T>('GET', path, undefined, opts),
   post: <T>(path: string, body?: unknown, opts?: RequestOptions) =>
     request<T>('POST', path, body, opts),
