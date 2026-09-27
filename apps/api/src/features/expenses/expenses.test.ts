@@ -1237,7 +1237,7 @@ describe('boundary-year transition + invariants', () => {
     // 2027-01-01T02:00Z is OUTSIDE — realised P&L total is zero (no rows).
     expect(body2026.realisedPnl.total).toBe('0.00');
     // 2026 is the CURRENT year at this clock — current-year stability wording.
-    expect(body2026.disclaimer).toContain('most recent rates available');
+    expect(body2026.disclaimer).toContain('kurs terbaru yang tersedia');
 
     // -------- (b) At 2027-01-01T01:00 UTC: 2027 is the current year. --------
     vi.setSystemTime(new Date('2027-01-01T01:00:00Z'));
@@ -1250,13 +1250,13 @@ describe('boundary-year transition + invariants', () => {
     // 2027-01-01T02:00Z is INSIDE — realised P&L = +$10.
     expect(body2027.realisedPnl.total).toBe('10.00');
     // 2027 is the current year at this clock — current-year stability wording.
-    expect(body2027.disclaimer).toContain('most recent rates available');
+    expect(body2027.disclaimer).toContain('kurs terbaru yang tersedia');
 
     // The same 2026 query, now AT a 2027 clock, is a past-year request.
     const res2026Past = await authedRequest('GET', '/api/expenses/tax-summary?year=2026', cookie);
     expect(res2026Past.status).toBe(200);
     const body2026Past = await res2026Past.json();
-    expect(body2026Past.disclaimer).toContain('Reloading does not change the numbers');
+    expect(body2026Past.disclaimer).toContain('Memuat ulang tidak mengubah angka');
   });
 
   it('reopen contract: a second position_pnl for the same position is now ACCEPTED — ledger_position_pnl_unique_idx dropped (d-536e8750)', async () => {

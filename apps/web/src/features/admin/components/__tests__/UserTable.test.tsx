@@ -327,9 +327,7 @@ describe('UserTable — detail view', () => {
     expect(within(dialog()).getByText('6000')).toBeTruthy();
     expect(within(dialog()).getByText('7000')).toBeTruthy();
     // Wallet balance: micro-USD → USD display (2,500,000 micro-USD = $2.50).
-    const usd = new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(
-      2.5,
-    );
+    const usd = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'USD' }).format(2.5);
     expect(within(dialog()).getByText(usd)).toBeTruthy();
     // Never-active user shows the dash in the detail too.
     expect(within(dialog()).getByText('—')).toBeTruthy();

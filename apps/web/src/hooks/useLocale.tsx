@@ -6,6 +6,7 @@ import {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import type { ReactNode } from 'react';
@@ -13,7 +14,9 @@ import type { ReactNode } from 'react';
 import { resolveLocale, translate, type AppLocale, type MessageKey } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
+import { detectBrowserLocale } from '@/lib/browserLocale';
 import { getAppLocale, setAppLocale } from '@/lib/locale';
+import { useEventBusSubscribe } from '@/stores/event-bus.store';
 
 const STORAGE_KEY = 'jurnal_zitn_locale';
 
@@ -26,10 +29,16 @@ const LocaleContext = createContext<LocaleContextValue | null>(null);
 
 function readStored(): AppLocale {
   try {
-    return resolveLocale(globalThis.localStorage?.getItem(STORAGE_KEY));
+    const stored = globalThis.localStorage?.getItem(STORAGE_KEY);
+    if (stored === 'id' || stored === 'en') return stored;
   } catch {
-    return 'id';
+    /* private mode / no storage — fall through to the product default */
   }
+  // The first paint has no session to ask yet, so signed-out pages keep the
+  // product default `id`. The browser preference applies on the authenticated
+  // path only: the server flags a never-chosen row `stored: false` and the
+  // one-time seed below persists the language the browser reports.
+  return 'id';
 }
 
 function writeStored(locale: AppLocale): void {
@@ -48,18 +57,32 @@ function writeStored(locale: AppLocale): void {
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [locale, setLocaleState] = useState<AppLocale>(readStored);
+  // The last `/users/me/locale` result the seed already handled. Keyed on the
+  // result object itself so React's double-invoked effects cannot double-write.
+  const seededResult = useRef<{ locale: AppLocale; stored: boolean } | null>(null);
+
+  // A session teardown (`clearClientSessionState`) clears the cache and announces
+  // it, so the next user on this tab — whose row may also be `stored: false` — is
+  // seeded again rather than inheriting the previous user's handled result.
+  const resetSeed = useCallback(() => {
+    seededResult.current = null;
+  }, []);
+  useEventBusSubscribe('auth:logout', resetSeed);
 
   const { data } = useQuery({
     queryKey: ['users', 'me', 'locale'],
-    queryFn: async () => api.get<{ locale: AppLocale }>('/users/me/locale'),
+    queryFn: async () => api.get<{ locale: AppLocale; stored: boolean }>('/users/me/locale'),
     retry: false,
     staleTime: 5 * 60 * 1000,
   });
 
-  // Server wins when it answers (a signed-in user's stored choice).
+  // Server wins when it answers a STORED choice. A `stored: false` answer is the
+  // server's substituted default (`id`), not a choice, so applying it here would
+  // flash that default over the browser preference the seed is about to persist.
   useEffect(() => {
+    if (data?.stored === false) return;
     if (data?.locale) setLocaleState(resolveLocale(data.locale));
-  }, [data?.locale]);
+  }, [data?.locale, data?.stored]);
 
   // Set locale modul secara sinkron SELAMA render, sebelum anak-anak merender, agar
   // formatter murni (`formatCurrency` dll.) memakai bahasa baru di render yang sama.
@@ -85,6 +108,22 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
     },
     [queryClient],
   );
+
+  // One-time seed of a row whose language was never chosen (ZITN-TECH-017 A0):
+  // the server substitutes DEFAULT_LOCALE ('id') and flags `stored: false`, so
+  // the first authenticated load stores the language the browser already
+  // reports. Mirrors useReportingTimezoneBackfill: one attempt per query result,
+  // never overwrites a stored choice, silent on failure, and skipped when the
+  // browser reports nothing we support. Also skipped when detection already
+  // equals the resolved default, so an Indonesian browser never writes 'id'.
+  useEffect(() => {
+    if (!data || data.stored !== false) return;
+    if (seededResult.current === data) return;
+    seededResult.current = data;
+
+    const detected = detectBrowserLocale();
+    if (detected && detected !== resolveLocale(data.locale)) setLocale(detected);
+  }, [data, setLocale]);
 
   const value = useMemo(() => ({ locale, setLocale }), [locale, setLocale]);
   // `key={locale}` memaksa subtree dirender ulang saat bahasa berganti. Tanpa ini,

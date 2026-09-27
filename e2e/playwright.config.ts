@@ -149,6 +149,20 @@ export default defineConfig({
     baseURL,
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
+    // The suite asserts the English copy, and a signed-out first paint now keeps
+    // the product default `id` (ZITN-TECH-017 A0: the browser preference applies
+    // on the authenticated path only, via the one-time seed). Pinning the stored
+    // language in every context keeps the login/register pages English; the
+    // seeded rows follow the browser (en-US in Playwright), so the two agree.
+    storageState: {
+      cookies: [],
+      origins: [
+        {
+          origin: new URL(baseURL).origin,
+          localStorage: [{ name: 'jurnal_zitn_locale', value: 'en' }],
+        },
+      ],
+    },
   },
   // Boot the full stack: UW stub → GitHub stub → SEC stub → quote stub → API
   // (all upstream base URLs → stubs) → web dev server.

@@ -13,7 +13,7 @@
 import { eq } from 'drizzle-orm';
 import { describe, expect, it } from 'vitest';
 
-import { DEFAULT_REPORTING_TIMEZONE } from '@jurnal-zitn/shared';
+import { DEFAULT_SIGNUP_TIMEZONE } from '@jurnal-zitn/shared';
 
 import app from '@/app';
 import { db, poolerDriverOptions } from '@/db';
@@ -198,7 +198,7 @@ describe('onboarding surface parity — every optional integration off', () => {
 
     const read = await authedRequest('GET', '/api/users/me/timezone', cookie);
     expect(read.status).toBe(200);
-    expect(await read.json()).toEqual({ timezone: DEFAULT_REPORTING_TIMEZONE, stored: true });
+    expect(await read.json()).toEqual({ timezone: DEFAULT_SIGNUP_TIMEZONE, stored: true });
 
     const write = await authedRequest('PUT', '/api/users/me/timezone', cookie, {
       timezone: 'Europe/London',

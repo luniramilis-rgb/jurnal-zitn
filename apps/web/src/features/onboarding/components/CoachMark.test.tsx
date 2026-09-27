@@ -311,11 +311,12 @@ describe('CoachMark copy is accurate against the shipped UI', () => {
     return text;
   }
 
-  const NAMED_CONTROLS: Record<CoachMarkSurface, Array<[string, string]>> = {
-    // [phrase in the mark, file that must contain it]
+  const NAMED_CONTROLS: Record<CoachMarkSurface, Array<[string, string, string?]>> = {
+    // [phrase in the mark, file that must contain it, source token if the label
+    // is an i18n key rather than a literal (A1–A5 moved copy behind `t()`)]
     'position-partials': [
       ['Add Fill', 'features/positions/components/PositionDetail.tsx'],
-      ['Close Position', 'features/positions/components/PositionDetail.tsx'],
+      ['Close Position', 'features/positions/components/PositionDetail.tsx', 'pos.action.close'],
     ],
     'csv-import': [
       ['Imports are additive', 'features/csv-import/components/ImportPage.tsx'],
@@ -335,9 +336,9 @@ describe('CoachMark copy is accurate against the shipped UI', () => {
 
   it.each(surfaces)('%s names only controls its surface renders', (surface) => {
     const body = bodyOf(surface);
-    for (const [phrase, file] of NAMED_CONTROLS[surface]) {
+    for (const [phrase, file, token = phrase] of NAMED_CONTROLS[surface]) {
       expect(body).toContain(phrase);
-      expect(read(file)).toContain(phrase);
+      expect(read(file)).toContain(token);
     }
   });
 

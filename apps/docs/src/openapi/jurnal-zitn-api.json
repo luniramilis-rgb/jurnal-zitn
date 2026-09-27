@@ -109,7 +109,7 @@
     }
   },
   "info": {
-    "description": "HTTP API for Tradr — the open-source trading journal.\n\nThis reference is generated from the `@swagger` JSDoc blocks that live next to each route in the API source, so it always matches the endpoints the app actually serves. All routes are mounted under `/api`. The same API backs both the hosted app (`api.tradr.cloud`) and a self-hosted instance (reached through the web container at `/api`). Most endpoints require an authenticated session cookie.",
+    "description": "HTTP API for Jurnal ZITN — the open-source trading journal.\n\nThis reference is generated from the `@swagger` JSDoc blocks that live next to each route in the API source, so it always matches the endpoints the app actually serves. All routes are mounted under `/api`. The same API backs both the hosted app (`api.tradr.cloud`) and a self-hosted instance (reached through the web container at `/api`). Most endpoints require an authenticated session cookie.",
     "title": "Jurnal ZITN API",
     "version": "0.15.0"
   },
@@ -1089,6 +1089,76 @@
           }
         },
         "summary": "Create an account and start a session.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/auth/sso": {
+      "get": {
+        "description": "Public. Verifies the single-use token minted by ZITN, consumes its nonce, and on success sets the `session` cookie and redirects to `/`. Fail-closed when the instance has no `JOURNAL_SSO_SECRET`.\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "token",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Session started; redirect to `/`."
+          },
+          "401": {
+            "description": "Invalid",
+            "expired": null,
+            "or replayed token.": null
+          },
+          "503": {
+            "description": "ZITN SSO is not configured on this instance."
+          }
+        },
+        "summary": "Exchange a ZITN SSO token and start a session (browser redirect).",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "post": {
+        "description": "Public. Same verification and single-use nonce as the GET; returns the user id and sets the `session` cookie instead of redirecting. For SPAs.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Session started: `{ ok: true, userId }`."
+          },
+          "401": {
+            "description": "Invalid",
+            "expired": null,
+            "or replayed token.": null
+          },
+          "503": {
+            "description": "ZITN SSO is not configured on this instance."
+          }
+        },
+        "summary": "Exchange a ZITN SSO token and start a session (JSON).",
         "tags": [
           "Auth"
         ]
@@ -2523,6 +2593,7 @@
                       "enum": [
                         "US",
                         "CA",
+                        "ID",
                         "other"
                       ],
                       "nullable": true,
@@ -4625,6 +4696,139 @@
         ]
       }
     },
+    "/api/users/me/export": {
+      "get": {
+        "description": "Authed. Walks every table reachable from the user's row and returns the rows as one JSON document. Credential/token columns are redacted (`[redacted]`); a table that hit the row cap is listed in `truncatedTables`. Served as a download.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "exportedAt": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "format": {
+                      "example": "jurnal-zitn-export",
+                      "type": "string"
+                    },
+                    "tables": {
+                      "additionalProperties": {
+                        "items": {
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "type": "object"
+                    },
+                    "truncatedTables": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "userId": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "version": {
+                      "example": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The export bundle (`application/json`, attachment)."
+          },
+          "401": {
+            "description": "Authentication required."
+          }
+        },
+        "summary": "Export all of the signed-in user's data as JSON.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/api/users/me/locale": {
+      "get": {
+        "description": "Authed. Returns the stored locale (`id` | `en`). `stored: false` when the column is unset and `id` (the default) is being substituted.\n",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "locale": {
+                      "enum": [
+                        "id",
+                        "en"
+                      ],
+                      "type": "string"
+                    },
+                    "stored": {
+                      "type": "boolean"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "`{ locale, stored }`."
+          },
+          "401": {
+            "description": "Authentication required."
+          }
+        },
+        "summary": "Get the UI language preference.",
+        "tags": [
+          "Auth"
+        ]
+      },
+      "put": {
+        "description": "Authed. `id` (Indonesia) or `en` (English). Affects UI copy and number/date formatting only; it rewrites no stored data.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "locale": {
+                    "enum": [
+                      "id",
+                      "en"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "locale"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "`{ locale, stored: true }`."
+          },
+          "400": {
+            "description": "Validation error."
+          },
+          "401": {
+            "description": "Authentication required."
+          }
+        },
+        "summary": "Set the UI language preference.",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/api/users/me/onboarding": {
       "get": {
         "description": "Authed. Whether the user has started, skipped or finished the guided walkthrough, when they first used the calculator, and which contextual coach marks they have already dismissed. Preference only — this does not report checklist progress, which is derived from the user's accounts and positions and so cannot disagree with their real data. Never null: a user who has expressed no preference reads as `pending` with an empty coach-mark list.\n",
@@ -4753,6 +4957,7 @@
                       "enum": [
                         "US",
                         "CA",
+                        "ID",
                         "other"
                       ],
                       "nullable": true,
@@ -4782,6 +4987,7 @@
                     "enum": [
                       "US",
                       "CA",
+                      "ID",
                       "other"
                     ],
                     "nullable": true,

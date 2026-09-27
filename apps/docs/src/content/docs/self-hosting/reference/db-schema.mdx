@@ -6,9 +6,9 @@ description: Every table Jurnal ZITN creates, its columns, and how they referenc
 {/* GENERATED FILE — do not edit.
     Source: apps/api/src/db/migrations/meta/ (latest snapshot) · Generator: apps/docs/scripts/gen-db-schema.mjs */}
 
-Jurnal ZITN's schema is **37 tables**, created by **37 migrations** that run
+Jurnal ZITN's schema is **38 tables**, created by **42 migrations** that run
 automatically when the api boots. This page is generated from the Drizzle snapshot
-for the latest schema-changing migration (`0036_account_deletion_tables`), so it describes the schema the migrations
+for the latest schema-changing migration (`0041_loud_titanium_man`), so it describes the schema the migrations
 actually produce.
 
 You do not need any of this to run Jurnal ZITN. It is here for writing queries against
@@ -29,10 +29,12 @@ a query you write against these tables may need updating on any release.
 | `id` | `uuid` | primary key, default `gen_random_uuid()` |
 | `email` | `varchar(255)` | not null |
 | `password_hash` | `varchar(255)` | not null |
+| `zitn_user_id` | `varchar(64)` | — |
 | `is_admin` | `boolean` | not null, default `false` |
 | `email_verified` | `boolean` | not null, default `true` |
 | `display_currency` | `varchar(3)` | — |
 | `timezone` | `varchar(64)` | — |
+| `locale` | `varchar(5)` | — |
 | `tax_jurisdiction` | `varchar(8)` | — |
 | `theme` | `varchar(8)` | not null, default `'system'` |
 | `buying_power_basis` | `varchar(7)` | not null, default `'cash'` |
@@ -81,7 +83,7 @@ a query you write against these tables may need updating on any release.
 | `user_id` | `uuid` | not null |
 | `name` | `varchar(100)` | not null |
 | `currency` | `varchar(3)` | not null |
-| `timezone` | `varchar(64)` | not null, default `'America/New_York'` |
+| `timezone` | `varchar(64)` | not null, default `'Asia/Jakarta'` |
 | `brokerage_id` | `uuid` | — |
 | `starting_balance` | `numeric(18, 4)` | not null, default `'0'` |
 | `default_risk_percent` | `numeric(5, 2)` | — |
@@ -120,6 +122,8 @@ a query you write against these tables may need updating on any release.
 | `stock_per_share_commission` | `numeric(18, 8)` | not null, default `'0'` |
 | `stock_min_per_fill` | `numeric(18, 8)` | not null, default `'0'` |
 | `stock_max_per_fill` | `numeric(18, 8)` | not null, default `'0'` |
+| `stock_percent_buy` | `numeric(18, 8)` | not null, default `'0'` |
+| `stock_percent_sell` | `numeric(18, 8)` | not null, default `'0'` |
 | `options_per_contract_commission` | `numeric(18, 8)` | not null, default `'0'` |
 | `options_per_contract_exchange_fee` | `numeric(18, 8)` | not null, default `'0'` |
 | `options_min_per_fill` | `numeric(18, 8)` | not null, default `'0'` |
@@ -526,6 +530,14 @@ a query you write against these tables may need updating on any release.
 | `deleted_at` | `timestamp with time zone` | not null, default `now()` |
 | `initiator` | `text` | not null |
 | `purge_outcome` | `text` | not null, default `'pending'` |
+
+### `sso_consumed_tokens`
+
+| Column | Type | Notes |
+| --- | --- | --- |
+| `jti` | `varchar(128)` | primary key |
+| `created_at` | `timestamp with time zone` | not null, default `now()` |
+| `expires_at` | `timestamp with time zone` | not null |
 
 ## Next steps
 

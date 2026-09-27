@@ -67,8 +67,17 @@ function authedRequest(method: string, path: string, cookie: string, body?: unkn
   });
 }
 
-async function createTestAccount(cookie: string, name = 'Test Account', currency = 'USD') {
-  const res = await authedRequest('POST', '/api/accounts', cookie, { name, currency });
+async function createTestAccount(
+  cookie: string,
+  name = 'Test Account',
+  currency = 'USD',
+  timezone?: string,
+) {
+  const res = await authedRequest('POST', '/api/accounts', cookie, {
+    name,
+    currency,
+    ...(timezone ? { timezone } : {}),
+  });
   expect(res.status).toBe(201);
   return res.json();
 }
@@ -1734,7 +1743,11 @@ describe('positions classification (R9/R10)', () => {
 
   it('classifies a zero-net closed position as breakeven on both list and detail, and clears it on reopen', async () => {
     const { cookie } = await registerAndGetCookie();
-    const account = await createTestAccount(cookie);
+    // Pin the trading-day zone: the classification is zone-independent, but the
+    // same-day reopen guard below reads the account's zone, and the default
+    // account zone is now Asia/Jakarta (IDX). A US-Eastern evening session that
+    // shares one New York day must stay re-enterable.
+    const account = await createTestAccount(cookie, 'Test Account', 'USD', 'America/New_York');
     const pos = await buildClosed(cookie, account.id, '10.02');
 
     const detail = await (await authedRequest('GET', `/api/positions/${pos.id}`, cookie)).json();

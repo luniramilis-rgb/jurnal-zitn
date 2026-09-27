@@ -120,7 +120,7 @@ const results = await Promise.all([
   }),
   esbuild.build({
     ...common,
-    entryPoints: { jurnal-zitn: resolve(apiRoot, 'src/cli/jurnal-zitn.ts') },
+    entryPoints: { 'jurnal-zitn': resolve(apiRoot, 'src/cli/jurnal-zitn.ts') },
     outdir: resolve(apiRoot, 'dist'),
   }),
 ]);

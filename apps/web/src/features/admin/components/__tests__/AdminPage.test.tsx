@@ -141,7 +141,7 @@ describe('AdminPage — stats cards', () => {
 
     // Revenue is micro-USD → USD for display (1 credit = 1 micro-USD).
     const usd = (micro: string) =>
-      new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(
+      new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'USD' }).format(
         Number(micro) / 1_000_000,
       );
     expect(screen.getByText(usd('125000000'))).toBeTruthy();

@@ -36,7 +36,7 @@ vi.mock('../UsageChart', () => ({
 import { UsageSection } from '../UsageSection';
 
 const usd = (micro: string) =>
-  new Intl.NumberFormat(undefined, { style: 'currency', currency: 'USD' }).format(
+  new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'USD' }).format(
     Number(micro) / 1_000_000,
   );
 
@@ -151,8 +151,8 @@ describe('UsageSection — top users', () => {
     expect(await screen.findByText('top 50 by billed credits')).toBeTruthy();
     expect(screen.getByText('top@x.com')).toBeTruthy();
     expect(screen.getByText('4')).toBeTruthy(); // turns
-    expect(screen.getByText(new Intl.NumberFormat().format(1500n))).toBeTruthy();
-    expect(screen.getByText(new Intl.NumberFormat().format(2500n))).toBeTruthy();
+    expect(screen.getByText(new Intl.NumberFormat('id-ID').format(1500n))).toBeTruthy();
+    expect(screen.getByText(new Intl.NumberFormat('id-ID').format(2500n))).toBeTruthy();
   });
 
   it('renders an empty notice instead of a table when there are no top users', async () => {

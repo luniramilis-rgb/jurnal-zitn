@@ -646,6 +646,19 @@ export async function mockAppShell(page: Page): Promise<void> {
   await page.route('**/api/users/me/timezone', (route) =>
     route.fulfill(json({ timezone: 'UTC', stored: true })),
   );
+  // The active UI language is read on every authenticated view (locale provider,
+  // ZITN-TECH-017 A0) and the server's answer wins over localStorage, so this is
+  // app-shell surface: unmocked it fails the same way the timezone note above
+  // describes (backstop throw / 401 → /login redirect).
+  //
+  // `en` is deliberate, not the product's `id` default: the whole suite is
+  // written against the English copy, so pinning the mocked session to English
+  // keeps every existing selector valid — the same seam A1–A5 use to pin the
+  // web unit suites. `stored: true` keeps the one-time browser-language seed
+  // from firing, so this stays a single GET and the language stays pinned.
+  await page.route('**/api/users/me/locale', (route) =>
+    route.fulfill(json({ locale: 'en', stored: true })),
+  );
   // Quick Stats tab fetches /performance; the route-under-test mock (registered
   // later by the performance specs) overrides this benign empty default.
   await page.route(/\/api\/performance(\?.*)?$/, (route) =>

@@ -1006,7 +1006,7 @@ test.describe('user onboarding', () => {
       await expect(page.getByText(label, { exact: false })).toBeVisible();
     }
     const docsLink = page.getByTestId('zero-state-docs-link');
-    await expect(docsLink).toHaveAttribute('href', /docs\.jurnal-zitn\.cloud/);
+    await expect(docsLink).toHaveAttribute('href', /docs\.tradr\.cloud/);
     await expect(docsLink).toHaveAttribute('target', '_blank');
 
     // Take the unguided fork: create the account directly, no tour anywhere.
