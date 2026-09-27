@@ -140,15 +140,20 @@ pnpm test        # butuh Postgres (harness vitest menyambung DB)
 
 ## 7. Menjalankan di host (VPS + Docker)
 
-**Spesifikasi minimum:** Ubuntu 22.04/24.04, 2 vCPU, 4 GB RAM, 40 GB disk. Port masuk yang perlu:
-**SSH (22) saja** — Tunnel mendail keluar, jadi **tidak** perlu membuka 80/443.
+**Spesifikasi:** Ubuntu 22.04/24.04, **2 GB RAM, 60 GB disk** — lantai di `ROADMAP.md` B1
+(1 core/2 GB/60 GB) — plus **2 vCPU** (1 core jalan; 2 vCPU lebih nyaman) dan **swap 4 GB**
+(§7.2b). Port masuk yang perlu: **SSH (22) saja** — Tunnel mendail keluar, jadi **tidak** perlu
+membuka 80/443.
+
+2 GB cukup untuk menjalankan stack (postgres + api + web + cloudflared). Yang membuat 2 GB sempit
+bukan trafik, melainkan **build atau `pnpm test` di host** — untuk itu siapkan 4 GB RAM (§7.9).
 
 ### 7.1 Pindahkan kode
 
-Perubahan fork ini **belum di-commit**; `git clone` upstream akan kehilangan rebrand/SSO/ekspor.
-Pilih salah satu:
+Fork ini sudah ada di repo privat `github.com/luniramilis-rgb/jurnal-zitn`; **jangan** `git clone`
+upstream `madmatt112/tradr` (kehilangan rebrand/SSO/ekspor). Pilih salah satu:
 
-- **Commit + push** ke repo privat, lalu `git clone <repo> jurnal-zitn` di host, atau
+- **clone** repo privat di host (butuh deploy key atau token baca), atau
 - **rsync salinan kerja** (kecualikan `node_modules`, `.git`, `dist`):
   ```bash
   rsync -av --exclude node_modules --exclude .git --exclude dist \
@@ -162,6 +167,27 @@ curl -fsSL https://get.docker.com | sh
 sudo usermod -aG docker "$USER"   # logout/login agar berlaku
 docker compose version
 ```
+
+### 7.2b Swap 4 GB (wajib di 2 GB)
+
+```bash
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+free -h
+```
+
+### 7.2c Batas log Docker (cegah disk penuh)
+
+Tulis `/etc/docker/daemon.json`:
+
+```json
+{ "log-driver": "json-file", "log-opts": { "max-size": "10m", "max-file": "3" } }
+```
+
+lalu `sudo systemctl restart docker`.
 
 ### 7.3 Siapkan `.env` (jangan di-commit)
 
@@ -183,18 +209,61 @@ JOURNAL_SSO_SECRET=<dari .env lokal>
 
 ### 7.4 Jalankan
 
+**Tarik image, jangan build di host** (§7.9). `docker-compose.yml` hanya punya blok `build:`; pakai
+override kecil yang menambahkan `image:` GHCR yang di-pin ke commit:
+
+```yaml
+# docker-compose.ghcr.yml
+services:
+  api:
+    image: ghcr.io/luniramilis-rgb/jurnal-zitn-api:sha-<commit>
+  web:
+    image: ghcr.io/luniramilis-rgb/jurnal-zitn-web:sha-<commit>
+```
+
+Paket GHCR repo privat default-nya privat, jadi login dulu di host (PAT dengan scope
+`read:packages`), atau jadikan paketnya publik di setelan repo:
+
+```bash
+echo "$GHCR_PAT" | docker login ghcr.io -u <username> --password-stdin
+```
+
 ```bash
 cd /opt/jurnal-zitn
-docker compose -f docker-compose.yml -f docker-compose.cloudflare.yml up -d
-docker compose logs -f api        # tunggu migrasi otomatis (0037/0038) + "Config loaded"
+COMPOSE="docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.cloudflare.yml"
+$COMPOSE pull
+$COMPOSE up -d --no-build
+$COMPOSE logs -f api        # tunggu migrasi otomatis (0037/0038) + "Config loaded"
 ```
+
+`--no-build` memakai image hasil `pull` dan tidak pernah membangun di host. Bila memilih membangun
+di host, hilangkan `-f docker-compose.ghcr.yml` dan pakai `up -d --build` — tetapi lihat §7.9.
+
+### 7.4b Tuning Postgres untuk 2 GB
+
+Setelah boot pertama (nilai konservatif; validasi dengan `free -h` dan `docker stats`):
+
+```bash
+COMPOSE="docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.cloudflare.yml"
+$COMPOSE exec postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" \
+  -c "ALTER SYSTEM SET shared_buffers='256MB';" \
+  -c "ALTER SYSTEM SET effective_cache_size='768MB';" \
+  -c "ALTER SYSTEM SET work_mem='8MB';" \
+  -c "ALTER SYSTEM SET maintenance_work_mem='64MB';" \
+  -c "ALTER SYSTEM SET max_connections=50;"
+$COMPOSE restart postgres
+$COMPOSE exec postgres psql -U "$POSTGRES_USER" -d "$POSTGRES_DB" -c "SHOW shared_buffers;"
+```
+
+`ALTER SYSTEM` menulis `postgresql.auto.conf` di dalam volume PGDATA, jadi bertahan lintas restart.
 
 ### 7.5 Verifikasi
 
 ```bash
-docker compose ps                                   # postgres/api/web/cloudflared healthy
-curl -I http://localhost:8080                       # web merespons (jangan buka 8080 ke publik)
-curl -I https://jurnal.zeninthenoise.com            # harus 200/3xx, BUKAN 530
+COMPOSE="docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.cloudflare.yml"
+$COMPOSE ps                                          # postgres/api/web/cloudflared healthy
+curl -I http://localhost:8080                        # web merespons (jangan buka 8080 ke publik)
+curl -I https://jurnal.zeninthenoise.com             # harus 200/3xx, BUKAN 530
 ```
 
 Lalu di ZITN: aktifkan SSO —
@@ -209,16 +278,24 @@ alur masuk end-to-end.
 
 ### 7.6 Uji
 
+Harness butuh Postgres; jalankan lewat service `api`. Ini **berat** di 2 GB (§7.9) — CI sudah
+menjalankannya otomatis, jadi pakai ini hanya bila perlu:
+
 ```bash
-docker compose run --rm api pnpm test     # harness butuh Postgres; gunakan DB compose
+COMPOSE="docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.cloudflare.yml"
+$COMPOSE run --rm api pnpm test
 ```
 
 ### 7.7 Operasional
 
-- **Backup**: `docker compose exec postgres pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB" > backup.sql`
-- **Update**: `git pull` (atau rsync) → `docker compose ... up -d --build`
-- **Log**: `docker compose logs -f web api cloudflared`
-- **Rahasia**: `.env` gitignored; token Tunnel & SSO jangan pernah masuk git atau chat.
+(`$COMPOSE` seperti didefinisikan di §7.4.)
+
+- **Backup**: `$COMPOSE exec postgres pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB" > backup.sql`
+  (jadwalkan via cron; simpan salinannya di luar host)
+- **Update**: `git pull` (atau rsync) → `$COMPOSE pull && $COMPOSE up -d --no-build`
+- **Log**: `$COMPOSE logs -f web api cloudflared`
+- **Rahasia**: `.env` gitignored; token Tunnel & SSO jangan pernah masuk git atau chat. Rotasi
+  `JOURNAL_SSO_SECRET` mengikuti §2 (ganti kedua sisi bersamaan).
 
 ### 7.8 Alternatif tanpa VPS (PaaS)
 
@@ -226,3 +303,15 @@ Railway/Fly/Render bisa menjalankan `docker/Dockerfile.web` + `Dockerfile.api` +
 Karena Tunnel menuntut container `cloudflared`, biasanya lebih mudah pakai **domain platform**
 lalu arahkan `jurnal.zeninthenoise.com` sebagai CNAME ke host platform (DEPLOY §1b jalur C) —
 tanpa overlay Cloudflare. Pilih salah satu; jangan campur Tunnel dan CNAME ke platform.
+
+### 7.9 Catatan sumber daya (2 GB)
+
+- **Jangan build image di host** — `vite`/`tsc` bisa OOM di 2 GB. Pakai image GHCR yang di-pin
+  bareng `--no-build`; build hanya terjadi di CI.
+- **`pnpm test` di host juga berat**; biarkan CI yang menjalankannya.
+- Kalau tetap mau build atau uji di host, naikkan ke **4 GB RAM** — angka inilah yang dulu tertulis
+  di dokumen ini sebelum diselaraskan dengan `ROADMAP.md` B1.
+- Penyangga: **swap 4 GB** (§7.2b), **batas log Docker** (§7.2c), **tuning Postgres** (§7.4b).
+- `docker-compose.ghcr.yml` (override `image:`) ditambahkan bersama langkah kode; sebelum itu ada,
+  ganti manual blok `build:` service `api`/`web` dengan `image:` (lihat komentar di
+  `docker-compose.yml`) dan tetap pakai `--no-build`.
