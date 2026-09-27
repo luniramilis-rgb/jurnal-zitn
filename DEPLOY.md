@@ -221,12 +221,15 @@ services:
     image: ghcr.io/luniramilis-rgb/jurnal-zitn-web:sha-<commit>
 ```
 
-Paket GHCR repo privat default-nya privat, jadi login dulu di host (PAT dengan scope
-`read:packages`), atau jadikan paketnya publik di setelan repo:
+Paket GHCR repo privat **tetap privat** (keputusan produk: image memuat aplikasi ter-build).
+Login di host dengan **fine-grained PAT** repo `jurnal-zitn`, permission **Packages: Read-only**
+(least privilege; jangan pakai token sesi `gh` pribadi):
 
 ```bash
-echo "$GHCR_PAT" | docker login ghcr.io -u <username> --password-stdin
+echo "$GHCR_PAT" | docker login ghcr.io -u luniramilis-rgb --password-stdin
 ```
+
+Kredensial tersimpan di `~/.docker/config.json` host (hanya-baca paket). Rotasi: §8.3.
 
 ```bash
 cd /opt/jurnal-zitn
@@ -376,13 +379,14 @@ Referensi keputusan pemilik yang menunggu: jam backup, retensi, dan region hosti
 
 ### 8.3 Rotasi rahasia
 
-| Rahasia              | Cara rotasi                                                                                                              |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
-| `JOURNAL_SSO_SECRET` | Ganti **kedua sisi bersamaan** (`.env` journal + Pages secret `trutova`); token TTL 120s → aman (§2)                     |
-| `TUNNEL_TOKEN`       | Zero Trust → rotate token → perbarui `.env` → `$COMPOSE up -d cloudflared`                                               |
-| `SESSION_SECRET`     | Ganti di `.env` → `$COMPOSE up -d api`; semua sesi journal invalid (user masuk lagi via SSO) — lakukan di luar jam ramai |
-| `POSTGRES_PASSWORD`  | Perbarui `.env` **dan** `ALTER USER` di DB → `$COMPOSE up -d`                                                            |
-| SSH                  | Key-only, nonaktifkan auth kata sandi, firewall hanya port 22                                                            |
+| Rahasia              | Cara rotasi                                                                                                                                                                                                                        |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `JOURNAL_SSO_SECRET` | Ganti **kedua sisi bersamaan** (`.env` journal + Pages secret `trutova`); token TTL 120s → aman (§2)                                                                                                                               |
+| `TUNNEL_TOKEN`       | Zero Trust → rotate token → perbarui `.env` → `$COMPOSE up -d cloudflared`                                                                                                                                                         |
+| `SESSION_SECRET`     | Ganti di `.env` → `$COMPOSE up -d api`; semua sesi journal invalid (user masuk lagi via SSO) — lakukan di luar jam ramai                                                                                                           |
+| `POSTGRES_PASSWORD`  | Perbarui `.env` **dan** `ALTER USER` di DB → `$COMPOSE up -d`                                                                                                                                                                      |
+| `GHCR pull token`    | Fine-grained PAT (repo `jurnal-zitn`, **Packages: Read-only**). Rotasi: token baru → `docker login ghcr.io -u luniramilis-rgb --password-stdin` di host → cabut token lama. Hanya-baca paket; jangan pakai token sesi `gh` pribadi |
+| SSH                  | Key-only, nonaktifkan auth kata sandi, firewall hanya port 22                                                                                                                                                                      |
 
 Aturan tetap: token Tunnel & SSO **jangan pernah** masuk git atau chat.
 
