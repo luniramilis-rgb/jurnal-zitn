@@ -1,0 +1,67 @@
+name: Images (edge)
+
+# Build + push `edge` images of jurnal-zitn-api and jurnal-zitn-web to GHCR on every
+# push to main, so a small (1-core) production host only has to `docker compose pull`
+# instead of building. Tagged releases still come from release.yml (multi-arch + GitHub
+# Release); this workflow is amd64-only and labelled `edge` + `sha-<commit>`.
+#
+# Manual runs: Actions → Images (edge) → Run workflow.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: images-edge-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: jurnal-zitn-api
+            dockerfile: docker/Dockerfile.api
+          - image: jurnal-zitn-web
+            dockerfile: docker/Dockerfile.web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4.2.0
+
+      # GHCR rejects uppercase namespaces; the owner may contain capitals.
+      - name: Resolve GHCR namespace (lowercased owner)
+        id: ns
+        run: echo "owner=${GITHUB_REPOSITORY_OWNER,,}" >> "$GITHUB_OUTPUT"
+
+      - name: Log in to GHCR
+        uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
+        with:
+          context: .
+          file: ${{ matrix.dockerfile }}
+          push: true
+          tags: |
+            ${{ env.REGISTRY }}/${{ steps.ns.outputs.owner }}/${{ matrix.image }}:edge
+            ${{ env.REGISTRY }}/${{ steps.ns.outputs.owner }}/${{ matrix.image }}:sha-${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
