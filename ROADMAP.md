@@ -45,15 +45,15 @@ A10 dulu agar setiap batch berikutnya terverifikasi otomatis (uji ber-Postgres d
 
 ## Fase B — Aktivasi produksi (butuh VPS)
 
-| #   | Pekerjaan                                                                                                 | Verifikasi                               |
-| --- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
-| B1  | Provision VPS (1 Core/2 GB/60 GB) → swap 4 GB, batas log Docker, tuning Postgres, hardening SSH           | `free -h`, `df -h`                       |
-| B2  | Deploy stack (pull image GHCR atau build), jalankan migrasi, smoke test lokal host                        | `docker compose ps`, `curl -I localhost` |
-| B3  | Verifikasi `https://jurnal.zeninthenoise.com` **530 → 200** (tunnel sehat)                                | curl TLS                                 |
-| B4  | **Aktivasi ZITN**: set `JOURNAL_ENABLED=true` + redeploy, uji **SSO end-to-end** (302 → sesi → dashboard) | alur manual + log                        |
-| B5  | Aktifkan **ekspor/hapus** dari UI, uji di produksi                                                        | unduhan JSON                             |
-| B6  | **Backup terjadwal** (`pg_dump` + retensi) & monitoring disk/RAM; **rotasi** kredensial + kunci key-only  | restore uji                              |
-| B7  | Opsional: **Cloudflare Access** untuk `/admin`                                                            | uji akses                                |
+| #   | Pekerjaan                                                                                                                                                                                                                                                                                                      | Verifikasi                               |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------- |
+| B1  | Provision VPS (1 Core/2 GB/60 GB) → swap 4 GB, batas log Docker, tuning Postgres, hardening SSH — ✅ **selesai 2026-09-28** (NEO Lite `jurnal-zitn`, West Java, Ubuntu 22.04, 1 vCPU/2 GB/58 GB; Docker 29.8.1; swap 4 GiB; log Docker 10m×3; Postgres tuned 256 MB/768 MB/8 MB/64 MB/50; SSH key-only bawaan) | `free -h`, `df -h`                       |
+| B2  | Deploy stack (pull image GHCR atau build), jalankan migrasi, smoke test lokal host — ✅ **selesai 2026-09-28** (`--no-build`, image `:sha-adf615c…`, migrasi + post-migrasi selesai, api healthy)                                                                                                              | `docker compose ps`, `curl -I localhost` |
+| B3  | Verifikasi `https://jurnal.zeninthenoise.com` **530 → 200** (tunnel sehat) — ✅ **selesai 2026-09-28**                                                                                                                                                                                                         | curl TLS                                 |
+| B4  | **Aktivasi ZITN**: set `JOURNAL_ENABLED=true` + redeploy, uji **SSO end-to-end** (302 → sesi → dashboard) — ⚠️ **sebagian**: secret diset + Pages diterbitkan ulang; `/api/journal/sso` **302** ke `/masuk/`, `/api/auth/sso` **401** tanpa token; **uji e2e dengan akun pelanggan menunggu**                  | alur manual + log                        |
+| B5  | Aktifkan **ekspor/hapus** dari UI, uji di produksi — ⏳ belum                                                                                                                                                                                                                                                  | unduhan JSON                             |
+| B6  | **Backup terjadwal** (`pg_dump` + retensi) & monitoring disk/RAM; **rotasi** kredensial + kunci key-only — ⚠️ **sebagian**: `pg_dump -Fc` harian 02:00 WIB retensi 14 hari + **uji restore lulus** (`tables=38`); **salinan off-host** & rotasi belum                                                          | restore uji                              |
+| B7  | Opsional: **Cloudflare Access** untuk `/admin`                                                                                                                                                                                                                                                                 | uji akses                                |
 
 ## Fase C — Integrasi balik ke ZITN (#2)
 

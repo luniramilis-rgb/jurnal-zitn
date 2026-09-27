@@ -77,9 +77,16 @@ Catatan:
   sebagai secret Cloudflare Pages `trutova` (production) bersama `JOURNAL_SSO_URL`.
 - **Terverifikasi fail-closed (2026-09-26):** `GET https://trutova.pages.dev/api/journal/sso` →
   **503** `{"ok":false,"error":"journal_nonaktif"}` (juga via `zeninthenoise.com`); `/pelajaran/` 200.
-  `JOURNAL_ENABLED` sengaja **belum** diisi.
-- **Belum:** connector jalan di host (kini 530) → lalu set `JOURNAL_ENABLED=true` + redeploy, dan
-  `pnpm test` di lingkungan ber-Postgres.
+  Saat itu `JOURNAL_ENABLED` sengaja belum diisi.
+
+**Status tayang (2026-09-28):** host NEO Lite `jurnal-zitn` (West Java, Ubuntu 22.04, 1 vCPU /
+2 GB + swap 4 GB / 58 GB); Docker 29.8.1; image GHCR `:sha-…` ditarik (`--no-build`); migrasi
+otomatis selesai; `https://jurnal.zeninthenoise.com` **200** (tunnel `cloudflared` aktif);
+`JOURNAL_ENABLED=true` di-set + Pages diterbitkan ulang → `GET /api/journal/sso` **302** ke
+`/masuk/?next=…` (bukan 503), `GET /api/auth/sso` tanpa token **401**; backup `pg_dump -Fc` harian
+02:00 WIB (retensi 14 hari) + **uji restore lulus**; SSH **key-only** (bawaan NEO Lite).
+**Belum:** uji SSO end-to-end dengan akun pelanggan berlangganan; salinan backup off-host; batasi
+Security Group port 22 ke IP operator.
 
 Setelah aktif:
 
@@ -191,21 +198,27 @@ lalu `sudo systemctl restart docker`.
 
 ### 7.3 Siapkan `.env` (jangan di-commit)
 
-Salin `.env.example` → `.env`, lalu isi minimal:
+Salin `.env.example` → `.env`. Minimal yang dipakai compose:
 
 ```
-POSTGRES_USER=zitn
-POSTGRES_PASSWORD=<kuat>
-POSTGRES_DB=jurnal
-SESSION_SECRET=<kuat>
-WEB_BASE_URL=https://jurnal.zeninthenoise.com
-EMAIL_FROM=<opsional>            # bila email diaktifkan, tambah SMTP_*
+POSTGRES_USER=jurnal-zitn
+POSTGRES_PASSWORD=<kuat>         # openssl rand -hex 24
+POSTGRES_DB=jurnal-zitn
+SESSION_SECRET=<kuat>            # openssl rand -hex 32
+ENCRYPTION_KEY=<kuat>            # openssl rand -hex 32
+NODE_ENV=production
+DISABLE_REGISTRATION=true        # masuk lewat SSO ZITN, bukan pendaftaran mandiri
 # dari mesin lokal (D:\jurnal-zitn\.env), salin apa adanya:
 TUNNEL_TOKEN=<dari .env lokal>
 JOURNAL_SSO_SECRET=<dari .env lokal>
 ```
 
 `DATABASE_URL` **tidak** diisi di `.env` — compose menyusunnya dari `POSTGRES_*`.
+
+> **Email bersifat all-or-nothing.** Jangan set `WEB_BASE_URL` sendirian: bila diisi tanpa
+> `SMTP_HOST` **dan** `EMAIL_FROM`, api **gagal boot** ("Partial email config: WEB*BASE_URL set, but
+> required email var(s) missing…"). Untuk menyalakan email isi **ketiganya** (+ `SMTP*\*`); untuk
+> mematikannya kosongkan semuanya (postur saat ini — reset kata sandi memakai CLI operator).
 
 ### 7.4 Jalankan
 
