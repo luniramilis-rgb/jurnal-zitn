@@ -95,26 +95,20 @@ describe('LocaleProvider — bahasa mengubah format saat berjalan (A0)', () => {
   });
 
   it('menyemai lagi untuk pengguna berikutnya setelah sesi dibersihkan', async () => {
-    // A fresh, non-identical result per call: React Query's structural sharing
-    // keeps the SAME reference for deeply-equal data, so the `nonce` stands in
-    // for the genuinely different row a second user brings.
-    let nonce = 0;
-    vi.mocked(api.get).mockImplementation(async () => ({
-      locale: 'id',
-      stored: false,
-      nonce: ++nonce,
-    }));
+    vi.mocked(api.get).mockResolvedValue({ locale: 'id', stored: false });
     const client = renderWithProviders();
     await waitFor(() => expect(api.put).toHaveBeenCalledTimes(1));
 
     // `clearClientSessionState` empties the cache and announces the teardown; the
-    // observer then re-creates the query and fetches a fresh result.
+    // seed is re-armed so the next user is handled too — and only once more.
     await act(async () => {
       eventBus.publish('auth:logout', {});
       await client.refetchQueries({ queryKey: ['users', 'me', 'locale'] });
     });
 
     await waitFor(() => expect(api.put).toHaveBeenCalledTimes(2));
+    await act(async () => {});
+    expect(api.put).toHaveBeenCalledTimes(2);
   });
 
   it('setLocale menyimpan pilihan terbaru ke server', async () => {

@@ -57,15 +57,18 @@ function writeStored(locale: AppLocale): void {
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const queryClient = useQueryClient();
   const [locale, setLocaleState] = useState<AppLocale>(readStored);
-  // The last `/users/me/locale` result the seed already handled. Keyed on the
-  // result object itself so React's double-invoked effects cannot double-write.
-  const seededResult = useRef<{ locale: AppLocale; stored: boolean } | null>(null);
+  // One-time guard for the browser-language seed. A boolean, not the result
+  // object: keying on identity would re-seed on every refetch (a PUT invalidates
+  // the query), and a server that kept answering `stored: false` would loop. The
+  // guard is re-armed on a session teardown so the next user is seeded too.
+  const seedDone = useRef(false);
+  const [seedEpoch, setSeedEpoch] = useState(0);
 
-  // A session teardown (`clearClientSessionState`) clears the cache and announces
-  // it, so the next user on this tab — whose row may also be `stored: false` — is
-  // seeded again rather than inheriting the previous user's handled result.
+  // `clearClientSessionState` clears the cache and announces the teardown, so the
+  // next user on this tab — whose row may also be `stored: false` — is seeded.
   const resetSeed = useCallback(() => {
-    seededResult.current = null;
+    seedDone.current = false;
+    setSeedEpoch((epoch) => epoch + 1);
   }, []);
   useEventBusSubscribe('auth:logout', resetSeed);
 
@@ -112,18 +115,18 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   // One-time seed of a row whose language was never chosen (ZITN-TECH-017 A0):
   // the server substitutes DEFAULT_LOCALE ('id') and flags `stored: false`, so
   // the first authenticated load stores the language the browser already
-  // reports. Mirrors useReportingTimezoneBackfill: one attempt per query result,
-  // never overwrites a stored choice, silent on failure, and skipped when the
-  // browser reports nothing we support. Also skipped when detection already
-  // equals the resolved default, so an Indonesian browser never writes 'id'.
+  // reports. Mirrors useReportingTimezoneBackfill: once per session (`seedEpoch`
+  // re-arms it), never overwrites a stored choice, silent on failure, and
+  // skipped when the browser reports nothing we support. Also skipped when
+  // detection already equals the resolved default, so an Indonesian browser
+  // never writes 'id'.
   useEffect(() => {
-    if (!data || data.stored !== false) return;
-    if (seededResult.current === data) return;
-    seededResult.current = data;
+    if (!data || data.stored !== false || seedDone.current) return;
+    seedDone.current = true;
 
     const detected = detectBrowserLocale();
     if (detected && detected !== resolveLocale(data.locale)) setLocale(detected);
-  }, [data, setLocale]);
+  }, [data, setLocale, seedEpoch]);
 
   const value = useMemo(() => ({ locale, setLocale }), [locale, setLocale]);
   // `key={locale}` memaksa subtree dirender ulang saat bahasa berganti. Tanpa ini,
