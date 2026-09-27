@@ -288,14 +288,11 @@ $COMPOSE run --rm api pnpm test
 
 ### 7.7 Operasional
 
-(`$COMPOSE` seperti didefinisikan di §7.4.)
+Ringkasan cepat (`$COMPOSE` seperti di §7.4); detail di **§8**.
 
-- **Backup**: `$COMPOSE exec postgres pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB" > backup.sql`
-  (jadwalkan via cron; simpan salinannya di luar host)
-- **Update**: `git pull` (atau rsync) → `$COMPOSE pull && $COMPOSE up -d --no-build`
-- **Log**: `$COMPOSE logs -f web api cloudflared`
-- **Rahasia**: `.env` gitignored; token Tunnel & SSO jangan pernah masuk git atau chat. Rotasi
-  `JOURNAL_SSO_SECRET` mengikuti §2 (ganti kedua sisi bersamaan).
+- **Update**: `git pull` (atau rsync) → pin tag baru di `docker-compose.ghcr.yml` → `$COMPOSE pull && $COMPOSE up -d --no-build` (§7.10).
+- **Log**: `$COMPOSE logs -f web api cloudflared`.
+- **Backup & restore, monitoring, rotasi rahasia, insiden**: §8.
 
 ### 7.8 Alternatif tanpa VPS (PaaS)
 
@@ -304,14 +301,90 @@ Karena Tunnel menuntut container `cloudflared`, biasanya lebih mudah pakai **dom
 lalu arahkan `jurnal.zeninthenoise.com` sebagai CNAME ke host platform (DEPLOY §1b jalur C) —
 tanpa overlay Cloudflare. Pilih salah satu; jangan campur Tunnel dan CNAME ke platform.
 
-### 7.9 Catatan sumber daya (2 GB)
+### 7.9 Kapasitas & kapan naik (checklist)
 
-- **Jangan build image di host** — `vite`/`tsc` bisa OOM di 2 GB. Pakai image GHCR yang di-pin
-  bareng `--no-build`; build hanya terjadi di CI.
-- **`pnpm test` di host juga berat**; biarkan CI yang menjalankannya.
-- Kalau tetap mau build atau uji di host, naikkan ke **4 GB RAM** — angka inilah yang dulu tertulis
-  di dokumen ini sebelum diselaraskan dengan `ROADMAP.md` B1.
-- Penyangga: **swap 4 GB** (§7.2b), **batas log Docker** (§7.2c), **tuning Postgres** (§7.4b).
-- `docker-compose.ghcr.yml` (override `image:`) ditambahkan bersama langkah kode; sebelum itu ada,
-  ganti manual blok `build:` service `api`/`web` dengan `image:` (lihat komentar di
-  `docker-compose.yml`) dan tetap pakai `--no-build`.
+Ambang di bawah **heuristik**, bukan hasil load-test; validasi dengan baseline minggu pertama.
+Pantau rutin, dan **wajib** pada dua puncak: impor statement nyata pertama, dan menjelang tutup bulan.
+
+| Sinyal         | Cara lihat                                          | Ambang naik (tindakan)                                 |
+| -------------- | --------------------------------------------------- | ------------------------------------------------------ |
+| CPU            | `uptime` (load average), `docker stats --no-stream` | load avg **> 1** (1 core) persisten → **+vCPU (ke 2)** |
+| RAM            | `free -h`, `docker stats --no-stream`               | tersedia **< ~300 MB** persisten → **+RAM (ke 4 GB)**  |
+| Swap           | `vmstat 1` (kolom `si`/`so`)                        | `si/so` **aktif rutin** (bukan sesaat) → +RAM          |
+| OOM            | `dmesg \| grep -i oom`                              | ada **OOM-kill** / container restart → +RAM            |
+| Disk           | `df -h`                                             | terpakai **> 80%** → tambah disk/prune                 |
+| Koneksi DB     | `psql -c "SELECT count(*) FROM pg_stat_activity;"`  | mendekati `max_connections=50` / pool menunggu → tune  |
+| Latensi origin | Cloudflare analytics                                | p95 naik / request origin melambat → +vCPU             |
+
+Urutan tindakan: **tambah vCPU dulu** (ke 2), lalu **RAM** (ke 4 GB). Skala vertikal cukup jauh di
+atas 50 user; belum perlu arsitektur horizontal.
+
+Ekspektasi beban: per-user ringan (CRUD jurnal; data per-user orde MB). Puncak CPU hanya saat
+**impor statement** — dibatasi `CSV_IMPORT_MAX_FILE_BYTES` 10 MB / `CSV_IMPORT_MAX_ROWS` 10.000 —
+dan impor berjalan **di proses `api` yang sama** (tak ada worker/queue terpisah), jadi dua impor
+berbarengan mengunci satu core: itulah kenapa vCPU adalah penambah pertama.
+
+Syarat tetap yang menahan lonjakan: **swap 4 GB** (§7.2b), **batas log Docker** (§7.2c), **tuning
+Postgres** (§7.4b). Dan **jangan build atau `pnpm test` di host** — build hanya di CI (itulah
+alasan "$7" pernah menyaratkan 4 GB; dengan `--no-build` angka itu tidak perlu).
+
+### 7.10 Update & rollback image
+
+```bash
+COMPOSE="docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.cloudflare.yml"
+# pin ke commit baru di docker-compose.ghcr.yml, lalu:
+$COMPOSE pull && $COMPOSE up -d --no-build
+# rollback: kembalikan tag :sha-<commit> lama, ulangi perintah di atas
+```
+
+Migrasi berjalan otomatis saat `api` boot; perhatikan log `Config loaded`.
+
+## 8. Operasional (A11)
+
+Referensi keputusan pemilik yang menunggu: jam backup, retensi, dan region hosting (residensi data)
+— `ROADMAP.md` "Keputusan yang perlu pemilik".
+
+### 8.1 Monitoring
+
+- **Rutin (harian/mingguan):** `free -h`, `df -h`, `uptime`, `docker stats --no-stream`, `vmstat 1`.
+- **Health:** `curl -fsS http://localhost:8080/api/health` (via web; §4) dan `$COMPOSE ps` untuk
+  status container.
+- **Ambang & tindakan:** tabel §7.9 (load avg, RAM tersedia, swap si/so, OOM, disk, koneksi DB).
+- **Puncak yang wajib diukur:** impor statement nyata pertama; menjelang tutup bulan.
+- Simpan baseline minggu pertama sebagai pembanding.
+
+### 8.2 Backup
+
+- **Manual:** `$COMPOSE exec -T postgres pg_dump -U "$POSTGRES_USER" -Fc "$POSTGRES_DB" > jurnal-$(date +%F).dump`
+  (`-Fc` = custom format, dipakai `pg_restore`).
+- **Terjadwal:** cron harian pada jam yang dipilih pemilik; retensi sesuai keputusan (mis. 14
+  harian + 1 bulanan).
+- **Off-host:** salin hasil dump keluar host (object storage/SCP). Backup di host yang sama **bukan**
+  backup — bila host hilang, ikut hilang.
+- **Uji restore** (bagian dari DoD Fase B):
+  ```bash
+  $COMPOSE exec -T postgres createdb -U "$POSTGRES_USER" jurnal_restore_test
+  $COMPOSE exec -T postgres pg_restore -U "$POSTGRES_USER" -d jurnal_restore_test < jurnal-YYYY-MM-DD.dump
+  $COMPOSE exec postgres psql -U "$POSTGRES_USER" -d jurnal_restore_test -c "SELECT count(*) FROM users;"
+  $COMPOSE exec postgres dropdb -U "$POSTGRES_USER" jurnal_restore_test
+  ```
+- **Sensitif:** dump memuat data pengguna; perlakukan sebagai rahasia (jangan ke git/chat).
+
+### 8.3 Rotasi rahasia
+
+| Rahasia              | Cara rotasi                                                                                                              |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `JOURNAL_SSO_SECRET` | Ganti **kedua sisi bersamaan** (`.env` journal + Pages secret `trutova`); token TTL 120s → aman (§2)                     |
+| `TUNNEL_TOKEN`       | Zero Trust → rotate token → perbarui `.env` → `$COMPOSE up -d cloudflared`                                               |
+| `SESSION_SECRET`     | Ganti di `.env` → `$COMPOSE up -d api`; semua sesi journal invalid (user masuk lagi via SSO) — lakukan di luar jam ramai |
+| `POSTGRES_PASSWORD`  | Perbarui `.env` **dan** `ALTER USER` di DB → `$COMPOSE up -d`                                                            |
+| SSH                  | Key-only, nonaktifkan auth kata sandi, firewall hanya port 22                                                            |
+
+Aturan tetap: token Tunnel & SSO **jangan pernah** masuk git atau chat.
+
+### 8.4 Insiden dasar
+
+- Restart satu layanan: `$COMPOSE restart <api|web|postgres|cloudflared>`.
+- Setelah mengubah `.env`: `$COMPOSE up -d --no-build`.
+- Log: `$COMPOSE logs --since 1h web api cloudflared`.
+- **Jangan** buka port 8080 ke publik — satu-satunya jalan masuk adalah Tunnel (§7).
