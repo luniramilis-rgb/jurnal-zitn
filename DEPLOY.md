@@ -85,8 +85,10 @@ otomatis selesai; `https://jurnal.zeninthenoise.com` **200** (tunnel `cloudflare
 `JOURNAL_ENABLED=true` di-set + Pages diterbitkan ulang → `GET /api/journal/sso` **302** ke
 `/masuk/?next=…` (bukan 503), `GET /api/auth/sso` tanpa token **401**; backup `pg_dump -Fc` harian
 02:00 WIB (retensi 14 hari) + **uji restore lulus**; SSH **key-only** (bawaan NEO Lite).
-**Belum:** uji SSO end-to-end dengan akun pelanggan berlangganan; salinan backup off-host; batasi
-Security Group port 22 ke IP operator.
+**Uji SSO end-to-end lulus 2026-09-28 (akun pemilik, `ADMIN_EMAILS`):** ZITN `/api/journal/sso`
+**302** → jurnal `/api/auth/sso` **302** (`sso_login created=true`) → sesi aktif; `users=1` dengan
+`zitn_user_id` terisi; `sso_consumed_tokens=1`. **Belum:** cabang **langganan berbayar**
+(`journalEntitled`) sampai ada akun pelanggan; salinan backup off-host; batasi Security Group port 22.
 
 Setelah aktif:
 
@@ -211,6 +213,8 @@ DISABLE_REGISTRATION=true        # masuk lewat SSO ZITN, bukan pendaftaran mandi
 # dari mesin lokal (D:\jurnal-zitn\.env), salin apa adanya:
 TUNNEL_TOKEN=<dari .env lokal>
 JOURNAL_SSO_SECRET=<dari .env lokal>
+# jembatan konteks (ZITN-TECH-019) — opsional, fail-closed bila kosong:
+ZITN_BASE_URL=https://zeninthenoise.com
 ```
 
 `DATABASE_URL` **tidak** diisi di `.env` — compose menyusunnya dari `POSTGRES_*`.
