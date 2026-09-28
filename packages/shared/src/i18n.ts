@@ -1,10 +1,25 @@
 import { z } from 'zod';
 
+import { TERM_MESSAGES } from './glossary';
+
 /**
  * Infrastruktur i18n dua bahasa (ZITN-TECH-017 A0): **Indonesia (id)** & **Inggris (en)**.
  *
  * Kamus ringan berbasis kunci stabil, dipakai bersama web (UI) dan API (email/pesan galat)
- * agar satu sumber. Default & fallback = `id` (pasar utama IDX).
+ * agar satu sumber. Pasar utama IDX, bahasa utama ID, EN = fallback teknis.
+ *
+ * **Gate bahasa (ZITN-TECH-021 §6, keputusan pemilik B1 2026-09-28).** `DEFAULT_LOCALE` adalah
+ * **pasar utama**: `id`. Pengguna ber-bahasa Inggris mendapat `en` lewat penyemian sekali dari
+ * `detectBrowserLocale()` (`apps/web/src/hooks/useLocale.tsx`) — bukan lewat default yang dipaksa
+ * EN. Menahan default di `en` pernah dipertimbangkan, tetapi ditolak karena `users.locale` kosong
+ * untuk semua pengguna sehingga permukaan sebelum-masuk (login/register/reset), email sebelum
+ * login, dan shell web akan tampil EN bagi pengguna ID.
+ *
+ * Selama jendela tinjau manual per halaman (TECH-021 §5), `DEFAULT_LOCALE` **tetap** `id`; yang
+ * bergerak adalah status `sah` per rute di `LOCALIZATION.md`, bukan default bahasa.
+ *
+ * Namespace `term.*` berasal dari `glossary.ts` (nilai identik `id`/`en`) — satu-satunya
+ * tempat keputusan istilah pasar.
  */
 
 export const SUPPORTED_LOCALES = ['id', 'en'] as const;
@@ -592,7 +607,9 @@ const ID_MESSAGES = {
   'calc.sizing.roundsToZero':
     'Nilai berisiko tidak menutup satu saham/kontrak pada jarak stop ini, sehingga ukuran dibulatkan ke nol. Ukuran hanya bergerak mengikuti jarak stop dan nilai berisiko.',
   'tax.page.title': 'Ringkasan Pajak',
-  'tax.subtitle': 'P&L realisasi, pengeluaran tercatat, dan posisi bertanda untuk tahun terpilih.',
+  'tax.subtitle': 'P&L realisasi dan pengeluaran tercatat untuk tahun terpilih.',
+  'tax.subtitleFlags':
+    'P&L realisasi, pengeluaran tercatat, dan posisi bertanda untuk tahun terpilih.',
   'tax.field.year': 'Tahun',
   'tax.field.jurisdiction': 'Yurisdiksi',
   'tax.disclaimer.trigger': 'Disclaimer — baca sebelum memakai angka ini',
@@ -612,9 +629,12 @@ const ID_MESSAGES = {
   'tax.pphTitle': 'PPh Final ({rate}%)',
   'tax.pphSell': 'Penjualan {currency}',
   'tax.pphEmpty': 'Belum ada penjualan tahun ini.',
-  'tax.pphNote': 'Estimasi 0,1% dari nilai penjualan; bukan perhitungan pajak resmi.',
+  'tax.pphNote': 'Estimasi {rate}% dari nilai penjualan; bukan perhitungan pajak resmi.',
   'tax.washSales': 'Wash sales ({n})',
   'tax.superficial': 'Kerugian superficial ({n})',
+  'tax.jurisdiction.us': 'United States',
+  'tax.jurisdiction.ca': 'Canada',
+  'tax.jurisdiction.id': 'Indonesia',
   'tax.jurisdiction.other': 'Lainnya',
   'expense.cat.data_subscription': 'Langganan data',
   'expense.cat.platform_fee': 'Biaya platform',
@@ -714,7 +734,7 @@ const ID_MESSAGES = {
   'tax.disc.recCA':
     'Biaya komisi yang dibayar lewat fill sudah termasuk dalam laba/rugi realisasi di atas (sesuai perlakuan adjusted cost base CRA). Tarif inklusi capital gains 50% TIDAK diterapkan oleh Jurnal ZITN — P&L realisasi yang ditampilkan adalah angka sebelum tarif inklusi.',
   'tax.disc.recID':
-    'Pajak: Jurnal ZITN menampilkan **PPh final 0,1% dari nilai penjualan** (bukan perhitungan pajak resmi). Angka di bawah hanya agregat komputasional dari data transaksi Anda; konsultasikan dengan konsultan pajak.',
+    'Pajak: Jurnal ZITN menampilkan **PPh final {rate}% dari nilai penjualan** (bukan perhitungan pajak resmi). Angka di bawah hanya agregat komputasional dari data transaksi Anda; konsultasikan dengan konsultan pajak.',
   'tax.disc.recOther':
     'Jurnal ZITN tidak mendukung aturan pajak khusus untuk yurisdiksi Anda. Angka di bawah hanya agregat komputasional; konsultasikan dengan konsultan pajak setempat.',
   'tax.disc.reconcile':
@@ -739,6 +759,8 @@ const ID_MESSAGES = {
   'err.emailNotConfigured': 'Instance ini tidak mengonfigurasi email.',
   'err.registrationDisabled': 'Pendaftaran akun baru ditutup.',
   'err.invalidTimezone': 'Zona waktu tidak valid.',
+  // Istilah pasar (glossary.ts) — nilai identik `id`/`en`.
+  ...TERM_MESSAGES,
 } as const;
 
 export type MessageKey = keyof typeof ID_MESSAGES;
@@ -1323,7 +1345,9 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'calc.sizing.roundsToZero':
     'The amount at risk does not cover one share/contract at this stop distance, so the size rounds down to zero. Size moves only with the stop distance and the amount at risk.',
   'tax.page.title': 'Tax Summary',
-  'tax.subtitle': 'Realised P&L, tracked expenses, and flagged positions for the selected year.',
+  'tax.subtitle': 'Realised P&L and tracked expenses for the selected year.',
+  'tax.subtitleFlags':
+    'Realised P&L, tracked expenses, and flagged positions for the selected year.',
   'tax.field.year': 'Year',
   'tax.field.jurisdiction': 'Jurisdiction',
   'tax.disclaimer.trigger': 'Disclaimer — please read before using these figures',
@@ -1343,9 +1367,12 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'tax.pphTitle': 'PPh Final ({rate}%)',
   'tax.pphSell': 'Sales {currency}',
   'tax.pphEmpty': 'No sales this year.',
-  'tax.pphNote': 'Estimated 0.1% of sale proceeds; not an official tax computation.',
+  'tax.pphNote': 'Estimated {rate}% of sale proceeds; not an official tax computation.',
   'tax.washSales': 'Wash sales ({n})',
   'tax.superficial': 'Superficial losses ({n})',
+  'tax.jurisdiction.us': 'United States',
+  'tax.jurisdiction.ca': 'Canada',
+  'tax.jurisdiction.id': 'Indonesia',
   'tax.jurisdiction.other': 'Other',
   'expense.cat.data_subscription': 'Data subscription',
   'expense.cat.platform_fee': 'Platform fee',
@@ -1446,7 +1473,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'tax.disc.recCA':
     "Commission fees paid through fills are already incorporated into the realised gain/loss above (consistent with the CRA's adjusted cost base treatment). The 50% capital-gains inclusion rate is NOT applied by Jurnal ZITN — the realised P&L shown is the pre-inclusion-rate figure.",
   'tax.disc.recID':
-    'Tax: Jurnal ZITN shows the **0.1% final income tax on sale proceeds** (not an official tax computation). The figures below are computational aggregates of your transaction data; consult a tax professional.',
+    'Tax: Jurnal ZITN shows the **{rate}% final income tax on sale proceeds** (not an official tax computation). The figures below are computational aggregates of your transaction data; consult a tax professional.',
   'tax.disc.recOther':
     'Jurnal ZITN does not support jurisdiction-specific tax rules for your jurisdiction. The figures below are computational aggregates only; consult a local tax professional.',
   'tax.disc.reconcile':
@@ -1471,6 +1498,8 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'err.emailNotConfigured': 'This instance has no email configured.',
   'err.registrationDisabled': 'New account signups are closed.',
   'err.invalidTimezone': 'Invalid timezone.',
+  // Istilah pasar (glossary.ts) — nilai identik `id`/`en`.
+  ...TERM_MESSAGES,
 };
 
 export const MESSAGES: Record<AppLocale, Record<MessageKey, string>> = {
@@ -1478,14 +1507,14 @@ export const MESSAGES: Record<AppLocale, Record<MessageKey, string>> = {
   en: EN_MESSAGES,
 };
 
-/** Normalisasi nilai apa pun menjadi locale yang didukung (fallback `id`). */
+/** Normalisasi nilai apa pun menjadi locale yang didukung (fallback `DEFAULT_LOCALE`). */
 export function resolveLocale(value: unknown): AppLocale {
   return typeof value === 'string' && (SUPPORTED_LOCALES as readonly string[]).includes(value)
     ? (value as AppLocale)
     : DEFAULT_LOCALE;
 }
 
-/** Terjemahkan `key` untuk `locale`, ganti `{nama}` dengan `vars`; fallback ke `id`, lalu key. */
+/** Terjemahkan `key` untuk `locale`, ganti `{nama}` dengan `vars`; fallback ke `DEFAULT_LOCALE`, lalu key. */
 export function translate(
   locale: unknown,
   key: MessageKey,
@@ -1499,6 +1528,51 @@ export function translate(
     }
   }
   return out;
+}
+
+const LOCALE_TAGS: Record<AppLocale, string> = { id: 'id-ID', en: 'en-US' };
+
+/**
+ * Format angka per locale tampilan **sebelum** masuk `translate()` (rubrik R13).
+ *
+ * `translate()` hanya substitusi string, jadi nilai kanonik seperti `PPH_FINAL_RATE_PERCENT = '0.1'`
+ * akan tampil "0.1%" pada salinan ID. Helper ini menghasilkan "0,1%" (id) / "0.1%" (en) tanpa
+ * mengubah angka kanoniknya. Dipakai web dan server (disclaimer dirender server).
+ */
+export function formatNumber(
+  value: string | number,
+  locale: unknown,
+  options?: Intl.NumberFormatOptions,
+): string {
+  const numeric = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(numeric)) return String(value);
+  return new Intl.NumberFormat(LOCALE_TAGS[resolveLocale(locale)], {
+    useGrouping: false,
+    maximumFractionDigits: 10,
+    ...options,
+  }).format(numeric);
+}
+
+/**
+ * Format tanggal per locale tampilan sebelum masuk `translate()` (rubrik R13).
+ * `timeZone: 'UTC'` mencegah pergeseran hari untuk nilai tanggal-saja (`YYYY-MM-DD`,
+ * termasuk `ratesAsOf`). Nilai tak valid dikembalikan apa adanya.
+ */
+export function formatDate(
+  value: string | number | Date,
+  locale: unknown,
+  options?: Intl.DateTimeFormatOptions,
+): string {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime()))
+    return value instanceof Date ? value.toISOString() : String(value);
+  return new Intl.DateTimeFormat(LOCALE_TAGS[resolveLocale(locale)], {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+    ...options,
+  }).format(date);
 }
 
 /** True bila kedua kamus memuat himpunan kunci yang sama (penjaga kelengkapan). */
