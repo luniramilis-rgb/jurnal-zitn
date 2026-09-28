@@ -373,6 +373,9 @@ Referensi keputusan pemilik yang menunggu: jam backup, retensi, dan region hosti
 ### 8.1 Monitoring
 
 - **Rutin (harian/mingguan):** `free -h`, `df -h`, `uptime`, `docker stats --no-stream`, `vmstat 1`.
+- **Otomatis (terpasang 2026-09-28):** cron **per jam** `/home/ubuntu/jurnal-monitor.sh` →
+  `/home/ubuntu/jurnal-monitor.log` (disk/mem/swap/load/health, plus `ALERT:` bila melewati ambang);
+  **backup harian** 19:00 UTC (= 02:00 WIB) `/home/ubuntu/jurnal-backup.sh` → `/home/ubuntu/jurnal-backups`.
 - **Health:** `curl -fsS http://localhost:8080/api/health` (via web; §4) dan `$COMPOSE ps` untuk
   status container.
 - **Ambang & tindakan:** tabel §7.9 (load avg, RAM tersedia, swap si/so, OOM, disk, koneksi DB).
