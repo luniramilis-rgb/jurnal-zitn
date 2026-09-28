@@ -187,6 +187,11 @@ export const envSchema = z.object({
   // fail-closed: unset ⇒ the `/api/auth/sso` route answers 503 and no token is accepted.
   // Empty string ⇒ unset (blank .env line), the CHANGELOG_GITHUB_REPO idiom above.
   JOURNAL_SSO_SECRET: z.preprocess((v) => (v === '' ? undefined : v), z.string().optional()),
+  // ZITN base URL for the read-only context bridge (ZITN-TECH-019): the API calls ZITN's
+  // `GET /api/journal/context` server-side with a short-lived `journal_context` token.
+  // Optional and empty-tolerant (the JOURNAL_SSO_SECRET idiom):
+  // unset ⇒ the bridge answers `503 konteks_nonaktif`.
+  ZITN_BASE_URL: z.preprocess((v) => (v === '' ? undefined : v), z.string().url().optional()),
   // Observability telemetry (REQ-1.2/1.3). ALL optional — each surface is absent,
   // not broken, when unconfigured (REQ-10.2). Gated via the predicates below;
   // read through `config`, never bare process.env (ESLint-banned here).

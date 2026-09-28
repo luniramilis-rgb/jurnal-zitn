@@ -22,6 +22,19 @@ export function linkUserZitnId(db: DB, userId: string, zitnUserId: string) {
 }
 
 /**
+ * ZITN user id linked to a journal account (`null` when the row predates SSO).
+ * Dipakai jembatan konteks: hanya akun yang datang lewat SSO ZITN yang boleh membaca lembar.
+ */
+export function selectZitnIdByUserId(db: DB, userId: string): Promise<string | null> {
+  return db
+    .select({ zitnUserId: users.zitnUserId })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1)
+    .then((rows) => rows[0]?.zitnUserId ?? null);
+}
+
+/**
  * Atomically consume a one-time `jti`.
  *
  * `INSERT … ON CONFLICT DO NOTHING RETURNING` is the whole single-use guarantee: the

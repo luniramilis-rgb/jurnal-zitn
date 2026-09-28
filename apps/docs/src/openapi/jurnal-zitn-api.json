@@ -1105,11 +1105,21 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "description": "Optional lembar date (`YYYY-MM-DD`) carried from the ZITN lembar link; on success the redirect becomes `/lembar?tanggal=…` so the journal can show \"that day's sheet\" context.\n",
+            "in": "query",
+            "name": "tanggal",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "302": {
-            "description": "Session started; redirect to `/`."
+            "description": "Session started; redirect to `/` (or `/lembar?tanggal=…`)."
           },
           "401": {
             "description": "Invalid",
@@ -2741,6 +2751,44 @@
         "summary": "Liveness probe (DB connectivity) plus the deployed version.",
         "tags": [
           "Platform"
+        ]
+      }
+    },
+    "/api/journal/context": {
+      "get": {
+        "description": "Authed. Mints a short-lived `journal_context` token with the shared secret and calls ZITN's `GET /api/journal/context` on the server, so no ZITN token reaches the browser. Returns only the selected snippet: `tanggal`, `asof`, `simbol[]`, `level_watch[]`. Each IDX entry also carries a `chartUrl` deep-link to ZITN's `/daily/chart/` (option B: the journal links to the chart, it never renders one and never receives a price). Fail-closed: `503 konteks_nonaktif` when unconfigured, `409 belum_tertaut` when the journal account is not linked to ZITN, and ZITN's own status when its gates are shut.\n",
+        "parameters": [
+          {
+            "description": "Sheet date (`YYYY-MM-DD`); omitted lets ZITN use the latest published sheet.",
+            "in": "query",
+            "name": "tanggal",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The snippet (`ok`, `tersedia`, `tanggal`, `asof`, `simbol`, `level_watch`)."
+          },
+          "400": {
+            "description": "tanggal is not a YYYY-MM-DD date."
+          },
+          "401": {
+            "description": "Authentication required."
+          },
+          "409": {
+            "description": "belum_tertaut — the account is not linked to ZITN."
+          },
+          "503": {
+            "description": "konteks_nonaktif, or ZITN data gates are shut."
+          }
+        },
+        "summary": "Read the ZITN daily-sheet snippet for a date (context bridge).",
+        "tags": [
+          "Journal"
         ]
       }
     },

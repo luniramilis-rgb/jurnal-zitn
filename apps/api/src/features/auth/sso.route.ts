@@ -16,6 +16,7 @@ import { setCookie } from 'hono/cookie';
 
 import { sessionCookieOptions } from '@/lib/cookie-policy';
 
+import { ssoRedirectTarget } from './sso-redirect';
 import { exchangeSsoToken } from './sso.service';
 
 const sso = new Hono();
@@ -35,15 +36,22 @@ const sso = new Hono();
  *         name: token
  *         required: true
  *         schema: { type: string }
+ *       - in: query
+ *         name: tanggal
+ *         required: false
+ *         schema: { type: string, format: date }
+ *         description: >
+ *           Optional lembar date (`YYYY-MM-DD`) carried from the ZITN lembar link; on success the
+ *           redirect becomes `/lembar?tanggal=…` so the journal can show "that day's sheet" context.
  *     responses:
- *       302: { description: Session started; redirect to `/`. }
+ *       302: { description: Session started; redirect to `/` (or `/lembar?tanggal=…`). }
  *       401: { description: Invalid, expired, or replayed token. }
  *       503: { description: ZITN SSO is not configured on this instance. }
  */
 sso.get('/sso', async (c) => {
   const { token } = await exchangeSsoToken(c.req.query('token'));
   setCookie(c, 'session', token, sessionCookieOptions());
-  return c.redirect('/', 302);
+  return c.redirect(ssoRedirectTarget(c.req.query('tanggal')), 302);
 });
 
 /**
