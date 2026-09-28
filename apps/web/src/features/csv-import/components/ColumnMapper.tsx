@@ -119,6 +119,12 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
     onChange({ ...value, mapping: { ...value.mapping, contractForm: next } });
   }
 
+  // IDX (A8): a statement that quotes lots must be stored as shares, so the
+  // quantity column needs to declare its unit (1 lot = 100 shares).
+  function setQuantityUnit(next: 'shares' | 'lots') {
+    onChange({ ...value, mapping: { ...value.mapping, quantityUnit: next } });
+  }
+
   function setExpiryFormat(next: ExpiryFormat) {
     onChange({ ...value, mapping: { ...value.mapping, expiryFormat: next } });
   }
@@ -235,6 +241,22 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
                   {f.label}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="import-quantity-unit">Quantity unit</Label>
+          <Select
+            value={value.mapping.quantityUnit ?? 'shares'}
+            onValueChange={(v) => setQuantityUnit(v as 'shares' | 'lots')}
+          >
+            <SelectTrigger id="import-quantity-unit" className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="shares">Shares</SelectItem>
+              <SelectItem value="lots">Lots (IDX — 1 lot = 100 shares)</SelectItem>
             </SelectContent>
           </Select>
         </div>

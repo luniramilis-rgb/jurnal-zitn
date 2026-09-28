@@ -1,5 +1,6 @@
 import { Decimal } from 'decimal.js';
 
+import { IDX_SHARES_PER_LOT } from '@jurnal-zitn/shared';
 import type {
   DateFormat,
   ExpiryFormat,
@@ -47,6 +48,8 @@ export interface NormalizeOptions {
   expiryFormat?: ExpiryFormat;
   /** Preset-only: the `quantity` cell's sign carries direction (seam 1). */
   signedQuantity?: boolean;
+  /** IDX (A8): the `quantity` cell is in lots; stored as shares (×100). */
+  quantityUnit?: 'shares' | 'lots';
   /** Preset-only: the `fees` cell's sign marks a cost; the magnitude is stored. */
   signedFees?: boolean;
 }
@@ -150,6 +153,12 @@ export function normalizeRow(
         value = value.abs();
       } else if (opts.signedFees && field === 'fees') {
         value = value.abs();
+      }
+      // IDX (A8): a statement quoting lots lands in the journal as shares
+      // (1 lot = 100). Applied to the magnitude AFTER the sign is taken, so a
+      // signed-lots preset still derives the right direction.
+      if (field === 'quantity' && opts.quantityUnit === 'lots') {
+        value = value.times(IDX_SHARES_PER_LOT);
       }
       // Quantize to the column scale BEFORE the magnitude bound (order matters:
       // quantization can carry into a new integer digit).

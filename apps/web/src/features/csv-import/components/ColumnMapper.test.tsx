@@ -219,3 +219,27 @@ describe('ColumnMapper — preset-only field rows', () => {
     expect(screen.getByText('Notes/Codes (set by preset)')).toBeTruthy();
   });
 });
+
+describe('ColumnMapper — quantity unit (A8, IDX lots)', () => {
+  it('defaults the quantity unit to shares', () => {
+    render(<ColumnMapper columns={GENERIC_COLUMNS} value={makeValue()} onChange={vi.fn()} />);
+
+    const select = screen
+      .getByRole('option', { name: 'Shares' })
+      .closest('select') as HTMLSelectElement;
+    expect(select.value).toBe('shares');
+  });
+
+  it('declares the quantity column as lots', () => {
+    const onChange = vi.fn();
+    render(<ColumnMapper columns={GENERIC_COLUMNS} value={makeValue()} onChange={onChange} />);
+
+    const select = screen
+      .getByRole('option', { name: 'Lots (IDX — 1 lot = 100 shares)' })
+      .closest('select') as HTMLSelectElement;
+    fireEvent.change(select, { target: { value: 'lots' } });
+
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect((onChange.mock.calls[0][0] as ColumnMapperValue).mapping.quantityUnit).toBe('lots');
+  });
+});

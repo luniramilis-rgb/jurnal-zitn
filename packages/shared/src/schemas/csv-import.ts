@@ -28,6 +28,9 @@ export const MappingSchema = z.object({
   signedQuantity: z.boolean().optional(),
   // Preset-only: the fees column's sign marks a cost; the magnitude is stored.
   signedFees: z.boolean().optional(),
+  // IDX (A8): when the statement quotes `lots`, the engine stores shares
+  // (1 lot = 100). Default/absent means the column is already in shares.
+  quantityUnit: z.enum(['shares', 'lots']).optional(),
 });
 
 export const CsvPreviewRequestSchema = z.object({

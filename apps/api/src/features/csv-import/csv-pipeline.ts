@@ -101,6 +101,7 @@ export function runPipeline(
       expiryFormat: mapping.expiryFormat,
       signedQuantity: mapping.signedQuantity,
       signedFees: mapping.signedFees,
+      quantityUnit: mapping.quantityUnit,
     });
     if (Array.isArray(result)) {
       errors.push(...result);

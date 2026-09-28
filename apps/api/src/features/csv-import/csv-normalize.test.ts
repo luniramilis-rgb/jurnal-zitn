@@ -312,6 +312,32 @@ describe('normalizeRow — sign conventions (seam 1, REQ-3.2, REQ-1.7)', () => {
     expect(r.row.values.fees).toBe('0.65');
   });
 
+  // A8 (IDX): a statement that quotes lots must be stored as shares — 1 lot = 100.
+  it('quantityUnit=lots: a lot column is stored as shares (×100)', () => {
+    const r = ok(normalizeRow(row({ quantity: '5' }), { ...US, quantityUnit: 'lots' }));
+    expect(r.row.values.quantity).toBe('500');
+  });
+
+  it('quantityUnit=lots with signedQuantity: the sign still derives the action', () => {
+    const r = ok(
+      normalizeRow(row({ quantity: '-3' }), {
+        ...US,
+        signedQuantity: true,
+        quantityUnit: 'lots',
+      }),
+    );
+    expect(r.row.values.quantity).toBe('300');
+    expect(r.row.values.action).toBe('sell');
+  });
+
+  it('quantityUnit=shares (or absent): the quantity passes through unchanged', () => {
+    expect(
+      ok(normalizeRow(row({ quantity: '500' }), { ...US, quantityUnit: 'shares' })).row.values
+        .quantity,
+    ).toBe('500');
+    expect(ok(normalizeRow(row({ quantity: '500' }), US)).row.values.quantity).toBe('500');
+  });
+
   it('undeclared: a negative quantity passes through unchanged (refused downstream)', () => {
     const r = ok(normalizeRow(row({ quantity: '-100' }), US));
     expect(r.row.values.quantity).toBe('-100');
