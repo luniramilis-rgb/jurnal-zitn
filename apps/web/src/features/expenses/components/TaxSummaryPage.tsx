@@ -1,7 +1,7 @@
 import { ChevronDown, Loader2, Receipt } from 'lucide-react';
 import { Fragment, useMemo, useState } from 'react';
 
-import type { MessageKey } from '@jurnal-zitn/shared';
+import { formatDate, formatNumber, type MessageKey } from '@jurnal-zitn/shared';
 import type { ExpenseCategory } from '@jurnal-zitn/shared/constants/expense-categories';
 import type { TaxJurisdiction } from '@jurnal-zitn/shared/schemas/expense';
 
@@ -30,7 +30,7 @@ import {
   useTaxJurisdictionQuery,
 } from '@/features/expenses/hooks/useTaxJurisdiction';
 import { useTaxSummary } from '@/features/expenses/hooks/useTaxSummary';
-import { useT } from '@/hooks/useLocale';
+import { useLocale, useT } from '@/hooks/useLocale';
 import { formatCurrency } from '@/lib/format';
 
 const EXPENSE_CATEGORY_KEYS: Record<ExpenseCategory, MessageKey> = {
@@ -42,11 +42,13 @@ const EXPENSE_CATEGORY_KEYS: Record<ExpenseCategory, MessageKey> = {
   other: 'expense.cat.other',
 };
 
-const JURISDICTION_LABELS: Record<TaxJurisdiction, string> = {
-  US: 'United States',
-  CA: 'Canada',
-  ID: 'Indonesia',
-  other: 'Other',
+// Label yurisdiksi berasal dari kamus bersama (`tax.jurisdiction.*`) — satu jalur
+// dengan `tax.jurisdiction.other`, tanpa literal EN yang ter-hardcode (ZITN-TECH-021 §5.5-1).
+const JURISDICTION_KEYS: Record<TaxJurisdiction, MessageKey> = {
+  US: 'tax.jurisdiction.us',
+  CA: 'tax.jurisdiction.ca',
+  ID: 'tax.jurisdiction.id',
+  other: 'tax.jurisdiction.other',
 };
 
 function buildYearOptions(currentYear: number): number[] {
@@ -112,6 +114,9 @@ function DisclaimerBody({ text }: { text: string }) {
 
 export function TaxSummaryPage() {
   const t = useT();
+  // Nilai kanonik (`pphFinal.rate`) diformat per locale SEBELUM masuk kamus (rubrik R13):
+  // "0,1%" pada ID, "0.1%" pada EN.
+  const { locale } = useLocale();
   const currentYear = new Date().getUTCFullYear();
   const [selectedYear, setSelectedYear] = useState<number>(currentYear);
   const yearOptions = useMemo(() => buildYearOptions(currentYear), [currentYear]);
@@ -140,12 +145,18 @@ export function TaxSummaryPage() {
 
   const showFlags = jurisdiction !== 'other';
   const showShortLong = jurisdiction === 'US';
+  // Flag wash-sale/superficial-loss hanya dihitung server untuk US/CA (Req 4.4), jadi
+  // klausa "posisi bertanda" pada subjudul hanya ditampilkan bila tabelnya bisa muncul
+  // (rubrik R0: jangan mendeskripsikan fitur yang tidak dirender untuk yurisdiksi ini).
+  const showFlagCopy = jurisdiction === 'US' || jurisdiction === 'CA';
 
   return (
     <div className="space-y-6">
       <div>
         <PageHeader page={t('tax.page.title')} className="mb-2" />
-        <p className="text-sm text-muted-foreground">{t('tax.subtitle')}</p>
+        <p className="text-sm text-muted-foreground">
+          {t(showFlagCopy ? 'tax.subtitleFlags' : 'tax.subtitle')}
+        </p>
       </div>
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex items-end gap-3">
@@ -185,9 +196,9 @@ export function TaxSummaryPage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {(Object.keys(JURISDICTION_LABELS) as TaxJurisdiction[]).map((j) => (
+                  {(Object.keys(JURISDICTION_KEYS) as TaxJurisdiction[]).map((j) => (
                     <SelectItem key={j} value={j}>
-                      {j === 'other' ? t('tax.jurisdiction.other') : JURISDICTION_LABELS[j]}
+                      {t(JURISDICTION_KEYS[j])}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -256,7 +267,9 @@ export function TaxSummaryPage() {
         <>
           {(data.ratesAsOf || data.excludedCurrencies.length > 0) && (
             <div className="rounded-md border p-3 text-xs text-muted-foreground">
-              {data.ratesAsOf && <span>{t('tax.ratesAsOf', { date: data.ratesAsOf })}</span>}
+              {data.ratesAsOf && (
+                <span>{t('tax.ratesAsOf', { date: formatDate(data.ratesAsOf, locale) })}</span>
+              )}
               {data.excludedCurrencies.length > 0 && (
                 <span>{t('tax.excluded', { list: data.excludedCurrencies.join(', ') })}</span>
               )}
@@ -359,7 +372,7 @@ export function TaxSummaryPage() {
               <section className="space-y-3">
                 <div className="flex flex-wrap items-baseline justify-between gap-2">
                   <h2 className="text-lg font-semibold">
-                    {t('tax.pphTitle', { rate: data.pphFinal.rate })}
+                    {t('tax.pphTitle', { rate: formatNumber(data.pphFinal.rate, locale) })}
                   </h2>
                 </div>
                 <div className="rounded-md border p-3">
@@ -380,7 +393,9 @@ export function TaxSummaryPage() {
                     )}
                   </ul>
                 </div>
-                <p className="text-xs text-muted-foreground">{t('tax.pphNote')}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t('tax.pphNote', { rate: formatNumber(data.pphFinal.rate, locale) })}
+                </p>
               </section>
             </>
           )}
