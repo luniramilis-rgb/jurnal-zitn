@@ -1,15 +1,17 @@
 name: Images (edge)
 
-# Build + push `edge` images of jurnal-zitn-api and jurnal-zitn-web to GHCR on every
-# push to main, so a small (1-core) production host only has to `docker compose pull`
-# instead of building. Tagged releases still come from release.yml (multi-arch + GitHub
-# Release); this workflow is amd64-only and labelled `edge` + `sha-<commit>`.
+# Build + push `edge` images of jurnal-zitn-api and jurnal-zitn-web to GHCR.
+#
+# MANUAL ONLY (Actions → Images (edge) → Run workflow). It used to run on every
+# push to main; on this PRIVATE repo that billed ~6m of Actions minutes per push
+# against a shared account quota and added a new `sha-<commit>` tag (GHCR
+# storage) every time. Production updates should now come from a tagged release
+# (release.yml, multi-arch + `:vX.Y.Z`/`:latest`); use this only when you need an
+# amd64 `:edge`/`:sha-<commit>` image without cutting a release.
 #
 # Manual runs: Actions → Images (edge) → Run workflow.
 
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 concurrency:

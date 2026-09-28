@@ -345,20 +345,25 @@ Syarat tetap yang menahan lonjakan: **swap 4 GB** (§7.2b), **batas log Docker**
 Postgres** (§7.4b). Dan **jangan build atau `pnpm test` di host** — build hanya di CI (itulah
 alasan "$7" pernah menyaratkan 4 GB; dengan `--no-build` angka itu tidak perlu).
 
-Override image **`docker-compose.ghcr.yml`** sudah ada di repo; pin tag `:sha-<commit>` di dua baris
-`image:`-nya, lalu tetap pakai `--no-build`. Bila paket GHCR privat (default repo privat), host
-perlu `docker login ghcr.io` (§7.4).
+Override image **`docker-compose.ghcr.yml`** sudah ada di repo; pin tag di dua baris `image:`-nya,
+lalu tetap pakai `--no-build`. **Rilis** (tag `v*`) membangun `:vX.Y.Z`/`:latest` (multi-arch) lewat
+`release.yml`; **`:edge`/`:sha-<commit>`** (amd64) kini dibangun **manual** (Actions → _Images (edge)_
+→ Run workflow) karena tiap push dulu memakan kuota Actions repo privat. Bila paket GHCR privat
+(default repo privat), host perlu `docker login ghcr.io` (§7.4).
 
 ### 7.10 Update & rollback image
 
 ```bash
 COMPOSE="docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.cloudflare.yml"
-# pin ke commit baru di docker-compose.ghcr.yml, lalu:
+# pin tag baru di docker-compose.ghcr.yml (rilis :vX.Y.Z, atau :sha-<commit> dari
+# run manual Images (edge)), lalu:
 $COMPOSE pull && $COMPOSE up -d --no-build
-# rollback: kembalikan tag :sha-<commit> lama, ulangi perintah di atas
+# rollback: kembalikan tag lama, ulangi perintah di atas
 ```
 
 Migrasi berjalan otomatis saat `api` boot; perhatikan log `Config loaded`.
+Rilis (`v*`) membangun image multi-arch + GitHub Release; `:edge`/`:sha-<commit>` hanya dari run
+manual **Images (edge)** (hemat kuota — lihat catatan di header workflow itu).
 
 ## 8. Operasional (A11)
 

@@ -3,7 +3,17 @@ name: CI
 on:
   push:
     branches: [main]
+    # Docs-only pushes skip CI entirely. A release commit always bumps
+    # package.json, so release.yml's ci-gate still finds a run for the tag.
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
   pull_request:
+    paths-ignore:
+      - '**/*.md'
+      - 'docs/**'
+  # Manual runs re-enable the PR-only jobs (e2e, docker-smoke) on demand.
+  workflow_dispatch:
 
 # One in-flight run per PR — a rapid successive push cancels the stale run
 # instead of stacking a full duplicate. Main pushes each key on their own sha
@@ -217,6 +227,12 @@ jobs:
         run: pnpm exec vitest run --project web --project shared --project web-scripts --project docs-scripts
 
   e2e:
+    # The two expensive jobs (~20m e2e, ~5m smoke) gate a PR but are skipped on a
+    # plain push to main: this is a PRIVATE repo, where Actions minutes are billed
+    # against a shared account quota, and a direct push has already been verified
+    # locally (`pnpm --filter @jurnal-zitn/e2e test`). Run on demand with
+    # workflow_dispatch.
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
@@ -273,6 +289,9 @@ jobs:
           if-no-files-found: ignore
 
   docker-smoke:
+    # See the e2e job's note: PR-only (+ dispatch) to protect the private-repo
+    # Actions minutes budget.
+    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
