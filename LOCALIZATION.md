@@ -178,3 +178,76 @@ Basis Tradr berorientasi AS (USD, NYSE, fee per saham, opsi OCC, wash-sale). Ren
   padanan yang menyesatkan.
 - Angka/harga tetap dari sumber kanonik; lokalisasi hanya format tampilan.
 - Tidak menambah klaim; disclaimer tetap.
+
+## Tinjauan manual per halaman (ZITN-TECH-021) — mulai 2026-09-28
+
+Kebijakan: **istilah pasar tetap EN, kalimat penjelas ID, chrome ID**; tinjauan manual per
+halaman **wajib**, dengan penegakan otomatis anti-busuk. Rujukan: `ZITN-TECH-021` §2/§4/§5.
+
+- **Gate rilis:** `DEFAULT_LOCALE` ditahan `'en'` (`packages/shared/src/i18n.ts`) selama jendela
+  tinjau agar pengguna melihat salinan EN yang koheren, bukan campuran mentah; dikembalikan ke
+  `'id'` setelah Lapis 1 `sah` penuh. Uji: `packages/shared/src/i18n.test.ts`.
+- **Glosarium:** `packages/shared/src/glossary.ts` — satu-satunya tempat keputusan istilah
+  (`policy: keep-en | translate | free`, plus `source` tiga lapis: regulasi / broker / metrik).
+  Namespace `term.*` di kamus (nilai identik `id`/`en`). Lint: `glossary.test.ts`.
+- **Alat:** `node scripts/i18n-coverage.mjs` (lembar kerja `key → en → id` + salinan ID setelah
+  substitusi + literal JSX belum-terekstrak: teks JSX, atribut, dan placeholder numerik R14;
+  tulis UTF-8 eksplisit). Overlay dev `VITE_I18N_DEBUG=1` menandai fallback / kalimat `id === en`.
+- **R13 (nilai kanonik):** angka/tanggal diformat per locale **sebelum** masuk `translate()` —
+  `formatNumber`/`formatDate` di `packages/shared/src/i18n.ts` (dipakai web **dan** server, karena
+  disclaimer dirender server). Bukti: `{rate}` → "0,1" (id). Tanpa ini nilai kanonik "0.1"
+  bocor jadi "0.1%" di salinan ID.
+- **R14 (placeholder):** placeholder numerik/tanggal di form harus ikut locale (mis. "0,00" bukan
+  "0.00") — dicatat oleh alat, perbaikan menyusul per halaman.
+- **Paket tinjau halaman kalibrasi:** `apps/web/docs/i18n-review-packet-tax-summary.md`
+  (+ lampiran mesin `apps/web/docs/i18n-coverage-tax-summary.md`).
+- **Penegak:** `apps/web/src/i18n-review.manifest.json` + `i18n-review.test.ts` — hash himpunan
+  kunci per rute; drift pada rute `sah`/Lapis 1 → CI gagal sampai ditinjau ulang.
+  Regenerasi: `node scripts/i18n-coverage.mjs --emit-manifest`.
+
+### Lembar tinjau per rute
+
+| Rute                     | Kelas   | Keadaan diuji                                    | Peninjau                              | Tanggal    | Commit    | Status   | Catatan                                                                                                                                                        |
+| ------------------------ | ------- | ------------------------------------------------ | ------------------------------------- | ---------- | --------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `accounting/tax-summary` | Lapis 1 | kosong/loading/galat/1 baris/penuh + kurs hilang | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | `c5cf71f` | `sedang` | Verdict kalibrasi: diterima dengan perbaikan (6 temuan + R0 subjudul); paket di `apps/web/docs/i18n-review-packet-tax-summary.md`; menunggu ratifikasi pemilik |
+| `accounting/fee-rollup`  | Lapis 1 | —                                                | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
+| `accounting/expenses`    | Lapis 1 | —                                                | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
+| `settings/billing`       | Lapis 1 | —                                                | —                                     | —          | —         | `belum`  | Salinan masih literal EN (belum masuk kamus)                                                                                                                   |
+| `calculator`             | Lapis 1 | —                                                | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
+| `positions/$positionId`  | Lapis 1 | —                                                | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
+| `import`                 | Lapis 1 | —                                                | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
+| `settings/account`       | Lapis 1 | —                                                | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
+
+**Urutan Lapis:** 1 = angka/uang/klaim (tabel di atas + disclaimer pajak + email); 2 = dashboard +
+widget, `positions/index`, `performance`, drawer; 3 = chrome, settings umum, changelog, admin,
+tour/onboarding. Rute opsi gaya AS ditinjau terakhir atau ditandai "EN sengaja" (Fase 4).
+
+**Catatan gate (perlu diketahui pemilik):** `DEFAULT_LOCALE` sendiri belum cukup memaksa EN untuk
+pengguna — `LocaleProvider` menyemai bahasa dari browser (`detectBrowserLocale`) saat `users.locale`
+NULL, sehingga peramban `id` tetap mendapat `id`. Bila tujuan gate adalah "semua pengguna melihat EN
+selama jendela", penyemaian itu perlu ditahan sementara; keputusan ada di pemilik.
+
+### Glosarium ringkas (awal; sementara)
+
+| Istilah                                                                 | id                      | policy      | Lapis sumber                                |
+| ----------------------------------------------------------------------- | ----------------------- | ----------- | ------------------------------------------- |
+| Position                                                                | **Posisi**              | `translate` | broker (sementara)                          |
+| Fill                                                                    | Fill                    | `keep-en`   | metrik                                      |
+| Stop Loss / Take Profit                                                 | Stop Loss / Take Profit | `keep-en`   | metrik                                      |
+| Lot                                                                     | Lot                     | `free`      | regulasi (IDX)                              |
+| PPh Final                                                               | PPh Final               | `free`      | regulasi                                    |
+| P&L / Drawdown / Slippage / Tick / Win rate / Risk of ruin / Wash sales | (EN)                    | `keep-en`   | metrik                                      |
+| Equity                                                                  | **Ekuitas**             | `translate` | metrik (koreksi: copy lama pakai "Ekuitas") |
+| Breakeven                                                               | **Impas**               | `translate` | metrik (koreksi: copy lama pakai "Impas")   |
+| Win rate / Risk of ruin / Wash sales                                    | (EN)                    | `keep-en`   | metrik (hasil = milik pengguna, K11)        |
+
+Istilah yang copy lamanya sudah mapan dan mengalahkan usulan keep-en awal ditulis sebagai
+**keputusan final** di `GLOSSARY_RECONCILIATION` (`packages/shared/src/glossary.ts`), bukan
+sekadar catatan: `equity → "Ekuitas"`, `breakeven → "Impas"`. Daftar `keep-en` selebihnya masih
+**menunggu konfirmasi pemilik** (`ZITN-TECH-021` §7 butir 2).
+
+**F7 — parkir (arahan prioritas "bahasa dulu, pengaman menyusul"):** R13-b 9 situs tanggal,
+R14 20 placeholder numerik, lint otomatis tambahan (`toLocaleDateString()` tanpa locale; kalimat
+template literal), gelombang F2 (draf ID `features/brokerages/components`,
+`features/accounts/components`, `routes/_auth/accounts`), dan keputusan gate `DEFAULT_LOCALE`.
+Tercatat sebagai `parkedItems` di `apps/web/src/i18n-review.manifest.json`.
