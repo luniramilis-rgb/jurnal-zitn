@@ -2,6 +2,7 @@ import { type Control, type FieldValues, type Path, useController } from 'react-
 
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useT } from '@/hooks/useLocale';
 
 interface FeeFieldProps<T extends FieldValues> {
   control: Control<T>;
@@ -40,66 +41,67 @@ export function FeeScheduleFields<T extends FieldValues>({
   control,
   disabled,
 }: FeeScheduleFieldsProps<T>) {
+  const t = useT();
   return (
     <div className="space-y-6">
       <fieldset className="space-y-3 rounded-md border p-4">
-        <legend className="px-2 text-sm font-medium">Stock Fees</legend>
+        <legend className="px-2 text-sm font-medium">{t('broker.fee.stock')}</legend>
         <FeeField
           control={control}
           name={'feeSchedule.stockPerShareCommission' as Path<T>}
-          label="Per Share Commission"
+          label={t('broker.fee.perShareCommission')}
           disabled={disabled}
         />
         <FeeField
           control={control}
           name={'feeSchedule.stockMinPerFill' as Path<T>}
-          label="Min Per Fill"
+          label={t('broker.fee.minPerFill')}
           disabled={disabled}
         />
         <FeeField
           control={control}
           name={'feeSchedule.stockMaxPerFill' as Path<T>}
-          label="Max Per Fill"
+          label={t('broker.fee.maxPerFill')}
           disabled={disabled}
         />
         <FeeField
           control={control}
           name={'feeSchedule.stockPercentBuy' as Path<T>}
-          label="% Commission (Buy)"
+          label={t('broker.fee.percentBuy')}
           disabled={disabled}
         />
         <FeeField
           control={control}
           name={'feeSchedule.stockPercentSell' as Path<T>}
-          label="% Commission (Sell)"
+          label={t('broker.fee.percentSell')}
           disabled={disabled}
         />
       </fieldset>
 
       <fieldset className="space-y-3 rounded-md border p-4">
-        <legend className="px-2 text-sm font-medium">Options Fees</legend>
+        <legend className="px-2 text-sm font-medium">{t('broker.fee.options')}</legend>
         <FeeField
           control={control}
           name={'feeSchedule.optionsPerContractCommission' as Path<T>}
-          label="Per Contract Commission"
+          label={t('broker.fee.perContractCommission')}
           disabled={disabled}
         />
         <FeeField
           control={control}
           name={'feeSchedule.optionsPerContractExchangeFee' as Path<T>}
-          label="Per Contract Exchange Fee"
+          label={t('broker.fee.perContractExchangeFee')}
           disabled={disabled}
         />
         <FeeField
           control={control}
           name={'feeSchedule.optionsMinPerFill' as Path<T>}
-          label="Min Per Fill"
+          label={t('broker.fee.minPerFill')}
           disabled={disabled}
         />
         <FeeField
           control={control}
           name={'feeSchedule.optionsMaxPerFill' as Path<T>}
-          label="Max Per Fill"
+          label={t('broker.fee.maxPerFill')}
           disabled={disabled}
         />
       </fieldset>

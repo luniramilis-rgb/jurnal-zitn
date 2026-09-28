@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import type { Brokerage } from '@jurnal-zitn/shared';
+import { formatNumber, type Brokerage } from '@jurnal-zitn/shared';
 
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Badge } from '@/components/ui/badge';
@@ -20,27 +20,13 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useLocale, useT } from '@/hooks/useLocale';
 
 import { useBrokerages } from '../hooks/useBrokerages';
 
-function formatFeeSummary(brokerage: Brokerage): string {
-  const parts: string[] = [];
-  const stock = Number(brokerage.feeSchedule.stockPerShareCommission);
-  const option = Number(brokerage.feeSchedule.optionsPerContractCommission);
-
-  if (stock > 0) {
-    parts.push(`$${brokerage.feeSchedule.stockPerShareCommission}/share`);
-  }
-  if (option > 0) {
-    parts.push(`$${brokerage.feeSchedule.optionsPerContractCommission}/contract`);
-  }
-  if (parts.length === 0) {
-    return 'No fees configured';
-  }
-  return parts.join(', ');
-}
-
 export function BrokerageList() {
+  const t = useT();
+  const { locale } = useLocale();
   const { data: brokerages, isLoading } = useBrokerages();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editBrokerage, setEditBrokerage] = useState<Brokerage | null>(null);
@@ -48,6 +34,31 @@ export function BrokerageList() {
   // Placeholder: dialog component is task 15
   void dialogOpen;
   void editBrokerage;
+
+  function formatFeeSummary(brokerage: Brokerage): string {
+    const parts: string[] = [];
+    const stock = Number(brokerage.feeSchedule.stockPerShareCommission);
+    const option = Number(brokerage.feeSchedule.optionsPerContractCommission);
+
+    if (stock > 0) {
+      parts.push(
+        t('broker.fee.perShare', {
+          amount: formatNumber(brokerage.feeSchedule.stockPerShareCommission, locale),
+        }),
+      );
+    }
+    if (option > 0) {
+      parts.push(
+        t('broker.fee.perContract', {
+          amount: formatNumber(brokerage.feeSchedule.optionsPerContractCommission, locale),
+        }),
+      );
+    }
+    if (parts.length === 0) {
+      return t('broker.fee.none');
+    }
+    return parts.join(', ');
+  }
 
   if (isLoading) {
     return (
@@ -62,7 +73,7 @@ export function BrokerageList() {
   return (
     <>
       <PageHeader
-        page="Brokerages"
+        page={t('page.brokerages')}
         right={
           <Button
             className="cursor-pointer"
@@ -71,22 +82,20 @@ export function BrokerageList() {
               setDialogOpen(true);
             }}
           >
-            New Brokerage
+            {t('broker.list.new')}
           </Button>
         }
       />
 
       {!brokerages?.length ? (
-        <div className="py-12 text-center text-muted-foreground">
-          No brokerages yet. Create one to start tracking fees.
-        </div>
+        <div className="py-12 text-center text-muted-foreground">{t('broker.list.empty')}</div>
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Fee Summary</TableHead>
+              <TableHead>{t('common.name')}</TableHead>
+              <TableHead>{t('broker.col.type')}</TableHead>
+              <TableHead>{t('broker.col.feeSummary')}</TableHead>
               <TableHead className="w-12" />
             </TableRow>
           </TableHeader>
@@ -97,15 +106,13 @@ export function BrokerageList() {
                   <div>
                     <span className="font-medium">{brokerage.name}</span>
                     {brokerage.isSystem && (
-                      <p className="text-xs text-muted-foreground">
-                        Approximate rates — verify with your broker
-                      </p>
+                      <p className="text-xs text-muted-foreground">{t('broker.row.approx')}</p>
                     )}
                   </div>
                 </TableCell>
                 <TableCell>
                   <Badge variant={brokerage.isSystem ? 'secondary' : 'outline'}>
-                    {brokerage.isSystem ? 'System' : 'Custom'}
+                    {t(brokerage.isSystem ? 'broker.type.system' : 'broker.type.custom')}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
@@ -127,7 +134,7 @@ export function BrokerageList() {
                             setDialogOpen(true);
                           }}
                         >
-                          View
+                          {t('common.view')}
                         </DropdownMenuItem>
                       ) : (
                         <>
@@ -138,10 +145,10 @@ export function BrokerageList() {
                               setDialogOpen(true);
                             }}
                           >
-                            Edit
+                            {t('common.edit')}
                           </DropdownMenuItem>
                           <DropdownMenuItem className="cursor-pointer text-destructive">
-                            Delete
+                            {t('common.delete')}
                           </DropdownMenuItem>
                         </>
                       )}

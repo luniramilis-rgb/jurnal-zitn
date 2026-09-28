@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+﻿// @vitest-environment jsdom
 import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -34,7 +34,7 @@ describe('BrokerageDialog — preset broker IDX (D3)', () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<BrokerageDialog open onOpenChange={() => {}} />);
 
-    await user.click(screen.getByRole('combobox', { name: 'Preset broker IDX' }));
+    await user.click(screen.getByRole('combobox', { name: 'Broker preset' }));
     await user.click(await screen.findByRole('option', { name: 'Mirae Asset Sekuritas' }));
 
     // The preset fills the name; the fee values are what the submit must carry.
@@ -55,14 +55,14 @@ describe('BrokerageDialog — preset broker IDX (D3)', () => {
     );
     // The disclaimer travels in notes so it survives as the user's own record.
     const payload = createMutate.mock.calls[0][0] as { notes: string };
-    expect(payload.notes).toContain('Perkiraan komisi');
+    expect(payload.notes).toContain('Estimated commission');
   });
 
   it('offers every shipped IDX preset', async () => {
     const user = userEvent.setup({ pointerEventsCheck: 0 });
     render(<BrokerageDialog open onOpenChange={() => {}} />);
 
-    await user.click(screen.getByRole('combobox', { name: 'Preset broker IDX' }));
+    await user.click(screen.getByRole('combobox', { name: 'Broker preset' }));
 
     for (const name of [
       'Mirae Asset Sekuritas',

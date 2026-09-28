@@ -10,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { useT } from '@/hooks/useLocale';
 
 interface DeleteBrokerageDialogProps {
   open: boolean;
@@ -26,27 +27,25 @@ export function DeleteBrokerageDialog({
   referencedAccountNames = [],
   onConfirm,
 }: DeleteBrokerageDialogProps) {
+  const t = useT();
+  const hasReferences = referencedAccountNames.length > 0;
+
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete Brokerage</AlertDialogTitle>
+          <AlertDialogTitle>{t('broker.delete.title')}</AlertDialogTitle>
           <AlertDialogDescription>
-            Are you sure you want to delete &ldquo;{brokerage.name}&rdquo;? This action cannot be
-            undone.
-            {referencedAccountNames.length > 0 && (
-              <>
-                {' '}
-                The following accounts reference this brokerage and will need to be reassigned:{' '}
-                <span className="font-medium">{referencedAccountNames.join(', ')}</span>.
-              </>
-            )}
+            {t(hasReferences ? 'broker.delete.bodyReferenced' : 'broker.delete.body', {
+              name: brokerage.name,
+              names: referencedAccountNames.join(', '),
+            })}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+          <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
           <AlertDialogAction className="cursor-pointer" variant="destructive" onClick={onConfirm}>
-            Delete
+            {t('common.delete')}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
