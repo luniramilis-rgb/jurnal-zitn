@@ -36,6 +36,7 @@ import {
 import { UpgradeLink } from '@/features/billing/UpgradeLink';
 import { useTierState } from '@/features/billing/useTierState';
 import { useBrokerages } from '@/features/brokerages/hooks/useBrokerages';
+import { useT } from '@/hooks/useLocale';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -49,9 +50,9 @@ const NONE_SENTINEL = '__none__';
 // account. Naming the cost is the point — "conservative" is an argument, a
 // drawdown is a fact.
 const RISK_PRESETS = [
-  { value: '1', label: '1%', note: '10 losses: -10%' },
-  { value: '2', label: '2%', note: '10 losses: -18%' },
-  { value: '3', label: '3%', note: '10 losses: -26%' },
+  { value: '1', labelKey: 'acct.risk.preset1Label', noteKey: 'acct.risk.preset1Note' },
+  { value: '2', labelKey: 'acct.risk.preset2Label', noteKey: 'acct.risk.preset2Note' },
+  { value: '3', labelKey: 'acct.risk.preset3Label', noteKey: 'acct.risk.preset3Note' },
 ] as const;
 
 // Selected on create. NOT applied on edit: an account that stores no rule keeps
@@ -73,6 +74,7 @@ interface AccountDialogProps {
 }
 
 export function AccountDialog({ open, onOpenChange, account }: AccountDialogProps) {
+  const t = useT();
   const isEdit = !!account;
   const queryClient = useQueryClient();
   const createAccount = useCreateAccount();
@@ -147,14 +149,18 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
       ? storedRisk
       : null;
   const riskOptions: RiskOption[] = [
-    ...RISK_PRESETS,
+    ...RISK_PRESETS.map((preset) => ({
+      value: preset.value,
+      label: t(preset.labelKey),
+      note: t(preset.noteKey),
+    })),
     ...(customRisk
-      ? [{ value: customRisk, label: `${customRisk}%`, note: 'current setting' }]
+      ? [{ value: customRisk, label: `${customRisk}%`, note: t('acct.risk.current') }]
       : []),
     // Absence stays reachable: the calculator seeds its risk percent only from
     // an account that HAS a rule, and clearing one is a documented action the
     // API models as an explicit null.
-    { value: undefined, label: 'No rule', note: 'set it per calculation' },
+    { value: undefined, label: t('acct.risk.none'), note: t('acct.risk.noneNote') },
   ];
   // Numeric comparison, because the API normalises to numeric(5,2): a stored
   // '1.00' is the 1% preset, not a fourth option.
@@ -244,7 +250,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
       <Dialog open={open} onOpenChange={onOpenChange}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>{isEdit ? 'Edit Account' : 'New Account'}</DialogTitle>
+            <DialogTitle>{t(isEdit ? 'acct.title.edit' : 'acct.title.new')}</DialogTitle>
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4">
             {tierRefused && (
@@ -252,21 +258,23 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
                 data-testid="account-tier-refusal"
                 className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-destructive/50 bg-destructive/10 p-3"
               >
-                <span className="text-sm text-destructive">
-                  You&apos;ve reached your plan&apos;s account limit.
-                </span>
+                <span className="text-sm text-destructive">{t('acct.tier.refused')}</span>
                 {tierState?.purchasable && <UpgradeLink surface="account-dialog" />}
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" {...form.register('name')} placeholder="e.g., IBKR Main" />
+              <Label htmlFor="name">{t('common.name')}</Label>
+              <Input
+                id="name"
+                {...form.register('name')}
+                placeholder={t('acct.field.namePlaceholder')}
+              />
               {form.formState.errors.name && (
                 <p className="text-sm text-destructive">{form.formState.errors.name.message}</p>
               )}
             </div>
             <div className="space-y-2">
-              <Label htmlFor="currency">Currency</Label>
+              <Label htmlFor="currency">{t('common.currency')}</Label>
               <Select
                 value={form.watch('currency')}
                 onValueChange={(val) => form.setValue('currency', val)}
@@ -295,7 +303,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
                 other being the settings control, which disclaims this one in
                 return. */}
             <div className="space-y-2">
-              <Label htmlFor="timezone">Trading-day timezone</Label>
+              <Label htmlFor="timezone">{t('acct.field.timezone')}</Label>
               <Select
                 value={form.watch('timezone') ?? DEFAULT_ACCOUNT_TIMEZONE}
                 onValueChange={(val) => form.setValue('timezone', val)}
@@ -311,22 +319,18 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
                   ))}
                 </SelectContent>
               </Select>
-              <p className="text-sm text-muted-foreground">
-                Defines the trading day for this account — used to decide whether a position can be
-                re-entered the same day. It is not your reporting timezone, which buckets your
-                P&amp;L and is set in settings.
-              </p>
+              <p className="text-sm text-muted-foreground">{t('acct.field.timezoneHelp')}</p>
               {form.formState.errors.timezone && (
                 <p className="text-sm text-destructive">{form.formState.errors.timezone.message}</p>
               )}
             </div>
             {!isEdit && (
               <div className="space-y-2">
-                <Label htmlFor="startingBalance">Starting balance</Label>
+                <Label htmlFor="startingBalance">{t('acct.field.startingBalance')}</Label>
                 <Input
                   id="startingBalance"
                   inputMode="decimal"
-                  placeholder="0.00"
+                  placeholder={t('acct.field.startingBalancePlaceholder')}
                   {...form.register('startingBalance', {
                     // Empty field means "not provided" — the schema only
                     // accepts a decimal string or undefined, never ''.
@@ -358,7 +362,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
                 id), so it stays on the group now that the input is gone. */}
             <fieldset id="defaultRiskPercent" role="radiogroup" className="space-y-2">
               <legend className="text-sm leading-none font-medium select-none">
-                Default risk %
+                {t('acct.field.defaultRisk')}
               </legend>
               <div className="flex flex-wrap gap-2">
                 {riskOptions.map((option) => {
@@ -395,11 +399,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
                   );
                 })}
               </div>
-              <p className="text-sm text-muted-foreground">
-                The share of this account&apos;s balance you risk on a single trade — it prefills
-                the position-size calculator, and you can override it on any one calculation. The
-                second figure is what ten losing trades in a row would cost.
-              </p>
+              <p className="text-sm text-muted-foreground">{t('acct.field.defaultRiskHelp')}</p>
               {form.formState.errors.defaultRiskPercent && (
                 <p className="text-sm text-destructive">
                   {form.formState.errors.defaultRiskPercent.message}
@@ -407,7 +407,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
               )}
             </fieldset>
             <div className="space-y-2">
-              <Label htmlFor="brokerage">Brokerage</Label>
+              <Label htmlFor="brokerage">{t('acct.field.brokerage')}</Label>
               <Select
                 value={selectValue}
                 onValueChange={(val) => {
@@ -415,13 +415,13 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
                 }}
               >
                 <SelectTrigger id="brokerage" className="cursor-pointer">
-                  <SelectValue placeholder="None" />
+                  <SelectValue placeholder={t('common.none')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value={NONE_SENTINEL}>None</SelectItem>
+                  <SelectItem value={NONE_SENTINEL}>{t('common.none')}</SelectItem>
                   {systemBrokerages.length > 0 && (
                     <SelectGroup>
-                      <SelectLabel>System Presets</SelectLabel>
+                      <SelectLabel>{t('acct.brokerage.systemPresets')}</SelectLabel>
                       {systemBrokerages.map((b) => (
                         <SelectItem key={b.id} value={b.id}>
                           {b.name}
@@ -431,7 +431,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
                   )}
                   {userBrokerages.length > 0 && (
                     <SelectGroup>
-                      <SelectLabel>Your Brokerages</SelectLabel>
+                      <SelectLabel>{t('acct.brokerage.yours')}</SelectLabel>
                       {userBrokerages.map((b) => (
                         <SelectItem key={b.id} value={b.id}>
                           {b.name}
@@ -443,8 +443,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
               </Select>
               {showCurrencyWarning && (
                 <p className="text-sm text-warning" aria-live="polite">
-                  This preset assumes USD fees — amounts may not reflect accurate currency-adjusted
-                  costs.
+                  {t('acct.warn.usdFees')}
                 </p>
               )}
             </div>
@@ -455,7 +454,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
                 className="cursor-pointer"
                 onClick={() => onOpenChange(false)}
               >
-                Cancel
+                {t('action.cancel')}
               </Button>
               {/* `data-tour` is the walkthrough's anchor and nothing else —
                   the tour steps are data in features/onboarding/lib/steps and
@@ -467,7 +466,7 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
                 className="cursor-pointer"
                 disabled={isPending}
               >
-                {isPending ? 'Saving...' : isEdit ? 'Save' : 'Create'}
+                {isPending ? t('common.saving') : t(isEdit ? 'common.save' : 'common.create')}
               </Button>
             </div>
           </form>
@@ -477,18 +476,22 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Change brokerage?</AlertDialogTitle>
+            <AlertDialogTitle>{t('acct.confirmBrokerage.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This account has {positionCount} position{positionCount !== 1 ? 's' : ''}. Changing
-              the brokerage will affect fee calculations for existing positions.
+              {t(
+                positionCount === 1
+                  ? 'acct.confirmBrokerage.bodyOne'
+                  : 'acct.confirmBrokerage.bodyMany',
+                { count: positionCount },
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel className="cursor-pointer" onClick={handleConfirmCancel}>
-              Cancel
+              {t('action.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction className="cursor-pointer" onClick={handleConfirm}>
-              Continue
+              {t('common.continue')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
