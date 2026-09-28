@@ -168,7 +168,9 @@ Basis Tradr berorientasi AS (USD, NYSE, fee per saham, opsi OCC, wash-sale). Ren
 ## F2 — draf ID brokerages + accounts (ZITN-TECH-021 §5.7/§5.13) — 2026-09-28
 
 - **Cabang:** `l10n-f2` (dari `l10n-id`). Commit kamus `4b125ea`, brokerages `15ae67d`,
-  accounts + rute `160143d`, dokumen ini + paket (lihat hash di atas).
+  accounts + rute `160143d`, koreksi review §5.16 `87d6a3f`, dokumen ini + paket.
+- **Status:** **diratifikasi `sah`** (pemilik "F2 OK", 2026-09-28) untuk ketiga rute; entri manifest
+  `brokerages`/`accounts`/`accounts/$accountId` = `sah`, hash dijaga `i18n-review.test.ts`.
 - **Kamus:** `broker.*`, `acct.*`, `common.*` (chrome umum: Nama/Catatan/Mata uang/Tutup/Lihat/Ubah/
   Hapus/Simpan/Buat/Konfirmasi/Lanjutkan/Tidak ada), `page.accounts`, `page.brokerages`.
 - **Taat §5.13:** entity (`&apos;`/`&#39;`) → karakter asli di kamus; kalimat tak dirakit di JSX
@@ -180,7 +182,8 @@ Basis Tradr berorientasi AS (USD, NYSE, fee per saham, opsi OCC, wash-sale). Ren
   **740** hijau. Paket: `apps/web/docs/i18n-review-packet-{brokerages,accounts}.md`; lembar mesin
   `apps/web/docs/i18n-coverage-{brokerages,accounts}*.md`.
 - **Sisa (temuan paket):** toast hooks (`useBrokerages`/`useAccounts`) & galat server masih EN;
-  badan F3 `LedgerView`/`AccountBalance` belum dilokalisasi; `DeleteBrokerageDialog` belum tersambung.
+  badan F3 `LedgerView`/`AccountBalance` belum dilokalisasi; `DeleteBrokerageDialog` belum tersambung
+  (salinannya ditandai tidak-relevan, bug menu Hapus jadi tiket produk terpisah).
 
 ## Catatan uji
 
@@ -224,19 +227,19 @@ halaman **wajib**, dengan penegakan otomatis anti-busuk. Rujukan: `ZITN-TECH-021
 
 ### Lembar tinjau per rute
 
-| Rute                     | Kelas    | Keadaan diuji                                     | Peninjau                              | Tanggal    | Commit    | Status   | Catatan                                                                                                                                                        |
-| ------------------------ | -------- | ------------------------------------------------- | ------------------------------------- | ---------- | --------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `accounting/tax-summary` | Lapis 1  | kosong/loading/galat/1 baris/penuh + kurs hilang  | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | `c5cf71f` | `sedang` | Verdict kalibrasi: diterima dengan perbaikan (6 temuan + R0 subjudul); paket di `apps/web/docs/i18n-review-packet-tax-summary.md`; menunggu ratifikasi pemilik |
-| `accounting/fee-rollup`  | Lapis 1  | —                                                 | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
-| `accounting/expenses`    | Lapis 1  | —                                                 | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
-| `settings/billing`       | Lapis 1  | —                                                 | —                                     | —          | —         | `belum`  | Salinan masih literal EN (belum masuk kamus)                                                                                                                   |
-| `calculator`             | Lapis 1  | —                                                 | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
-| `positions/$positionId`  | Lapis 1  | —                                                 | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
-| `import`                 | Lapis 1  | —                                                 | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
-| `settings/account`       | Lapis 1  | —                                                 | —                                     | —          | —         | `belum`  |                                                                                                                                                                |
-| `brokerages`             | 1+chrome | buat + preset (2 uji); lain lihat paket           | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | `15ae67d` | `draf`   | F2; paket `apps/web/docs/i18n-review-packet-brokerages.md`; disclaimer preset IDX pindah ke kamus (R8 terjaga); 7 temuan (toast hooks/galat server/badge)      |
-| `accounts`               | 3        | 26 uji daftar/dialog (cap, demo, default, risiko) | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | `160143d` | `draf`   | F2; paket `apps/web/docs/i18n-review-packet-accounts.md`; perakitan `account{s}`/klausa writable → 4 kunci (`acct.cap.body*`)                                  |
-| `accounts/$accountId`    | 3        | e2e render (tanpa assert salinan)                 | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | `160143d` | `draf`   | F2 chrome (judul + Kembali/Buku besar); badan `LedgerView`/`AccountBalance` masih EN (F3)                                                                      |
+| Rute                     | Kelas    | Keadaan diuji                                     | Peninjau                                                | Tanggal    | Commit    | Status   | Catatan                                                                                                                                                              |
+| ------------------------ | -------- | ------------------------------------------------- | ------------------------------------------------------- | ---------- | --------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `accounting/tax-summary` | Lapis 1  | kosong/loading/galat/1 baris/penuh + kurs hilang  | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0`                   | 2026-09-28 | `c5cf71f` | `sedang` | Verdict kalibrasi: diterima dengan perbaikan (6 temuan + R0 subjudul); paket di `apps/web/docs/i18n-review-packet-tax-summary.md`; menunggu ratifikasi pemilik       |
+| `accounting/fee-rollup`  | Lapis 1  | —                                                 | —                                                       | —          | —         | `belum`  |                                                                                                                                                                      |
+| `accounting/expenses`    | Lapis 1  | —                                                 | —                                                       | —          | —         | `belum`  |                                                                                                                                                                      |
+| `settings/billing`       | Lapis 1  | —                                                 | —                                                       | —          | —         | `belum`  | Salinan masih literal EN (belum masuk kamus)                                                                                                                         |
+| `calculator`             | Lapis 1  | —                                                 | —                                                       | —          | —         | `belum`  |                                                                                                                                                                      |
+| `positions/$positionId`  | Lapis 1  | —                                                 | —                                                       | —          | —         | `belum`  |                                                                                                                                                                      |
+| `import`                 | Lapis 1  | —                                                 | —                                                       | —          | —         | `belum`  |                                                                                                                                                                      |
+| `settings/account`       | Lapis 1  | —                                                 | —                                                       | —          | —         | `belum`  |                                                                                                                                                                      |
+| `brokerages`             | 1+chrome | buat + preset (2 uji); lain lihat paket           | pemilik (F2 OK) + sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | `87d6a3f` | `sah`    | F2; paket `apps/web/docs/i18n-review-packet-brokerages.md`; disclaimer preset IDX pindah ke kamus (R8 terjaga); §5.16 koreksi (inventaris, `$`→netral, label risiko) |
+| `accounts`               | 3        | 26 uji daftar/dialog (cap, demo, default, risiko) | pemilik (F2 OK) + sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | `87d6a3f` | `sah`    | F2; paket `apps/web/docs/i18n-review-packet-accounts.md`; perakitan `account{s}`/klausa writable → 4 kunci (`acct.cap.body*`); label risiko locale                   |
+| `accounts/$accountId`    | 3        | e2e render (tanpa assert salinan)                 | pemilik (F2 OK) + sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | `87d6a3f` | `sah`    | F2 chrome (judul + Kembali/Buku besar); badan `LedgerView`/`AccountBalance` masih EN (F3) — tinjau ulang saat F3                                                     |
 
 **Urutan Lapis:** 1 = angka/uang/klaim (tabel di atas + disclaimer pajak + email); 2 = dashboard +
 widget, `positions/index`, `performance`, drawer; 3 = chrome, settings umum, changelog, admin,
@@ -267,7 +270,11 @@ sekadar catatan: `equity → "Ekuitas"`, `breakeven → "Impas"`. Daftar `keep-e
 **menunggu konfirmasi pemilik** (`ZITN-TECH-021` §7 butir 2).
 
 **F7 — parkir (arahan prioritas "bahasa dulu, pengaman menyusul"):** R13-b 9 situs tanggal,
-R14 20 placeholder numerik, lint otomatis tambahan (`toLocaleDateString()` tanpa locale; kalimat
-template literal), gelombang F2 (draf ID `features/brokerages/components`,
-`features/accounts/components`, `routes/_auth/accounts`), dan keputusan gate `DEFAULT_LOCALE`.
-Tercatat sebagai `parkedItems` di `apps/web/src/i18n-review.manifest.json`.
+R14 (tool `scripts/i18n-coverage.mjs` melaporkan **19** placeholder numerik bergaya EN — 12× `"0.00"`,
+2× `"100.00"`, 2× `"150.00"`, 1× `"0.0822"`, 1× `"0.30"`, 1× `"0.0440"`; hitungan manual peninjau
+(11–12× `"0.00"` + `"150.00"`) **BERBEDA** — selaraskan sebelum F7), dan lint otomatis tambahan
+(`toLocaleDateString()` tanpa locale; kalimat template literal).
+Gelombang **F2 selesai & diratifikasi** (`brokerages`, `accounts`, `accounts/$accountId` → `sah`),
+jadi bukan lagi butir parkir. Butir stale "keputusan gate `DEFAULT_LOCALE`" dihapus (sudah diputuskan
+B1: default tetap `id` + penyemian browser). Tercatat sebagai `parkedItems` di
+`apps/web/src/i18n-review.manifest.json`.

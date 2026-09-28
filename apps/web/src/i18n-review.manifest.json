@@ -432,10 +432,10 @@
         "features/brokerages/components/FeeScheduleFields.tsx",
         "features/brokerages/lib/idxBrokerPresets.ts"
       ],
-      "status": "sedang",
-      "reviewer": null,
-      "date": null,
-      "commit": null,
+      "status": "sah",
+      "reviewer": "pemilik (F2 OK) + chat diskusi (ses_f1614741bffeFv4Hxmb2QQGGz0)",
+      "date": "2026-09-28",
+      "commit": "87d6a3f",
       "keys": [
         "action.cancel",
         "broker.action.duplicate",
@@ -486,7 +486,7 @@
         "page.brokerages"
       ],
       "keyHash": "fnv1a32:b7e8a46d",
-      "notes": "F2 draf ID (paket apps/web/docs/i18n-review-packet-brokerages.md, commit 15ae67d). DeleteBrokerageDialog belum tersambung ke aksi Hapus -> salinan di dalamnya tidak-relevan (R0); toast hooks + galat server masih EN (temuan paket)."
+      "notes": "Ratifikasi pemilik \"F2 OK\" 2026-09-28 (disampaikan sesi diskusi). Koreksi review §5.16 tercakup: (1) rute F2 masuk inventaris manifest + utang teknis inventaris-dirawat-tangan dicatat, (2) simbol `$` dihapus dari broker.fee.perShare/perContract -> netral tanpa mengarang mata uang, (3) label risiko non-preset diformat per locale (nilai tersimpan tetap mentah). DeleteBrokerageDialog belum tersambung ke aksi Hapus -> salinan tidak-relevan (R0); bug menu Hapus dicatat sebagai tiket produk. Toast hooks + galat server masih EN (di luar berkas F2)."
     },
     {
       "route": "accounts",
@@ -496,10 +496,10 @@
         "features/accounts/components/AccountList.tsx",
         "features/accounts/components/AccountDialog.tsx"
       ],
-      "status": "sedang",
-      "reviewer": null,
-      "date": null,
-      "commit": null,
+      "status": "sah",
+      "reviewer": "pemilik (F2 OK) + chat diskusi (ses_f1614741bffeFv4Hxmb2QQGGz0)",
+      "date": "2026-09-28",
+      "commit": "87d6a3f",
       "keys": [
         "acct.action.makeDefault",
         "acct.action.makeWritable",
@@ -559,16 +559,16 @@
         "page.accounts"
       ],
       "keyHash": "fnv1a32:72a05ddf",
-      "notes": "F2 draf ID (paket apps/web/docs/i18n-review-packet-accounts.md, commit 160143d). Toast hooks + galat server masih EN (temuan paket)."
+      "notes": "Ratifikasi pemilik \"F2 OK\" 2026-09-28 (disampaikan sesi diskusi). Koreksi review §5.16: (1) rute F2 masuk inventaris manifest, (3) label risiko non-preset diformat per locale (mis. \"1,5%\" id / \"1.5%\" en) sementara nilai tersimpan tetap mentah. Toast hooks + galat server masih EN (di luar berkas F2)."
     },
     {
       "route": "accounts/$accountId",
       "layer": 3,
       "files": ["routes/_auth/accounts/$accountId.tsx"],
-      "status": "sedang",
-      "reviewer": null,
-      "date": null,
-      "commit": null,
+      "status": "sah",
+      "reviewer": "pemilik (F2 OK) + chat diskusi (ses_f1614741bffeFv4Hxmb2QQGGz0)",
+      "date": "2026-09-28",
+      "commit": "87d6a3f",
       "keys": [
         "acct.detail.back",
         "acct.detail.backToAccounts",
@@ -576,7 +576,7 @@
         "acct.detail.notFound"
       ],
       "keyHash": "fnv1a32:497a9d36",
-      "notes": "F2 chrome (judul halaman + Kembali/Buku besar). Badan LedgerView/AccountBalance masih literal EN (F3) -> halaman detail belum 'sah'."
+      "notes": "Ratifikasi pemilik \"F2 OK\" 2026-09-28 (disampaikan sesi diskusi). Cakupan entri ini = chrome rute (`$accountId.tsx`: judul + Kembali/Buku besar). Badan `LedgerView`/`AccountBalance` (F3) BELUM termasuk dan masih literal EN -> tinjau ulang entri ini saat F3 mendarat."
     }
   ]
 }

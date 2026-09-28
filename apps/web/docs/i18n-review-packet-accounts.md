@@ -1,7 +1,7 @@
 # Paket tinjau — `accounts` (ZITN-TECH-021 §5.4/§5.7/§5.13)
 
 **Rute:** `/_auth/accounts/` dan `/_auth/accounts/$accountId` · **Lapis:** 3 (chrome/daftar) + sentuhan
-angka (saldo, risiko %) · **Status manifest:** di luar manifest Lapis 1 (F2 ad-hoc)
+angka (saldo, risiko %) · **Status manifest:** rute `accounts` + `accounts/$accountId` = **`sah`**
 **Basis:** repo journal `l10n-f2` dari `l10n-id` (tip `8918c0a`) · **Sesi:** `ses_f1614741bffeFv4Hxmb2QQGGz0`
 **Berkas draf:**
 
@@ -13,10 +13,16 @@ angka (saldo, risiko %) · **Status manifest:** di luar manifest Lapis 1 (F2 ad-
 
 **Ledger tinjau**
 
-| Peran              | Siapa                                             | Tanggal    | Commit/keputusan                         |
-| ------------------ | ------------------------------------------------- | ---------- | ---------------------------------------- |
-| Penyusun draf (ID) | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` (`l10n-f2`) | 2026-09-28 | `4b125ea` (kamus) + `160143d` (komponen) |
-| Peninjau manusia   | **belum**                                         | —          | verdict menunggu; status `belum`/`draf`  |
+| Peran              | Siapa                                             | Tanggal    | Commit/keputusan                  |
+| ------------------ | ------------------------------------------------- | ---------- | --------------------------------- |
+| Penyusun draf (ID) | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` (`l10n-f2`) | 2026-09-28 | `4b125ea` (kamus) + `160143d`     |
+| Koreksi review     | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0`             | 2026-09-28 | `87d6a3f` (§5.16 butir 1, 3)      |
+| Ratifikasi `sah`   | **pemilik "F2 OK" + chat diskusi**                | 2026-09-28 | `87d6a3f`; entri manifest = `sah` |
+
+> Verdict `sah` di manifest diisi atas ratifikasi pemilik yang disampaikan sesi diskusi
+> `ses_f1614741bffeFv4Hxmb2QQGGz0`; bila relay itu keliru, turunkan kembali ke `sedang`.
+> Entri `accounts/$accountId` hanya mencakup chrome rute; badan F3 (`LedgerView`/`AccountBalance`)
+> belum termasuk.
 
 ## (a) Lembar kerja `key → id → en` (+ salinan ID setelah substitusi)
 
@@ -114,15 +120,15 @@ dan potongan `{restricted ? ' Only the writable account…' : ''}` → kini memi
 
 ## (c) Temuan (berkutipan) + Terjangkau?
 
-| #   | Berkas:baris                                                                        | Kutipan                                                                                                                                                   | Terjangkau?                                 | Usul                                                                                                                                  |
-| --- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
-| 1   | `features/accounts/hooks/useAccounts.ts:78,94,111,126,129,144,147`                  | `toast.error('Failed to create account')`, `'Failed to update account'`, … `toast.success('Default account updated')`, `'Writable account updated'`       | ya (toast)                                  | di luar berkas F2; usul kunci `acct.toast.*` di gelombang lanjut                                                                      |
-| 2   | `apps/api/src/features/accounts/accounts.service.ts:96,122,151,187,193,206,231,271` | `'An account with this name already exists'`, `'Remove the sample data before creating an account.'`, `'Cannot delete account while it has positions'`, … | ya (galat form/toast via `getErrorMessage`) | di luar F2 (server); usul peta kode→kunci lokal seperti A5, termasuk pemakaian di `AccountDialog`                                     |
-| 3   | `apps/api/src/features/accounts/accounts.demo.ts:81,103,115,137,159,181,223`        | catatan contoh `'Breakout above the January range on volume'`, `'Faded the opening gap'`, …                                                               | ya (isi akun contoh)                        | **sengaja tidak diterjemahkan** — ini **data** contoh (catatan transaksi milik pengguna), bukan salinan UI                            |
-| 4   | `apps/web/src/routes/_auth/accounts/$accountId.tsx`                                 | `'Ledger'` → `Buku besar`; `'Account not found.'` → `Akun tidak ditemukan.`                                                                               | ya                                          | **catatan lingkup:** badan `LedgerView`/`AccountBalance` (F3) masih literal EN — halaman detail belum "sah" walau chrome-nya sudah ID |
-| 5   | `features/accounts/components/AccountDialog.tsx` pemilih mata uang                  | `{c.code} — {c.name}` (`'Indonesian Rupiah'`, `'US Dollar'`, … dari `SUPPORTED_CURRENCIES`)                                                               | ya                                          | nama mata uang = data konstanta (EN); **biarkan** atau lokalisasi konstanta di gelombang terpisah — jangan hardcode di komponen       |
-| 6   | `features/accounts/components/AccountDialog.tsx`                                    | `label: \`${customRisk}%\`` untuk nilai risiko non-preset                                                                                                 | ya                                          | nilai tersimpan apa adanya (mis. `2.5%`); tidak diformat karena ini label nilai pengguna, bukan satuan uang                           |
-| 7   | `features/accounts/components/AccountList.tsx`                                      | baris `data-tour`/`⋯` tetap simbol (bukan kata)                                                                                                           | ya                                          | tidak perlu kamus                                                                                                                     |
+| #   | Berkas:baris                                                                        | Kutipan                                                                                                                                                   | Terjangkau?                                 | Usul                                                                                                                                                                     |
+| --- | ----------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 1   | `features/accounts/hooks/useAccounts.ts:78,94,111,126,129,144,147`                  | `toast.error('Failed to create account')`, `'Failed to update account'`, … `toast.success('Default account updated')`, `'Writable account updated'`       | ya (toast)                                  | di luar berkas F2; usul kunci `acct.toast.*` di gelombang lanjut                                                                                                         |
+| 2   | `apps/api/src/features/accounts/accounts.service.ts:96,122,151,187,193,206,231,271` | `'An account with this name already exists'`, `'Remove the sample data before creating an account.'`, `'Cannot delete account while it has positions'`, … | ya (galat form/toast via `getErrorMessage`) | di luar F2 (server); usul peta kode→kunci lokal seperti A5, termasuk pemakaian di `AccountDialog`                                                                        |
+| 3   | `apps/api/src/features/accounts/accounts.demo.ts:81,103,115,137,159,181,223`        | catatan contoh `'Breakout above the January range on volume'`, `'Faded the opening gap'`, …                                                               | ya (isi akun contoh)                        | **sengaja tidak diterjemahkan** — ini **data** contoh (catatan transaksi milik pengguna), bukan salinan UI                                                               |
+| 4   | `apps/web/src/routes/_auth/accounts/$accountId.tsx`                                 | `'Ledger'` → `Buku besar`; `'Account not found.'` → `Akun tidak ditemukan.`                                                                               | ya                                          | **catatan lingkup:** badan `LedgerView`/`AccountBalance` (F3) masih literal EN — halaman detail belum "sah" walau chrome-nya sudah ID                                    |
+| 5   | `features/accounts/components/AccountDialog.tsx` pemilih mata uang                  | `{c.code} — {c.name}` (`'Indonesian Rupiah'`, `'US Dollar'`, … dari `SUPPORTED_CURRENCIES`)                                                               | ya                                          | nama mata uang = data konstanta (EN); **biarkan** atau lokalisasi konstanta di gelombang terpisah — jangan hardcode di komponen                                          |
+| 6   | `features/accounts/components/AccountDialog.tsx`                                    | `label: \`${formatNumber(customRisk, locale)}%\`` untuk nilai risiko non-preset (koreksi §5.16)                                                           | ya                                          | **selesai:** label tampilan mengikuti locale (mis. `1,5%` id / `1.5%` en); nilai tersimpan tetap mentah (`'1.50'`) — uji `AccountDialog.test.tsx` memverifikasi keduanya |
+| 7   | `features/accounts/components/AccountList.tsx`                                      | baris `data-tour`/`⋯` tetap simbol (bukan kata)                                                                                                           | ya                                          | tidak perlu kamus                                                                                                                                                        |
 
 **D3 (mata uang):** tidak ada salinan akun yang mengasumsikan USD sebagai default; `AccountDialog`
 memakai `account?.currency ?? 'IDR'` dan pengingat `acct.warn.usdFees` khusus saat preset sistem
@@ -130,18 +136,21 @@ dipilih untuk akun non-USD. Tidak ada perubahan perilaku.
 
 ## (d) Nilai setelah format (D5) — field angka yang disentuh
 
-| Field                                            | Sumber nilai                         | Format id              | Format en          | Catatan                                               |
-| ------------------------------------------------ | ------------------------------------ | ---------------------- | ------------------ | ----------------------------------------------------- |
-| `acct.field.startingBalancePlaceholder`          | literal kamus                        | **0,00**               | 0.00               | R14: desimal koma untuk id (placeholder, bukan nilai) |
-| `acct.risk.preset{1,2,3}Note`                    | literal (hasil majemuk 10 transaksi) | **-10% / -18% / -26%** | -10% / -18% / -26% | persen bilangan bulat; id/en sama angkanya            |
-| `acct.confirmBrokerage.body{One,Many}` `{count}` | `positionCount` (server)             | **1 / 5**              | 1 / 5              | integer; plural EN lewat kunci terpisah               |
-| `acct.cap.body*` `{used}`/`{cap}`                | `tierState.usage`/`limits` (server)  | **3 / 1**              | 3 / 1              | integer; plural EN lewat kunci terpisah               |
-| `customRisk` label                               | nilai risiko tersimpan               | `2.5%`                 | `2.5%`             | nilai pengguna, tidak diformat (temuan 6)             |
+| Field                                            | Sumber nilai                         | Format id              | Format en          | Catatan                                                                      |
+| ------------------------------------------------ | ------------------------------------ | ---------------------- | ------------------ | ---------------------------------------------------------------------------- |
+| `acct.field.startingBalancePlaceholder`          | literal kamus                        | **0,00**               | 0.00               | R14: desimal koma untuk id (placeholder, bukan nilai)                        |
+| `acct.risk.preset{1,2,3}Note`                    | literal (hasil majemuk 10 transaksi) | **-10% / -18% / -26%** | -10% / -18% / -26% | persen bilangan bulat; id/en sama angkanya                                   |
+| `acct.confirmBrokerage.body{One,Many}` `{count}` | `positionCount` (server)             | **1 / 5**              | 1 / 5              | integer; plural EN lewat kunci terpisah                                      |
+| `acct.cap.body*` `{used}`/`{cap}`                | `tierState.usage`/`limits` (server)  | **3 / 1**              | 3 / 1              | integer; plural EN lewat kunci terpisah                                      |
+| `customRisk` label                               | nilai risiko tersimpan               | **1,5%**               | **1.5%**           | tampilan diformat per locale (koreksi §5.16); nilai tersimpan tetap `'1.50'` |
 
-## (e) Definition of done (yang belum)
+## (e) Definition of done
 
-- Verdict `sah` butuh ratifikasi peninjau manusia; status kini `draf`.
-- Temuan 1 & 2 (toast hooks + galat server) + badan F3 `LedgerView`/`AccountBalance` harus selesai
-  agar halaman detail akun dapat dinyatakan "nol literal".
+- Verdict **`sah`** (pemilik "F2 OK", 2026-09-28) untuk `accounts` dan `accounts/$accountId`;
+  entri manifest = `sah`, `commit 87d6a3f`, hash dijaga `i18n-review.test.ts`.
+- Koreksi review §5.16 butir 1 & 3 **selesai** (inventaris rute + label risiko locale).
+- Sisa: temuan 1 & 2 (toast hooks + galat server) + badan F3 `LedgerView`/`AccountBalance` harus
+  selesai agar halaman detail akun benar-benar "nol literal" (entri `accounts/$accountId` saat ini
+  hanya mencakup berkas rute chrome).
 - Keadaan yang belum diuji (hapus akun, loading/kosong daftar, not-found detail) perlu uji bila
-  rute ini dinaikkan ke gerbang Lapis.
+  rute ini dinaikkan cakupannya.
