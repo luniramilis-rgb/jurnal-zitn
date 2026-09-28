@@ -353,6 +353,7 @@ export async function createPosition(
     notes?: string | null;
     targetPrice?: string | null;
     stopLoss?: string | null;
+    playbookId?: string | null;
   },
   // Routes pass `isAdmin` from AuthEnv — services never read Hono context
   // (plan-tiers D9).
@@ -449,6 +450,7 @@ export async function createPositionTx(
     notes?: string | null;
     targetPrice?: string | null;
     stopLoss?: string | null;
+    playbookId?: string | null;
   },
 ) {
   // Verify account ownership
@@ -554,6 +556,7 @@ export async function listPositions(
       netPnl,
       targetPrice: targetPriceRaw === null ? null : new Decimal(targetPriceRaw).toNumber(),
       stopLoss: stopLossRaw === null ? null : new Decimal(stopLossRaw).toNumber(),
+      playbookId: (row.playbook_id as string | null) ?? null,
       targetRR,
       actualRR,
       openUnits: pnl.totalEntryQuantity - pnl.totalExitQuantity,
@@ -654,6 +657,7 @@ export async function getPositionDetail(db: Database, id: string, userId: string
     targetPrice:
       position.targetPrice === null ? null : new Decimal(position.targetPrice).toNumber(),
     stopLoss: position.stopLoss === null ? null : new Decimal(position.stopLoss).toNumber(),
+    playbookId: position.playbookId ?? null,
     targetRR,
     actualRR,
     openUnits: pnl.totalEntryQuantity - pnl.totalExitQuantity,
@@ -679,6 +683,7 @@ export async function editPosition(
     notes?: string | null;
     targetPrice?: string | null;
     stopLoss?: string | null;
+    playbookId?: string | null;
   },
 ) {
   return withTransaction(db, async (tx) => {
@@ -692,7 +697,7 @@ export async function editPosition(
       // join `notes` as always-editable (R2 amendment 2026-07-17) — they do not
       // affect fill quantities. Everything else (symbol/side/assetType/
       // accountId) stays draft-only.
-      const alwaysAllowed = new Set(['notes', 'targetPrice', 'stopLoss']);
+      const alwaysAllowed = new Set(['notes', 'targetPrice', 'stopLoss', 'playbookId']);
       const restrictedKeys = Object.keys(data)
         .filter((k) => !alwaysAllowed.has(k))
         .filter((k) => data[k as keyof typeof data] !== undefined);

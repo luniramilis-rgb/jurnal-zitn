@@ -65,6 +65,12 @@ export {
   BreakdownRowSchema,
   BreakdownCurrencySchema,
   BreakdownResponseSchema,
+  RiskStatsSchema,
+  RiskSymbolStatsSchema,
+  RiskHistogramBinSchema,
+  TimeBucketStatsSchema,
+  TimeDistributionSchema,
+  BehaviorStatsSchema,
   computeBucketCount,
   resolveTimezone,
 } from './schemas/performance';
@@ -75,6 +81,11 @@ export type {
   PerformanceResponse,
   PerformanceCurrency,
   PerformanceStats,
+  RiskStats,
+  RiskSymbolStats,
+  TimeBucketStats,
+  TimeDistribution,
+  BehaviorStats,
   SeriesBucket,
   EquityCurvePoint,
   BreakdownQueryInput,
@@ -145,6 +156,8 @@ export * from './constants/timezones';
 export * from './constants/expense-categories';
 export * from './constants/tags';
 export { CSV_IMPORT_PRESETS } from './constants/csv-import-presets';
+export { kellyFraction, halfKellyFraction, riskOfRuin, riskControlLevel } from './lib/behavior';
+export type { RiskControlLevel, RiskControlReading } from './lib/behavior';
 export * from './lib/occ';
 export * from './fees';
 export * from './idx';
@@ -314,6 +327,72 @@ export type {
 } from './schemas/changelog';
 export { ReportingTimezoneField, UserTimezoneSchema } from './schemas/user';
 export type { UserTimezoneInput } from './schemas/user';
+export {
+  FEEDBACK_TYPES,
+  FEEDBACK_SOURCES,
+  FEEDBACK_STATUSES,
+  FEEDBACK_MESSAGE_MIN,
+  FEEDBACK_MESSAGE_MAX,
+  FEEDBACK_PAGE_URL_MAX,
+  FEEDBACK_ADMIN_LIMIT_DEFAULT,
+  FEEDBACK_ADMIN_LIMIT_MAX,
+  FeedbackTypeSchema,
+  FeedbackSourceSchema,
+  FeedbackStatusSchema,
+  CreateFeedbackInputSchema,
+  FeedbackSchema,
+  FeedbackListQuerySchema,
+  FeedbackListResponseSchema,
+  UpdateFeedbackStatusSchema,
+} from './schemas/feedback';
+export type {
+  FeedbackType,
+  FeedbackSource,
+  FeedbackStatus,
+  CreateFeedbackInput,
+  Feedback,
+  FeedbackListQuery,
+  FeedbackListResponse,
+  UpdateFeedbackStatusInput,
+} from './schemas/feedback';
+export {
+  PLAYBOOK_NAME_MAX,
+  PlaybookSchema,
+  CreatePlaybookInputSchema,
+  UpdatePlaybookInputSchema,
+  PlaybookListResponseSchema,
+  PlaybookSetupStatsSchema,
+  PlaybookStatsResponseSchema,
+} from './schemas/playbook';
+export type {
+  Playbook,
+  CreatePlaybookInput,
+  UpdatePlaybookInput,
+  PlaybookListResponse,
+  PlaybookSetupStats,
+  PlaybookStatsResponse,
+} from './schemas/playbook';
+export {
+  TRADE_PLAN_STATUSES,
+  TRADE_PLAN_SIDES,
+  TradePlanStatusSchema,
+  TradePlanSideSchema,
+  TradePlanSchema,
+  CreateTradePlanInputSchema,
+  UpdateTradePlanInputSchema,
+  UpdateTradePlanStatusSchema,
+  LinkTradePlanInputSchema,
+  TradePlanListResponseSchema,
+} from './schemas/trade-plan';
+export type {
+  TradePlanStatus,
+  TradePlan,
+  CreateTradePlanInput,
+  UpdateTradePlanInput,
+  UpdateTradePlanStatusInput,
+  LinkTradePlanInput,
+  TradePlanListResponse,
+} from './schemas/trade-plan';
 export {
   OnboardingStatusSchema,
   OnboardingStateSchema,

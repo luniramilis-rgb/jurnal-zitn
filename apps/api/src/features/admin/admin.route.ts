@@ -5,10 +5,13 @@ import {
   AdminDeleteUserRequestSchema,
   AdminResetRequestSchema,
   AdminUsageQuerySchema,
+  FeedbackListQuerySchema,
   ToggleAdminRequestSchema,
+  UpdateFeedbackStatusSchema,
 } from '@jurnal-zitn/shared';
 
 import { adminDeleteUser } from '@/features/account-deletion/account-deletion.service';
+import { listFeedback, setFeedbackStatus } from '@/features/feedback/feedback.service';
 import { validate } from '@/lib/validation';
 import { adminMiddleware } from '@/middleware/admin.middleware';
 import { authMiddleware } from '@/middleware/auth.middleware';
@@ -250,6 +253,91 @@ adminRouter.get('/usage', validate('query', AdminUsageQuerySchema), async (c) =>
   const { from, to } = c.req.valid('query');
   return c.json(await getUsage(from, to), 200);
 });
+
+/**
+ * @swagger
+ * /api/admin/feedback:
+ *   get:
+ *     summary: List in-app feedback, newest-first (admin only).
+ *     description: >
+ *       Admin-gated (403 `ADMIN_REQUIRED`) and per-user rate limited. Filters are
+ *       optional and combine with AND: `type` (bug/feature/general/question),
+ *       `status` (baru/ditinjau/direncanakan/selesai/ditolak) and `source`
+ *       (jurnal/lembar). Cursor-paginated over `(created_at, id)` descending;
+ *       `cursor` is the opaque base64 cursor from a prior page, absent/invalid ⇒
+ *       first page. `limit` defaults to 25, clamped to [1, 100]. Response
+ *       `{ items, nextCursor }`; each item carries `userEmail` (PII) because this
+ *       is the triage inbox.
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: query
+ *         name: type
+ *         schema: { type: string, enum: [bug, feature, general, question] }
+ *       - in: query
+ *         name: status
+ *         schema: { type: string, enum: [baru, ditinjau, direncanakan, selesai, ditolak] }
+ *       - in: query
+ *         name: source
+ *         schema: { type: string, enum: [jurnal, lembar] }
+ *       - in: query
+ *         name: cursor
+ *         schema: { type: string }
+ *       - in: query
+ *         name: limit
+ *         schema: { type: integer, default: 25, minimum: 1, maximum: 100 }
+ *     responses:
+ *       200: { description: '{ items: Feedback[], nextCursor: string | null }.' }
+ *       400: { description: VALIDATION_ERROR — malformed filter or limit. }
+ *       401: { description: Not authenticated. }
+ *       403: { description: ADMIN_REQUIRED — authenticated but not an admin. }
+ *       429: { description: Admin rate limit reached (60 / 60 s per user). }
+ */
+adminRouter.get('/feedback', validate('query', FeedbackListQuerySchema), async (c) => {
+  return c.json(await listFeedback(c.req.valid('query')), 200);
+});
+
+/**
+ * @swagger
+ * /api/admin/feedback/{id}:
+ *   patch:
+ *     summary: Move one feedback row to another triage status (admin only).
+ *     description: >
+ *       Admin-gated (403 `ADMIN_REQUIRED`). Body `{ status }`; PATCH (never GET)
+ *       per the SameSite=Lax CSRF posture. Returns the updated row. A non-UUID
+ *       id is a 400 `VALIDATION_ERROR`; an unknown id is a 404 `NOT_FOUND`.
+ *     tags: [Admin]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema: { type: string, format: uuid }
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required: [status]
+ *             properties:
+ *               status: { type: string, enum: [baru, ditinjau, direncanakan, selesai, ditolak] }
+ *     responses:
+ *       200: { description: The updated feedback row. }
+ *       400: { description: 'VALIDATION_ERROR — id is not a UUID or the status is invalid.' }
+ *       401: { description: Not authenticated. }
+ *       403: { description: ADMIN_REQUIRED — authenticated but not an admin. }
+ *       404: { description: NOT_FOUND — no such feedback row. }
+ *       429: { description: Admin rate limit reached (60 / 60 s per user). }
+ */
+adminRouter.patch(
+  '/feedback/:id',
+  validate('param', IdParamSchema),
+  validate('json', UpdateFeedbackStatusSchema),
+  async (c) => {
+    const { id } = c.req.valid('param');
+    const { status } = c.req.valid('json');
+    return c.json(await setFeedbackStatus(id, status), 200);
+  },
+);
 
 export { adminRouter };
 

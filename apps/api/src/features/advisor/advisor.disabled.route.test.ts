@@ -98,4 +98,66 @@ describe('DISABLE_ADVISOR', () => {
     config.DISABLE_ADVISOR = false;
     expect((await authedGet('/api/advisor/_health', cookie)).status).toBe(200);
   });
+
+  it('also withdraws the US-style options tools (A7, F6)', async () => {
+    const cookie = await registerAndGetCookie();
+
+    // Served alongside the advisor when unset — and provably NOT gated (a 403
+    // would be the disabled code, so anything else means the route ran).
+    const enabled = await app.request('/api/options/black-scholes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: `session=${cookie}`,
+        'X-Forwarded-For': uniqueIp(),
+      },
+      body: JSON.stringify({
+        spot: '100',
+        strike: '100',
+        timeToExpiry: '1',
+        riskFreeRate: '0.05',
+        volatility: '0.2',
+        type: 'call',
+      }),
+    });
+    expect(enabled.status).not.toBe(403);
+    expect(enabled.status).not.toBe(401);
+
+    config.DISABLE_ADVISOR = true;
+    const res = await app.request('/api/options/black-scholes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Cookie: `session=${cookie}`,
+        'X-Forwarded-For': uniqueIp(),
+      },
+      body: JSON.stringify({
+        spot: '100',
+        strike: '100',
+        timeToExpiry: '1',
+        riskFreeRate: '0.05',
+        volatility: '0.2',
+        type: 'call',
+      }),
+    });
+    expect(res.status).toBe(403);
+    const body = await res.json();
+    expect(body.error?.code ?? body.code).toBe('OPTIONS_DISABLED');
+
+    // Anonymous callers still get 401, never the disabled code.
+    config.DISABLE_ADVISOR = true;
+    const anon = await app.request('/api/options/black-scholes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'X-Forwarded-For': uniqueIp() },
+      body: JSON.stringify({
+        spot: '100',
+        strike: '100',
+        timeToExpiry: '1',
+        riskFreeRate: '0.05',
+        volatility: '0.2',
+        type: 'call',
+      }),
+    });
+    expect(anon.status).toBe(401);
+  });
 });

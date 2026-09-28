@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/useAuth';
 
 import { useAdminStats } from '../hooks/useAdminStats';
 
+import { FeedbackInbox } from './FeedbackInbox';
 import { StatsCards } from './StatsCards';
 import { UsageSection } from './UsageSection';
 import { UserTable } from './UserTable';
@@ -71,6 +72,13 @@ export function AdminPage() {
           Users
         </h2>
         <UserTable />
+      </section>
+
+      <section aria-labelledby="admin-feedback-heading">
+        <h2 id="admin-feedback-heading" className="mb-4 text-lg font-semibold">
+          Feedback
+        </h2>
+        <FeedbackInbox />
       </section>
 
       <section aria-labelledby="admin-usage-heading">

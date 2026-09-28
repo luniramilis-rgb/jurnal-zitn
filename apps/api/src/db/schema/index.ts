@@ -16,3 +16,6 @@ export * from './tags.schema';
 export * from './position-images.schema';
 export * from './account-deletion.schema';
 export * from './sso.schema';
+export * from './feedback.schema';
+export * from './playbooks.schema';
+export * from './trade-plans.schema';

@@ -4,5 +4,9 @@ Copyright 2026 Zen in the Noise (ZITN)
 This product is a modified fork of Tradr (Apache-2.0). See MODIFICATIONS.md for the list of
 changes and the upstream NOTICE file (./NOTICE) for original attribution.
 
+Portions of this product may be derived from other MIT-licensed projects; those are recorded in
+MODIFICATIONS.md, including the exact attribution line `portions derived from Journedge, MIT`
+for any code ported from Journedge.
+
 "Jurnal ZITN" and its logo are trademarks of Zen in the Noise. "Tradr" and the Tradr logo are
 trademarks of the Tradr project and are not used as the name of this product.

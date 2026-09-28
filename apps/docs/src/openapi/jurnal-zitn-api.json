@@ -394,6 +394,154 @@
         ]
       }
     },
+    "/api/admin/feedback": {
+      "get": {
+        "description": "Admin-gated (403 `ADMIN_REQUIRED`) and per-user rate limited. Filters are optional and combine with AND: `type` (bug/feature/general/question), `status` (baru/ditinjau/direncanakan/selesai/ditolak) and `source` (jurnal/lembar). Cursor-paginated over `(created_at, id)` descending; `cursor` is the opaque base64 cursor from a prior page, absent/invalid ⇒ first page. `limit` defaults to 25, clamped to [1, 100]. Response `{ items, nextCursor }`; each item carries `userEmail` (PII) because this is the triage inbox.\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "enum": [
+                "bug",
+                "feature",
+                "general",
+                "question"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "enum": [
+                "baru",
+                "ditinjau",
+                "direncanakan",
+                "selesai",
+                "ditolak"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "source",
+            "schema": {
+              "enum": [
+                "jurnal",
+                "lembar"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ items: Feedback[], nextCursor: string | null }."
+          },
+          "400": {
+            "description": "VALIDATION_ERROR — malformed filter or limit."
+          },
+          "401": {
+            "description": "Not authenticated."
+          },
+          "403": {
+            "description": "ADMIN_REQUIRED — authenticated but not an admin."
+          },
+          "429": {
+            "description": "Admin rate limit reached (60 / 60 s per user)."
+          }
+        },
+        "summary": "List in-app feedback, newest-first (admin only).",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
+    "/api/admin/feedback/{id}": {
+      "patch": {
+        "description": "Admin-gated (403 `ADMIN_REQUIRED`). Body `{ status }`; PATCH (never GET) per the SameSite=Lax CSRF posture. Returns the updated row. A non-UUID id is a 400 `VALIDATION_ERROR`; an unknown id is a 404 `NOT_FOUND`.\n",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "status": {
+                    "enum": [
+                      "baru",
+                      "ditinjau",
+                      "direncanakan",
+                      "selesai",
+                      "ditolak"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "status"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The updated feedback row."
+          },
+          "400": {
+            "description": "VALIDATION_ERROR — id is not a UUID or the status is invalid."
+          },
+          "401": {
+            "description": "Not authenticated."
+          },
+          "403": {
+            "description": "ADMIN_REQUIRED — authenticated but not an admin."
+          },
+          "404": {
+            "description": "NOT_FOUND — no such feedback row."
+          },
+          "429": {
+            "description": "Admin rate limit reached (60 / 60 s per user)."
+          }
+        },
+        "summary": "Move one feedback row to another triage status (admin only).",
+        "tags": [
+          "Admin"
+        ]
+      }
+    },
     "/api/admin/stats": {
       "get": {
         "description": "Admin-gated (403 `ADMIN_REQUIRED` for non-admins) and per-user rate limited (60 / 60 s). Returns total users, \"Active now\" users (still-valid sessions in the last 30 min — `activeUsersWindowMinutes` is serialized for honest labeling), positions by status, and revenue as micro-USD integer strings: `allTime` and the reversal-attributed UTC `currentMonth`, with the pinned `basis: 'purchased-credit-volume'`. An empty instance returns well-formed zeros, never errors.\n",
@@ -2737,6 +2885,69 @@
         ]
       }
     },
+    "/api/feedback": {
+      "post": {
+        "description": "Authed. Stores one feedback row scoped to the caller. `type` is one of bug/feature/general/question, `message` is 10–500 characters, `pageUrl` is the client-supplied page the feedback was sent from, and `source` defaults to `jurnal` (the daily sheet sends `lembar`). Insert-only; no telemetry is emitted.\n",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "message": {
+                    "maxLength": 500,
+                    "minLength": 10,
+                    "type": "string"
+                  },
+                  "pageUrl": {
+                    "maxLength": 2048,
+                    "type": "string"
+                  },
+                  "source": {
+                    "default": "jurnal",
+                    "enum": [
+                      "jurnal",
+                      "lembar"
+                    ],
+                    "type": "string"
+                  },
+                  "type": {
+                    "enum": [
+                      "bug",
+                      "feature",
+                      "general",
+                      "question"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "type",
+                  "message",
+                  "pageUrl"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "The created feedback row."
+          },
+          "400": {
+            "description": "VALIDATION_ERROR — malformed body."
+          },
+          "401": {
+            "description": "No valid session."
+          }
+        },
+        "summary": "Submit in-app feedback.",
+        "tags": [
+          "Feedback"
+        ]
+      }
+    },
     "/api/health": {
       "get": {
         "description": "Runs `SELECT 1` against the database. `version` is the deployed version string (e.g. `v0.2.0-f51f9f5`) baked into the image at build time via the APP_VERSION env; the field is omitted where unset (local dev).\n",
@@ -3257,6 +3468,189 @@
         "summary": "Per-dimension performance breakdown for one window.",
         "tags": [
           "Performance"
+        ]
+      }
+    },
+    "/api/playbooks": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "{ items: Playbook[] }."
+          },
+          "401": {
+            "description": "No valid session."
+          }
+        },
+        "summary": "List the caller's playbooks.",
+        "tags": [
+          "Playbooks"
+        ]
+      },
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "entryTrigger": {
+                    "type": "string"
+                  },
+                  "exitCriteria": {
+                    "type": "string"
+                  },
+                  "instrument": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "type": "string"
+                  },
+                  "setupRules": {
+                    "type": "string"
+                  },
+                  "timeframe": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "The created playbook."
+          },
+          "400": {
+            "description": "VALIDATION_ERROR."
+          },
+          "401": {
+            "description": "No valid session."
+          }
+        },
+        "summary": "Create a playbook.",
+        "tags": [
+          "Playbooks"
+        ]
+      }
+    },
+    "/api/playbooks/stats": {
+      "get": {
+        "description": "Groups the caller's latched flat trades by their soft playbook link and returns the same completed-trade statistics the performance surface uses. Trades whose playbook was deleted (or never had one) fold into a single entry with `playbookId: null`.\n",
+        "responses": {
+          "200": {
+            "description": "{ items: PlaybookSetupStats[] }."
+          },
+          "401": {
+            "description": "No valid session."
+          }
+        },
+        "summary": "Per-setup statistics, computed at read time.",
+        "tags": [
+          "Playbooks"
+        ]
+      }
+    },
+    "/api/playbooks/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "401": {
+            "description": "No valid session."
+          },
+          "404": {
+            "description": "NOT_FOUND."
+          }
+        },
+        "summary": "Delete a playbook (soft link — trades are untouched).",
+        "tags": [
+          "Playbooks"
+        ]
+      },
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The playbook."
+          },
+          "401": {
+            "description": "No valid session."
+          },
+          "404": {
+            "description": "NOT_FOUND."
+          }
+        },
+        "summary": "Get one playbook.",
+        "tags": [
+          "Playbooks"
+        ]
+      },
+      "patch": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "The updated playbook."
+          },
+          "400": {
+            "description": "VALIDATION_ERROR."
+          },
+          "401": {
+            "description": "No valid session."
+          },
+          "404": {
+            "description": "NOT_FOUND."
+          }
+        },
+        "summary": "Update a playbook.",
+        "tags": [
+          "Playbooks"
         ]
       }
     },
@@ -4447,6 +4841,167 @@
         "summary": "Edit a tag.",
         "tags": [
           "Tags"
+        ]
+      }
+    },
+    "/api/trade-plans": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "enum": [
+                "pending",
+                "executed",
+                "missed",
+                "cancelled"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "{ items: TradePlan[] }."
+          },
+          "401": {
+            "description": "No valid session."
+          }
+        },
+        "summary": "List the caller's pre-trade plans (optionally by status).",
+        "tags": [
+          "Trade Plans"
+        ]
+      },
+      "post": {
+        "responses": {
+          "201": {
+            "description": "The created plan."
+          },
+          "400": {
+            "description": "VALIDATION_ERROR."
+          },
+          "401": {
+            "description": "No valid session."
+          }
+        },
+        "summary": "Create a pre-trade plan (Pending).",
+        "tags": [
+          "Trade Plans"
+        ]
+      }
+    },
+    "/api/trade-plans/{id}": {
+      "delete": {
+        "responses": {
+          "204": {
+            "description": "Deleted."
+          },
+          "401": {
+            "description": "No valid session."
+          },
+          "404": {
+            "description": "NOT_FOUND."
+          }
+        },
+        "summary": "Delete a pre-trade plan.",
+        "tags": [
+          "Trade Plans"
+        ]
+      },
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The plan."
+          },
+          "401": {
+            "description": "No valid session."
+          },
+          "404": {
+            "description": "NOT_FOUND."
+          }
+        },
+        "summary": "Get one pre-trade plan.",
+        "tags": [
+          "Trade Plans"
+        ]
+      },
+      "patch": {
+        "responses": {
+          "200": {
+            "description": "The updated plan."
+          },
+          "400": {
+            "description": "VALIDATION_ERROR."
+          },
+          "401": {
+            "description": "No valid session."
+          },
+          "404": {
+            "description": "NOT_FOUND."
+          }
+        },
+        "summary": "Update a pre-trade plan's fields.",
+        "tags": [
+          "Trade Plans"
+        ]
+      }
+    },
+    "/api/trade-plans/{id}/link": {
+      "patch": {
+        "description": "Body `{ positionId: uuid | null }`. The position must be the caller's and must not already be linked to another plan. Attaching a Pending plan marks it Executed; detaching an Executed plan returns it to Pending. PATCH (never GET) per the CSRF posture. Soft link — deleting the trade leaves the plan.\n",
+        "responses": {
+          "200": {
+            "description": "The updated plan."
+          },
+          "400": {
+            "description": "VALIDATION_ERROR — bad body or an already-linked trade."
+          },
+          "401": {
+            "description": "No valid session."
+          },
+          "404": {
+            "description": "NOT_FOUND — no such plan or position."
+          }
+        },
+        "summary": "Attach a plan to the trade it produced (1:1), or detach.",
+        "tags": [
+          "Trade Plans"
+        ]
+      }
+    },
+    "/api/trade-plans/{id}/status": {
+      "patch": {
+        "description": "Pending → executed / missed / cancelled. Repeating a terminal state is idempotent; moving between terminal states is a 400.",
+        "responses": {
+          "200": {
+            "description": "The updated plan."
+          },
+          "400": {
+            "description": "VALIDATION_ERROR — illegal transition."
+          },
+          "401": {
+            "description": "No valid session."
+          },
+          "404": {
+            "description": "NOT_FOUND."
+          }
+        },
+        "summary": "Move a plan through its lifecycle.",
+        "tags": [
+          "Trade Plans"
         ]
       }
     },

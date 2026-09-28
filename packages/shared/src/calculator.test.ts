@@ -111,12 +111,15 @@ describe('calculateTrade', () => {
     // perUnitReward = 5, perUnitRisk = 2 → ratio 2.50
     expect(result.perUnitReward).toBe('5.00');
     expect(result.riskRewardRatio).toBe('2.50');
+    // 100/(1+2.5) = 28.57… → 28.6%
+    expect(result.breakevenWinRate).toBe('28.6');
   });
 
   it('omits perUnitReward and riskRewardRatio when target absent', () => {
     const result = calculateTrade(baseInput());
     expect(result.perUnitReward).toBeUndefined();
     expect(result.riskRewardRatio).toBeUndefined();
+    expect(result.breakevenWinRate).toBeUndefined();
   });
 
   it('short-circuits to zero position size and omits all optional fields', () => {
@@ -317,6 +320,7 @@ describe('calculateTrade — percent/dollar parity', () => {
     'adjustedDollarRisk',
     'breakeven',
     'adjustedRiskRewardRatio',
+    'breakevenWinRate',
   ] as const;
 
   for (const c of combos) {

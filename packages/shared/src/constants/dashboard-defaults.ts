@@ -25,6 +25,15 @@ export const WidgetDefaultSize: Record<WidgetType, { w: number; h: number }> = {
   'open-positions': { w: 8, h: 12 },
   'account-balances': { w: 4, h: 12 },
   'position-sizing': { w: 4, h: 24 },
+  // Fase F (F0). Widgets added from the picker; not part of the shipped default
+  // roster (the default reordering that places them mobile-first lands with the
+  // F3/F4 widgets, so the default is only rewritten once).
+  'pnl-calendar': { w: 12, h: 9 },
+  'dimension-breakdown': { w: 6, h: 9 },
+  'idx-tax-fees': { w: 6, h: 4 },
+  'daily-sheet': { w: 6, h: 4 },
+  'record-completeness': { w: 6, h: 4 },
+  'risk-control': { w: 6, h: 6 },
 };
 
 // 12-column grid. Geometry only — IDs are computed per-user via uuidv5 in the
@@ -106,4 +115,9 @@ export const PRIOR_DEFAULT_LAYOUTS: readonly (readonly DefaultWidgetSpec[])[] = 
 // Maximum size of a PUT /dashboard/layout request body. Enforced by the
 // backend bodyLimit middleware and pre-checked on the frontend via
 // TextEncoder before sending.
-export const BODY_LIMIT_BYTES = 16 * 1024;
+//
+// 32 KiB, not the original 16: the worst legal body is one widget per
+// `WidgetTypeSchema` option at the schema's 2,048-byte config cap, which
+// serialises to roughly 25 KiB once Fase F's widgets are counted. 16 KiB stopped
+// being able to carry every type the schema accepts the moment the roster grew.
+export const BODY_LIMIT_BYTES = 32 * 1024;

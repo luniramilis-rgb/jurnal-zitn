@@ -9,7 +9,8 @@ import {
   parseOccSymbol,
 } from '@jurnal-zitn/shared';
 
-import { ValidationError } from '@/lib/errors';
+import { isAdvisorEnabled } from '@/lib/config';
+import { AppError, ValidationError } from '@/lib/errors';
 import { validate } from '@/lib/validation';
 import { authMiddleware } from '@/middleware/auth.middleware';
 
@@ -18,6 +19,22 @@ type AuthEnv = { Variables: { userId: string; isAdmin: boolean } };
 const optionsRouter = new Hono<AuthEnv>();
 
 optionsRouter.use(authMiddleware);
+
+// F6 (ZITN-TECH-017 §10.8/§10.9): the US-style options surfaces are withdrawn
+// together with the advisor (A7). Gated after auth so an anonymous caller still
+// gets 401, and before every route so "withdrawn" means the whole namespace. 403
+// (not 404) mirrors ADVISOR_DISABLED — the routes exist, the SPA can tell
+// "withdrawn" from "wrong URL".
+optionsRouter.use(async (_c, next) => {
+  if (!isAdvisorEnabled()) {
+    throw new AppError(
+      403,
+      'OPTIONS_DISABLED',
+      'The options tools are not available on this instance.',
+    );
+  }
+  await next();
+});
 
 /**
  * @swagger-example occ-parse-form1 {"input":"AAPL  250620C00150000"} → {"underlying":"AAPL","expiration":"2025-06-20","type":"call","strike":"150.000"}

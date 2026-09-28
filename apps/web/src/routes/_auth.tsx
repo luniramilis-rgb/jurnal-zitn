@@ -1,6 +1,7 @@
 import { createFileRoute, Navigate, Outlet } from '@tanstack/react-router';
 
 import { DrawerToggleRefProvider } from '@/components/layout/DrawerToggleRefContext';
+import { GlobalShortcuts } from '@/components/layout/GlobalShortcuts';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { SideDrawer } from '@/components/layout/SideDrawer';
 import {
@@ -62,6 +63,7 @@ function AuthLayout() {
         </main>
         <SideDrawer />
         <FeedbackSurface />
+        <GlobalShortcuts />
       </div>
     </DrawerToggleRefProvider>
   );

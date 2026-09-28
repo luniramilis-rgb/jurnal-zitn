@@ -21,6 +21,7 @@ import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { approachingRemaining, isAccountWritable } from '@/features/billing/tier-usage';
 import { UpgradeLink } from '@/features/billing/UpgradeLink';
 import { useTierState } from '@/features/billing/useTierState';
+import { usePlaybooks } from '@/features/playbook/hooks/usePlaybooks';
 import { useT } from '@/hooks/useLocale';
 
 import { getPositionErrorCode, useCreatePosition } from '../hooks/usePositions';
@@ -134,6 +135,9 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
   const t = useT();
   const { data: accounts } = useAccounts();
   const createPosition = useCreatePosition();
+  const { data: playbooksData } = usePlaybooks();
+  // F4: optional soft link to a playbook, chosen at create time.
+  const [playbookId, setPlaybookId] = useState('');
   const { data: tierState } = useTierState();
   // The rare non-field encoder error (e.g. OCC_COMPACT_TOO_LONG) lives here and
   // renders in OptionContractFields' form slot — not as an RHF field error.
@@ -228,6 +232,7 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
       side: data.side,
       assetType: data.assetType,
       notes: data.notes,
+      ...(playbookId ? { playbookId } : {}),
     };
     try {
       await createPosition.mutateAsync(payload);
@@ -241,6 +246,7 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
     }
     onOpenChange(false);
     form.reset();
+    setPlaybookId('');
     setFormError(null);
   });
 
@@ -394,6 +400,26 @@ export function CreatePositionDialog({ open, onOpenChange }: Props) {
               {...form.register('notes')}
               placeholder={t('pos.field.notesPlaceholder')}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('pos.field.playbook')}</Label>
+            <Select
+              value={playbookId || '__none__'}
+              onValueChange={(val) => setPlaybookId(val === '__none__' ? '' : val)}
+            >
+              <SelectTrigger data-testid="position-playbook">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">{t('pos.field.playbookNone')}</SelectItem>
+                {playbooksData?.items.map((playbook) => (
+                  <SelectItem key={playbook.id} value={playbook.id}>
+                    {playbook.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex justify-end gap-2">

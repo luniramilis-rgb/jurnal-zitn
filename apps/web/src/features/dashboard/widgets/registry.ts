@@ -76,4 +76,61 @@ export const widgetRegistry: Record<WidgetType, WidgetDefinition> = {
     minSize: PerWidgetMinSize['equity-curve'],
     defaultSize: WidgetDefaultSize['equity-curve'],
   },
+  'pnl-calendar': {
+    type: 'pnl-calendar',
+    displayName: 'P&L Calendar',
+    displayNameKey: 'widget.pnlCalendar',
+    component: lazy(() => import('./PnlCalendarWidget')),
+    minSize: PerWidgetMinSize['pnl-calendar'],
+    defaultSize: WidgetDefaultSize['pnl-calendar'],
+  },
+  'dimension-breakdown': {
+    type: 'dimension-breakdown',
+    displayName: 'Dimension Breakdown',
+    displayNameKey: 'widget.dimensionBreakdown',
+    component: lazy(() => import('./DimensionBreakdownWidget')),
+    minSize: PerWidgetMinSize['dimension-breakdown'],
+    defaultSize: WidgetDefaultSize['dimension-breakdown'],
+  },
+  'idx-tax-fees': {
+    type: 'idx-tax-fees',
+    displayName: 'IDX Tax & Fees',
+    displayNameKey: 'widget.idxTaxFees',
+    component: lazy(() => import('./IdxTaxFeesWidget')),
+    minSize: PerWidgetMinSize['idx-tax-fees'],
+    defaultSize: WidgetDefaultSize['idx-tax-fees'],
+  },
+  'daily-sheet': {
+    type: 'daily-sheet',
+    displayName: 'Today’s Sheet',
+    displayNameKey: 'widget.dailySheet',
+    component: lazy(() => import('./DailySheetWidget')),
+    minSize: PerWidgetMinSize['daily-sheet'],
+    defaultSize: WidgetDefaultSize['daily-sheet'],
+  },
+  'record-completeness': {
+    type: 'record-completeness',
+    displayName: 'Record Completeness',
+    displayNameKey: 'widget.recordCompleteness',
+    component: lazy(() => import('./RecordCompletenessWidget')),
+    minSize: PerWidgetMinSize['record-completeness'],
+    defaultSize: WidgetDefaultSize['record-completeness'],
+  },
+  'risk-control': {
+    type: 'risk-control',
+    displayName: 'Risk Control',
+    displayNameKey: 'widget.riskControl',
+    component: lazy(() => import('./RiskControlWidget')),
+    minSize: PerWidgetMinSize['risk-control'],
+    defaultSize: WidgetDefaultSize['risk-control'],
+    // F3: the daily loss / trade limits live in the widget's own config, so a
+    // self-hosted instance needs no migration or preferences endpoint for them.
+    defaultConfig: { dailyLossLimit: '', maxDailyTrades: 0 },
+    configSchema: z
+      .object({
+        dailyLossLimit: z.string().max(32).default(''),
+        maxDailyTrades: z.number().int().min(0).max(100).default(0),
+      })
+      .strict(),
+  },
 };

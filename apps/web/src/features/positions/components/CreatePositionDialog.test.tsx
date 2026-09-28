@@ -18,6 +18,9 @@ const { ACCOUNT_ID, ACCOUNT_B_ID, mutateAsync, accountsData, tierData } = vi.hoi
 
 // Mock the create mutation hook — assert against `mutateAsync`. Keep the real
 // getPositionErrorCode (the dialog's tier-refusal mapping goes through it).
+vi.mock('@/features/playbook/hooks/usePlaybooks', () => ({
+  usePlaybooks: () => ({ data: { items: [] } }),
+}));
 vi.mock('../hooks/usePositions', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../hooks/usePositions')>();
   return {

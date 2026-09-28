@@ -217,6 +217,14 @@ export function CalculatorResults({
                     <Numeric value={result.riskRewardRatio!} kind="decimal" direction="none" />
                   </Badge>
                 </div>
+                {result.breakevenWinRate !== undefined && (
+                  <Row
+                    label={t('calc.result.breakevenWinRate')}
+                    value={
+                      <Numeric value={result.breakevenWinRate} kind="percent" direction="none" />
+                    }
+                  />
+                )}
               </CardContent>
             </Card>
           )}

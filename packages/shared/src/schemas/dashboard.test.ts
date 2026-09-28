@@ -8,6 +8,8 @@ import {
   PerWidgetMinSize,
   PutDashboardLayoutRequestSchema,
   WidgetPlacementSchema,
+  WidgetTypeSchema,
+  type WidgetType,
 } from './dashboard';
 
 // ---------------------------------------------------------------------------
@@ -20,7 +22,6 @@ const UUID_C = '33333333-3333-4333-8333-333333333333';
 const UUID_D = '44444444-4444-4444-8444-444444444444';
 const UUID_E = '55555555-5555-4555-8555-555555555555';
 const UUID_F = '66666666-6666-4666-8666-666666666666';
-const UUID_G = '77777777-7777-4777-8777-777777777777';
 
 // Canonical six-widget default layout that satisfies all refinements.
 //
@@ -63,12 +64,35 @@ function canonicalWidgets() {
 // ---------------------------------------------------------------------------
 
 describe('PutDashboardLayoutRequestSchema refinements', () => {
-  // 1. max-length: 7 widgets rejects with .max(6)
-  it('rejects 7 widgets via the .max(6) constraint', () => {
-    const widgets = [
-      ...canonicalWidgets(),
-      { id: UUID_G, type: 'stats-summary' as const, x: 0, y: 8, w: 4, h: 1 },
-    ];
+  // 1. max-length: a body past the widget-type cap rejects with `.max(...)`.
+  // The cap equals the number of widget types, so exceeding it necessarily
+  // repeats a type; either way the body is refused.
+  it('rejects a body with more placements than the widget-type cap', () => {
+    const used = new Set<WidgetType>(canonicalWidgets().map((w) => w.type));
+    const widgets: { id: string; type: WidgetType; x: number; y: number; w: number; h: number }[] =
+      canonicalWidgets().map((w) => ({ ...w }));
+    let y = 60;
+    for (const type of WidgetTypeSchema.options) {
+      if (used.has(type)) continue;
+      widgets.push({
+        id: globalThis.crypto.randomUUID(),
+        type,
+        x: 0,
+        y,
+        w: PerWidgetMinSize[type].w,
+        h: PerWidgetMinSize[type].h,
+      });
+      y += GRID_MAX_ROWS;
+    }
+    // One more than the number of types — the cap the `.max()` enforces.
+    widgets.push({
+      id: globalThis.crypto.randomUUID(),
+      type: 'stats-summary',
+      x: 0,
+      y,
+      w: PerWidgetMinSize['stats-summary'].w,
+      h: PerWidgetMinSize['stats-summary'].h,
+    });
     const result = PutDashboardLayoutRequestSchema.safeParse({ widgets });
     expect(result.success).toBe(false);
   });

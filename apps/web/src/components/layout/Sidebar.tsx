@@ -8,6 +8,7 @@ import {
   Landmark,
   LayoutDashboard,
   List,
+  ListChecks,
   LogOut,
   Megaphone,
   Newspaper,
@@ -195,6 +196,22 @@ export function Sidebar() {
         >
           <ItemContent expanded={expanded} label={t('nav.lembar')} Icon={Newspaper} />
         </Link>
+        <Link
+          to="/playbooks"
+          aria-label={t('nav.playbooks')}
+          title={expanded ? undefined : t('nav.playbooks')}
+          className={itemClass(expanded)}
+        >
+          <ItemContent expanded={expanded} label={t('nav.playbooks')} Icon={BookOpen} />
+        </Link>
+        <Link
+          to="/trade-plans"
+          aria-label={t('nav.tradePlans')}
+          title={expanded ? undefined : t('nav.tradePlans')}
+          className={itemClass(expanded)}
+        >
+          <ItemContent expanded={expanded} label={t('nav.tradePlans')} Icon={ListChecks} />
+        </Link>
         {advisorEnabled && (
           <Link
             to="/advisor"
@@ -223,14 +240,16 @@ export function Sidebar() {
         >
           <ItemContent expanded={expanded} label={t('nav.calculator')} Icon={Calculator} />
         </Link>
-        <Link
-          to="/options"
-          aria-label={t('nav.options')}
-          title={expanded ? undefined : t('nav.options')}
-          className={itemClass(expanded)}
-        >
-          <ItemContent expanded={expanded} label={t('nav.options')} Icon={List} />
-        </Link>
+        {advisorEnabled && (
+          <Link
+            to="/options"
+            aria-label={t('nav.options')}
+            title={expanded ? undefined : t('nav.options')}
+            className={itemClass(expanded)}
+          >
+            <ItemContent expanded={expanded} label={t('nav.options')} Icon={List} />
+          </Link>
+        )}
         <Link
           to="/import"
           aria-label={t('nav.import')}

@@ -149,10 +149,12 @@ describe('Sidebar on an instance that withdrew the advisor', () => {
     unmount(container, root);
   });
 
-  it('omits the Advisor item, and only that item, when withdrawn', () => {
+  it('omits the Advisor and Options items when withdrawn', () => {
     posture.advisorEnabled = false;
     const { container, root } = mountWith(<Sidebar />);
     expect(container.querySelector('a[aria-label="Advisor"]')).toBeNull();
+    // The US-style options surfaces are withdrawn with the advisor (A7, F6-lite).
+    expect(container.querySelector('a[aria-label="Options"]')).toBeNull();
     expect(container.querySelector('a[aria-label="Dashboard"]')).toBeTruthy();
     expect(container.querySelector('a[aria-label="Positions"]')).toBeTruthy();
     unmount(container, root);

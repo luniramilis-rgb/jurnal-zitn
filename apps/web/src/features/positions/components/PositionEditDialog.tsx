@@ -6,7 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { usePlaybooks } from '@/features/playbook/hooks/usePlaybooks';
 import { useT } from '@/hooks/useLocale';
 
 import { useUpdatePosition } from '../hooks/usePosition';
@@ -53,6 +61,7 @@ interface Props {
 export function PositionEditDialog({ open, onOpenChange, position }: Props) {
   const t = useT();
   const updatePosition = useUpdatePosition(position.id);
+  const { data: playbooksData } = usePlaybooks();
 
   const isDraftOption = position.status === 'draft' && position.assetType === 'option';
   const decoded = isDraftOption ? decodeContract(position.symbol) : null;
@@ -73,6 +82,8 @@ export function PositionEditDialog({ open, onOpenChange, position }: Props) {
   );
   const [contractErrors, setContractErrors] = useState<ContractErrors>({});
   const [symbolError, setSymbolError] = useState<string | null>(null);
+  // F4 soft link — editable on any status (like notes/target/stop).
+  const [playbookId, setPlaybookId] = useState(position.playbookId ?? '');
 
   // Re-seed the editable state each time the dialog (re)opens, so a cancelled edit
   // doesn't leak into the next open and the prefill reflects the latest data. The
@@ -88,15 +99,18 @@ export function PositionEditDialog({ open, onOpenChange, position }: Props) {
     setStopLoss(position.stopLoss != null ? String(position.stopLoss) : '');
     setContractErrors({});
     setSymbolError(null);
+    setPlaybookId(position.playbookId ?? '');
   }, [open]);
 
   const handleSave = async () => {
     // Trade-plan fields are accepted on any status (R14). Empty input clears the
     // value (null); otherwise send the trimmed decimal string for the server-side
     // schema to validate.
-    const planFields: Pick<UpdatePositionInput, 'targetPrice' | 'stopLoss'> = {
+    const planFields: Pick<UpdatePositionInput, 'targetPrice' | 'stopLoss' | 'playbookId'> = {
       targetPrice: targetPrice.trim() === '' ? null : targetPrice.trim(),
       stopLoss: stopLoss.trim() === '' ? null : stopLoss.trim(),
+      // F4 soft link — null clears it; editable on any status.
+      playbookId: playbookId === '' ? null : playbookId,
     };
 
     if (mode === 'structured') {
@@ -205,6 +219,26 @@ export function PositionEditDialog({ open, onOpenChange, position }: Props) {
           <div className="space-y-2">
             <Label htmlFor="edit-notes">{t('pos.field.notes')}</Label>
             <Textarea id="edit-notes" value={notes} onChange={(e) => setNotes(e.target.value)} />
+          </div>
+
+          <div className="space-y-2">
+            <Label>{t('pos.field.playbook')}</Label>
+            <Select
+              value={playbookId || '__none__'}
+              onValueChange={(val) => setPlaybookId(val === '__none__' ? '' : val)}
+            >
+              <SelectTrigger data-testid="edit-position-playbook">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">{t('pos.field.playbookNone')}</SelectItem>
+                {playbooksData?.items.map((playbook) => (
+                  <SelectItem key={playbook.id} value={playbook.id}>
+                    {playbook.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="flex justify-end gap-2">

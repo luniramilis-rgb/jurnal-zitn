@@ -76,6 +76,37 @@ A10 dulu agar setiap batch berikutnya terverifikasi otomatis (uji ber-Postgres d
 
 ---
 
+## Fase F — Transplant fitur proses Journedge (F0, F0b, F1 ✅; D-F1…D-F6 ✅ disetujui 2026-09-28)
+
+Rencana lengkap + approval: **`ZITN-TECH-017 §10`** (repo ZITN, `docs/product/HANDOFF_technical_17.md`).
+Sumber: **Journedge (MIT)** — reimplementasi, bukan copy-paste. Prasyarat: Fase B & C ✅.
+
+**Validasi penting:** Tradr **sudah punya** performance/`PnlCalendar`/`EquityCurveChart`/`StatsPanel`/
+breakdown, `tags`, `calculator`, `accounts`, `PositionScreenshots`, `export`, `csv-import`.
+
+| #   | Pekerjaan                                                                                                                                                                                                                                                                                                                                                                                | Biaya | Catatan                                                                                                                                                                             |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| F0  | **Paket widget dashboard** ✅ **disetujui 2026-09-28** — kalender P&L, rincian dimensi, pajak/fee IDX, kartu "Lembar hari ini" (tanpa harga), kelengkapan catatan                                                                                                                                                                                                                        | S     | komponen sudah ada; tambah `WidgetType` + `registry.ts` + `widgets/*`; tanpa migrasi                                                                                                |
+| F0b | **Feedback in-app / lapor masalah** ✅ **disetujui 2026-09-28** — pola tabel `feedback` ZITN + kolom `source`/`status`; inbox `/admin`; **rewire `FeedbackSurface` keluar dari PostHog**; ikut ekspor & hapus akun                                                                                                                                                                       | S–M   | `apps/api/src/features/feedback/*` + migrasi forward-only; `features/{feedback,admin,export,account-deletion}`                                                                      |
+| F1  | **Analitik risiko** ✅ — Sharpe/Sortino/Calmar, max drawdown + durasi, rolling 20-trade win rate, R-multiple & expectancy (rata-rata kerugian = 1R), R per simbol, + breakeven win rate di kalkulator                                                                                                                                                                                    | S–M   | `packages/shared/src/lib/risk.ts` (uji golden), `performance.service` + `RiskPanel` di `/performance`, `calculator`                                                                 |
+| F2  | **Distribusi waktu** ✅ — P&L & win rate per hari-masuk, **heatmap jam masuk**, distribusi P&L per periode; zona tampil = zona pelaporan (WIB default)                                                                                                                                                                                                                                   | S     | **tanpa migrasi**: `entryAt` diturunkan saat baca dari fill masuk (bukan kolom `hourOfDay` tersimpan — lihat catatan), pure fn `lib/time-distribution.ts` + `TimeDistributionPanel` |
+| F3  | **Perilaku & kontrol risiko** ✅ — overtrading (mean + 1,5σ), revenge (jendela 30 mnt), skor disiplin (berbobot, terdokumentasi), risk of ruin + Kelly/half-Kelly, meter kontrol risiko harian (75%)                                                                                                                                                                                     | M     | `lib/behavior.ts` (uji golden), `BehaviorPanel` di `/performance`, widget `risk-control`; **tanpa migrasi** — limit disimpan di `config` widget                                     |
+| F4  | **Playbook + rencana pra-trade** ✅ — playbook (setup/pemicu/keluar/timeframe/instrumen) + statistik per-setup saat baca (**`currency` wajib**); rencana pra-trade (tesis, zona, stop, target, R:R live; Pending→Executed/Missed/Cancelled); **tautan tulis**: form posisi memilih playbook, aksi rencana↔trade 1:1 (`PATCH /trade-plans/:id/link`)                                      | M–L   | migrasi `0043` (`playbooks`, `trade_plans`, `positions.playbook_id` **soft link tanpa FK**); `features/playbook` & `features/trade-plans` + UI                                      |
+| F5  | _(opsional)_ editor jurnal kaya (TipTap) + laporan PDF                                                                                                                                                                                                                                                                                                                                   | M     | menambah dependensi                                                                                                                                                                 |
+| F6  | **Pembersihan doktrin** ✅ — **`/api/options/*` bergerbang `DISABLE_ADVISOR` (403 `OPTIONS_DISABLED`)**; `/options` + nav tersembunyi (F6-lite); **bootstrap advisor dilewati saat dinonaktifkan**; nav docs "Options tools" dihapus + halaman `draft`; OpenAPI menyembunyikan `advisor` & `options`; PostHog off; **shortcut keyboard `g <huruf>` + `?` bantuan** (inert saat mengetik) | S     | ✅ lengkap                                                                                                                                                                          |
+
+**Pagar:** metrik hasil hanya di `/jurnal/*` (K11); tanpa AI/advisor, tanpa notifikasi hasil, tanpa telemetry;
+MAE/MFE ditunda (butuh data pasar → D12); kode Journedge yang di-port → atribusi MIT di `MODIFICATIONS.md`.
+
+**Keputusan pemilik:** **F0 ✅, F0b ✅, D-F1…D-F6 ✅ disetujui 2026-09-28** (§10.14 `ZITN-TECH-017`):
+lingkup v1 = (a) F1–F4; editor kaya ditunda; `advisor` disembunyikan total; PostHog tetap off; MAE/MFE
+ditunda; PDF ditunda. Implementasi berjalan: **F1 ✅, F2 ✅, F3 ✅, F4 ✅, F6 ✅ lengkap**;
+F5 tetap ditunda. **Keputusan default layout:** susunan default widget **tetap 5 widget kurasi**; widget
+F0/F3 tersedia lewat **picker** (Add widget). Menata ulang default mengubah tata letak semua pengguna dan
+memuat uji default yang sudah dipin, jadi ditunda sebagai commit tersendiri bila diinginkan.
+
+---
+
 ## Definition of done per fase
 
 - **A**: `pnpm -r check-types` + `pnpm test` (CI dengan Postgres) hijau; `eslint` bersih; tiap batch
@@ -83,3 +114,5 @@ A10 dulu agar setiap batch berikutnya terverifikasi otomatis (uji ber-Postgres d
 - **B**: subdomain 200; SSO end-to-end; ekspor/hapus jalan; backup & restore terbukti; kredensial dirotasi.
 - **C**: kartu beranda & rute tayang; `build_site --check` bersih; pagar doktrin (D12) dipatuhi.
 - **D**: opsional, hanya setelah A–C stabil.
+- **F**: fungsi analitik beruji vitest; `advisor`/`options` tak dapat diakses; kamus `id`/`en` lengkap;
+  `pnpm -r check-types`/`eslint`/`pnpm test` (CI ber-Postgres) hijau; tanpa regresi jalur IDX.

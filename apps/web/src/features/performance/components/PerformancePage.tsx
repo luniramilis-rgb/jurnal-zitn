@@ -14,6 +14,7 @@ import { isTimezoneRejected } from '@/lib/invalidTimezone';
 import { isInvalidTimezoneError, usePerformance } from '../hooks/usePerformance';
 import type { PerformancePreset } from '../utils/derivePresetRange';
 
+import { BehaviorPanel } from './BehaviorPanel';
 import { BreakdownDimensionSelector } from './BreakdownDimensionSelector';
 import { BreakdownTable } from './BreakdownTable';
 import { ChartChunkStaleBanner } from './ChartChunkStaleBanner';
@@ -24,7 +25,9 @@ import { EquityCurveChartSkeleton } from './EquityCurveChartSkeleton';
 import { InvalidTimezoneBanner } from './InvalidTimezoneBanner';
 import { PerformanceEmptyState } from './PerformanceEmptyState';
 import { PnlCalendar } from './PnlCalendar';
+import { RiskPanel } from './RiskPanel';
 import { StatsPanel } from './StatsPanel';
+import { TimeDistributionPanel } from './TimeDistributionPanel';
 import { TimeframeSelector } from './TimeframeSelector';
 import { WeekStartChangedBanner } from './WeekStartChangedBanner';
 
@@ -281,6 +284,18 @@ export function PerformancePage({ params, month, by }: PerformancePageProps) {
       </ChunkErrorBoundary>
 
       <StatsPanel stats={activeCurrency.stats} currency={currencyCode} />
+
+      <RiskPanel risk={activeCurrency.risk} currency={currencyCode} />
+
+      <TimeDistributionPanel
+        time={activeCurrency.timeDistribution}
+        series={activeCurrency.series}
+        granularity={params.granularity}
+        currency={currencyCode}
+        timezone={resolvedTimezone}
+      />
+
+      <BehaviorPanel behavior={activeCurrency.behavior} />
 
       <PnlCalendar
         params={params}

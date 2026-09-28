@@ -1,12 +1,16 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import { FEEDBACK_TEXT_MAX_LENGTH } from '@/lib/telemetry/posthog';
+import { FEEDBACK_MESSAGE_MAX } from '@jurnal-zitn/shared';
+
+import { setAppLocale } from '@/lib/locale';
 
 import { FeedbackForm } from './FeedbackForm';
 
+beforeEach(() => setAppLocale('en'));
 afterEach(() => {
+  setAppLocale('id');
   cleanup();
 });
 
@@ -14,79 +18,87 @@ function sendButton(): HTMLButtonElement {
   return screen.getByRole('button', { name: 'Send' }) as HTMLButtonElement;
 }
 
-describe('FeedbackForm', () => {
-  it('disables Send until a rating is chosen, then enables it (REQ-4.4)', () => {
-    render(<FeedbackForm sent={false} onSend={vi.fn()} />);
+function messageBox(): HTMLTextAreaElement {
+  return screen.getByRole('textbox', { name: 'Message' }) as HTMLTextAreaElement;
+}
+
+describe('FeedbackForm (F0b — type + message)', () => {
+  it('disables Send until a type is chosen AND the message is at least 10 characters', () => {
+    render(<FeedbackForm sent={false} submitting={false} error={null} onSend={vi.fn()} />);
     expect(sendButton().disabled).toBe(true);
 
-    fireEvent.click(screen.getByRole('radio', { name: '3' }));
+    fireEvent.click(screen.getByRole('radio', { name: 'Bug' }));
+    expect(sendButton().disabled).toBe(true); // no message yet
 
-    expect(screen.getByRole('radio', { name: '3' }).getAttribute('aria-checked')).toBe('true');
+    fireEvent.change(messageBox(), { target: { value: 'short' } });
+    expect(sendButton().disabled).toBe(true);
+    expect(screen.getByText('Message must be at least 10 characters.')).toBeTruthy();
+
+    fireEvent.change(messageBox(), { target: { value: 'a long enough message' } });
     expect(sendButton().disabled).toBe(false);
   });
 
-  it('yields exactly one onSend under double-activation (REQ-4.4)', () => {
+  it('sends the trimmed { type, message } exactly once under double activation', () => {
     const onSend = vi.fn();
-    render(<FeedbackForm sent={false} onSend={onSend} />);
-    fireEvent.click(screen.getByRole('radio', { name: '4' }));
+    render(<FeedbackForm sent={false} submitting={false} error={null} onSend={onSend} />);
+    fireEvent.click(screen.getByRole('radio', { name: 'Feature' }));
+    fireEvent.change(messageBox(), { target: { value: '  sebuah pesan yang panjang  ' } });
 
     const send = sendButton();
-    // Two activations in the same tick — the form-local sending guard must let
-    // exactly one through (the disabled attribute has not re-rendered yet).
     fireEvent.click(send);
     fireEvent.click(send);
 
     expect(onSend).toHaveBeenCalledTimes(1);
-    expect(onSend).toHaveBeenCalledWith(4, '');
+    expect(onSend).toHaveBeenCalledWith('feature', 'sebuah pesan yang panjang');
   });
 
-  it('shows the remaining-character counter only under 200 remaining (REQ-4.5)', () => {
-    render(<FeedbackForm sent={false} onSend={vi.fn()} />);
-    const textarea = screen.getByRole('textbox', { name: 'Details (optional)' });
-
-    // Empty: no counter.
+  it('shows the remaining-character counter only under 200 remaining', () => {
+    render(<FeedbackForm sent={false} submitting={false} error={null} onSend={vi.fn()} />);
     expect(screen.queryByText(/characters remaining/)).toBeNull();
 
-    // Exactly 200 remaining (length 1800) — still not shown ("under 200", strict).
-    fireEvent.change(textarea, { target: { value: 'a'.repeat(FEEDBACK_TEXT_MAX_LENGTH - 200) } });
-    expect(screen.queryByText(/characters remaining/)).toBeNull();
-
-    // 199 remaining (length 1801) — the counter appears.
-    fireEvent.change(textarea, { target: { value: 'a'.repeat(FEEDBACK_TEXT_MAX_LENGTH - 199) } });
+    fireEvent.change(messageBox(), { target: { value: 'a'.repeat(FEEDBACK_MESSAGE_MAX - 199) } });
     expect(screen.getByText('199 characters remaining')).toBeTruthy();
 
-    // Back under the threshold — it disappears again.
-    fireEvent.change(textarea, { target: { value: 'a'.repeat(FEEDBACK_TEXT_MAX_LENGTH - 200) } });
+    fireEvent.change(messageBox(), { target: { value: 'a'.repeat(FEEDBACK_MESSAGE_MAX - 200) } });
     expect(screen.queryByText(/characters remaining/)).toBeNull();
   });
 
-  it('resets rating and text when remounted with a new key (reopen, REQ-4.8)', () => {
-    const { rerender } = render(<FeedbackForm key="open-1" sent={false} onSend={vi.fn()} />);
-    fireEvent.click(screen.getByRole('radio', { name: '5' }));
-    fireEvent.change(screen.getByRole('textbox', { name: 'Details (optional)' }), {
-      target: { value: 'kept between renders only within one open' },
-    });
-    expect(screen.getByRole('radio', { name: '5' }).getAttribute('aria-checked')).toBe('true');
+  it('shows the inline error and re-enables a retry', () => {
+    render(
+      <FeedbackForm
+        sent={false}
+        submitting={false}
+        error="Failed to send. Try again."
+        onSend={vi.fn()}
+      />,
+    );
+    expect(screen.getByRole('alert').textContent).toContain('Failed to send');
+  });
 
-    // A new key remounts the form — the parent's per-open remount contract.
-    rerender(<FeedbackForm key="open-2" sent={false} onSend={vi.fn()} />);
+  it('resets local state on a new key (reopen)', () => {
+    const { rerender } = render(
+      <FeedbackForm key="open-1" sent={false} submitting={false} error={null} onSend={vi.fn()} />,
+    );
+    fireEvent.click(screen.getByRole('radio', { name: 'General' }));
+    fireEvent.change(messageBox(), { target: { value: 'pesan pertama yang panjang' } });
 
-    for (const value of ['1', '2', '3', '4', '5']) {
-      expect(screen.getByRole('radio', { name: value }).getAttribute('aria-checked')).toBe('false');
+    rerender(
+      <FeedbackForm key="open-2" sent={false} submitting={false} error={null} onSend={vi.fn()} />,
+    );
+    for (const label of ['Bug', 'Feature', 'General', 'Question']) {
+      expect(screen.getByRole('radio', { name: label }).getAttribute('aria-checked')).toBe('false');
     }
-    expect(
-      (screen.getByRole('textbox', { name: 'Details (optional)' }) as HTMLTextAreaElement).value,
-    ).toBe('');
-    // No rating selected ⇒ Send disabled again.
+    expect(messageBox().value).toBe('');
     expect(sendButton().disabled).toBe(true);
   });
 
-  it('swaps to the sent acknowledgement when sent is true (REQ-4.6)', () => {
-    const { rerender } = render(<FeedbackForm sent={false} onSend={vi.fn()} />);
+  it('swaps to the sent acknowledgement when sent is true', () => {
+    const { rerender } = render(
+      <FeedbackForm sent={false} submitting={false} error={null} onSend={vi.fn()} />,
+    );
     expect(screen.queryByText('Sent. Thank you.')).toBeNull();
-    rerender(<FeedbackForm sent onSend={vi.fn()} />);
+    rerender(<FeedbackForm sent submitting={false} error={null} onSend={vi.fn()} />);
     expect(screen.getByText('Sent. Thank you.')).toBeTruthy();
-    // The rating group is gone in the sent state.
     expect(screen.queryByRole('radio')).toBeNull();
   });
 });

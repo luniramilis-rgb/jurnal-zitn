@@ -2,20 +2,38 @@ import Decimal from 'decimal.js';
 
 import {
   getCurrencyMinorUnits,
+  type Granularity,
   type PerformanceCurrency,
   type PerformanceQueryInput,
   type PerformanceResponse,
+  type RiskStats,
   type SeriesBucket,
   PerformanceResponseSchema,
 } from '@jurnal-zitn/shared';
+import {
+  detectOvertrading,
+  detectRevengeTrades,
+  disciplineScore,
+  type BehaviorTrade,
+} from '@jurnal-zitn/shared/lib/behavior';
 import type { BreakdownPosition } from '@jurnal-zitn/shared/lib/breakdown';
 import {
   buildCumulativeSeries,
   classifyPosition,
   computePositionSetStatistics,
   generateBucketSeries,
-  type ClassifiedPosition,
 } from '@jurnal-zitn/shared/lib/performance';
+import {
+  calmarRatio,
+  maxDrawdown,
+  periodsPerYearForGranularity,
+  rMultipleBySymbol,
+  rMultipleStats,
+  rollingWinRate,
+  sharpeRatio,
+  sortinoRatio,
+} from '@jurnal-zitn/shared/lib/risk';
+import { computeTimeDistribution } from '@jurnal-zitn/shared/lib/time-distribution';
 import { resolveTimezone } from '@jurnal-zitn/shared/schemas/performance';
 
 import type { Database } from '@/db';
@@ -93,7 +111,7 @@ export async function getPerformance(
     ? history.currencies.filter((c) => c.code === input.currency)
     : history.currencies;
 
-  const positionsByCurrency = new Map<string, ClassifiedPosition[]>();
+  const positionsByCurrency = new Map<string, BreakdownPosition[]>();
   for (const p of classified.flat) {
     const list = positionsByCurrency.get(p.currency);
     if (list) list.push(p);
@@ -113,6 +131,9 @@ export async function getPerformance(
       positionsByCurrency.get(cur.code) ?? [],
       realizationsByCurrency.get(cur.code) ?? [],
       buckets,
+      input.granularity,
+      resolvedTimezone,
+      config.WEEK_START_DAY,
     ),
   );
 
@@ -258,7 +279,27 @@ function classifyOne(position: SnapshotPosition): BreakdownPosition | null {
     symbol: position.symbol,
     assetType,
     tags: position.tags,
+    entryAt: entryInstant(position),
   };
+}
+
+/**
+ * F2 — the instant a position was ENTERED: the earliest `entry` fill's
+ * `filled_at`, falling back to the stored `opened_at` (drafts / positions with
+ * no entry fill) and finally `created_at` so the value is always defined. Fills
+ * arrive ordered by `filled_at`, but this scans for the minimum rather than
+ * assuming it.
+ */
+function entryInstant(position: SnapshotPosition): Date {
+  let earliest: number | null = null;
+  for (const f of position.fills) {
+    if (f.type !== 'entry') continue;
+    const t = new Date(f.filledAt).getTime();
+    if (!Number.isNaN(t) && (earliest === null || t < earliest)) earliest = t;
+  }
+  if (earliest !== null) return new Date(earliest);
+  if (position.openedAt !== null) return new Date(position.openedAt);
+  return new Date(position.createdAt);
 }
 
 function computeGrossPnl(
@@ -301,9 +342,12 @@ function computeGrossPnl(
  */
 function buildCurrencyEntry(
   history: HistoryCurrency,
-  positions: readonly ClassifiedPosition[],
+  positions: readonly BreakdownPosition[],
   realizations: readonly RealizationEvent[],
   buckets: ReturnType<typeof generateBucketSeries>,
+  granularity: Granularity,
+  timezone: string,
+  weekStartDay: 0 | 1,
 ): PerformanceCurrency {
   const series: SeriesBucket[] = buckets.map((b) => ({
     bucketStart: b.label,
@@ -378,6 +422,79 @@ function buildCurrencyEntry(
       // would silently reinstate the flat-only population.
       totalNetPnl: series.reduce((sum, b) => sum.plus(b.netPnl), new Decimal(0)).toString(),
     },
+    risk: computeRiskStats(series, positions, granularity),
+    timeDistribution: computeTimeDistribution(positions, timezone, weekStartDay),
+    behavior: computeBehaviorStats(positions, timezone),
+  };
+}
+
+// F3 — behaviour analytics over the flat positions, in the reporting zone.
+function computeBehaviorStats(
+  positions: readonly BreakdownPosition[],
+  timezone: string,
+): NonNullable<PerformanceCurrency['behavior']> {
+  const trades: BehaviorTrade[] = positions.map((p) => ({
+    entryAt: p.entryAt,
+    closedAt: p.closedAt,
+    netPnl: Number(p.netPnl),
+    tagCount: p.tags.length,
+  }));
+  const overtrading = detectOvertrading(trades, timezone);
+  const revenge = detectRevengeTrades(trades);
+  const discipline = disciplineScore(overtrading, revenge, trades);
+  return {
+    overtrading: {
+      activeDays: overtrading.activeDays,
+      overDayCount: overtrading.overDays.length,
+      overDayRate: overtrading.overDayRate,
+      threshold: overtrading.threshold,
+      mean: overtrading.mean,
+    },
+    revenge: {
+      windowMinutes: revenge.windowMinutes,
+      revengeCount: revenge.revengeCount,
+      revengeRate: revenge.revengeRate,
+    },
+    discipline: {
+      taggedRate: discipline.taggedRate,
+      noRevengeRate: discipline.noRevengeRate,
+      noOvertradingRate: discipline.noOvertradingRate,
+      score: discipline.score,
+    },
+  };
+}
+
+// F1 — risk & R-multiple analytics, computed from the same populations the rest
+// of the entry uses: ratios/drawdown from the per-period P&L series (bucket B),
+// R-multiple from the closed-trade P&L list (bucket A, which carries `symbol`).
+const RISK_ROLLING_WINDOW = 20;
+
+function computeRiskStats(
+  series: readonly SeriesBucket[],
+  positions: readonly BreakdownPosition[],
+  granularity: Granularity,
+): RiskStats {
+  const periodsPerYear = periodsPerYearForGranularity(granularity);
+  const periodPnls = series.map((b) => Number(b.netPnl));
+  const tradePnls = positions.map((p) => Number(p.netPnl));
+
+  const drawdown = maxDrawdown(periodPnls);
+  const rMultiple = rMultipleStats(tradePnls);
+  const rolling = rollingWinRate(tradePnls, RISK_ROLLING_WINDOW);
+
+  return {
+    sharpe: sharpeRatio(periodPnls, periodsPerYear),
+    sortino: sortinoRatio(periodPnls, periodsPerYear),
+    calmar: calmarRatio(periodPnls, periodsPerYear),
+    maxDrawdown: drawdown.maxDrawdown,
+    maxDrawdownPct: drawdown.maxDrawdownPct,
+    drawdownPeriods: drawdown.longestPeriods,
+    avgR: rMultiple.avgR,
+    expectancyR: rMultiple.expectancyR,
+    rHistogram: rMultiple.histogram,
+    rollingWindow: rolling.window,
+    rollingWinRate: rolling.latest,
+    bySymbol: rMultipleBySymbol(positions.map((p) => ({ key: p.symbol, pnl: Number(p.netPnl) }))),
   };
 }
 

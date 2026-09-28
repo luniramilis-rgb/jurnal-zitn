@@ -13,6 +13,14 @@ export const WidgetTypeSchema = z.enum([
   'account-balances',
   'position-sizing',
   'equity-curve',
+  // Fase F (ZITN-TECH-017 §10.3, F0): paket widget dashboard dari komponen yang sudah ada.
+  'pnl-calendar',
+  'dimension-breakdown',
+  'idx-tax-fees',
+  'daily-sheet',
+  'record-completeness',
+  // Fase F3: daily risk control meter.
+  'risk-control',
 ]);
 export type WidgetType = z.infer<typeof WidgetTypeSchema>;
 
@@ -67,6 +75,20 @@ export const PerWidgetMinSize: Record<WidgetType, { w: number; h: number }> = {
   'position-sizing': { w: 3, h: 24 },
   // No toolbar — the chart is the whole body.
   'equity-curve': { w: 4, h: chartWidgetMinRows(0) },
+  // Fase F (F0). The calendar renders a header block plus a six-week grid, so it
+  // needs real height; four columns is the narrowest the seven day columns plus
+  // the week total can be read at (the table scrolls below that).
+  'pnl-calendar': { w: 4, h: 8 },
+  // Per-dimension statistics table: a header row and at least a few data rows.
+  'dimension-breakdown': { w: 4, h: 6 },
+  // A short summary: a couple of labelled figures plus a link.
+  'idx-tax-fees': { w: 4, h: 3 },
+  // A snippet: date, symbol count and a link to the sheet.
+  'daily-sheet': { w: 4, h: 3 },
+  // A short process checklist.
+  'record-completeness': { w: 4, h: 3 },
+  // F3: two labelled meters (daily loss, trade count) plus inline limit inputs.
+  'risk-control': { w: 4, h: 4 },
 };
 
 export const WidgetPlacementSchema = z

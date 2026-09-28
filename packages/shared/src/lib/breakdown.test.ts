@@ -29,6 +29,7 @@ function bpos(overrides: Partial<BreakdownPosition> = {}): BreakdownPosition {
     symbol: overrides.symbol ?? 'AAPL',
     assetType: overrides.assetType ?? 'stock',
     tags: overrides.tags ?? [],
+    entryAt: overrides.entryAt ?? overrides.closedAt ?? new Date('2026-01-01T00:00:00Z'),
   };
 }
 
@@ -226,6 +227,7 @@ describe('groupPositions partition property', () => {
         currency: 'USD',
         grossPnl: r.netPnl,
         fees: new Decimal(0),
+        entryAt: r.closedAt,
       }),
     );
 

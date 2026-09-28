@@ -33,6 +33,9 @@ export interface SnapshotPosition {
    */
   closedAt: string | null;
   status: string;
+  /** Stored entry instant (set on open). Null for drafts never opened. */
+  openedAt: string | null;
+  createdAt: string;
   /** Latched flat snapshot — see positions.schema.ts. Null if never flat. */
   lastFlatAt: string | null;
   lastFlatNetPnl: string | null;
@@ -89,6 +92,7 @@ export async function fetchTimeframeSnapshot(
       -- come from fills.fees and are never re-applied at read time.
       SELECT DISTINCT
         p.id, p.side, p.asset_type, p.symbol, p.closed_at, p.status,
+        p.opened_at, p.created_at,
         p.last_flat_at, p.last_flat_net_pnl,
         a.currency
       FROM positions p
@@ -159,6 +163,7 @@ export async function fetchTimeframeSnapshot(
           'id', c.id, 'side', c.side, 'assetType', c.asset_type,
           'symbol', c.symbol,
           'currency', c.currency, 'closedAt', c.closed_at, 'status', c.status,
+          'openedAt', c.opened_at, 'createdAt', c.created_at,
           'lastFlatAt', c.last_flat_at, 'lastFlatNetPnl', c.last_flat_net_pnl::text,
           'fills', COALESCE(pf.fills, '[]'::jsonb),
           'tags', COALESCE(pts.tags, '[]'::jsonb)

@@ -172,7 +172,6 @@ export default defineConfig({
             { label: 'Customise the dashboard', slug: 'user-guide/dashboard' },
             { label: 'Accounts & the multi-currency ledger', slug: 'user-guide/accounts' },
             { label: 'Review performance & P&L', slug: 'user-guide/performance' },
-            { label: 'Options tools', slug: 'user-guide/options-tools' },
             { label: 'Import your history', slug: 'user-guide/import-history' },
             { label: 'Accounting & tax', slug: 'user-guide/accounting-tax' },
             { label: 'Delete your account', slug: 'user-guide/account-deletion' },

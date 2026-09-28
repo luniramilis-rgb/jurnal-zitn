@@ -32,10 +32,12 @@ import { dashboardRoute } from '@/features/dashboard/dashboard.route';
 import { initDashboardCache } from '@/features/dashboard/dashboard.service';
 import expensesRouter from '@/features/expenses/expenses.route';
 import exportRouter from '@/features/export/export.route';
+import feedbackRouter from '@/features/feedback/feedback.route';
 import health from '@/features/health/health.route';
 import journalContextRouter from '@/features/journal-context/journal-context.route';
 import optionsRouter from '@/features/options/options.route';
 import performance from '@/features/performance/performance.route';
+import playbookRouter from '@/features/playbook/playbook.route';
 import fillsRouter from '@/features/positions/fills.route';
 import positionImagesRouter from '@/features/positions/position-images.route';
 import positions from '@/features/positions/positions.route';
@@ -49,7 +51,8 @@ import { initStockQuoteCache } from '@/features/symbols/stock-quote.client';
 import symbolsRouter from '@/features/symbols/symbols.route';
 import { syncSymbolsIfStale } from '@/features/symbols/symbols.service';
 import tagsRouter from '@/features/tags/tags.route';
-import { isMetricsConfigured } from '@/lib/config';
+import tradePlanRouter from '@/features/trade-plans/trade-plan.route';
+import { isAdvisorEnabled, isMetricsConfigured } from '@/lib/config';
 import {
   loadEncryptionKeyMaterial,
   runEncryptionFingerprintCheckIfConfigured,
@@ -136,7 +139,10 @@ app.route('/api/calculator', calculatorRouter);
 app.route('/api/changelog', changelogRouter);
 app.route('/api/csv-import', csvImport);
 app.route('/api/dashboard', dashboardRoute);
+app.route('/api/feedback', feedbackRouter);
 app.route('/api/journal/context', journalContextRouter);
+app.route('/api/playbooks', playbookRouter);
+app.route('/api/trade-plans', tradePlanRouter);
 app.route('/api/options', optionsRouter);
 app.route('/api/positions', positions);
 app.route('/api/positions', fillsRouter);
@@ -219,9 +225,15 @@ export async function bootstrap(): Promise<void> {
       error: e instanceof Error ? e.message : String(e),
     }),
   );
-  await runDecryptCanary();
-  await applyBuiltinPersonaOverrides();
-  initProviderRegistry(new ListModelsCache());
+  // F6 (ZITN-TECH-017 §10.9): advisor-only startup is skipped while the advisor
+  // is withdrawn (the default), so a disabled instance pays no
+  // provider-registry / persona / decrypt-canary cost. Migrations and the
+  // encryption key material still load — they are not advisor-only.
+  if (isAdvisorEnabled()) {
+    await runDecryptCanary();
+    await applyBuiltinPersonaOverrides();
+    initProviderRegistry(new ListModelsCache());
+  }
 }
 
 export default app;

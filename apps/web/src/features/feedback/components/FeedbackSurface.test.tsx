@@ -1,5 +1,9 @@
 // @vitest-environment jsdom
-
+//
+// FeedbackSurface after the F0b rewire (ZITN-TECH-017 §10.4): the surface is
+// always available (no survey-config gate), a submission goes to our own
+// POST /api/feedback via useSubmitFeedback, and NO PostHog capture fires — the
+// telemetry spies below must stay at zero across every path.
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
@@ -12,9 +16,12 @@ import {
 } from '@/lib/telemetry/posthog';
 import { useDrawerStore } from '@/stores/drawer.store';
 
-// The one seam the slice touches. Mock the three capture wrappers as spies at
-// the module level — FeedbackSurface is the only component that talks to
-// telemetry. Keep FEEDBACK_TEXT_MAX_LENGTH real (FeedbackForm imports it).
+import { useSubmitFeedback } from '../hooks/useSubmitFeedback';
+
+import { FeedbackSurface, feedbackMainGutterClasses, SENT_STATE_DWELL_MS } from './FeedbackSurface';
+
+// The telemetry seam this slice USED to touch. Kept mocked so the test can prove
+// nothing calls it any more (F0b: rewired off PostHog).
 vi.mock('@/lib/telemetry/posthog', () => ({
   captureFeedbackShown: vi.fn(),
   captureFeedbackSent: vi.fn(),
@@ -22,31 +29,21 @@ vi.mock('@/lib/telemetry/posthog', () => ({
   FEEDBACK_TEXT_MAX_LENGTH: 2000,
 }));
 
-// Controllable coarse-pointer / mobile query — the slice reads only
-// '(max-width: 767px)'. Default desktop (false).
-vi.mock('@/hooks/useMediaQuery', () => ({
-  useMediaQuery: vi.fn(() => false),
-}));
+vi.mock('../hooks/useSubmitFeedback', () => ({ useSubmitFeedback: vi.fn() }));
 
-import { FeedbackSurface, feedbackMainGutterClasses } from './FeedbackSurface';
+vi.mock('@/hooks/useMediaQuery', () => ({ useMediaQuery: vi.fn(() => false) }));
 
-// The parsed shape of the configured survey value below.
-const IDS = { surveyId: 'survey-1', ratingQuestionId: 'rating-q', textQuestionId: 'text-q' };
+type Mutation = ReturnType<typeof useSubmitFeedback>;
 
-function configure() {
-  window.__JURNAL_ZITN_CONFIG__ = {
-    posthogPublicKey: 'phc_test',
-    feedbackSurvey: `${IDS.surveyId}:${IDS.ratingQuestionId}:${IDS.textQuestionId}`,
-  };
-}
-
-function setMobile(mobile: boolean) {
-  vi.mocked(useMediaQuery).mockReturnValue(mobile);
-}
+let mutate: ReturnType<typeof vi.fn>;
 
 const shown = vi.mocked(captureFeedbackShown);
 const sent = vi.mocked(captureFeedbackSent);
 const dismissed = vi.mocked(captureFeedbackDismissed);
+
+function setMobile(mobile: boolean) {
+  vi.mocked(useMediaQuery).mockReturnValue(mobile);
+}
 
 beforeEach(() => {
   vi.mocked(useMediaQuery).mockReset();
@@ -54,250 +51,133 @@ beforeEach(() => {
   shown.mockReset();
   sent.mockReset();
   dismissed.mockReset();
+  mutate = vi.fn();
+  vi.mocked(useSubmitFeedback).mockReturnValue({
+    mutate,
+    isPending: false,
+  } as unknown as Mutation);
   useDrawerStore.setState({
     isOpen: false,
     activeTab: 'open-positions',
     legacyDetected: false,
     inspectedPosition: null,
   });
-  configure();
 });
 
 afterEach(() => {
   cleanup();
   vi.useRealTimers();
-  window.__JURNAL_ZITN_CONFIG__ = undefined;
+  vi.clearAllMocks();
 });
 
 const tab = () => screen.getByTestId('feedback-tab');
 
-describe('FeedbackSurface — gate', () => {
-  it('renders nothing and yields undefined gutter classes when unconfigured', () => {
-    window.__JURNAL_ZITN_CONFIG__ = undefined;
-    const { container } = render(<FeedbackSurface />);
-    expect(container.firstChild).toBeNull();
-    expect(feedbackMainGutterClasses(false)).toBeUndefined();
-    expect(feedbackMainGutterClasses(true)).toBeUndefined();
+async function fillAndSend(ratingType = 'Bug', message = 'sepuluh karakter lebih') {
+  const user = userEvent.setup();
+  await user.click(tab());
+  await user.click(screen.getByRole('radio', { name: ratingType }));
+  await user.type(screen.getByRole('textbox'), message);
+  await user.click(screen.getByRole('button', { name: 'Send' }));
+  return user;
+}
+
+describe('FeedbackSurface — always available, off PostHog', () => {
+  it('renders the tab without any survey-config gate and always yields gutter classes', () => {
+    render(<FeedbackSurface />);
+    expect(tab()).toBeTruthy();
+    expect(tab().getAttribute('aria-label')).toBe('Send feedback');
+    expect(typeof feedbackMainGutterClasses(false)).toBe('string');
+    expect(feedbackMainGutterClasses(false).length).toBeGreaterThan(0);
   });
 
-  it('renders the tab with the aria contract when configured, aria-controls resolving to the open content', async () => {
+  it('opens the popover and never calls PostHog', async () => {
     const user = userEvent.setup();
     render(<FeedbackSurface />);
-
-    const trigger = tab();
-    expect(trigger.getAttribute('aria-label')).toBe('Send feedback');
-    expect(trigger.getAttribute('aria-expanded')).toBe('false');
-
-    await user.click(trigger);
-
-    expect(trigger.getAttribute('aria-expanded')).toBe('true');
-    const controls = trigger.getAttribute('aria-controls');
-    expect(controls).toBeTruthy();
-    const content = document.getElementById(controls!);
-    expect(content).not.toBeNull();
-    expect(content).toBe(screen.getByTestId('feedback-popover'));
-  });
-});
-
-describe('FeedbackSurface — survey shown', () => {
-  it('fires on open, not on mount', async () => {
-    const user = userEvent.setup();
-    render(<FeedbackSurface />);
-    expect(shown).not.toHaveBeenCalled();
-
     await user.click(tab());
-
-    expect(shown).toHaveBeenCalledTimes(1);
-    expect(shown).toHaveBeenCalledWith(IDS);
-  });
-});
-
-describe('FeedbackSurface — close funnel (exactly one dismissal per open)', () => {
-  it('captures exactly one dismissal on a close without send', async () => {
-    const user = userEvent.setup();
-    render(<FeedbackSurface />);
-
-    await user.click(tab());
-    await user.keyboard('{Escape}');
-
-    await waitFor(() => expect(dismissed).toHaveBeenCalledTimes(1));
-    const [ids, submissionId] = dismissed.mock.calls[0];
-    expect(ids).toEqual(IDS);
-    expect(typeof submissionId).toBe('string');
-    expect(submissionId.length).toBeGreaterThan(0);
-    expect(sent).not.toHaveBeenCalled();
-  });
-
-  // fireEvent (synchronous) drives the fake-timer cases — userEvent's internal
-  // delays deadlock against vitest fake timers.
-  it('does not capture a dismissal on the after-send close', () => {
-    vi.useFakeTimers();
-    render(<FeedbackSurface />);
-
-    fireEvent.click(tab());
-    fireEvent.click(screen.getByRole('radio', { name: '3' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
-    expect(sent).toHaveBeenCalledTimes(1);
-
-    // The 3 s sent-state dwell auto-closes through the funnel; sent ⇒ no dismissal.
-    act(() => {
-      vi.advanceTimersByTime(3000);
-    });
-
-    expect(dismissed).not.toHaveBeenCalled();
-    expect(screen.queryByTestId('feedback-popover')).toBeNull();
-  });
-});
-
-describe('FeedbackSurface — drawer-change effect', () => {
-  it('closes as exactly one dismissal on a drawerOpen flip (false → true) while open', async () => {
-    const user = userEvent.setup();
-    render(<FeedbackSurface />);
-
-    await user.click(tab());
-    act(() => {
-      useDrawerStore.setState({ isOpen: true });
-    });
-
-    await waitFor(() => expect(dismissed).toHaveBeenCalledTimes(1));
-    expect(sent).not.toHaveBeenCalled();
-  });
-
-  it('closes as exactly one dismissal on a drawerOpen flip (true → false) while open', async () => {
-    act(() => {
-      useDrawerStore.setState({ isOpen: true });
-    });
-    const user = userEvent.setup();
-    render(<FeedbackSurface />);
-
-    await user.click(tab());
-    act(() => {
-      useDrawerStore.setState({ isOpen: false });
-    });
-
-    await waitFor(() => expect(dismissed).toHaveBeenCalledTimes(1));
-  });
-
-  it('captures nothing when a drawerOpen flip lands during the sent dwell', () => {
-    vi.useFakeTimers();
-    render(<FeedbackSurface />);
-
-    fireEvent.click(tab());
-    fireEvent.click(screen.getByRole('radio', { name: '2' }));
-    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
-    expect(sent).toHaveBeenCalledTimes(1);
-
-    // Drawer flips while the "Sent." state dwells — already sent, so the funnel
-    // closes immediately and captures nothing.
-    act(() => {
-      useDrawerStore.setState({ isOpen: true });
-    });
-    expect(dismissed).not.toHaveBeenCalled();
-
-    act(() => {
-      vi.advanceTimersByTime(3000);
-    });
-    expect(dismissed).not.toHaveBeenCalled();
-    expect(sent).toHaveBeenCalledTimes(1);
-  });
-
-  it('closes as one dismissal when isMobile flips to true with the drawer open', async () => {
-    act(() => {
-      useDrawerStore.setState({ isOpen: true });
-    });
-    setMobile(false);
-    const user = userEvent.setup();
-    const { rerender } = render(<FeedbackSurface />);
-
-    await user.click(tab());
-
-    // Resize crosses below md with the drawer open — the tab hides and the
-    // popover must close.
-    setMobile(true);
-    rerender(<FeedbackSurface />);
-
-    await waitFor(() => expect(dismissed).toHaveBeenCalledTimes(1));
-  });
-
-  it('does NOT close on an isMobile flip while the drawer is closed (must-not-fire)', async () => {
-    setMobile(false);
-    const user = userEvent.setup();
-    const { rerender } = render(<FeedbackSurface />);
-
-    await user.click(tab());
-    expect(shown).toHaveBeenCalledTimes(1);
-
-    setMobile(true);
-    rerender(<FeedbackSurface />);
-
-    // Drawer closed ⇒ the resize clause never fires; the popover stays open.
-    expect(dismissed).not.toHaveBeenCalled();
     expect(screen.getByTestId('feedback-popover')).toBeTruthy();
-  });
-
-  it('still yields exactly one dismissal when a timer close races a Radix close', () => {
-    vi.useFakeTimers();
-    render(<FeedbackSurface />);
-
-    fireEvent.click(tab());
-
-    // A deferred "timer close" (a drawer flip on a timer) armed to race a Radix
-    // close (a trigger re-click) of the same open. The once-per-open guard
-    // collapses both to a single dismissal.
-    setTimeout(() => {
-      useDrawerStore.setState({ isOpen: true });
-    }, 5);
-    fireEvent.click(tab()); // Radix onOpenChange(false)
-    act(() => {
-      vi.advanceTimersByTime(10);
-    });
-
-    expect(dismissed).toHaveBeenCalledTimes(1);
-    expect(sent).not.toHaveBeenCalled();
-  });
-});
-
-describe('FeedbackSurface — cross-open (REQ-4.8)', () => {
-  it('two full open→rate→Send cycles emit two survey-sent captures with distinct submission ids', async () => {
-    const user = userEvent.setup();
-    render(<FeedbackSurface />);
-
-    // Cycle 1.
-    await user.click(tab());
-    await user.click(screen.getByRole('radio', { name: '3' }));
-    await user.click(screen.getByRole('button', { name: 'Send' }));
-    // Close the sent state without waiting on the dwell timer.
-    await user.keyboard('{Escape}');
-
-    // Cycle 2 — a fresh open remounts the form, resetting its guard.
-    await user.click(tab());
-    await user.click(screen.getByRole('radio', { name: '4' }));
-    await user.click(screen.getByRole('button', { name: 'Send' }));
-
-    expect(sent).toHaveBeenCalledTimes(2);
-    expect(dismissed).not.toHaveBeenCalled();
-
-    const firstSubmissionId = sent.mock.calls[0][1];
-    const secondSubmissionId = sent.mock.calls[1][1];
-    expect(typeof firstSubmissionId).toBe('string');
-    expect(firstSubmissionId).not.toBe(secondSubmissionId);
-    // Ratings carried through per cycle.
-    expect(sent.mock.calls[0][2]).toBe(3);
-    expect(sent.mock.calls[1][2]).toBe(4);
-  });
-});
-
-describe('FeedbackSurface — mount silence', () => {
-  it('emits nothing when mounted with persisted-open drawer state on a phone', () => {
-    act(() => {
-      useDrawerStore.setState({ isOpen: true });
-    });
-    setMobile(true);
-
-    render(<FeedbackSurface />);
-
     expect(shown).not.toHaveBeenCalled();
     expect(sent).not.toHaveBeenCalled();
+    expect(dismissed).not.toHaveBeenCalled();
+  });
+});
+
+describe('FeedbackSurface — submission goes to our API', () => {
+  it('sends { type, message, pageUrl, source } to the mutation and shows the sent state', async () => {
+    render(<FeedbackSurface />);
+    await fillAndSend('Feature', 'Ini pesan umpan balik yang cukup panjang');
+
+    expect(mutate).toHaveBeenCalledTimes(1);
+    const [body] = mutate.mock.calls[0];
+    expect(body).toMatchObject({
+      type: 'feature',
+      message: 'Ini pesan umpan balik yang cukup panjang',
+      source: 'jurnal',
+    });
+    expect(typeof body.pageUrl).toBe('string');
+    expect(sent).not.toHaveBeenCalled();
+
+    // Resolve the request: the parent's onSuccess shows the sent state.
+    const options = mutate.mock.calls[0][1] as { onSuccess?: () => void };
+    act(() => options.onSuccess?.());
+    expect(screen.getByText('Sent. Thank you.')).toBeTruthy();
+    expect(sent).not.toHaveBeenCalled();
+  });
+
+  it('shows an inline error when the request fails', async () => {
+    render(<FeedbackSurface />);
+    await fillAndSend('Bug', 'Pesan bug yang cukup panjang');
+
+    const options = mutate.mock.calls[0][1] as { onError?: () => void };
+    act(() => options.onError?.());
+    expect(screen.getByRole('alert').textContent).toContain('Failed to send');
+  });
+
+  it('auto-closes the sent state after the dwell, with no capture', () => {
+    vi.useFakeTimers();
+    render(<FeedbackSurface />);
+    fireEvent.click(tab());
+    fireEvent.click(screen.getByRole('radio', { name: 'Question' }));
+    fireEvent.change(screen.getByRole('textbox'), {
+      target: { value: 'Pertanyaan yang cukup panjang' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
+
+    const options = mutate.mock.calls[0][1] as { onSuccess?: () => void };
+    act(() => options.onSuccess?.());
+    act(() => {
+      vi.advanceTimersByTime(SENT_STATE_DWELL_MS);
+    });
+
+    expect(screen.queryByTestId('feedback-popover')).toBeNull();
+    expect(sent).not.toHaveBeenCalled();
+    expect(dismissed).not.toHaveBeenCalled();
+  });
+});
+
+describe('FeedbackSurface — drawer-follow', () => {
+  it('closes the popover on a drawerOpen flip while open, with no capture', async () => {
+    const user = userEvent.setup();
+    render(<FeedbackSurface />);
+    await user.click(tab());
+    act(() => {
+      useDrawerStore.setState({ isOpen: true });
+    });
+    await waitFor(() => expect(screen.queryByTestId('feedback-popover')).toBeNull());
+    expect(dismissed).not.toHaveBeenCalled();
+  });
+
+  it('hides the tab and closes on a mobile flip with the drawer open', async () => {
+    act(() => {
+      useDrawerStore.setState({ isOpen: true });
+    });
+    setMobile(false);
+    const user = userEvent.setup();
+    const { rerender } = render(<FeedbackSurface />);
+    await user.click(tab());
+
+    setMobile(true);
+    rerender(<FeedbackSurface />);
+    await waitFor(() => expect(screen.queryByTestId('feedback-popover')).toBeNull());
     expect(dismissed).not.toHaveBeenCalled();
   });
 });

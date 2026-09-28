@@ -29,15 +29,22 @@ vi.mock('@/features/advisor/pages/AdvisorPage', () => ({
   AdvisorPage: () => <div data-testid="advisor-page" />,
 }));
 
+// Same for the options page (advisor-bound, withdrawn together with it).
+vi.mock('@/features/options/components/OptionsPage', () => ({
+  OptionsPage: () => <div data-testid="options-page" />,
+}));
+
 import { Route as AdvisorIndexRoute } from '../_auth.advisor.index';
 import { Route as AdvisorNewRoute } from '../_auth.advisor.new';
 import { Route as AdvisorIdRoute } from '../_auth.advisor.$id';
+import { Route as OptionsRoute } from '../_auth.options';
 import { Route as SettingsAdvisorRoute } from '../_auth.settings.advisor';
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 const indexOpts = AdvisorIndexRoute.options as any;
 const newOpts = AdvisorNewRoute.options as any;
 const idOpts = AdvisorIdRoute.options as any;
+const optionsOpts = OptionsRoute.options as any;
 const settingsAdvisorOpts = SettingsAdvisorRoute.options as any;
 
 // ---- Test router ----------------------------------------------------------
@@ -81,6 +88,12 @@ function buildRouter(initialPath: string) {
     beforeLoad: idOpts.beforeLoad,
     component: idOpts.component,
   });
+  const options = createRoute({
+    getParentRoute: () => rootRoute as any,
+    path: '/options',
+    beforeLoad: optionsOpts.beforeLoad,
+    component: optionsOpts.component,
+  });
 
   const routeTree = rootRoute.addChildren([
     dashboard,
@@ -89,6 +102,7 @@ function buildRouter(initialPath: string) {
     advisorIndex,
     advisorNew,
     advisorId,
+    options,
   ]);
 
   return createRouter({
@@ -143,5 +157,25 @@ describe('advisor routes on an instance that withdrew the advisor', () => {
 
     expect(await screen.findByTestId('advisor-page')).toBeTruthy();
     expect(router.state.location.pathname).toBe('/advisor/new');
+  });
+});
+
+describe('options route on an instance that withdrew the advisor (A7)', () => {
+  it('/options lands on the dashboard and the options page never mounts', async () => {
+    posture.advisorEnabled = false;
+    const router = renderAt('/options');
+
+    await waitFor(() => {
+      expect(router.state.location.pathname).toBe('/dashboard');
+    });
+    expect(await screen.findByTestId('dashboard')).toBeTruthy();
+    expect(screen.queryByTestId('options-page')).toBeNull();
+  });
+
+  it('renders where the advisor (and thus options) is offered', async () => {
+    const router = renderAt('/options');
+
+    expect(await screen.findByTestId('options-page')).toBeTruthy();
+    expect(router.state.location.pathname).toBe('/options');
   });
 });

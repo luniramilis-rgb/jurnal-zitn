@@ -88,16 +88,17 @@ spec.paths = Object.fromEntries(
 );
 const droppedKeys = Object.keys(rawPaths).length - Object.keys(spec.paths).length;
 
-// The advisor is withdrawn while it is reworked (DISABLE_ADVISOR defaults to
-// true; every /api/advisor route answers 403) and the docs no longer describe
-// it, so its endpoints and tag are left out of the published reference. The
-// `@swagger` blocks stay with the routes; drop this filter when it returns.
-const HIDDEN_PATH = /^\/api\/advisor(\/|$)/;
+// The advisor AND the US-style options tools are withdrawn while the advisor is
+// reworked (DISABLE_ADVISOR defaults to true; /api/advisor/* and /api/options/*
+// answer 403) and the docs no longer describe them, so their endpoints and tags
+// are left out of the published reference. The `@swagger` blocks stay with the
+// routes; drop these filters when the surfaces return.
+const HIDDEN_PATH = /^\/api\/(advisor|options)(\/|$)/;
 spec.paths = Object.fromEntries(
   Object.entries(spec.paths).filter(([key]) => !HIDDEN_PATH.test(key)),
 );
 if (Array.isArray(spec.tags)) {
-  spec.tags = spec.tags.filter((tag) => !/advisor/i.test(tag?.name ?? ''));
+  spec.tags = spec.tags.filter((tag) => !/advisor|options/i.test(tag?.name ?? ''));
 }
 
 const pathCount = Object.keys(spec.paths).length;

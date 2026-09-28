@@ -30,6 +30,10 @@ export const positions = pgTable(
     notes: text('notes'),
     targetPrice: numeric('target_price', { precision: 18, scale: 8 }),
     stopLoss: numeric('stop_loss', { precision: 18, scale: 8 }),
+    // F4 — SOFT link to a playbook (ZITN-TECH-017 §10.8). Deliberately NOT a
+    // foreign key: deleting a playbook must leave its trades untouched (a
+    // dangling id is fine, the per-setup aggregate simply ignores it).
+    playbookId: uuid('playbook_id'),
     openedAt: timestamp('opened_at', { withTimezone: true }),
     closedAt: timestamp('closed_at', { withTimezone: true }),
     // --- Latched flat-only snapshot (performance bucket A) ---

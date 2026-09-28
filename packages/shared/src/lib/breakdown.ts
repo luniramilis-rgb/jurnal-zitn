@@ -14,6 +14,10 @@ export interface BreakdownPosition extends ClassifiedPosition {
   symbol: string;
   assetType: 'stock' | 'option';
   tags: Tag[];
+  // Fase F2: the position's ENTRY instant (earliest entry fill, falling back to
+  // the stored open/created instant). Distinct from `closedAt`; used by the
+  // entry-time distribution (weekday/hour) analysis.
+  entryAt: Date;
 }
 
 // D3: an option keys on its parsed underlying (falling back to the stored symbol

@@ -54,6 +54,8 @@ export const CreatePositionSchema = z
     notes: z.string().max(10000).nullable().optional(),
     targetPrice: tradePlanPrice.nullable().optional(),
     stopLoss: tradePlanPrice.nullable().optional(),
+    // F4 soft link to a playbook (no FK). Null clears the link.
+    playbookId: z.string().uuid().nullable().optional(),
   })
   .superRefine(refineOptionSymbol);
 
@@ -68,6 +70,8 @@ export const UpdatePositionSchema = z
     notes: z.string().max(10000).nullable().optional(),
     targetPrice: tradePlanPrice.nullable().optional(),
     stopLoss: tradePlanPrice.nullable().optional(),
+    // F4 soft link — editable on any status (like notes/target/stop).
+    playbookId: z.string().uuid().nullable().optional(),
   })
   .superRefine(refineOptionSymbol);
 
@@ -206,6 +210,8 @@ export const PositionListItemSchema = z.object({
   // carry one; null for draft/open rows. Optional so callers that do not compute
   // it can omit the key.
   classification: ClassificationSchema.nullable().optional(),
+  // F4 soft link to a playbook; null/absent when unlinked.
+  playbookId: z.string().uuid().nullable().optional(),
 });
 
 export const PositionDetailSchema = z.object({
@@ -256,6 +262,8 @@ export const PositionDetailSchema = z.object({
   // carry one; null for draft/open rows. Optional so callers that do not compute
   // it can omit the key.
   classification: ClassificationSchema.nullable().optional(),
+  // F4 soft link to a playbook; null/absent when unlinked.
+  playbookId: z.string().uuid().nullable().optional(),
 });
 
 export type CreatePositionInput = z.infer<typeof CreatePositionSchema>;

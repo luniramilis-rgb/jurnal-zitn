@@ -16,7 +16,9 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as AuthRouteImport } from './routes/_auth'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthTradePlansRouteImport } from './routes/_auth.trade-plans'
 import { Route as AuthSettingsRouteImport } from './routes/_auth.settings'
+import { Route as AuthPlaybooksRouteImport } from './routes/_auth.playbooks'
 import { Route as AuthPerformanceRouteImport } from './routes/_auth.performance'
 import { Route as AuthOptionsRouteImport } from './routes/_auth.options'
 import { Route as AuthLembarRouteImport } from './routes/_auth.lembar'
@@ -78,9 +80,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthTradePlansRoute = AuthTradePlansRouteImport.update({
+  id: '/trade-plans',
+  path: '/trade-plans',
+  getParentRoute: () => AuthRoute,
+} as any)
 const AuthSettingsRoute = AuthSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthPlaybooksRoute = AuthPlaybooksRouteImport.update({
+  id: '/playbooks',
+  path: '/playbooks',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthPerformanceRoute = AuthPerformanceRouteImport.update({
@@ -232,7 +244,9 @@ export interface FileRoutesByFullPath {
   '/lembar': typeof AuthLembarRoute
   '/options': typeof AuthOptionsRoute
   '/performance': typeof AuthPerformanceRoute
+  '/playbooks': typeof AuthPlaybooksRoute
   '/settings': typeof AuthSettingsRouteWithChildren
+  '/trade-plans': typeof AuthTradePlansRoute
   '/accounting/expenses': typeof AuthAccountingExpensesRoute
   '/accounting/fee-rollup': typeof AuthAccountingFeeRollupRoute
   '/accounting/tax-summary': typeof AuthAccountingTaxSummaryRoute
@@ -267,7 +281,9 @@ export interface FileRoutesByTo {
   '/lembar': typeof AuthLembarRoute
   '/options': typeof AuthOptionsRoute
   '/performance': typeof AuthPerformanceRoute
+  '/playbooks': typeof AuthPlaybooksRoute
   '/settings': typeof AuthSettingsRouteWithChildren
+  '/trade-plans': typeof AuthTradePlansRoute
   '/accounting/expenses': typeof AuthAccountingExpensesRoute
   '/accounting/fee-rollup': typeof AuthAccountingFeeRollupRoute
   '/accounting/tax-summary': typeof AuthAccountingTaxSummaryRoute
@@ -304,7 +320,9 @@ export interface FileRoutesById {
   '/_auth/lembar': typeof AuthLembarRoute
   '/_auth/options': typeof AuthOptionsRoute
   '/_auth/performance': typeof AuthPerformanceRoute
+  '/_auth/playbooks': typeof AuthPlaybooksRoute
   '/_auth/settings': typeof AuthSettingsRouteWithChildren
+  '/_auth/trade-plans': typeof AuthTradePlansRoute
   '/_auth/accounting/expenses': typeof AuthAccountingExpensesRoute
   '/_auth/accounting/fee-rollup': typeof AuthAccountingFeeRollupRoute
   '/_auth/accounting/tax-summary': typeof AuthAccountingTaxSummaryRoute
@@ -341,7 +359,9 @@ export interface FileRouteTypes {
     | '/lembar'
     | '/options'
     | '/performance'
+    | '/playbooks'
     | '/settings'
+    | '/trade-plans'
     | '/accounting/expenses'
     | '/accounting/fee-rollup'
     | '/accounting/tax-summary'
@@ -376,7 +396,9 @@ export interface FileRouteTypes {
     | '/lembar'
     | '/options'
     | '/performance'
+    | '/playbooks'
     | '/settings'
+    | '/trade-plans'
     | '/accounting/expenses'
     | '/accounting/fee-rollup'
     | '/accounting/tax-summary'
@@ -412,7 +434,9 @@ export interface FileRouteTypes {
     | '/_auth/lembar'
     | '/_auth/options'
     | '/_auth/performance'
+    | '/_auth/playbooks'
     | '/_auth/settings'
+    | '/_auth/trade-plans'
     | '/_auth/accounting/expenses'
     | '/_auth/accounting/fee-rollup'
     | '/_auth/accounting/tax-summary'
@@ -492,11 +516,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_auth/trade-plans': {
+      id: '/_auth/trade-plans'
+      path: '/trade-plans'
+      fullPath: '/trade-plans'
+      preLoaderRoute: typeof AuthTradePlansRouteImport
+      parentRoute: typeof AuthRoute
+    }
     '/_auth/settings': {
       id: '/_auth/settings'
       path: '/settings'
       fullPath: '/settings'
       preLoaderRoute: typeof AuthSettingsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/playbooks': {
+      id: '/_auth/playbooks'
+      path: '/playbooks'
+      fullPath: '/playbooks'
+      preLoaderRoute: typeof AuthPlaybooksRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/performance': {
@@ -733,7 +771,9 @@ interface AuthRouteChildren {
   AuthLembarRoute: typeof AuthLembarRoute
   AuthOptionsRoute: typeof AuthOptionsRoute
   AuthPerformanceRoute: typeof AuthPerformanceRoute
+  AuthPlaybooksRoute: typeof AuthPlaybooksRoute
   AuthSettingsRoute: typeof AuthSettingsRouteWithChildren
+  AuthTradePlansRoute: typeof AuthTradePlansRoute
   AuthAccountsAccountIdRoute: typeof AuthAccountsAccountIdRoute
   AuthAdvisorIdRoute: typeof AuthAdvisorIdRoute
   AuthAdvisorNewRoute: typeof AuthAdvisorNewRoute
@@ -754,7 +794,9 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthLembarRoute: AuthLembarRoute,
   AuthOptionsRoute: AuthOptionsRoute,
   AuthPerformanceRoute: AuthPerformanceRoute,
+  AuthPlaybooksRoute: AuthPlaybooksRoute,
   AuthSettingsRoute: AuthSettingsRouteWithChildren,
+  AuthTradePlansRoute: AuthTradePlansRoute,
   AuthAccountsAccountIdRoute: AuthAccountsAccountIdRoute,
   AuthAdvisorIdRoute: AuthAdvisorIdRoute,
   AuthAdvisorNewRoute: AuthAdvisorNewRoute,

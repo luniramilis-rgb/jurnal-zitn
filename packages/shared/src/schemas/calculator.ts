@@ -106,6 +106,9 @@ export const CalculatorOutputSchema = z.object({
   totalPositionValue: z.string(),
   perUnitReward: z.string().optional(),
   riskRewardRatio: z.string().optional(),
+  // F1: the win rate at which this setup breaks even, as a percent (1 dp).
+  // Derived from the fee-adjusted reward:risk when fees are known, else gross.
+  breakevenWinRate: z.string().optional(),
   estimatedFees: z.string().optional(),
   feeToRiskPercent: z.string().optional(),
   adjustedDollarRisk: z.string().optional(),

@@ -2,6 +2,7 @@ import Decimal from 'decimal.js';
 
 import { calculateFees } from './fees';
 import type { FillInput } from './fees';
+import { breakevenWinRate } from './lib/risk';
 import { DOLLAR_RISK_MAX } from './schemas/calculator';
 import type { CalculatorInput, CalculatorOutput } from './schemas/calculator';
 
@@ -208,6 +209,14 @@ export function calculateTrade(input: CalculatorInput): CalculatorOutput {
       const adjustedRR = adjustedReward.div(adjustedDollarRisk);
       output.adjustedRiskRewardRatio = to2dp(adjustedRR);
     }
+  }
+
+  // F1: breakeven win rate. Prefer the fee-adjusted reward:risk — the real
+  // hurdle once costs are paid — and fall back to the gross ratio.
+  const hurdleRatio = output.adjustedRiskRewardRatio ?? output.riskRewardRatio;
+  if (hurdleRatio !== undefined) {
+    const rate = breakevenWinRate(Number(hurdleRatio));
+    if (rate !== null) output.breakevenWinRate = rate.toFixed(1);
   }
 
   return output;

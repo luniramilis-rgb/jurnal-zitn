@@ -5,10 +5,11 @@ import { createElement, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type {
-  DashboardLayoutResponse,
-  PutDashboardLayoutRequest,
-  WidgetPlacement,
+import {
+  BODY_LIMIT_BYTES,
+  type DashboardLayoutResponse,
+  type PutDashboardLayoutRequest,
+  type WidgetPlacement,
 } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
@@ -22,6 +23,11 @@ vi.mock('sonner', () => ({
 }));
 
 const QUERY_KEY = ['dashboard', 'layout'] as const;
+
+// A string that is UNDER BODY_LIMIT_BYTES by String.length but OVER it in UTF-8
+// bytes: `€` is one UTF-16 unit and three UTF-8 bytes, so a String.length-based
+// check would pass while the byte-aware check must reject.
+const OVER_LIMIT_UTF8_TEXT = '\u20AC'.repeat(Math.floor(BODY_LIMIT_BYTES * 0.6));
 
 const sampleWidget: WidgetPlacement = {
   id: '00000000-0000-4000-8000-000000000001',
@@ -135,19 +141,18 @@ describe('useDashboardLayout', () => {
     expect(invalidateSpy).toHaveBeenCalledWith({ queryKey: ['dashboard', 'layout'] });
   });
 
-  it('§B2-r4: body-size pre-check rejects with LOCAL_BODY_TOO_LARGE when UTF-8 byte length > 16384', async () => {
+  it('§B2-r4: body-size pre-check rejects with LOCAL_BODY_TOO_LARGE when UTF-8 byte length > BODY_LIMIT_BYTES', async () => {
     vi.spyOn(api, 'get').mockResolvedValue(initialResponse);
     const putSpy = vi.spyOn(api, 'put').mockResolvedValue(initialResponse);
     const qc = makeQueryClient();
     const { result } = renderHook(() => useDashboardLayout(), { wrapper: makeWrapper(qc) });
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    // 5000 chars of a 4-byte UTF-8 emoji (surrogate pair) = String.length 10000 (UTF-16 units)
-    // = 20000 UTF-8 bytes. Both > 16384 bytes AND String.length (10000) < 16384.
-    // This proves the check is UTF-8-byte-aware, not String.length-based.
-    const big = '\u{1F600}'.repeat(5000);
-    expect(big.length).toBeLessThan(16384);
-    expect(new TextEncoder().encode(big).length).toBeGreaterThan(16384);
+    // A string that is under BODY_LIMIT_BYTES by String.length but over it in
+    // UTF-8 bytes. This proves the check is UTF-8-byte-aware, not length-based.
+    const big = OVER_LIMIT_UTF8_TEXT;
+    expect(big.length).toBeLessThan(BODY_LIMIT_BYTES);
+    expect(new TextEncoder().encode(big).length).toBeGreaterThan(BODY_LIMIT_BYTES);
 
     const huge: PutDashboardLayoutRequest = {
       widgets: [{ ...sampleWidget, config: { blob: big } }],
@@ -255,7 +260,7 @@ describe('useDashboardLayout', () => {
     );
   });
 
-  it('flushPending size check: pending body exceeding 16384 bytes triggers toast.error and does NOT call fetch', async () => {
+  it('flushPending size check: pending body exceeding BODY_LIMIT_BYTES triggers toast.error and does NOT call fetch', async () => {
     vi.useFakeTimers();
     vi.spyOn(api, 'get').mockResolvedValue(initialResponse);
     const fetchSpy = vi.fn().mockResolvedValue(new Response(null, { status: 204 }));
@@ -267,7 +272,7 @@ describe('useDashboardLayout', () => {
     // Wait for initial GET via fake timers — manually flush microtasks.
     await vi.waitFor(() => expect(result.current.isSuccess).toBe(true));
 
-    const big = '\u{1F600}'.repeat(5000); // > 16384 bytes UTF-8
+    const big = OVER_LIMIT_UTF8_TEXT; // > BODY_LIMIT_BYTES UTF-8 bytes
     const huge: PutDashboardLayoutRequest = {
       widgets: [{ ...sampleWidget, config: { blob: big } }],
     };

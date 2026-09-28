@@ -203,6 +203,80 @@ export const PerformanceStatsSchema = z.object({
   hasLosses: z.boolean(),
 });
 
+// F1 — pure risk & R-multiple analytics (ZITN-TECH-017 §10.5). Definitions are
+// documented on the pure functions in `lib/risk.ts`: Sharpe/Sortino over the
+// per-period P&L stream (annualised by the granularity's periods/year), Calmar
+// as annualised mean P&L over max drawdown, and R-multiple with "average loss
+// = 1R".
+export const RiskHistogramBinSchema = z.object({
+  min: z.number().nullable(),
+  max: z.number().nullable(),
+  count: z.number().int().nonnegative(),
+});
+
+export const RiskSymbolStatsSchema = z.object({
+  key: z.string(),
+  trades: z.number().int().nonnegative(),
+  avgR: z.number().nullable(),
+  expectancyR: z.number().nullable(),
+});
+
+export const RiskStatsSchema = z.object({
+  sharpe: z.number().nullable(),
+  sortino: z.number().nullable(),
+  calmar: z.number().nullable(),
+  maxDrawdown: z.number().nonnegative(),
+  maxDrawdownPct: z.number().nullable(),
+  drawdownPeriods: z.number().int().nonnegative(),
+  avgR: z.number().nullable(),
+  expectancyR: z.number().nullable(),
+  rHistogram: z.array(RiskHistogramBinSchema),
+  rollingWindow: z.number().int().positive(),
+  rollingWinRate: z.number().nullable(),
+  bySymbol: z.array(RiskSymbolStatsSchema),
+});
+
+// F2 — entry-time distribution: P&L, trade count and win rate by the weekday and
+// hour at which the position was ENTERED, in the reporting timezone. Optional on
+// the wire (like `risk`) so fixtures and older consumers stay valid.
+export const TimeBucketStatsSchema = z.object({
+  key: z.string(),
+  label: z.string(),
+  netPnl: decimalString,
+  trades: z.number().int().nonnegative(),
+  winRate: z.number().nullable().refine(percentRefinement, {
+    message: 'timeDistribution winRate must be null or a number in [0, 100] with at most 1 decimal',
+  }),
+});
+
+export const TimeDistributionSchema = z.object({
+  weekday: z.array(TimeBucketStatsSchema),
+  hour: z.array(TimeBucketStatsSchema),
+});
+
+// F3 — behaviour analytics (overtrading / revenge / discipline), entry-time based.
+// Rates are fractions in [0, 1]. Optional on the wire like `risk`.
+export const BehaviorStatsSchema = z.object({
+  overtrading: z.object({
+    activeDays: z.number().int().nonnegative(),
+    overDayCount: z.number().int().nonnegative(),
+    overDayRate: z.number(),
+    threshold: z.number().nullable(),
+    mean: z.number().nullable(),
+  }),
+  revenge: z.object({
+    windowMinutes: z.number().int().positive(),
+    revengeCount: z.number().int().nonnegative(),
+    revengeRate: z.number(),
+  }),
+  discipline: z.object({
+    taggedRate: z.number(),
+    noRevengeRate: z.number(),
+    noOvertradingRate: z.number(),
+    score: z.number().nullable(),
+  }),
+});
+
 export const PerformanceCurrencySchema = z.object({
   code: z.string(),
   historyRange: z.object({
@@ -213,6 +287,13 @@ export const PerformanceCurrencySchema = z.object({
   series: z.array(SeriesBucketSchema),
   equityCurve: z.array(EquityCurvePointSchema),
   stats: PerformanceStatsSchema,
+  // F1 risk analytics. Optional on the wire so fixtures and older consumers stay
+  // valid; the API always emits it.
+  risk: RiskStatsSchema.optional(),
+  // F2 entry-time distribution (weekday/hour). Optional on the wire likewise.
+  timeDistribution: TimeDistributionSchema.optional(),
+  // F3 behaviour analytics. Optional on the wire likewise.
+  behavior: BehaviorStatsSchema.optional(),
 });
 
 // Extracted so the performance and breakdown responses share one shape.
@@ -415,3 +496,8 @@ export type EquityCurvePoint = z.infer<typeof EquityCurvePointSchema>;
 export type PerformanceStats = z.infer<typeof PerformanceStatsSchema>;
 export type PerformanceCurrency = z.infer<typeof PerformanceCurrencySchema>;
 export type PerformanceResponse = z.infer<typeof PerformanceResponseSchema>;
+export type RiskStats = z.infer<typeof RiskStatsSchema>;
+export type RiskSymbolStats = z.infer<typeof RiskSymbolStatsSchema>;
+export type TimeBucketStats = z.infer<typeof TimeBucketStatsSchema>;
+export type TimeDistribution = z.infer<typeof TimeDistributionSchema>;
+export type BehaviorStats = z.infer<typeof BehaviorStatsSchema>;

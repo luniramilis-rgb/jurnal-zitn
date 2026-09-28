@@ -14,7 +14,3 @@
 export const FEEDBACK_TAB_WIDTH_CLASSES = 'w-6 pointer-coarse:w-11';
 export const FEEDBACK_MAIN_GUTTER = 'pointer-coarse:pr-[44px]';
 export const FEEDBACK_MAIN_GUTTER_DRAWER_OPEN = 'pointer-coarse:lg:pr-[404px]';
-
-// The anonymity-copy link target — an alternative channel for feedback that
-// needs a reply (the form itself is anonymous and cannot).
-export const FEEDBACK_ISSUES_URL = 'https://github.com/madmatt112/tradr/issues';

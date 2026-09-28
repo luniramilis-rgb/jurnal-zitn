@@ -15,6 +15,7 @@ export function insertPosition(
     notes?: string | null;
     targetPrice?: string | null;
     stopLoss?: string | null;
+    playbookId?: string | null;
   },
 ) {
   return tx.insert(positions).values(data).returning();

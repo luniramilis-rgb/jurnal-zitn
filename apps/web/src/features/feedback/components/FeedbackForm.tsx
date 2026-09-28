@@ -1,147 +1,128 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+
+import {
+  FEEDBACK_MESSAGE_MAX,
+  FEEDBACK_MESSAGE_MIN,
+  FEEDBACK_TYPES,
+  type FeedbackType,
+  type MessageKey,
+} from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { FEEDBACK_TEXT_MAX_LENGTH } from '@/lib/telemetry/posthog';
+import { useT } from '@/hooks/useLocale';
 import { cn } from '@/lib/utils';
-
-import { FEEDBACK_ISSUES_URL } from '../geometry';
 
 interface FeedbackFormProps {
   sent: boolean;
-  onSend: (rating: number, text: string) => void;
+  submitting: boolean;
+  error: string | null;
+  onSend: (type: FeedbackType, message: string) => void;
 }
 
-const RATINGS = [1, 2, 3, 4, 5] as const;
-// The remaining-character counter appears only inside this last stretch.
-const COUNTER_THRESHOLD = 200;
+const TYPE_LABELS: Record<FeedbackType, MessageKey> = {
+  bug: 'feedback.form.types.bug',
+  feature: 'feedback.form.types.feature',
+  general: 'feedback.form.types.general',
+  question: 'feedback.form.types.question',
+};
 
 /**
- * FeedbackForm — the two-question feedback form (Component 4): a 1–5 rating
- * radiogroup, an optional free-text field, one line of anonymity copy, and a
- * Send button, plus the "Sent. Thank you." swap.
- *
- * Pure presentation. It holds only local input state (rating, text) and a
- * form-local double-activation guard (`sendingRef`); it makes no telemetry
- * call and reads no store. `FEEDBACK_TEXT_MAX_LENGTH` is imported (never
- * redefined). The parent owns the open/sent lifecycle and remounts the form
- * per open (`key={submissionId}`), so the guard resets for free.
+ * FeedbackForm — the in-app feedback composer (ZITN-TECH-017 §10.4, F0b),
+ * mirroring the ZITN dashboard feedback pattern: a type (Bug/Feature/General/
+ * Question), a 10–500 character message, and the page URL sent automatically by
+ * the parent. Pure presentation: it holds local input state and a synchronous
+ * double-submit guard; the parent owns the open/submitting/sent lifecycle.
  */
-export function FeedbackForm({ sent, onSend }: FeedbackFormProps) {
-  const [rating, setRating] = useState<number | null>(null);
-  const [text, setText] = useState('');
-  // Synchronous double-activation guard: checked-and-set in the click handler
-  // before onSend fires, so the parent receives at most one onSend per mount.
+export function FeedbackForm({ sent, submitting, error, onSend }: FeedbackFormProps) {
+  const t = useT();
+  const [type, setType] = useState<FeedbackType | null>(null);
+  const [message, setMessage] = useState('');
+  // Checked-and-set before onSend fires, so the parent receives at most one
+  // submission per mount even on a double click.
   const sendingRef = useRef(false);
-  const buttonRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  // Re-arm the guard when the request settles, so a failed send can be retried.
+  useEffect(() => {
+    if (!submitting) sendingRef.current = false;
+  }, [submitting]);
 
   if (sent) {
-    return <p className="text-sm text-popover-foreground">Sent. Thank you.</p>;
+    return <p className="text-sm text-popover-foreground">{t('feedback.form.sent')}</p>;
   }
 
-  function selectRating(value: number) {
-    setRating(value);
-    buttonRefs.current[value - 1]?.focus();
-  }
-
-  function moveRating(delta: number) {
-    // Roving focus starts on the selected radio, or the first when none is.
-    const current = rating ?? 1;
-    let next = current + delta;
-    if (next > 5) next = 1;
-    if (next < 1) next = 5;
-    selectRating(next);
-  }
-
-  function handleRatingKeyDown(event: React.KeyboardEvent<HTMLButtonElement>) {
-    if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
-      event.preventDefault();
-      moveRating(1);
-    } else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
-      event.preventDefault();
-      moveRating(-1);
-    }
-  }
+  const trimmedLength = message.trim().length;
+  const tooShort = trimmedLength > 0 && trimmedLength < FEEDBACK_MESSAGE_MIN;
+  const canSend = type !== null && trimmedLength >= FEEDBACK_MESSAGE_MIN && !submitting;
 
   function handleSend() {
-    if (rating === null) return;
+    if (!canSend || type === null) return;
     if (sendingRef.current) return;
     sendingRef.current = true;
-    onSend(rating, text);
+    onSend(type, message.trim());
   }
 
-  const remaining = FEEDBACK_TEXT_MAX_LENGTH - text.length;
-  // The tabbable radio is the selected one, or the first when none is selected.
-  const rovingValue = rating ?? 1;
+  const remaining = FEEDBACK_MESSAGE_MAX - message.length;
 
   return (
     <div className="flex flex-col gap-3">
       <div>
-        <div role="radiogroup" aria-label="Rating" className="flex gap-2">
-          {RATINGS.map((value) => {
-            const selected = rating === value;
+        <div
+          role="radiogroup"
+          aria-label={t('feedback.form.typeLabel')}
+          className="flex flex-wrap gap-2"
+        >
+          {FEEDBACK_TYPES.map((value) => {
+            const selected = type === value;
             return (
               <button
                 key={value}
-                ref={(el) => {
-                  buttonRefs.current[value - 1] = el;
-                }}
                 type="button"
                 role="radio"
                 aria-checked={selected}
-                tabIndex={rovingValue === value ? 0 : -1}
-                onClick={() => selectRating(value)}
-                onKeyDown={handleRatingKeyDown}
+                onClick={() => setType(value)}
                 className={cn(
-                  'flex h-10 w-10 cursor-pointer items-center justify-center rounded-md font-mono text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
+                  'cursor-pointer rounded-md border px-3 py-1.5 text-sm font-medium transition-colors outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50',
                   selected
                     ? 'border-2 border-foreground bg-secondary text-secondary-foreground'
-                    : 'border border-input bg-background text-muted-foreground hover:bg-accent hover:text-foreground',
+                    : 'border-input bg-background text-muted-foreground hover:bg-accent hover:text-foreground',
                 )}
               >
-                {value}
+                {t(TYPE_LABELS[value])}
               </button>
             );
           })}
-        </div>
-        <div className="mt-1 flex justify-between text-xs text-muted-foreground">
-          <span>Rough</span>
-          <span>Great</span>
         </div>
       </div>
 
       <div>
         <Textarea
-          aria-label="Details (optional)"
-          maxLength={FEEDBACK_TEXT_MAX_LENGTH}
-          value={text}
-          onChange={(event) => setText(event.target.value)}
+          aria-label={t('feedback.form.messageLabel')}
+          placeholder={t('feedback.form.messagePlaceholder')}
+          maxLength={FEEDBACK_MESSAGE_MAX}
+          value={message}
+          onChange={(event) => setMessage(event.target.value)}
         />
-        {remaining < COUNTER_THRESHOLD && (
-          <p className="mt-1 text-xs text-muted-foreground">{remaining} characters remaining</p>
-        )}
+        <div className="mt-1 flex justify-between text-xs text-muted-foreground">
+          <span>{tooShort ? t('feedback.form.tooShort') : ''}</span>
+          {remaining < 200 && <span>{t('feedback.form.counter', { n: remaining })}</span>}
+        </div>
       </div>
 
-      <p className="text-xs text-muted-foreground">
-        This is anonymous, so we can&apos;t reply. For something that needs an answer, open a{' '}
-        <a
-          href={FEEDBACK_ISSUES_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="cursor-pointer underline hover:text-foreground"
-        >
-          GitHub issue
-        </a>
-        .
-      </p>
+      <p className="text-xs text-muted-foreground">{t('feedback.form.pageNote')}</p>
+
+      {error && (
+        <p role="alert" className="text-xs text-destructive">
+          {error}
+        </p>
+      )}
 
       <Button
         type="button"
         className="w-full cursor-pointer"
-        disabled={rating === null}
+        disabled={!canSend}
         onClick={handleSend}
       >
-        Send
+        {t('feedback.form.send')}
       </Button>
     </div>
   );

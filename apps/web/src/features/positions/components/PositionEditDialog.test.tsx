@@ -10,6 +10,9 @@ import type { PositionDetail } from '@jurnal-zitn/shared';
 const { mutateAsync } = vi.hoisted(() => ({ mutateAsync: vi.fn() }));
 
 // Mock the update mutation hook (the only hook PositionEditDialog calls).
+vi.mock('@/features/playbook/hooks/usePlaybooks', () => ({
+  usePlaybooks: () => ({ data: { items: [] } }),
+}));
 vi.mock('../hooks/usePosition', () => ({
   useUpdatePosition: () => ({ mutateAsync, isPending: false }),
 }));
@@ -107,6 +110,7 @@ describe('PositionEditDialog', () => {
       notes: 'updated',
       targetPrice: null,
       stopLoss: null,
+      playbookId: null,
     });
   });
 
@@ -145,6 +149,7 @@ describe('PositionEditDialog', () => {
       notes: 'new note',
       targetPrice: null,
       stopLoss: null,
+      playbookId: null,
     });
   });
 
@@ -188,6 +193,7 @@ describe('PositionEditDialog', () => {
       notes: 'legacy',
       targetPrice: null,
       stopLoss: null,
+      playbookId: null,
     });
   });
 
@@ -231,6 +237,7 @@ describe('PositionEditDialog', () => {
       notes: 'edited',
       targetPrice: null,
       stopLoss: null,
+      playbookId: null,
     });
   });
 
@@ -258,6 +265,7 @@ describe('PositionEditDialog', () => {
       notes: 'plan',
       targetPrice: '160',
       stopLoss: '148',
+      playbookId: null,
     });
   });
 
@@ -273,6 +281,7 @@ describe('PositionEditDialog', () => {
       notes: 'plan',
       targetPrice: null,
       stopLoss: '145',
+      playbookId: null,
     });
   });
 });

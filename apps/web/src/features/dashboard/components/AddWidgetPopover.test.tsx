@@ -4,9 +4,12 @@ import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { WidgetPlacement, WidgetType } from '@jurnal-zitn/shared';
+import { WidgetTypeSchema } from '@jurnal-zitn/shared';
 
 import { setAppLocale } from '@/lib/locale';
 import { newWidgetId } from '@/lib/uuid-fallback';
+
+import { widgetRegistry } from '../widgets/registry';
 
 import { AddWidgetPopover, findFirstSlot } from './AddWidgetPopover';
 
@@ -65,7 +68,7 @@ describe('AddWidgetPopover', () => {
     expect(slot).toEqual({ x: 0, y: 2 });
   });
 
-  it('excludes placedTypes from the list and renders remaining four sorted by displayName', () => {
+  it('excludes placedTypes from the list and renders the rest sorted by displayName', () => {
     const { root } = mountIntoBody();
     act(() => {
       root.render(
@@ -81,14 +84,13 @@ describe('AddWidgetPopover', () => {
     // Excluded types absent.
     expect(types).not.toContain('stats-summary');
     expect(types).not.toContain('open-positions');
-    // Other four present, sorted by displayName ascending:
-    // 'Account Balances', 'Equity Curve', 'Performance Chart', 'Position Sizing'.
-    expect(labels).toEqual([
-      'Account Balances',
-      'Equity Curve',
-      'Performance Chart',
-      'Position Sizing',
-    ]);
+    // Every other registered type is present, sorted by displayName ascending —
+    // derived from the registry so the roster can grow without editing this test.
+    const expected = Object.values(widgetRegistry)
+      .filter((def) => def.type !== 'stats-summary' && def.type !== 'open-positions')
+      .map((def) => def.displayName)
+      .sort((a, b) => a.localeCompare(b));
+    expect(labels).toEqual(expected);
   });
 
   it('newWidgetId falls back to Math.random v4 when globalThis.crypto.randomUUID is undefined', () => {
@@ -115,27 +117,22 @@ describe('AddWidgetPopover', () => {
     }
   });
 
-  it('transitions from 5-placed (one entry, no empty copy) to 6-placed (empty copy, no entries) via rerender', () => {
-    const fiveTypes: WidgetType[] = [
-      'stats-summary',
-      'open-positions',
-      'performance-chart',
-      'account-balances',
-      'position-sizing',
-    ];
-    const sixTypes: WidgetType[] = [...fiveTypes, 'equity-curve'];
+  it('transitions from all-but-one placed (one entry) to all placed (empty copy) via rerender', () => {
+    const allTypes = [...WidgetTypeSchema.options] as WidgetType[];
+    const allButOne = allTypes.filter((type) => type !== 'equity-curve');
 
     const { root } = mountIntoBody();
-    // First render: 5 placed → "All widgets added." NOT visible AND ONE entry.
+    // First render: everything but one placed → "All widgets added." NOT visible
+    // AND exactly the remaining type is listed.
     act(() => {
-      root.render(<AddWidgetPopover placedTypes={fiveTypes} onAdd={() => undefined} defaultOpen />);
+      root.render(<AddWidgetPopover placedTypes={allButOne} onAdd={() => undefined} defaultOpen />);
     });
     expect(emptyVisible()).toBe(false);
     expect(listedTypes()).toEqual(['equity-curve']);
 
-    // Re-render SAME instance: 6 placed → "All widgets added." IS visible AND no entries.
+    // Re-render SAME instance: every type placed → empty copy IS visible AND no entries.
     act(() => {
-      root.render(<AddWidgetPopover placedTypes={sixTypes} onAdd={() => undefined} defaultOpen />);
+      root.render(<AddWidgetPopover placedTypes={allTypes} onAdd={() => undefined} defaultOpen />);
     });
     expect(emptyVisible()).toBe(true);
     expect(listedTypes()).toEqual([]);
