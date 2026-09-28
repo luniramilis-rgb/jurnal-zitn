@@ -790,8 +790,8 @@ const ID_MESSAGES = {
     'Broker ini dipakai oleh {count} posisi. Mengubah jadwal biaya akan memengaruhi perhitungan biaya posisi tersebut.',
   'broker.confirmFee.bodyMany':
     'Broker ini dipakai oleh {count} posisi. Mengubah jadwal biaya akan memengaruhi perhitungan biaya posisi tersebut.',
-  'broker.fee.perShare': '${amount}/saham',
-  'broker.fee.perContract': '${amount}/kontrak',
+  'broker.fee.perShare': '{amount}/saham',
+  'broker.fee.perContract': '{amount}/kontrak',
   'broker.fee.none': 'Belum ada biaya dikonfigurasi',
   'broker.list.new': 'Broker baru',
   'broker.list.empty': 'Belum ada broker. Buat satu untuk mulai melacak biaya.',
@@ -1644,8 +1644,8 @@ const EN_MESSAGES: Record<MessageKey, string> = {
     'This brokerage is referenced by {count} position. Changing the fee schedule will affect fee calculations for that position.',
   'broker.confirmFee.bodyMany':
     'This brokerage is referenced by {count} positions. Changing the fee schedule will affect fee calculations for those positions.',
-  'broker.fee.perShare': '${amount}/share',
-  'broker.fee.perContract': '${amount}/contract',
+  'broker.fee.perShare': '{amount}/share',
+  'broker.fee.perContract': '{amount}/contract',
   'broker.fee.none': 'No fees configured',
   'broker.list.new': 'New Brokerage',
   'broker.list.empty': 'No brokerages yet. Create one to start tracking fees.',

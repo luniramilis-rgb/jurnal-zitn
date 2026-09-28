@@ -426,8 +426,8 @@ describe('AccountDialog — default risk %', () => {
     updateMutateAsync.mockResolvedValue({ id: 'a' });
     renderDialog(vi.fn(), makeAccount({ defaultRiskPercent: '1.50' }));
 
-    expect(riskSelected(/^1\.50%/)).toBe(true);
-    expect(riskOptionBox(/^1\.50%/).textContent).toContain('current setting');
+    expect(riskSelected(/^1\.5%/)).toBe(true);
+    expect(riskOptionBox(/^1\.5%/).textContent).toContain('current setting');
     expect(riskSelected(/^1%/)).toBe(false);
     expect(riskSelected(/^2%/)).toBe(false);
 
@@ -490,7 +490,7 @@ describe('AccountDialog — default risk %', () => {
     );
 
     expect((screen.getByLabelText('Name') as HTMLInputElement).value).toBe('IBKR Main');
-    expect(riskSelected(/^1\.50%/)).toBe(true);
+    expect(riskSelected(/^1\.5%/)).toBe(true);
 
     // Saving an untouched edit must not clear the rule it just displayed.
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));

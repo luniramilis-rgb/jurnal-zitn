@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { CreateAccountSchema, type CreateAccountInput, type Account } from '@jurnal-zitn/shared';
 import {
   DEFAULT_ACCOUNT_TIMEZONE,
+  formatNumber,
   IANA_TIMEZONES,
   SUPPORTED_CURRENCIES,
 } from '@jurnal-zitn/shared';
@@ -36,7 +37,7 @@ import {
 import { UpgradeLink } from '@/features/billing/UpgradeLink';
 import { useTierState } from '@/features/billing/useTierState';
 import { useBrokerages } from '@/features/brokerages/hooks/useBrokerages';
-import { useT } from '@/hooks/useLocale';
+import { useLocale, useT } from '@/hooks/useLocale';
 import { api } from '@/lib/api';
 import { cn } from '@/lib/utils';
 
@@ -75,6 +76,7 @@ interface AccountDialogProps {
 
 export function AccountDialog({ open, onOpenChange, account }: AccountDialogProps) {
   const t = useT();
+  const { locale } = useLocale();
   const isEdit = !!account;
   const queryClient = useQueryClient();
   const createAccount = useCreateAccount();
@@ -155,7 +157,15 @@ export function AccountDialog({ open, onOpenChange, account }: AccountDialogProp
       note: t(preset.noteKey),
     })),
     ...(customRisk
-      ? [{ value: customRisk, label: `${customRisk}%`, note: t('acct.risk.current') }]
+      ? [
+          {
+            value: customRisk,
+            // Tampilan saja (D5/R13): nilai tersimpan tetap mentah ("1.50"),
+            // label mengikuti locale ("1,5%" id / "1.5%" en).
+            label: `${formatNumber(customRisk, locale)}%`,
+            note: t('acct.risk.current'),
+          },
+        ]
       : []),
     // Absence stays reachable: the calculator seeds its risk percent only from
     // an account that HAS a rule, and clearing one is a documented action the
