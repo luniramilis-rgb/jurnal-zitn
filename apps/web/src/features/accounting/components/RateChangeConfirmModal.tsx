@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
+import { useT } from '@/hooks/useLocale';
 import { formatMoney } from '@/lib/format';
 
 export interface RateChangeConfirmModalProps {
@@ -42,6 +43,7 @@ export function RateChangeConfirmModal({
   onCancel,
   isPending,
 }: RateChangeConfirmModalProps) {
+  const t = useT();
   const displayCurrency = preview?.displayCurrency ?? null;
   const beforeTotal = preview?.beforeTotal ?? null;
   const afterTotal = preview?.afterTotal ?? null;
@@ -64,13 +66,9 @@ export function RateChangeConfirmModal({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent showCloseButton={false}>
         <DialogHeader>
-          <DialogTitle>Confirm rate change</DialogTitle>
+          <DialogTitle>{t('fx.confirm.title')}</DialogTitle>
           <DialogDescription>
-            This rate change updates your displayed total from{' '}
-            <span className="font-semibold text-foreground">{formattedBefore}</span> to
-            approximately <span className="font-semibold text-foreground">{formattedAfter}</span>.
-            The exact total at commit time may differ if other tabs or sequential edits change
-            related rates. Continue?
+            {t('fx.confirm.body', { before: formattedBefore, after: formattedAfter })}
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
@@ -81,10 +79,10 @@ export function RateChangeConfirmModal({
             onClick={onCancel}
             disabled={isPending}
           >
-            Cancel
+            {t('action.cancel')}
           </Button>
           <Button type="button" className="cursor-pointer" onClick={onConfirm} disabled={isPending}>
-            {isPending ? 'Saving...' : 'Continue'}
+            {isPending ? t('common.saving') : t('common.continue')}
           </Button>
         </DialogFooter>
       </DialogContent>

@@ -2,7 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 
-import { SUPPORTED_CURRENCIES } from '@jurnal-zitn/shared';
+import { SUPPORTED_CURRENCIES, formatDate, formatNumber } from '@jurnal-zitn/shared';
 import {
   CreateExchangeRateInputSchema,
   type CreateExchangeRateInput,
@@ -47,6 +47,7 @@ import {
   useExchangeRates,
   usePreviewRateChange,
 } from '@/features/accounting/hooks/useExchangeRates';
+import { useLocale, useT } from '@/hooks/useLocale';
 
 function todayUTC(): string {
   return new Date().toISOString().slice(0, 10);
@@ -62,6 +63,8 @@ type PendingAction =
   | { kind: 'delete'; rateId: string };
 
 export function ExchangeRatesPage({ initialBase, initialQuote }: ExchangeRatesPageProps) {
+  const t = useT();
+  const { locale } = useLocale();
   const { data: rates, isLoading } = useExchangeRates();
   const createRate = useCreateExchangeRate();
   const deleteRate = useDeleteExchangeRate();
@@ -169,16 +172,14 @@ export function ExchangeRatesPage({ initialBase, initialQuote }: ExchangeRatesPa
   return (
     <div className="space-y-6">
       <div>
-        <PageHeader page="Exchange Rates" className="mb-2" />
-        <p className="text-sm text-muted-foreground">
-          Manage the rates used to convert account balances into your display currency.
-        </p>
+        <PageHeader page={t('page.exchangeRates')} className="mb-2" />
+        <p className="text-sm text-muted-foreground">{t('fx.subtitle')}</p>
       </div>
 
       <form onSubmit={onSubmit} className="space-y-4 rounded-md border p-4">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div className="space-y-2">
-            <Label htmlFor="baseCurrency">Base currency</Label>
+            <Label htmlFor="baseCurrency">{t('fx.field.base')}</Label>
             <Select
               value={baseCurrency}
               onValueChange={(val) => form.setValue('baseCurrency', val)}
@@ -201,7 +202,7 @@ export function ExchangeRatesPage({ initialBase, initialQuote }: ExchangeRatesPa
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="quoteCurrency">Quote currency</Label>
+            <Label htmlFor="quoteCurrency">{t('fx.field.quote')}</Label>
             <Select
               value={quoteCurrency}
               onValueChange={(val) => form.setValue('quoteCurrency', val)}
@@ -225,12 +226,12 @@ export function ExchangeRatesPage({ initialBase, initialQuote }: ExchangeRatesPa
           </div>
           <div className="space-y-2">
             <Label htmlFor="rate">
-              Rate ({baseCurrency} → {quoteCurrency})
+              {t('fx.field.rate', { base: baseCurrency, quote: quoteCurrency })}
             </Label>
             <Input
               id="rate"
               inputMode="decimal"
-              placeholder="e.g., 0.92"
+              placeholder={t('fx.field.ratePlaceholder')}
               {...form.register('rate')}
             />
             {form.formState.errors.rate && (
@@ -238,7 +239,7 @@ export function ExchangeRatesPage({ initialBase, initialQuote }: ExchangeRatesPa
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="effectiveDate">Effective date</Label>
+            <Label htmlFor="effectiveDate">{t('fx.field.effectiveDate')}</Label>
             <Input id="effectiveDate" type="date" {...form.register('effectiveDate')} />
             {form.formState.errors.effectiveDate && (
               <p className="text-sm text-destructive">
@@ -247,10 +248,7 @@ export function ExchangeRatesPage({ initialBase, initialQuote }: ExchangeRatesPa
             )}
           </div>
         </div>
-        <p className="text-xs text-muted-foreground">
-          Rates are stored as UTC dates. Your entered date may be one day behind your local date
-          depending on your timezone.
-        </p>
+        <p className="text-xs text-muted-foreground">{t('fx.utcNote')}</p>
         <div className="flex justify-end gap-2">
           <Button
             type="button"
@@ -265,33 +263,31 @@ export function ExchangeRatesPage({ initialBase, initialQuote }: ExchangeRatesPa
               })
             }
           >
-            Reset
+            {t('action.reset')}
           </Button>
           <Button type="submit" className="cursor-pointer" disabled={writePending}>
-            {writePending ? 'Saving...' : 'Save rate'}
+            {writePending ? t('common.saving') : t('fx.action.save')}
           </Button>
         </div>
       </form>
 
       <div>
-        <h2 className="mb-2 text-lg font-semibold">Saved rates</h2>
+        <h2 className="mb-2 text-lg font-semibold">{t('fx.list.title')}</h2>
         {isLoading ? (
           <div className="space-y-2">
             <Skeleton className="h-10 w-full" />
             <Skeleton className="h-10 w-full" />
           </div>
         ) : !rates?.length ? (
-          <div className="py-8 text-center text-sm text-muted-foreground">
-            No rates yet. Add one above to start converting balances.
-          </div>
+          <div className="py-8 text-center text-sm text-muted-foreground">{t('fx.list.empty')}</div>
         ) : (
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Pair</TableHead>
-                <TableHead>Rate</TableHead>
-                <TableHead>Effective date</TableHead>
-                <TableHead className="w-32 text-right">Actions</TableHead>
+                <TableHead>{t('fx.col.pair')}</TableHead>
+                <TableHead>{t('fx.col.rate')}</TableHead>
+                <TableHead>{t('fx.col.effectiveDate')}</TableHead>
+                <TableHead className="w-32 text-right">{t('pos.col.actions')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -304,8 +300,13 @@ export function ExchangeRatesPage({ initialBase, initialQuote }: ExchangeRatesPa
                   <TableCell className="font-medium">
                     {row.baseCurrency} → {row.quoteCurrency}
                   </TableCell>
-                  <TableCell>{row.rate}</TableCell>
-                  <TableCell>{row.effectiveDate}</TableCell>
+                  <TableCell>
+                    {formatNumber(row.rate, locale, {
+                      useGrouping: true,
+                      maximumFractionDigits: 10,
+                    })}
+                  </TableCell>
+                  <TableCell>{formatDate(row.effectiveDate, locale)}</TableCell>
                   <TableCell className="text-right">
                     <Button
                       type="button"
@@ -317,7 +318,7 @@ export function ExchangeRatesPage({ initialBase, initialQuote }: ExchangeRatesPa
                         setDeleteTarget(row);
                       }}
                     >
-                      Delete
+                      {t('common.delete')}
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -330,20 +331,20 @@ export function ExchangeRatesPage({ initialBase, initialQuote }: ExchangeRatesPa
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete exchange rate</AlertDialogTitle>
+            <AlertDialogTitle>{t('fx.delete.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {deleteTarget && (
-                <>
-                  Delete the {deleteTarget.baseCurrency} → {deleteTarget.quoteCurrency} rate
-                  effective {deleteTarget.effectiveDate}? This cannot be undone.
-                </>
-              )}
+              {deleteTarget &&
+                t('fx.delete.body', {
+                  base: deleteTarget.baseCurrency,
+                  quote: deleteTarget.quoteCurrency,
+                  date: formatDate(deleteTarget.effectiveDate, locale),
+                })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
             <AlertDialogAction className="cursor-pointer" onClick={confirmDelete}>
-              Delete
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

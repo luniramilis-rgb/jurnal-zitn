@@ -104,6 +104,21 @@ export function formatProfitFactor(
   return NULL_PLACEHOLDER;
 }
 
+/**
+ * Locale-aware date+time for an INSTANT (ledger `occurredAt` stamps). Unlike
+ * `formatDate` in `@jurnal-zitn/shared` (which pins UTC for date-only values),
+ * this renders in the viewer's local zone — the same behavior the old
+ * `new Date(iso).toLocaleString()` had, but pinned to the app locale (R13-b).
+ */
+export function formatDateTime(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return new Intl.DateTimeFormat(getAppLocale(), {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+  }).format(date);
+}
+
 export function formatRelativeTime(iso: string, now: Date = new Date()): string {
   if (iso === '') return '';
   const then = new Date(iso);
