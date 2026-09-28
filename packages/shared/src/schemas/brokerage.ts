@@ -33,6 +33,9 @@ export const FeeScheduleSchema = z.object({
 export const CreateBrokerageSchema = z.object({
   name: z.string().min(1).max(100).trim(),
   notes: z.string().max(10000).nullable().optional(),
+  // Optional so an IDX broker preset (D3) can be created already configured,
+  // in one step, instead of create-then-edit; omitted leaves every field 0.
+  feeSchedule: FeeScheduleSchema.partial().optional(),
 });
 
 export const UpdateBrokerageSchema = z.object({

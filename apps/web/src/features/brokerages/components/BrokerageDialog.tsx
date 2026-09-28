@@ -19,6 +19,13 @@ import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 
 import {
@@ -27,6 +34,7 @@ import {
   useDuplicateBrokerage,
   useBrokeragePositionCount,
 } from '../hooks/useBrokerages';
+import { IDX_BROKER_PRESETS } from '../lib/idxBrokerPresets';
 
 import { FeeScheduleFields } from './FeeScheduleFields';
 
@@ -80,6 +88,24 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
   const isPending =
     createBrokerage.isPending || updateBrokerage.isPending || duplicateBrokerage.isPending;
 
+  const [presetNotes, setPresetNotes] = useState<string | null>(null);
+
+  // Fill the form from an IDX preset: the percent fees persist through the
+  // extended create payload, so a preset is created already configured instead
+  // of create-then-edit.
+  function applyPreset(presetId: string) {
+    const preset = IDX_BROKER_PRESETS.find((p) => p.id === presetId);
+    if (!preset) {
+      setPresetNotes(null);
+      return;
+    }
+    form.setValue('name', preset.name);
+    form.setValue('notes', preset.notes);
+    form.setValue('feeSchedule.stockPercentBuy', preset.percentBuy);
+    form.setValue('feeSchedule.stockPercentSell', preset.percentSell);
+    setPresetNotes(preset.notes);
+  }
+
   function hasFeeChanges(data: BrokerageFormValues): boolean {
     if (!brokerage) return false;
     const fs = brokerage.feeSchedule;
@@ -120,7 +146,11 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
       }
       await submitEdit(data);
     } else {
-      await createBrokerage.mutateAsync({ name: data.name, notes: data.notes });
+      await createBrokerage.mutateAsync({
+        name: data.name,
+        notes: data.notes,
+        feeSchedule: data.feeSchedule,
+      });
       onOpenChange(false);
       form.reset();
     }
@@ -165,7 +195,26 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
               />
             </div>
 
-            {isEdit && <FeeScheduleFields control={form.control} disabled={isView} />}
+            {!isEdit && (
+              <div className="space-y-2">
+                <Label htmlFor="brokerage-preset">Preset broker IDX</Label>
+                <Select onValueChange={applyPreset}>
+                  <SelectTrigger id="brokerage-preset" className="cursor-pointer">
+                    <SelectValue placeholder="Pilih preset…" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {IDX_BROKER_PRESETS.map((preset) => (
+                      <SelectItem key={preset.id} value={preset.id}>
+                        {preset.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {presetNotes && <p className="text-sm text-muted-foreground">{presetNotes}</p>}
+              </div>
+            )}
+
+            {!isView && <FeeScheduleFields control={form.control} />}
 
             <div className="flex justify-end gap-2">
               {isView ? (

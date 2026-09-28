@@ -272,4 +272,21 @@ describe('brokerages', () => {
     const body = await res.json();
     expect(body.count).toBe(1);
   });
+
+  // 13. IDX broker preset (D3): create with a percent fee schedule in one request.
+  it('creates a brokerage already configured from a preset fee schedule', async () => {
+    const { cookie } = await registerAndGetCookie();
+
+    const res = await authedRequest('POST', '/api/brokerages', cookie, {
+      name: 'Mirae Asset Sekuritas',
+      notes: 'Perkiraan komisi 0,15% beli / 0,25% jual',
+      feeSchedule: { stockPercentBuy: '0.15', stockPercentSell: '0.25' },
+    });
+    expect(res.status).toBe(201);
+    const body = await res.json();
+    expect(body.feeSchedule.stockPercentBuy).toBe('0.15');
+    expect(body.feeSchedule.stockPercentSell).toBe('0.25');
+    // Fields the preset did not set keep their zero default.
+    expect(body.feeSchedule.stockPerShareCommission).toBe('0');
+  });
 });

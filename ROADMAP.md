@@ -67,12 +67,12 @@ A10 dulu agar setiap batch berikutnya terverifikasi otomatis (uji ber-Postgres d
 
 ## Fase D — IDX lanjutan (opsional)
 
-| #   | Pekerjaan                                                                                             | Catatan                               |
-| --- | ----------------------------------------------------------------------------------------------------- | ------------------------------------- |
-| D1  | Sumber simbol/kutipan **IDX** (mis. `.JK`) menggantikan vendor AS                                     | bila mau harga live                   |
-| D2  | Kalender/jam pasar IDX + libur nasional                                                               | bila ada fitur sesi                   |
-| D3  | Preset broker ID lengkap (Mirae/Stockbit/Sinarmas/BNI/Indo Premier) + fee persen default + disclaimer | menuntut model fee persen (sudah ada) |
-| D4  | Pajak: opsi perhitungan pajak lain (PPh badan) + ekspor CSV pajak                                     | bila diperlukan                       |
+| #   | Pekerjaan                                                                                                                                                                                                                                                                                                                                  | Catatan                                                                               |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------- |
+| D1  | Sumber simbol/kutipan **IDX** (mis. `.JK`) menggantikan vendor AS                                                                                                                                                                                                                                                                          | bila mau harga live                                                                   |
+| D2  | Kalender/jam pasar IDX + libur nasional                                                                                                                                                                                                                                                                                                    | bila ada fitur sesi                                                                   |
+| D3  | Preset broker ID lengkap (Mirae/Stockbit/Sinarmas/BNI/Indo Premier) + fee persen default + disclaimer — ✅ **selesai 2026-09-28**: pemilih "Preset broker IDX" di dialog (pra-isi nama + fee % beli/jual + disclaimer di `notes`); `POST /brokerages` kini menerima `feeSchedule` opsional sehingga preset terbuat langsung terkonfigurasi | menuntut model fee persen (sudah ada) — angka = perkiraan umum, disclaimer disertakan |
+| D4  | Pajak: opsi perhitungan pajak lain (PPh badan) + ekspor CSV pajak                                                                                                                                                                                                                                                                          | bila diperlukan                                                                       |
 
 ---
 

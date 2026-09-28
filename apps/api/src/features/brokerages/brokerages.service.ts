@@ -1,3 +1,8 @@
+import type {
+  CreateBrokerageInput,
+  UpdateBrokerageInput,
+} from '@jurnal-zitn/shared/schemas/brokerage';
+
 import type { Database } from '@/db';
 import { ConflictError, ForbiddenError, NotFoundError, ValidationError } from '@/lib/errors';
 import { withTransaction } from '@/lib/transaction';
@@ -33,11 +38,7 @@ export async function getBrokerage(db: Database, id: string, userId: string) {
   return brokerage;
 }
 
-export async function createBrokerage(
-  db: Database,
-  userId: string,
-  data: { name: string; notes?: string | null },
-) {
+export async function createBrokerage(db: Database, userId: string, data: CreateBrokerageInput) {
   return withTransaction(db, async (tx) => {
     try {
       return await insertBrokerage(tx, { userId, ...data });
@@ -54,19 +55,7 @@ export async function editBrokerage(
   db: Database,
   id: string,
   userId: string,
-  data: {
-    name?: string;
-    notes?: string | null;
-    feeSchedule?: Partial<{
-      stockPerShareCommission: string;
-      stockMinPerFill: string;
-      stockMaxPerFill: string;
-      optionsPerContractCommission: string;
-      optionsPerContractExchangeFee: string;
-      optionsMinPerFill: string;
-      optionsMaxPerFill: string;
-    }>;
-  },
+  data: UpdateBrokerageInput,
 ) {
   return withTransaction(db, async (tx) => {
     const existing = await findBrokerageById(tx, id, userId);

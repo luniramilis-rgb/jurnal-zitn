@@ -55,9 +55,22 @@ export async function findBrokerageById(db: Database | Transaction, id: string, 
   return normalizeBrokerage(row);
 }
 
+/** The writable fee-schedule columns, shared by create and update. */
+type FeeSchedulePatch = Partial<{
+  stockPerShareCommission: string;
+  stockMinPerFill: string;
+  stockMaxPerFill: string;
+  stockPercentBuy: string;
+  stockPercentSell: string;
+  optionsPerContractCommission: string;
+  optionsPerContractExchangeFee: string;
+  optionsMinPerFill: string;
+  optionsMaxPerFill: string;
+}>;
+
 export async function insertBrokerage(
   tx: Transaction,
-  data: { userId: string; name: string; notes?: string | null },
+  data: { userId: string; name: string; notes?: string | null; feeSchedule?: FeeSchedulePatch },
 ) {
   const [brokerage] = await tx
     .insert(brokerages)
@@ -66,7 +79,7 @@ export async function insertBrokerage(
 
   const [feeSchedule] = await tx
     .insert(feeSchedules)
-    .values({ brokerageId: brokerage.id })
+    .values({ brokerageId: brokerage.id, ...data.feeSchedule })
     .returning();
 
   return { ...brokerage, feeSchedule: normalizeFeeSchedule(feeSchedule) };
@@ -84,21 +97,7 @@ export function updateBrokerage(
     .returning();
 }
 
-export function updateFeeSchedule(
-  tx: Transaction,
-  brokerageId: string,
-  data: Partial<{
-    stockPerShareCommission: string;
-    stockMinPerFill: string;
-    stockMaxPerFill: string;
-    stockPercentBuy: string;
-    stockPercentSell: string;
-    optionsPerContractCommission: string;
-    optionsPerContractExchangeFee: string;
-    optionsMinPerFill: string;
-    optionsMaxPerFill: string;
-  }>,
-) {
+export function updateFeeSchedule(tx: Transaction, brokerageId: string, data: FeeSchedulePatch) {
   return tx
     .update(feeSchedules)
     .set({ ...data, updatedAt: new Date() })
