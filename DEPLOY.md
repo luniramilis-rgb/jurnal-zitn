@@ -394,6 +394,12 @@ Referensi keputusan pemilik yang menunggu: jam backup, retensi, dan region hosti
   harian + 1 bulanan).
 - **Off-host:** salin hasil dump keluar host (object storage/SCP). Backup di host yang sama **bukan**
   backup — bila host hilang, ikut hilang.
+  **Terpasang 2026-09-28:** `rclone` (v1.75.1) + `/home/ubuntu/jurnal-offsite.sh`, dipanggil di akhir
+  `jurnal-backup.sh` (**gagal-lunak**: keluar 0 dengan pesan bila remote belum dikonfigurasi).
+  Retensi off-site 30 hari (`rclone delete --min-age 30d`). **Menunggu kredensial**: isi
+  `~/.config/rclone/rclone.conf` dari `~/rclone.conf.example` (endpoint + access/secret key bucket
+  NEO Object Storage, NSS single region, 10 GB tahunan). Setelah terisi: `rclone lsd
+jurnal-offsite:jurnal-zitn-backup` harus hijau, lalu **uji unggah + unduh ulang** sekali.
 - **Uji restore** (bagian dari DoD Fase B):
   ```bash
   $COMPOSE exec -T postgres createdb -U "$POSTGRES_USER" jurnal_restore_test
