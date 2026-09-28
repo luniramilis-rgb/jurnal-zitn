@@ -1,6 +1,6 @@
 # Paket tinjau — `accounting/tax-summary` (ZITN-TECH-021 §5.4/§5.5/§5.11)
 
-**Rute:** `/_auth/accounting/tax-summary` · **Lapis:** 1 (angka/uang/klaim) · **Status manifest:** `sedang`
+**Rute:** `/_auth/accounting/tax-summary` · **Lapis:** 1 (angka/uang/klaim) · **Status manifest:** `sah` (2026-09-28)
 **Basis:** repo journal `c5cf71f` (branch kerja `l10n-id`) · **Sesi kalibrasi:** `ses_f1614741bffeFv4Hxmb2QQGGz0`
 **Berkas:** `apps/web/src/features/expenses/components/TaxSummaryPage.tsx`,
 `apps/web/src/features/expenses/components/WashSaleFlagsTable.tsx`;
@@ -8,11 +8,21 @@ badan disclaimer disusun server di `apps/api/src/features/expenses/expenses.serv
 
 **Ledger tinjau**
 
-| Peran              | Siapa                                 | Tanggal    | Commit/keputusan                                |
-| ------------------ | ------------------------------------- | ---------- | ----------------------------------------------- |
-| Penyusun paket     | chat teknis (`l10n-id`)               | 2026-09-28 | `c5cf71f` + perubahan TECH-021                  |
-| Kalibrasi/peninjau | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | verdict: diterima dengan perbaikan              |
-| Ratifikasi `sah`   | **pemilik (belum)**                   | —          | dibutuhkan untuk menaikkan status dari `sedang` |
+| Peran              | Siapa                                 | Tanggal    | Commit/keputusan                                                                                                                                                                           |
+| ------------------ | ------------------------------------- | ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Penyusun paket     | chat teknis (`l10n-id`)               | 2026-09-28 | `c5cf71f` + perubahan TECH-021                                                                                                                                                             |
+| Kalibrasi/peninjau | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | verdict: diterima dengan perbaikan                                                                                                                                                         |
+| Penegak (mekanis)  | peninjau (chat diskusi)               | 2026-09-28 | status `sah` ditulis ke manifest + `--emit-manifest` membuktikan status bertahan; `i18n-review.test.ts` hijau                                                                              |
+| Ratifikasi `sah`   | **pemilik**                           | 2026-09-28 | **"kosong OK"** — keadaan kosong diperiksa di instance lokal (`http://localhost:5173/accounting/tax-summary`, tahun 2021, akun demo `dev@example.com`, locale `id`, jurisdiksi pajak `ID`) |
+
+**Bukti peninjau via API (tanpa browser):**
+
+- `GET /api/expenses/tax-summary?year=2021` → `realisedPnl.total = "0.00"`, `perCurrency: []`,
+  `shortTerm`/`longTerm: null`, `pphFinal.perCurrency: []` → keadaan kosong terkonfirmasi di sisi data.
+- Tahun 2026, jurisdiksi `ID` → disclaimer server: "PPh final **0,1%** dari nilai penjualan" dan
+  "kurs per **28 Sep 2026**" (nilai kanonik `0.1` diformat locale; tidak ada `{rate}` tersisa,
+  markup `**tebal**` dan tautan `[Rekap Biaya](/accounting/fee-rollup)` utuh).
+- Verifikasi mojibake level byte: respons memuat **U+2014** (byte `226,128,148`), tanpa double-encoding.
 
 > Verdict Lapis 1 diratifikasi pemilik; chat teknis hanya menyediakan paket dan menjalankan perbaikan.
 

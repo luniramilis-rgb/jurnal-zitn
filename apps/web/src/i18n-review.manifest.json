@@ -5,10 +5,9 @@
   "parked": "F7 — ditunda atas arahan prioritas (bahasa dulu, pengaman menyusul) setelah Lapis 1 sah; bukan bagian dari gelombang kalibrasi ini.",
   "parkedItems": [
     "R13-b tanggal: toLocaleDateString()/toLocaleString() tanpa locale di 9 situs (account-deletion ×2, LedgerView, FeedbackInbox, UserTable, FactoryResetDialog ×2, FillTable, OpenPositionsWidget).",
-    "R14: 20 placeholder numerik memakai pemisah EN (mis. 0.00 ×12) — lihat apps/web/docs/i18n-coverage.md §R14.",
+    "R14: placeholder numerik memakai pemisah EN. Peninjau memverifikasi 13 situs (12x \"0.00\" + 1x \"150.00\"); sesi melaporkan 20 - angka ini PERLU DISELARASKAN sebelum F7 agar butir tuntas tidak salah hitung.",
     "Lint otomatis: larangan toLocaleDateString() tanpa argumen; deteksi kalimat template literal di komponen (mis. admin/FactoryResetDialog.tsx:110).",
-    "Gelombang F2: draf ID features/brokerages/components + features/accounts/components + routes/_auth/accounts (termasuk campuran ad-hoc placeholder=\"Pilih preset…\" dan 'Preset broker IDX').",
-    "Gate DEFAULT_LOCALE: menunggu konfirmasi pemilik ('en' selama jendela tinjau vs opsi A gerbang deteksi browser)."
+    "Gelombang F2: draf ID features/brokerages/components + features/accounts/components + routes/_auth/accounts (termasuk campuran ad-hoc placeholder=\"Pilih preset…\" dan 'Preset broker IDX')."
   ],
   "routes": [
     {
@@ -19,10 +18,10 @@
         "features/expenses/components/TaxSummaryPage.tsx",
         "features/expenses/components/WashSaleFlagsTable.tsx"
       ],
-      "status": "sedang",
-      "reviewer": null,
-      "date": null,
-      "commit": null,
+      "status": "sah",
+      "reviewer": "pemilik + chat diskusi (ses_f1614741bffeFv4Hxmb2QQGGz0)",
+      "date": "2026-09-28",
+      "commit": "8918c0a",
       "keys": [
         "expense.cat.data_subscription",
         "expense.cat.education",
@@ -72,7 +71,7 @@
         "wash.reason.repurchase"
       ],
       "keyHash": "fnv1a32:cc635668",
-      "notes": "Kalibrasi 2026-09-28 (ses_f1614741bffeFv4Hxmb2QQGGz0): verdict lolos-dengan-catatan; temuan §5.5-1/§5.5-2 diperbaiki. Menunggu ratifikasi pemilik untuk `sah`."
+      "notes": "Kalibrasi 2026-09-28; 4 koreksi §5.11 selesai dan diverifikasi §5.12. Ratifikasi pemilik: keadaan kosong diperiksa di instance lokal (http://localhost:5173/accounting/tax-summary, tahun 2021, akun demo dev@example.com, locale id, jurisdiksi pajak ID). Bukti peninjau via API: year=2021 -> realisedPnl.total \"0.00\" + perCurrency kosong; year=2026 jurisdiksi ID -> disclaimer server \"PPh final 0,1%\" dan \"kurs per 28 Sep 2026\" (R13 terbukti pada respons nyata, tanpa {rate} tersisa)."
     },
     {
       "route": "accounting/fee-rollup",
