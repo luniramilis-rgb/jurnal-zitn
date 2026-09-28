@@ -19,6 +19,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSettingsRouteImport } from './routes/_auth.settings'
 import { Route as AuthPerformanceRouteImport } from './routes/_auth.performance'
 import { Route as AuthOptionsRouteImport } from './routes/_auth.options'
+import { Route as AuthLembarRouteImport } from './routes/_auth.lembar'
 import { Route as AuthImportRouteImport } from './routes/_auth.import'
 import { Route as AuthDashboardRouteImport } from './routes/_auth.dashboard'
 import { Route as AuthChangelogRouteImport } from './routes/_auth.changelog'
@@ -90,6 +91,11 @@ const AuthPerformanceRoute = AuthPerformanceRouteImport.update({
 const AuthOptionsRoute = AuthOptionsRouteImport.update({
   id: '/options',
   path: '/options',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthLembarRoute = AuthLembarRouteImport.update({
+  id: '/lembar',
+  path: '/lembar',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthImportRoute = AuthImportRouteImport.update({
@@ -223,6 +229,7 @@ export interface FileRoutesByFullPath {
   '/changelog': typeof AuthChangelogRoute
   '/dashboard': typeof AuthDashboardRoute
   '/import': typeof AuthImportRoute
+  '/lembar': typeof AuthLembarRoute
   '/options': typeof AuthOptionsRoute
   '/performance': typeof AuthPerformanceRoute
   '/settings': typeof AuthSettingsRouteWithChildren
@@ -257,6 +264,7 @@ export interface FileRoutesByTo {
   '/changelog': typeof AuthChangelogRoute
   '/dashboard': typeof AuthDashboardRoute
   '/import': typeof AuthImportRoute
+  '/lembar': typeof AuthLembarRoute
   '/options': typeof AuthOptionsRoute
   '/performance': typeof AuthPerformanceRoute
   '/settings': typeof AuthSettingsRouteWithChildren
@@ -293,6 +301,7 @@ export interface FileRoutesById {
   '/_auth/changelog': typeof AuthChangelogRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_auth/import': typeof AuthImportRoute
+  '/_auth/lembar': typeof AuthLembarRoute
   '/_auth/options': typeof AuthOptionsRoute
   '/_auth/performance': typeof AuthPerformanceRoute
   '/_auth/settings': typeof AuthSettingsRouteWithChildren
@@ -329,6 +338,7 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/dashboard'
     | '/import'
+    | '/lembar'
     | '/options'
     | '/performance'
     | '/settings'
@@ -363,6 +373,7 @@ export interface FileRouteTypes {
     | '/changelog'
     | '/dashboard'
     | '/import'
+    | '/lembar'
     | '/options'
     | '/performance'
     | '/settings'
@@ -398,6 +409,7 @@ export interface FileRouteTypes {
     | '/_auth/changelog'
     | '/_auth/dashboard'
     | '/_auth/import'
+    | '/_auth/lembar'
     | '/_auth/options'
     | '/_auth/performance'
     | '/_auth/settings'
@@ -499,6 +511,13 @@ declare module '@tanstack/react-router' {
       path: '/options'
       fullPath: '/options'
       preLoaderRoute: typeof AuthOptionsRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/lembar': {
+      id: '/_auth/lembar'
+      path: '/lembar'
+      fullPath: '/lembar'
+      preLoaderRoute: typeof AuthLembarRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/import': {
@@ -711,6 +730,7 @@ interface AuthRouteChildren {
   AuthChangelogRoute: typeof AuthChangelogRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthImportRoute: typeof AuthImportRoute
+  AuthLembarRoute: typeof AuthLembarRoute
   AuthOptionsRoute: typeof AuthOptionsRoute
   AuthPerformanceRoute: typeof AuthPerformanceRoute
   AuthSettingsRoute: typeof AuthSettingsRouteWithChildren
@@ -731,6 +751,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthChangelogRoute: AuthChangelogRoute,
   AuthDashboardRoute: AuthDashboardRoute,
   AuthImportRoute: AuthImportRoute,
+  AuthLembarRoute: AuthLembarRoute,
   AuthOptionsRoute: AuthOptionsRoute,
   AuthPerformanceRoute: AuthPerformanceRoute,
   AuthSettingsRoute: AuthSettingsRouteWithChildren,

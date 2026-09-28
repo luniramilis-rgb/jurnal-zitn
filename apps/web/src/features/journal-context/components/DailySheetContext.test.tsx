@@ -1,0 +1,143 @@
+// @vitest-environment jsdom
+import { cleanup, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { setAppLocale } from '@/lib/locale';
+
+import { useSheetContext } from '../hooks/useSheetContext';
+
+import { DailySheetContext } from './DailySheetContext';
+
+(globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
+
+vi.mock('../hooks/useSheetContext', () => ({ useSheetContext: vi.fn() }));
+
+const refetch = vi.fn();
+
+function setQuery(value: unknown) {
+  vi.mocked(useSheetContext).mockReturnValue({
+    data: undefined,
+    isLoading: false,
+    refetch,
+    ...(value as object),
+  } as never);
+}
+
+beforeEach(() => setAppLocale('en'));
+afterEach(() => {
+  setAppLocale('id');
+  cleanup();
+  vi.clearAllMocks();
+});
+
+describe('DailySheetContext — konteks lembar (ZITN-TECH-019)', () => {
+  it('menampilkan status memuat', () => {
+    setQuery({ isLoading: true });
+    render(<DailySheetContext tanggal="2026-09-27" />);
+    expect(screen.getByText('Loading...')).toBeTruthy();
+  });
+
+  it('menampilkan cuplikan: tanggal, asof, simbol, level watch', () => {
+    setQuery({
+      data: {
+        ok: true,
+        tersedia: true,
+        tanggal: '2026-09-27',
+        asof: '2026-09-27',
+        simbol: [
+          { market: 'ID', ticker: 'BBBB' },
+          { market: 'US', ticker: 'CCCC' },
+        ],
+        level_watch: [{ market: 'ID', ticker: 'AAAA' }],
+      },
+    });
+
+    render(<DailySheetContext tanggal="2026-09-27" />);
+
+    expect(screen.getByRole('heading', { name: 'Daily sheet' })).toBeTruthy();
+    // Tanggal dan asof sama-sama "2026-09-27" pada kasus ini.
+    expect(screen.getAllByText('2026-09-27').length).toBeGreaterThan(0);
+    // Simbol & level watch adalah ticker + pasar, bukan harga.
+    expect(screen.getByText('BBBB')).toBeTruthy();
+    expect(screen.getByText('CCCC')).toBeTruthy();
+    expect(screen.getByText('AAAA')).toBeTruthy();
+  });
+
+  it('menjelaskan saat akun belum tertaut ke ZITN (409)', () => {
+    setQuery({
+      data: {
+        ok: false,
+        tersedia: false,
+        tanggal: '2026-09-27',
+        asof: null,
+        simbol: [],
+        level_watch: [],
+        error: 'belum_tertaut',
+      },
+    });
+    render(<DailySheetContext tanggal="2026-09-27" />);
+    expect(screen.getByText(/not linked to ZITN/)).toBeTruthy();
+    expect(screen.getByRole('button', { name: 'Reload' })).toBeTruthy();
+  });
+
+  it('menjelaskan saat konteks dimatikan ZITN (503)', () => {
+    setQuery({
+      data: {
+        ok: false,
+        tersedia: false,
+        tanggal: null,
+        asof: null,
+        simbol: [],
+        level_watch: [],
+        error: 'konteks_nonaktif',
+      },
+    });
+    render(<DailySheetContext tanggal={null} />);
+    expect(screen.getByText('Sheet context is currently unavailable.')).toBeTruthy();
+  });
+
+  it('menjelaskan saat lembar tanggal itu tidak tersedia', () => {
+    setQuery({
+      data: {
+        ok: false,
+        tersedia: false,
+        tanggal: '2026-01-01',
+        asof: null,
+        simbol: [],
+        level_watch: [],
+        error: 'tidak_tersedia',
+      },
+    });
+    render(<DailySheetContext tanggal="2026-01-01" />);
+    expect(screen.getByText('No sheet is available for this date.')).toBeTruthy();
+  });
+});
+
+it('menautkan simbol ID ke chart ZITN (opsi B) tanpa menggambar chart', () => {
+  setQuery({
+    data: {
+      ok: true,
+      tersedia: true,
+      tanggal: '2026-09-27',
+      asof: '2026-09-27',
+      simbol: [
+        {
+          market: 'ID',
+          ticker: 'BBRI',
+          chartUrl: 'https://zenitn.test/daily/chart/?tanggal=2026-09-27#BBRI',
+        },
+      ],
+      level_watch: [{ market: 'US', ticker: 'AAPL' }],
+    },
+  });
+
+  render(<DailySheetContext tanggal="2026-09-27" />);
+
+  const links = screen.getAllByRole('link', { name: 'Open the chart in the Daily sheet' });
+  // Hanya entri pasar ID yang bertaut; pasar US tetap teks biasa.
+  expect(links).toHaveLength(1);
+  expect(links[0].getAttribute('href')).toBe(
+    'https://zenitn.test/daily/chart/?tanggal=2026-09-27#BBRI',
+  );
+  expect(screen.getByText('AAPL')).toBeTruthy();
+});
