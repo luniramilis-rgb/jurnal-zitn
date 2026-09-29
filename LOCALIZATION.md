@@ -231,9 +231,10 @@ Basis Tradr berorientasi AS (USD, NYSE, fee per saham, opsi OCC, wash-sale). Ren
 Kebijakan: **istilah pasar tetap EN, kalimat penjelas ID, chrome ID**; tinjauan manual per
 halaman **wajib**, dengan penegakan otomatis anti-busuk. Rujukan: `ZITN-TECH-021` §2/§4/§5.
 
-- **Gate rilis:** `DEFAULT_LOCALE` ditahan `'en'` (`packages/shared/src/i18n.ts`) selama jendela
-  tinjau agar pengguna melihat salinan EN yang koheren, bukan campuran mentah; dikembalikan ke
-  `'id'` setelah Lapis 1 `sah` penuh. Uji: `packages/shared/src/i18n.test.ts`.
+- **Gate rilis:** `DEFAULT_LOCALE` **tetap `'id'`** (`packages/shared/src/i18n.ts`) — bukan ditahan
+  di `'en'`; pengguna berbahasa Inggris mendapat `'en'` lewat penyemaian sekali
+  `detectBrowserLocale()` di `apps/web/src/hooks/useLocale.tsx`. Yang bergerak selama jendela tinjau
+  adalah status `sah` per rute, bukan default bahasa. Uji: `packages/shared/src/i18n.test.ts`.
 - **Glosarium:** `packages/shared/src/glossary.ts` — satu-satunya tempat keputusan istilah
   (`policy: keep-en | translate | free`, plus `source` tiga lapis: regulasi / broker / metrik).
   Namespace `term.*` di kamus (nilai identik `id`/`en`). Lint: `glossary.test.ts`.

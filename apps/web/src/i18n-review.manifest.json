@@ -446,6 +446,7 @@
         "import.commit.tierLimit",
         "import.commit.title",
         "import.commit.viewPositions",
+        "import.err.closeBeforeOpen",
         "import.err.contractFieldMissing",
         "import.err.contractFieldOnStock",
         "import.err.contractFormMissing",
@@ -453,6 +454,8 @@
         "import.err.dateInvalid",
         "import.err.dateUnparseable",
         "import.err.descriptorUnparseable",
+        "import.err.exitBeforeEntry",
+        "import.err.exitExceedsEntry",
         "import.err.fieldInvalid",
         "import.err.invalidTimezone",
         "import.err.mappingColumnAbsent",
@@ -482,6 +485,10 @@
         "import.err.quantitySignContradiction",
         "import.err.rowMissingRequired",
         "import.err.rowMissingTypeOrAction",
+        "import.err.segmentCrossesFlat",
+        "import.err.segmentNotReconciled",
+        "import.err.segmentSideContradiction",
+        "import.err.segmentTypeContradiction",
         "import.err.transformNoMatch",
         "import.err.truncated",
         "import.err.unknown",
@@ -565,7 +572,7 @@
         "pos.col.fees",
         "pos.col.qty"
       ],
-      "keyHash": "fnv1a32:d49896d9",
+      "keyHash": "fnv1a32:15a81ce1",
       "notes": "F4 2026-09-29: rute /import (Lapis 1). Label EN keras -> kamus; R13-c (angka baris + harga/quantity/fees) per D5; entity HTML -> karakter asli; galat mapper/IssueList via peta kode->kunci (`issueCopy.ts`); R14 tanpa placeholder numerik. Preset `generic-idx` (D2) provisional tanpa fixture. Paket: apps/web/docs/i18n-review-packet-import.md. Menunggu ratifikasi pemilik."
     },
     {

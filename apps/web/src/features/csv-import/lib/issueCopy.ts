@@ -48,6 +48,13 @@ export const ISSUE_ERROR_KEYS: Record<string, MessageKey> = {
   OCC_BAD_UNDERLYING: 'import.err.occBadUnderlying',
   OCC_COMPACT_TOO_LONG: 'import.err.occCompactTooLong',
   OCC_STRIKE_NOT_REPRESENTABLE: 'import.err.occStrikeNotRepresentable',
+  SEGMENT_CROSSES_FLAT: 'import.err.segmentCrossesFlat',
+  SEGMENT_TYPE_CONTRADICTION: 'import.err.segmentTypeContradiction',
+  SEGMENT_SIDE_CONTRADICTION: 'import.err.segmentSideContradiction',
+  EXIT_BEFORE_ENTRY: 'import.err.exitBeforeEntry',
+  EXIT_EXCEEDS_ENTRY: 'import.err.exitExceedsEntry',
+  SEGMENT_NOT_RECONCILED: 'import.err.segmentNotReconciled',
+  CLOSE_BEFORE_OPEN: 'import.err.closeBeforeOpen',
 };
 
 /** `LocatedWarning.kind` dari server → kalimat ID. */

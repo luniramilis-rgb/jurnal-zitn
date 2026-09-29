@@ -1122,6 +1122,17 @@ const ID_MESSAGES = {
   'import.err.occBadUnderlying': 'Simbol aset dasar tidak valid.',
   'import.err.occCompactTooLong': 'Simbol OCC ringkas melebihi 20 karakter.',
   'import.err.occStrikeNotRepresentable': 'Strike tidak dapat diwakili pada presisi yang didukung.',
+  'import.err.segmentCrossesFlat':
+    'Kuantitas keluar melewati posisi nol; keluar tidak boleh melebihi kuantitas masuk.',
+  'import.err.segmentTypeContradiction':
+    'Jenis baris ini bertentangan dengan posisi berjalan (masuk/keluar yang terbentuk).',
+  'import.err.segmentSideContradiction':
+    'Sisi baris ini bertentangan dengan sisi saat segmen posisi dibuka.',
+  'import.err.exitBeforeEntry': 'Tidak bisa keluar sebelum ada baris masuk.',
+  'import.err.exitExceedsEntry': 'Kuantitas keluar melebihi kuantitas masuk yang tersedia.',
+  'import.err.segmentNotReconciled':
+    'Posisi harus keluar penuh untuk ditutup (kuantitas keluar ≠ kuantitas masuk).',
+  'import.err.closeBeforeOpen': 'Tanggal tutup tidak boleh mendahului tanggal buka.',
   'import.err.unknown': 'Baris ini memiliki galat yang belum dapat dijelaskan.',
   'import.warn.rounded': 'Nilai angka dibulatkan ke 8 angka desimal.',
   'import.warn.noFeesColumn': 'Tidak ada kolom biaya yang dipetakan; biaya fill default ke 0.',
@@ -2293,6 +2304,17 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'import.err.occBadUnderlying': 'The underlying symbol is not valid.',
   'import.err.occCompactTooLong': 'The compact OCC symbol exceeds 20 characters.',
   'import.err.occStrikeNotRepresentable': 'Strike is not representable at the supported precision.',
+  'import.err.segmentCrossesFlat':
+    'The exit quantity reverses the position past flat; an exit may not exceed the open quantity.',
+  'import.err.segmentTypeContradiction':
+    'This row type contradicts the running position (the entry/exit it forms).',
+  'import.err.segmentSideContradiction':
+    'This row side contradicts the side the position segment opened with.',
+  'import.err.exitBeforeEntry': 'Cannot exit before an entry fill.',
+  'import.err.exitExceedsEntry': 'The exit quantity would exceed the available entry quantity.',
+  'import.err.segmentNotReconciled':
+    'A position must be fully exited to close (exit quantity ≠ entry quantity).',
+  'import.err.closeBeforeOpen': 'The close date cannot precede the open date.',
   'import.err.unknown': 'This row has an error that cannot be explained yet.',
   'import.warn.rounded': 'A number was rounded to 8 decimal places.',
   'import.warn.noFeesColumn': 'No fees column was mapped; fills default to 0 fees.',
@@ -2396,6 +2418,34 @@ export function translate(
 
 const LOCALE_TAGS: Record<AppLocale, string> = { id: 'id-ID', en: 'en-US' };
 
+const NUMBER_FORMAT_CACHE = new Map<string, Intl.NumberFormat>();
+const DATE_FORMAT_CACHE = new Map<string, Intl.DateTimeFormat>();
+
+/**
+ * Reuse one `Intl` formatter per `locale + options` instead of constructing a new one per
+ * call — tables can format thousands of cells in a single render (ZITN-TECH-025 review,
+ * performance track).
+ */
+function getNumberFormat(locale: string, options: Intl.NumberFormatOptions): Intl.NumberFormat {
+  const cacheKey = `${locale}|${JSON.stringify(options)}`;
+  let formatter = NUMBER_FORMAT_CACHE.get(cacheKey);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(locale, options);
+    NUMBER_FORMAT_CACHE.set(cacheKey, formatter);
+  }
+  return formatter;
+}
+
+function getDateFormat(locale: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+  const cacheKey = `${locale}|${JSON.stringify(options)}`;
+  let formatter = DATE_FORMAT_CACHE.get(cacheKey);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, options);
+    DATE_FORMAT_CACHE.set(cacheKey, formatter);
+  }
+  return formatter;
+}
+
 /**
  * Format angka per locale tampilan **sebelum** masuk `translate()` (rubrik R13).
  *
@@ -2410,7 +2460,7 @@ export function formatNumber(
 ): string {
   const numeric = typeof value === 'number' ? value : Number(value);
   if (!Number.isFinite(numeric)) return String(value);
-  return new Intl.NumberFormat(LOCALE_TAGS[resolveLocale(locale)], {
+  return getNumberFormat(LOCALE_TAGS[resolveLocale(locale)], {
     useGrouping: false,
     maximumFractionDigits: 10,
     ...options,
@@ -2441,7 +2491,7 @@ export function formatDate(
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime()))
     return value instanceof Date ? value.toISOString() : String(value);
-  return new Intl.DateTimeFormat(LOCALE_TAGS[resolveLocale(locale)], {
+  return getDateFormat(LOCALE_TAGS[resolveLocale(locale)], {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
