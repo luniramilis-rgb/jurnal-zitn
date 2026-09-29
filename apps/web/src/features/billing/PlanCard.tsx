@@ -16,10 +16,17 @@
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import type { TierLimits, TierState } from '@jurnal-zitn/shared';
+import {
+  formatDate,
+  type AppLocale,
+  type MessageKey,
+  type TierLimits,
+  type TierState,
+} from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useLocale, useT } from '@/hooks/useLocale';
 import { useAdvisorEnabled } from '@/hooks/useRegistrationEnabled';
 import { formatCurrency } from '@/lib/format';
 import { captureClientEvent } from '@/lib/telemetry/posthog';
@@ -36,12 +43,12 @@ import { useTierState } from './useTierState';
 const POLL_INTERVAL_MS = 2_000;
 const POLL_CAP_MS = 60_000;
 
-const LEVERS: Array<{ key: keyof TierLimits; label: string }> = [
-  { key: 'accounts', label: 'Connected accounts' },
-  { key: 'positions', label: 'Positions' },
-  { key: 'platformTurns', label: 'Advisor turns / month' },
-  { key: 'images', label: 'Advisor image uploads / month' },
-  { key: 'csvImports', label: 'CSV imports (lifetime)' },
+const LEVERS: Array<{ key: keyof TierLimits; labelKey: MessageKey }> = [
+  { key: 'accounts', labelKey: 'billing.lever.accounts' },
+  { key: 'positions', labelKey: 'billing.lever.positions' },
+  { key: 'platformTurns', labelKey: 'billing.lever.platformTurns' },
+  { key: 'images', labelKey: 'billing.lever.images' },
+  { key: 'csvImports', labelKey: 'billing.lever.csvImports' },
 ];
 
 // The levers that only mean something while the advisor is offered. On an
@@ -49,22 +56,20 @@ const LEVERS: Array<{ key: keyof TierLimits; label: string }> = [
 // summary and the usage bars rather than advertising a quota nobody can spend.
 const ADVISOR_LEVERS: ReadonlySet<keyof TierLimits> = new Set(['platformTurns', 'images']);
 
-function leverValue(key: keyof TierLimits, value: number | null): string {
-  if (value === null) return 'Unlimited';
+function leverValue(value: number | null, unlimited: string): string {
+  if (value === null) return unlimited;
   return String(value);
 }
 
-function formatDay(iso: string): string {
-  return new Date(iso).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
+// R13-b: the billing period boundary is locale-formatted (shared `formatDate`,
+// UTC-pinned so a date-only value cannot shift a day).
+function formatDay(iso: string, locale: AppLocale): string {
+  return formatDate(iso, locale, { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 interface UsageBar {
   key: keyof TierLimits;
-  label: string;
+  labelKey: MessageKey;
   used: number;
   cap: number;
 }
@@ -75,16 +80,16 @@ function usageBars(state: TierState): UsageBar[] {
   const { usage } = state;
   if (!usage) return [];
   const caps = state.limits[state.tier];
-  const entries: Array<{ key: keyof TierLimits; label: string; used: number }> = [
-    { key: 'accounts', label: 'Connected accounts', used: usage.accounts.used },
-    { key: 'positions', label: 'Positions', used: usage.positions.used },
+  const entries: Array<{ key: keyof TierLimits; labelKey: MessageKey; used: number }> = [
+    { key: 'accounts', labelKey: 'billing.usage.accounts', used: usage.accounts.used },
+    { key: 'positions', labelKey: 'billing.usage.positions', used: usage.positions.used },
     {
       key: 'platformTurns',
-      label: 'Advisor turns this month',
+      labelKey: 'billing.usage.platformTurns',
       used: usage.platformTurns.allowanceUsed,
     },
-    { key: 'images', label: 'Image uploads this month', used: usage.images.used },
-    { key: 'csvImports', label: 'CSV imports', used: usage.csvImports.used },
+    { key: 'images', labelKey: 'billing.usage.images', used: usage.images.used },
+    { key: 'csvImports', labelKey: 'billing.usage.csvImports', used: usage.csvImports.used },
   ];
   const bars: UsageBar[] = [];
   for (const entry of entries) {
@@ -108,6 +113,8 @@ export function PlanCard({
   pollIntervalMs = POLL_INTERVAL_MS,
   pollCapMs = POLL_CAP_MS,
 }: PlanCardProps) {
+  const t = useT();
+  const { locale } = useLocale();
   // 'polling' → refetching every pollIntervalMs; 'capped' → the persistent
   // non-error still-confirming state; 'idle' → the normal card.
   const advisorEnabled = useAdvisorEnabled();
@@ -144,11 +151,9 @@ export function PlanCard({
     return (
       <Card data-testid="subscription-confirming">
         <CardHeader>
-          <CardTitle>Confirming your subscription…</CardTitle>
+          <CardTitle>{t('billing.confirming.title')}</CardTitle>
           <CardDescription>
-            {phase === 'capped'
-              ? 'Still confirming — this can take a minute; check back or contact support if it persists.'
-              : 'This usually takes a few seconds.'}
+            {phase === 'capped' ? t('billing.confirming.capped') : t('billing.confirming.desc')}
           </CardDescription>
         </CardHeader>
       </Card>
@@ -166,29 +171,30 @@ export function PlanCard({
   const onUpgrade = () => {
     captureClientEvent('upgrade_cta_clicked', { surface: 'plan-card' }); // D17
     subscribe.mutate(undefined, {
-      onError: () => toast.error("Couldn't start checkout. Try again."),
+      onError: () => toast.error(t('billing.checkout.error')),
     });
   };
 
   const onManage = () => {
     portal.mutate(undefined, {
-      onError: () => toast.error("Couldn't open the billing portal. Try again."),
+      onError: () => toast.error(t('billing.portal.error')),
     });
   };
 
   return (
     <Card data-testid="plan-card">
       <CardHeader>
-        <CardTitle>{state.tier === 'pro' ? 'Pro plan' : 'Free plan'}</CardTitle>
+        <CardTitle>{t(state.tier === 'pro' ? 'billing.plan.pro' : 'billing.plan.free')}</CardTitle>
         {/* The MIRRORED price (never a price id); omitted when the mirrored
             Price carries no unit_amount rather than rendering a broken value. */}
         {subscription && subscription.priceUnitAmount !== null && (
           <CardDescription data-testid="plan-price">
-            {formatCurrency(
-              subscription.priceUnitAmount / 100,
-              subscription.priceCurrency ?? 'USD',
-            )}{' '}
-            / month
+            {t('billing.plan.perMonth', {
+              price: formatCurrency(
+                subscription.priceUnitAmount / 100,
+                subscription.priceCurrency ?? 'USD',
+              ),
+            })}
           </CardDescription>
         )}
       </CardHeader>
@@ -196,29 +202,33 @@ export function PlanCard({
         {subscription &&
           (subscription.cancelAtPeriodEnd ? (
             <p className="text-sm text-muted-foreground" data-testid="plan-cancel-pending">
-              Pro until {formatDay(subscription.currentPeriodEnd)}
+              {t('billing.plan.proUntil', {
+                date: formatDay(subscription.currentPeriodEnd, locale),
+              })}
             </p>
           ) : subscription.pastDue ? null : (
             <p className="text-sm text-muted-foreground" data-testid="plan-renewal">
-              Renews {formatDay(subscription.currentPeriodEnd)}
+              {t('billing.plan.renews', {
+                date: formatDay(subscription.currentPeriodEnd, locale),
+              })}
             </p>
           ))}
 
         {subscription?.pastDue && (
           <p className="text-sm text-destructive" data-testid="plan-past-due">
-            Payment past due — update your payment method to keep Pro.
+            {t('billing.plan.pastDue')}
           </p>
         )}
 
         {showUpgrade && (
           <div className="space-y-3" data-testid="plan-upgrade">
             <ul className="space-y-1 text-sm text-muted-foreground" data-testid="lever-summary">
-              {levers.map(({ key, label }) => (
+              {levers.map(({ key, labelKey }) => (
                 <li key={key} className="flex justify-between gap-4">
-                  <span>{label}</span>
+                  <span>{t(labelKey)}</span>
                   <span>
-                    {leverValue(key, state.limits.free[key])} →{' '}
-                    {leverValue(key, state.limits.pro[key])}
+                    {leverValue(state.limits.free[key], t('billing.unlimited'))} →{' '}
+                    {leverValue(state.limits.pro[key], t('billing.unlimited'))}
                   </span>
                 </li>
               ))}
@@ -229,7 +239,7 @@ export function PlanCard({
               disabled={subscribe.isPending}
               onClick={onUpgrade}
             >
-              Upgrade to Pro
+              {t('billing.upgrade')}
             </Button>
           </div>
         )}
@@ -247,20 +257,20 @@ export function PlanCard({
               onClick={onManage}
               data-testid="manage-subscription"
             >
-              Manage subscription
+              {t('billing.manage')}
             </Button>
           ) : (
             <p className="text-sm text-muted-foreground" data-testid="billing-unavailable">
-              Billing is temporarily unavailable — subscription management will return shortly.
+              {t('billing.unavailable')}
             </p>
           ))}
 
         {bars.length > 0 && (
           <div className="space-y-3" data-testid="usage-warnings">
-            {bars.map(({ key, label, used, cap }) => (
+            {bars.map(({ key, labelKey, used, cap }) => (
               <div key={key} className="space-y-1" data-testid={`usage-${key}`}>
                 <div className="flex justify-between text-sm">
-                  <span>{label}</span>
+                  <span>{t(labelKey)}</span>
                   <span className="text-muted-foreground">
                     {used} / {cap}
                   </span>

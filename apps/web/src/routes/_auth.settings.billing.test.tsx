@@ -18,6 +18,7 @@ import type { TierState } from '@jurnal-zitn/shared';
 
 import { billingKeys } from '@/features/billing/useWalletBalance';
 import { api } from '@/lib/api';
+import { setAppLocale } from '@/lib/locale';
 
 import { Route as BillingRoute } from './_auth.settings.billing';
 
@@ -107,6 +108,8 @@ function renderRoute(initialEntry: string) {
 let advisorEnabled = false;
 
 beforeEach(() => {
+  // Copy assertions are English; pin the display locale (DEFAULT_LOCALE is 'id').
+  setAppLocale('en');
   advisorEnabled = false;
   vi.mocked(api.get).mockImplementation((path: string) => {
     if (path === '/config') {
@@ -123,6 +126,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  setAppLocale('id');
   cleanup();
   vi.clearAllMocks();
 });

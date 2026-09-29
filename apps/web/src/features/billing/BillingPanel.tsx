@@ -13,6 +13,7 @@ import type { CreditPack } from '@jurnal-zitn/shared';
 import { Numeric } from '@/components/Numeric';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useT } from '@/hooks/useLocale';
 import { formatCurrency } from '@/lib/format';
 
 import { useCreateCheckout } from './useCreateCheckout';
@@ -31,6 +32,18 @@ function approxUsd(credits: string): string {
   return formatCurrency(usd, 'USD');
 }
 
+/**
+ * D1 (keputusan pemilik): harga paket kredit adalah **IDR**. `pack.currency`
+ * di-mirror dari Stripe saat runtime — jangan diasumsikan. Bila mirror membawa
+ * mata uang lain, gagalkan keras alih-alih merender mata uang yang tidak kita
+ * putuskan (pagar harga/honesty).
+ */
+export function assertIdrCurrency(currency: string): void {
+  if (currency !== 'IDR') {
+    throw new Error(`D1: harga paket kredit harus IDR; diterima "${currency}"`);
+  }
+}
+
 function PackCard({
   pack,
   onBuy,
@@ -40,11 +53,14 @@ function PackCard({
   onBuy: (packId: string) => void;
   pending: boolean;
 }) {
+  const t = useT();
+  // Fail loud before rendering any price (D1) — a non-IDR mirror is a bug.
+  assertIdrCurrency(pack.currency);
   return (
     <Card data-testid={`credit-pack-${pack.id}`}>
       <CardHeader>
         <CardTitle>{pack.label}</CardTitle>
-        <CardDescription>{pack.credits} credits</CardDescription>
+        <CardDescription>{t('billing.pack.credits', { n: pack.credits })}</CardDescription>
       </CardHeader>
       <CardContent className="flex items-center justify-between gap-4">
         <span className="text-sm text-muted-foreground">
@@ -57,7 +73,7 @@ function PackCard({
           disabled={pending}
           onClick={() => onBuy(pack.id)}
         >
-          Buy credits
+          {t('billing.buyCredits')}
         </Button>
       </CardContent>
     </Card>
@@ -69,6 +85,7 @@ export interface BillingPanelProps {
 }
 
 export function BillingPanel({ packs }: BillingPanelProps) {
+  const t = useT();
   const balanceQuery = useWalletBalance();
   const checkout = useCreateCheckout();
   const [pendingPackId, setPendingPackId] = useState<string | null>(null);
@@ -80,7 +97,7 @@ export function BillingPanel({ packs }: BillingPanelProps) {
       {
         onError: () => {
           setPendingPackId(null);
-          toast.error("Couldn't start checkout. Try again.");
+          toast.error(t('billing.checkout.error'));
         },
         // onSuccess redirects via window.location (useCreateCheckout) — no reset.
       },
@@ -93,27 +110,30 @@ export function BillingPanel({ packs }: BillingPanelProps) {
     <div className="space-y-6" data-testid="billing-panel">
       <Card data-testid="balance-card">
         <CardHeader>
-          <CardTitle>Balance</CardTitle>
+          <CardTitle>{t('billing.balance.title')}</CardTitle>
         </CardHeader>
         <CardContent>
           {balanceQuery.isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading…</p>
+            <p className="text-sm text-muted-foreground">{t('billing.loading')}</p>
           ) : balance ? (
             <div>
               <p className="text-2xl font-semibold">
                 {/* Credit COUNT (neutral) — never gain/loss color, never displayCurrency. */}
-                <Numeric value={balance.available} kind="integer" direction="none" /> credits
+                <Numeric value={balance.available} kind="integer" direction="none" />{' '}
+                {t('term.credits')}
               </p>
-              <p className="text-sm text-muted-foreground">≈ {approxUsd(balance.available)}</p>
+              <p className="text-sm text-muted-foreground">
+                {t('billing.balance.approxUsd', { amount: approxUsd(balance.available) })}
+              </p>
             </div>
           ) : (
-            <p className="text-sm text-destructive">Couldn&apos;t load balance.</p>
+            <p className="text-sm text-destructive">{t('billing.balance.error')}</p>
           )}
         </CardContent>
       </Card>
 
       <section className="space-y-4">
-        <h3 className="text-base font-medium">Buy credits</h3>
+        <h3 className="text-base font-medium">{t('billing.buyCredits')}</h3>
         <div className="grid gap-4 sm:grid-cols-2">
           {packs.map((pack) => (
             <PackCard

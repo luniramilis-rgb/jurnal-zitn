@@ -40,6 +40,8 @@ export type GlossarySource = 'regulation' | 'broker' | 'metrics' | 'entity';
  * (nilai identik). Dipakai kalimat ID sebagai `{term.fill}` dsb.
  */
 export const TERM_MESSAGES = {
+  'term.credit': 'credit',
+  'term.credits': 'credits',
   'term.drawdown': 'Drawdown',
   'term.fill': 'Fill',
   'term.lot': 'Lot',
@@ -219,6 +221,28 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     source: 'regulation',
     termKey: 'term.pphFinal',
     note: 'PPh final atas penjualan saham; tarif dari `PPH_FINAL_RATE_PERCENT` dan diformat per locale (rubrik R8/R13).',
+  },
+
+  // -------------------------------------------------------------------------
+  // Unit produk (bukan metrik pasar) — tetap EN (ZITN-TECH-021 §5.6).
+  // -------------------------------------------------------------------------
+  {
+    key: 'credit',
+    en: 'credit',
+    id: 'credit',
+    policy: 'keep-en',
+    source: 'metrics',
+    termKey: 'term.credit',
+    note: 'Unit produk kredit Advisor (1 credit = 1 micro-USD), bukan metrik pasar. Keputusan §5.6: tetap EN. Bentuk jamak `credits` juga tetap EN.',
+  },
+  {
+    key: 'credits',
+    en: 'credits',
+    id: 'credits',
+    policy: 'keep-en',
+    source: 'metrics',
+    termKey: 'term.credits',
+    note: 'Bentuk jamak `credit`; label salinan memakai "credits" di kedua bahasa.',
   },
 ];
 
