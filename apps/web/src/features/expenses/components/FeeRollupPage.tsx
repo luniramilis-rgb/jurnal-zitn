@@ -159,7 +159,7 @@ export function FeeRollupPage() {
               href={deeplinkTo}
               className="cursor-pointer text-primary underline-offset-4 hover:underline"
             >
-              Enter rate
+              {t('fee.enterRate')}
             </a>
           )}
         </div>

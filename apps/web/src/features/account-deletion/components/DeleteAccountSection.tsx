@@ -14,9 +14,11 @@
 
 import { useState, type ReactNode } from 'react';
 
+import { formatDate } from '@jurnal-zitn/shared';
+
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useT } from '@/hooks/useLocale';
+import { useLocale, useT } from '@/hooks/useLocale';
 
 import { useCancelDeletion, useDeletionStatus } from '../hooks/useAccountDeletion';
 
@@ -34,6 +36,7 @@ function Section({ children }: { children: ReactNode }) {
 
 export function DeleteAccountSection() {
   const t = useT();
+  const { locale } = useLocale();
   const [dialogOpen, setDialogOpen] = useState(false);
   const status = useDeletionStatus();
   const cancel = useCancelDeletion();
@@ -65,9 +68,7 @@ export function DeleteAccountSection() {
       <Section>
         <p className="text-sm" data-testid="deletion-scheduled">
           {t('settings.delete.scheduledPrefix')}{' '}
-          {scheduledFor
-            ? new Date(scheduledFor).toLocaleDateString()
-            : t('settings.delete.scheduledFallback')}
+          {scheduledFor ? formatDate(scheduledFor, locale) : t('settings.delete.scheduledFallback')}
           .
         </p>
         {cancel.isError && (

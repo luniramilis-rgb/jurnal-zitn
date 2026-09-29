@@ -85,7 +85,7 @@ export function PositionImageLightbox({
               data-testid="image-unavailable"
               className="mx-auto flex h-48 w-64 items-center justify-center rounded-md border border-dashed border-border bg-muted text-xs text-muted-foreground"
             >
-              Image no longer available
+              {t('pos.lightbox.unavailable')}
             </div>
           ) : (
             <img

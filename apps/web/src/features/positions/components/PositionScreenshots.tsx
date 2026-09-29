@@ -72,7 +72,7 @@ export function PositionScreenshots({ positionId, symbol, images }: Props) {
       }
     }
     if (oversized) {
-      toast.error('That image is too large to upload.');
+      toast.error(t('pos.shots.tooLarge'));
     }
   };
 
@@ -155,11 +155,11 @@ export function PositionScreenshots({ positionId, symbol, images }: Props) {
                 {image.unavailable ? (
                   <div
                     role="img"
-                    aria-label="Image no longer available"
+                    aria-label={t('pos.shots.unavailable')}
                     data-testid="image-unavailable"
                     className="flex h-32 w-full items-center justify-center bg-muted text-xs text-muted-foreground"
                   >
-                    Image no longer available
+                    {t('pos.shots.unavailable')}
                   </div>
                 ) : (
                   <img

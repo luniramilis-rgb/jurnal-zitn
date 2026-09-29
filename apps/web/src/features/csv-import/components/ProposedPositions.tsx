@@ -1,5 +1,5 @@
 import type { CsvPreviewResponse, ProposedPosition } from '@jurnal-zitn/shared';
-import { formatNumber } from '@jurnal-zitn/shared';
+import { formatPriceDecimal } from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import { Badge } from '@/components/ui/badge';
@@ -40,12 +40,9 @@ function ContractLabel({ scope }: { scope: ProposedPosition['scope'] }) {
 
 /**
  * D5 (ZITN-TECH-021 §5.14): harga & quantity saham tetap bergaya titik — trader
- * IDX membaca titik sebagai pemisah desimal — sehingga diformat dengan locale
- * `en` (tanpa grouping ribuan), bukan locale tampilan.
+ * IDX membaca titik sebagai pemisah desimal — sehingga memakai helper bersama
+ * `formatPriceDecimal` (locale `en`, tanpa grouping ribuan), bukan locale tampilan.
  */
-function formatDot(value: string): string {
-  return formatNumber(value, 'en', { maximumFractionDigits: 8 });
-}
 
 interface ProposedPositionsProps {
   positions: ProposedPosition[];
@@ -140,8 +137,10 @@ export function ProposedPositions({
                     >
                       <TableCell>{fill.sourceRow}</TableCell>
                       <TableCell>{fill.type}</TableCell>
-                      <TableCell className="text-right">{formatDot(fill.quantity)}</TableCell>
-                      <TableCell className="text-right">{formatDot(fill.price)}</TableCell>
+                      <TableCell className="text-right">
+                        {formatPriceDecimal(fill.quantity)}
+                      </TableCell>
+                      <TableCell className="text-right">{formatPriceDecimal(fill.price)}</TableCell>
                       <TableCell className="text-right">
                         {formatMoney(fill.fees, currencyCode)}
                       </TableCell>

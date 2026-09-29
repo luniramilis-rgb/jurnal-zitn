@@ -1181,6 +1181,19 @@ const ID_MESSAGES = {
   'billing.kind.usage': 'Pemakaian',
   'billing.kind.reversal': 'Pembalikan',
   'billing.usage.detail': '{provider} · {model} · {input} masuk / {output} keluar token',
+  // --- Pengerasan F5: calculator, positions, fee-rollup (residu tak-terpeta). ---
+  'calc.placeholder.amount': '0,00',
+  'calc.options.selectFromChain': 'Pilih dari rantai opsi',
+  'calc.sizing.limitedByBuyingPower': 'Ukuran posisi dibatasi oleh daya beli akun',
+  'fee.enterRate': 'Masukkan kurs',
+  'pos.fill.none': 'Belum ada fill',
+  'pos.detail.editTags': 'Ubah tag',
+  'pos.detail.addFill': 'Tambah Fill',
+  'pos.shots.unavailable': 'Gambar tidak lagi tersedia',
+  'pos.shots.tooLarge': 'Gambar itu terlalu besar untuk diunggah.',
+  'pos.occ.strikePlaceholder': '150,00',
+  'pos.placeholder.amount': '0,00',
+  'pos.fill.enterPriceQty': 'Masukkan harga dan kuantitas',
 } as const;
 
 export type MessageKey = keyof typeof ID_MESSAGES;
@@ -2338,6 +2351,19 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'billing.kind.usage': 'Usage',
   'billing.kind.reversal': 'Reversal',
   'billing.usage.detail': '{provider} · {model} · {input} in / {output} out tokens',
+  // --- Hardening F5: calculator, positions, fee-rollup (unmapped residue). ---
+  'calc.placeholder.amount': '0.00',
+  'calc.options.selectFromChain': 'Select from options chain',
+  'calc.sizing.limitedByBuyingPower': 'Position size limited by account buying power',
+  'fee.enterRate': 'Enter rate',
+  'pos.fill.none': 'No fills yet',
+  'pos.detail.editTags': 'Edit tags',
+  'pos.detail.addFill': 'Add Fill',
+  'pos.shots.unavailable': 'Image no longer available',
+  'pos.shots.tooLarge': 'That image is too large to upload.',
+  'pos.occ.strikePlaceholder': '150.00',
+  'pos.placeholder.amount': '0.00',
+  'pos.fill.enterPriceQty': 'Enter price and quantity',
 };
 
 export const MESSAGES: Record<AppLocale, Record<MessageKey, string>> = {
@@ -2389,6 +2415,17 @@ export function formatNumber(
     maximumFractionDigits: 10,
     ...options,
   }).format(numeric);
+}
+
+/**
+ * Format harga/kuantitas dalam **gaya titik** (D5, ZITN-TECH-021 §5.14): trader IDX
+ * membaca `.` sebagai pemisah desimal, dan field kelas ini **tidak** boleh memakai
+ * grouping ribuan. Satu mekanisme untuk kelas "harga" — menggantikan `toFixed()`
+ * ad-hoc di komponen (mis. `PositionDetail`), tanpa mengubah nilai tersimpan.
+ * Dibatasi 8 desimal (presisi kuantisasi engine) dan sengaja memakai locale `en`.
+ */
+export function formatPriceDecimal(value: string | number, maximumFractionDigits = 8): string {
+  return formatNumber(value, 'en', { maximumFractionDigits });
 }
 
 /**

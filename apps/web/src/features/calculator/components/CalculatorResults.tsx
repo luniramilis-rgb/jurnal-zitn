@@ -193,7 +193,7 @@ export function CalculatorResults({
                 <div className="flex items-center gap-2 pt-1 text-sm">
                   <Badge variant="secondary">{t('calc.result.buyingPower')}</Badge>
                   <span className="text-muted-foreground">
-                    Position size limited by account buying power
+                    {t('calc.sizing.limitedByBuyingPower')}
                   </span>
                 </div>
               )}
