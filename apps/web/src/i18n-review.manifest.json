@@ -91,6 +91,7 @@
         "fee.col.totalFees",
         "fee.emptyDesc",
         "fee.emptyTitle",
+        "fee.enterRate",
         "fee.loadFailed",
         "fee.page.title",
         "fee.perAccount",
@@ -99,8 +100,8 @@
         "tax.field.year",
         "tax.missingRates"
       ],
-      "keyHash": "fnv1a32:b4f760c7",
-      "notes": ""
+      "keyHash": "fnv1a32:cc173e03",
+      "notes": "F5 pengerasan 2026-09-29: teks 'Enter rate' -> fee.enterRate. Sisa literal lain belum — gelombang rute fee-rollup."
     },
     {
       "route": "accounting/expenses",
@@ -156,14 +157,65 @@
     {
       "route": "settings/billing",
       "layer": 1,
-      "files": ["routes/_auth.settings.billing.tsx"],
-      "status": "belum",
+      "files": [
+        "routes/_auth.settings.billing.tsx",
+        "features/billing/BillingPanel.tsx",
+        "features/billing/PlanCard.tsx",
+        "features/billing/UpgradeLink.tsx",
+        "features/billing/UsageHistory.tsx"
+      ],
+      "status": "sedang",
       "reviewer": null,
       "date": null,
       "commit": null,
-      "keys": [],
-      "keyHash": "fnv1a32:811c9dc5",
-      "notes": "Salinan masih literal EN (belum masuk kamus) — kandidat utama tinjauan Lapis 1."
+      "keys": [
+        "billing.balance.approxUsd",
+        "billing.balance.error",
+        "billing.balance.title",
+        "billing.buyCredits",
+        "billing.checkout.error",
+        "billing.confirming.capped",
+        "billing.confirming.desc",
+        "billing.confirming.title",
+        "billing.history.empty",
+        "billing.history.error",
+        "billing.history.loadMore",
+        "billing.history.title",
+        "billing.kind.purchase",
+        "billing.kind.reversal",
+        "billing.kind.usage",
+        "billing.lever.accounts",
+        "billing.lever.csvImports",
+        "billing.lever.images",
+        "billing.lever.platformTurns",
+        "billing.lever.positions",
+        "billing.loading",
+        "billing.manage",
+        "billing.pack.credits",
+        "billing.plan.free",
+        "billing.plan.pastDue",
+        "billing.plan.perMonth",
+        "billing.plan.pro",
+        "billing.plan.proUntil",
+        "billing.plan.renews",
+        "billing.portal.error",
+        "billing.unavailable",
+        "billing.unlimited",
+        "billing.upgrade",
+        "billing.usage.accounts",
+        "billing.usage.csvImports",
+        "billing.usage.detail",
+        "billing.usage.images",
+        "billing.usage.platformTurns",
+        "billing.usage.positions",
+        "settings.billing.disabled",
+        "settings.billing.subtitleCredits",
+        "settings.billing.subtitleManage",
+        "settings.billing.title",
+        "term.credits"
+      ],
+      "keyHash": "fnv1a32:59df7b5e",
+      "notes": "F5 2026-09-29: draf ID billing penuh (BillingPanel/PlanCard/UpgradeLink/UsageHistory + rute) lewat kamus; entity -> karakter asli; label UpgradeLink = kunci (R12); guard D1 IDR gagal-loud; credit/credits keep-en. Paket: apps/web/docs/i18n-review-packet-billing.md. Menunggu ratifikasi."
     },
     {
       "route": "calculator",
@@ -213,7 +265,9 @@
         "calc.field.symbol",
         "calc.field.symbolPlaceholder",
         "calc.field.targetPrice",
+        "calc.options.selectFromChain",
         "calc.page.title",
+        "calc.placeholder.amount",
         "calc.quote.pull",
         "calc.quote.pulling",
         "calc.result.adjustedRR",
@@ -228,11 +282,12 @@
         "calc.result.rrRatio",
         "calc.sizing.buyingPowerZero",
         "calc.sizing.exceedsMax",
+        "calc.sizing.limitedByBuyingPower",
         "calc.sizing.nothing",
         "calc.sizing.roundsToZero"
       ],
-      "keyHash": "fnv1a32:064e5f35",
-      "notes": ""
+      "keyHash": "fnv1a32:8c7ad15c",
+      "notes": "F5 pengerasan 2026-09-29: 7 placeholder 0.00 -> R14 (calc.placeholder.amount) + 2 teks (selectFromChain, limitedByBuyingPower). Sisa literal (BuyingPowerBasisSelect, CalculatorPage, Row label, dialog desc, hook toast) BELUM — milik gelombang rute calculator."
     },
     {
       "route": "positions/$positionId",
@@ -275,8 +330,10 @@
         "pos.delete.title",
         "pos.detail.actualRR",
         "pos.detail.addEntryFirst",
+        "pos.detail.addFill",
         "pos.detail.avgEntry",
         "pos.detail.avgExit",
+        "pos.detail.editTags",
         "pos.detail.exitFullFirst",
         "pos.detail.fees",
         "pos.detail.fills",
@@ -298,6 +355,8 @@
         "pos.fill.calcFromSchedule",
         "pos.fill.deleteBody",
         "pos.fill.deleteTitle",
+        "pos.fill.enterPriceQty",
+        "pos.fill.none",
         "pos.fill.override",
         "pos.fill.priceTick",
         "pos.fill.saving",
@@ -315,8 +374,10 @@
         "pos.occ.expiry",
         "pos.occ.put",
         "pos.occ.strike",
+        "pos.occ.strikePlaceholder",
         "pos.occ.type",
         "pos.occ.underlying",
+        "pos.placeholder.amount",
         "pos.shots.add",
         "pos.shots.cap",
         "pos.shots.deleteAria",
@@ -325,12 +386,14 @@
         "pos.shots.empty",
         "pos.shots.openAria",
         "pos.shots.title",
+        "pos.shots.tooLarge",
+        "pos.shots.unavailable",
         "pos.status.closed",
         "pos.status.draft",
         "pos.status.open"
       ],
-      "keyHash": "fnv1a32:4ddad766",
-      "notes": ""
+      "keyHash": "fnv1a32:7084a28e",
+      "notes": "F5 pengerasan 2026-09-29: pos.fill.none, pos.detail.editTags/addFill, pos.shots.unavailable/tooLarge, placeholder 0,00 & 150,00 (R14), FillTable toLocaleString -> formatDateTime (R13-b), plus formatPriceDecimal di PositionDetail (toFixed(4) dihapus, D5). Sisa: angka mentah FillTable + literal lain belum — gelombang rute positions."
     },
     {
       "route": "import",
@@ -570,7 +633,7 @@
         "settings.logout"
       ],
       "keyHash": "fnv1a32:175ba704",
-      "notes": ""
+      "notes": "F5 pengerasan 2026-09-29: DeleteAccountDialog/DeleteAccountSection toLocaleDateString -> formatDate locale-aware (R13-b). Sisa literal lain belum — gelombang rute settings/account."
     },
     {
       "route": "brokerages",
