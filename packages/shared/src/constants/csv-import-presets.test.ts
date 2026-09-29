@@ -161,6 +161,8 @@ describe('csv-import-presets', () => {
   it('generic-idx ships only IDX alias columns + Beli/Jual synonyms, provisional (D2)', () => {
     const idx = CSV_IMPORT_PRESETS.find((p) => p.id === 'generic-idx')!;
     expect(idx, 'generic-idx preset missing').toBeDefined();
+    // Honesty pin (§5.24/§5.25): the label must not claim verified IDX labels.
+    expect(idx.label.toLowerCase()).toContain('unverified');
     expect(idx.dateFormat).toBe('eu');
     expect(idx.numberFormat).toBe('eu');
     expect(idx.mapping.delimiter).toBe(',');
