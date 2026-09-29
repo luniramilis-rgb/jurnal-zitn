@@ -27,8 +27,9 @@ function todayInTz(tz: string): string {
  * Reads the ZITN daily-sheet context through `useSheetContext`. The context is a
  * READ-ONLY snippet — date, watch/symbol tickers and an optional link to the
  * chart — and by contract (D12, pagar doktrin) it **carries no price**: nothing
- * here renders OHLCV or any market figure. The widget only counts and lists
- * tickers, then links to `/lembar`.
+ * here renders OHLCV or any market figure. The widget counts and lists tickers;
+ * a ticker that carries a `chartUrl` links straight to the ZITN chart (IDX & US,
+ * new tab), one CTA opens the first chart, and `/lembar` stays reachable.
  */
 function DailySheetWidget() {
   const t = useT();
@@ -76,7 +77,9 @@ function DailySheetWidget() {
 
   const symbols = context.simbol;
   const watch = context.level_watch;
-  const hasAny = symbols.length > 0 || watch.length > 0;
+  const entries = [...symbols, ...watch];
+  const hasAny = entries.length > 0;
+  const firstChart = entries.find((entry) => entry.chartUrl)?.chartUrl;
 
   return (
     <div className="flex h-full flex-col gap-3 text-sm">
@@ -92,9 +95,23 @@ function DailySheetWidget() {
 
       {hasAny ? (
         <ul className="flex flex-wrap gap-x-3 gap-y-1" data-slot="sheet-context-entries">
-          {[...symbols, ...watch].map((entry, index) => (
+          {entries.map((entry, index) => (
             <li key={`${entry.market}:${entry.ticker}:${index}`} className="text-sm">
-              <span className="font-medium">{entry.ticker}</span>{' '}
+              {entry.chartUrl ? (
+                <a
+                  href={entry.chartUrl}
+                  target="_blank"
+                  rel="noopener"
+                  data-slot="sheet-context-ticker-link"
+                  aria-label={`${entry.ticker} — ${t('journal.context.openChart')}`}
+                  title={t('journal.context.openChart')}
+                  className="font-medium underline underline-offset-2"
+                >
+                  {entry.ticker}
+                </a>
+              ) : (
+                <span className="font-medium">{entry.ticker}</span>
+              )}{' '}
               <span className="text-muted-foreground">{entry.market}</span>
             </li>
           ))}
@@ -103,7 +120,18 @@ function DailySheetWidget() {
         <p className="text-muted-foreground">{t('journal.context.none')}</p>
       )}
 
-      <div className="mt-auto">
+      <div className="mt-auto flex flex-wrap items-center gap-x-4 gap-y-1">
+        {firstChart && (
+          <a
+            href={firstChart}
+            target="_blank"
+            rel="noopener"
+            data-slot="sheet-context-open-chart"
+            className="text-sm font-medium underline underline-offset-2"
+          >
+            {t('journal.context.openChart')}
+          </a>
+        )}
         <Link to="/lembar" className="cursor-pointer text-sm font-medium hover:underline">
           {t('w.sheet.open')}
         </Link>

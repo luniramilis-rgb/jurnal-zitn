@@ -15,13 +15,15 @@ function Entries({ entries }: { entries: SheetContextEntry[] }) {
         <li key={`${entry.market}:${entry.ticker}`} className="text-sm">
           <span className="font-medium">{entry.ticker}</span>{' '}
           <span className="text-muted-foreground">{entry.market}</span>
-          {/* Opsi B: jurnal tidak menggambar chart; simbol IDX menautkan ke chart Lembar Harian
-              (permukaan ZITN, entitlement sama). Tanpa iframe, tanpa harga di sini. */}
+          {/* Opsi B: jurnal tidak menggambar chart; simbol IDX & US menautkan ke chart Lembar
+              Harian (permukaan ZITN, entitlement sama). Tab baru agar jurnal tetap terbuka.
+              Tanpa iframe, tanpa harga di sini. */}
           {entry.chartUrl && (
             <>
               {' '}
               <a
                 href={entry.chartUrl}
+                target="_blank"
                 rel="noopener"
                 aria-label={t('journal.context.openChart')}
                 title={t('journal.context.openChart')}

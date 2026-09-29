@@ -24,9 +24,10 @@ export interface SheetContextEntry {
   market: string;
   ticker: string;
   /**
-   * Tautan ke **chart ZITN** (`/daily/chart/?tanggal=…#TICKER`) bila entri ini dapat dipetakan
-   * ke panel chart (pasar ID). Jurnal **tidak** menggambar chart dan **tidak** menerima harga;
-   * tautan ini hanya memindahkan pengguna ke permukaan Lembar Harian dengan entitlement yang sama.
+   * Tautan ke **chart ZITN** bila entri ini dapat dipetakan ke panel chart (pasar **IDX** dan
+   * **US**). IDX: `/daily/chart/?tanggal=…#TICKER`; US: `/daily/chart/?pasar=us#TICKER`
+   * (ZITN-TECH-025). Jurnal **tidak** menggambar chart dan **tidak** menerima harga; tautan ini
+   * hanya memindahkan pengguna ke permukaan Lembar Harian dengan entitlement yang sama.
    */
   chartUrl?: string;
 }
@@ -47,24 +48,29 @@ export interface ContextConfig {
 }
 
 /**
- * Bangun tautan chart ZITN untuk satu entri (dipakai hanya untuk pasar ID — panel chart ZITN
- * berisi emiten IDX). `null` bila tak dapat dipetakan, sehingga UI merender teks biasa.
+ * Bangun tautan chart ZITN untuk satu entri. Panel chart ZITN memuat emiten **IDX** (`?tanggal`
+ * memilih lembar hari itu) dan **US** (`?pasar=us`, ZITN-TECH-023/025). `null` bila pasar tak
+ * punya panel atau tanggal tidak tersedia, sehingga UI merender teks biasa.
  */
 export function chartLink(
   baseUrl: string,
   tanggal: string | null,
   entry: SheetContextEntry,
 ): string | null {
-  if (!tanggal || entry.market !== 'ID') return null;
+  if (!tanggal) return null;
+  const market = String(entry.market || '').toUpperCase();
+  if (market !== 'ID' && market !== 'US') return null;
   const url = new URL('/daily/chart/', baseUrl);
-  url.searchParams.set('tanggal', tanggal);
+  if (market === 'US') url.searchParams.set('pasar', 'us');
+  else url.searchParams.set('tanggal', tanggal);
   url.hash = entry.ticker;
   return url.toString();
 }
 
 /**
- * Tambahkan `chartUrl` ke cuplikan (murni): hanya saat `ok`, hanya pasar ID, hanya bila tanggal
- * tersedia. Tidak menambah bidang data lain; ZITN tetap satu-satunya pemegang angkanya.
+ * Tambahkan `chartUrl` ke cuplikan (murni): hanya saat `ok`, hanya bila tanggal tersedia, dan
+ * hanya untuk pasar yang punya panel chart (IDX & US). Tidak menambah bidang data lain; ZITN
+ * tetap satu-satunya pemegang angkanya.
  */
 export function withChartLinks(body: SheetContext, baseUrl: string): SheetContext {
   if (!body.ok || !body.tanggal) return body;

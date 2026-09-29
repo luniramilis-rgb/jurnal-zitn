@@ -136,21 +136,19 @@ describe('fetchSheetContext', () => {
 
   it('membuang entri berbentuk salah dan membatasi jumlah', async () => {
     const entries = Array.from({ length: 600 }, (_, i) => ({ market: 'ID', ticker: `T${i}` }));
-    const fetchImpl = vi
-      .fn()
-      .mockResolvedValue(
-        new Response(
-          JSON.stringify({
-            ok: true,
-            tersedia: true,
-            tanggal: '2026-09-27',
-            asof: '2026-09-27',
-            simbol: [...entries, { ticker: 'X' }, null],
-            level_watch: 'bukan-array',
-          }),
-          { status: 200 },
-        ),
-      );
+    const fetchImpl = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          ok: true,
+          tersedia: true,
+          tanggal: '2026-09-27',
+          asof: '2026-09-27',
+          simbol: [...entries, { ticker: 'X' }, null],
+          level_watch: 'bukan-array',
+        }),
+        { status: 200 },
+      ),
+    );
 
     const { body } = await fetchSheetContext({
       baseUrl: 'https://zitn.test',
@@ -181,17 +179,43 @@ describe('withChartLinks � tautan ke chart ZITN (opsi B)', () => {
     expect(out.level_watch[0].chartUrl).toBe(
       'https://zenitn.test/daily/chart/?tanggal=2026-09-27#TLKM',
     );
+    // IDX memakai tanggal, bukan ?pasar (default pasar chart = id).
+    expect(out.simbol[0].chartUrl).not.toContain('pasar=');
     // Tidak ada bidang data lain yang ditambah.
     expect(Object.keys(out.simbol[0]).sort()).toEqual(['chartUrl', 'market', 'ticker']);
   });
 
-  it('tidak menautkan pasar non-ID (panel chart ZITN = emiten IDX)', () => {
+  it('menautkan pasar US ke chart dengan ?pasar=us (ZITN-TECH-025)', () => {
     const body = {
       ok: true,
       tersedia: true,
       tanggal: '2026-09-27',
       asof: '2026-09-27',
       simbol: [{ market: 'US', ticker: 'AAPL' }],
+      level_watch: [{ market: 'US', ticker: 'MSFT' }],
+    };
+    const out = withChartLinks(body, base);
+    expect(out.simbol[0].chartUrl).toBe('https://zenitn.test/daily/chart/?pasar=us#AAPL');
+    expect(out.level_watch[0].chartUrl).toBe('https://zenitn.test/daily/chart/?pasar=us#MSFT');
+    // US menandai pasar lewat ?pasar=us, bukan ?tanggal.
+    expect(out.simbol[0].chartUrl).not.toContain('tanggal=');
+    // Kode pasar dari ZITN boleh huruf kecil; tautan tetap dibangun.
+    const lower = withChartLinks(
+      { ...body, simbol: [{ market: 'us', ticker: 'AAPL' }], level_watch: [] },
+      base,
+    );
+    expect(lower.simbol[0].chartUrl).toBe('https://zenitn.test/daily/chart/?pasar=us#AAPL');
+    // Tidak ada bidang data lain yang ditambah (tanpa harga).
+    expect(Object.keys(out.simbol[0]).sort()).toEqual(['chartUrl', 'market', 'ticker']);
+  });
+
+  it('tidak menautkan pasar tanpa panel chart (bukan menambah data)', () => {
+    const body = {
+      ok: true,
+      tersedia: true,
+      tanggal: '2026-09-27',
+      asof: '2026-09-27',
+      simbol: [{ market: 'SG', ticker: 'D05' }],
       level_watch: [],
     };
     expect(withChartLinks(body, base).simbol[0].chartUrl).toBeUndefined();

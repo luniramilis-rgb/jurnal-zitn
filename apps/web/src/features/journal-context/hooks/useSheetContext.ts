@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 export interface SheetContextEntry {
   market: string;
   ticker: string;
-  /** Tautan ke chart ZITN (permukaan Lembar Harian) bila tersedia; jurnal tidak menggambar chart. */
+  /** Tautan ke chart ZITN (IDX & US, permukaan Lembar Harian) bila tersedia; jurnal tidak menggambar chart. */
   chartUrl?: string;
 }
 
