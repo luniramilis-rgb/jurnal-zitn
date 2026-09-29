@@ -11,10 +11,13 @@ import { isAccountWritable } from '@/features/billing/tier-usage';
 import { UpgradeLink } from '@/features/billing/UpgradeLink';
 import { useTierState } from '@/features/billing/useTierState';
 import { CoachMark } from '@/features/onboarding/components/CoachMark';
+import { useT } from '@/hooks/useLocale';
+import { apiErrorCode } from '@/lib/api-error';
 import { docsUrl } from '@/lib/docs';
 
 import { useCsvPreview } from '../hooks/useCsvPreview';
 import { isRequiredFieldSatisfied, targetFieldsForShape } from '../lib/fields';
+import { previewErrorKey } from '../lib/issueCopy';
 import { readHeaderHints } from '../lib/readHeaderHints';
 
 import { AccountPicker } from './AccountPicker';
@@ -24,12 +27,6 @@ import { FileUpload } from './FileUpload';
 import { IssueList } from './IssueList';
 import { PreviewSummary } from './PreviewSummary';
 import { ProposedPositions } from './ProposedPositions';
-
-function previewErrorMessage(err: unknown): string {
-  if (typeof err !== 'object' || err === null) return 'Preview failed. Please try again.';
-  const e = err as { error?: { message?: string }; message?: string };
-  return e.error?.message ?? e.message ?? 'Preview failed. Please try again.';
-}
 
 const initialMapper = (): ColumnMapperValue => ({
   presetId: null,
@@ -55,6 +52,7 @@ const initialMapper = (): ColumnMapperValue => ({
  * without changing the mapping surface above it.
  */
 export function ImportPage() {
+  const t = useT();
   const [accountId, setAccountId] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [columns, setColumns] = useState<string[]>([]);
@@ -148,7 +146,7 @@ export function ImportPage() {
             unavailable rather than available — better a mark one round trip
             late than one that appears and is then withdrawn. */}
         <PageHeader
-          page="Import trades from CSV"
+          page={t('page.import')}
           className="mb-2"
           chips={
             <CoachMark
@@ -158,8 +156,7 @@ export function ImportPage() {
           }
         />
         <p className="text-sm text-muted-foreground">
-          Imports are additive — they add positions and fills to the target account. Fees come from
-          the CSV unless no fees column is mapped.{' '}
+          {t('import.intro')}{' '}
           {/* Column mapping is the step people get stuck on, and the answer is
               longer than a tooltip. Link out rather than grow this paragraph. */}
           <a
@@ -168,17 +165,20 @@ export function ImportPage() {
             rel="noreferrer"
             className="cursor-pointer font-medium text-primary underline underline-offset-2"
           >
-            Read the import guide
+            {t('import.guideLink')}
           </a>
           .
         </p>
-        {csvRemaining !== null && (
+        {csvRemaining !== null && csvCap !== null && (
           <p
             data-testid="csv-imports-remaining"
             className="mt-2 flex flex-wrap items-center gap-2 text-sm text-muted-foreground"
           >
             <span>
-              {csvRemaining} of {csvCap} CSV import{csvCap === 1 ? '' : 's'} remaining on your plan.
+              {t(csvCap === 1 ? 'import.remainingOne' : 'import.remainingMany', {
+                remaining: csvRemaining,
+                cap: csvCap,
+              })}
             </span>
             {csvRemaining === 0 && tierState?.purchasable && <UpgradeLink surface="csv-import" />}
           </p>
@@ -187,8 +187,8 @@ export function ImportPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>1. Target account</CardTitle>
-          <CardDescription>Where the imported trades will be added.</CardDescription>
+          <CardTitle>{t('import.step1.title')}</CardTitle>
+          <CardDescription>{t('import.step1.desc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <AccountPicker value={accountId} onChange={setAccountId} />
@@ -197,8 +197,8 @@ export function ImportPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>2. Upload file</CardTitle>
-          <CardDescription>The server parses and validates the file.</CardDescription>
+          <CardTitle>{t('import.step2.title')}</CardTitle>
+          <CardDescription>{t('import.step2.desc')}</CardDescription>
         </CardHeader>
         <CardContent>
           <FileUpload file={file} onChange={setFile} />
@@ -208,18 +208,15 @@ export function ImportPage() {
       {file && (
         <Card>
           <CardHeader>
-            <CardTitle>3. Map columns</CardTitle>
-            <CardDescription>
-              Pick a preset to auto-fill, then adjust — or map every field by hand. Set the row
-              shape independently of any preset.
-            </CardDescription>
+            <CardTitle>{t('import.step3.title')}</CardTitle>
+            <CardDescription>{t('import.step3.desc')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <ColumnMapper columns={columns} value={mapper} onChange={setMapper} />
 
             {missingRequired.length > 0 && (
               <p className="text-sm text-muted-foreground">
-                Map all required fields to continue: {missingRequired.join(', ')}.
+                {t('import.missingRequired', { fields: missingRequired.join(', ') })}
               </p>
             )}
 
@@ -229,7 +226,7 @@ export function ImportPage() {
               disabled={!canPreview}
               onClick={runPreview}
             >
-              {preview.isPending ? 'Previewing…' : 'Preview import'}
+              {preview.isPending ? t('import.preview.pending') : t('import.preview.submit')}
             </Button>
           </CardContent>
         </Card>
@@ -252,8 +249,10 @@ export function ImportPage() {
       {preview.isError && (
         <Card className="border-destructive/50">
           <CardHeader>
-            <CardTitle className="text-base text-destructive">Preview failed</CardTitle>
-            <CardDescription>{previewErrorMessage(preview.error)}</CardDescription>
+            <CardTitle className="text-base text-destructive">
+              {t('import.preview.failedTitle')}
+            </CardTitle>
+            <CardDescription>{t(previewErrorKey(apiErrorCode(preview.error)))}</CardDescription>
           </CardHeader>
         </Card>
       )}

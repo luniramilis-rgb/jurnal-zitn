@@ -29,8 +29,10 @@ const EXECUTION_DIRECTION_FIELDS = ['type', 'action'] as const;
 const ROUND_TRIP_ENTRY_FIELDS = ['entryPrice', 'entryQuantity', 'entryDate'] as const;
 const ROUND_TRIP_EXIT_FIELDS = ['exitPrice', 'exitQuantity', 'exitDate'] as const;
 
-// Named presets each ship a committed real-export sample fixture (REQ-3.3).
-// generic-manual has no mapping, so no fixture.
+// Named presets each ship a committed real-export sample fixture (REQ-3.3),
+// EXCEPT `generic-manual` (no mapping) and `generic-idx` (D2 provisional: no
+// owner-verified IDX statement export exists yet, so no sample is committed —
+// REQ-3.5 unmet and recorded as such; inventing one would be fabricating data).
 const SAMPLE_FILES: Record<string, string> = {
   'interactive-brokers': 'interactive-brokers.csv',
   tradezella: 'tradezella.csv',
@@ -97,6 +99,7 @@ describe('csv-import-presets', () => {
     expect(ids).toEqual(
       [
         'generic-execution',
+        'generic-idx',
         'generic-manual',
         'interactive-brokers',
         'tradervue',
@@ -153,6 +156,31 @@ describe('csv-import-presets', () => {
     const tradezella = CSV_IMPORT_PRESETS.find((p) => p.id === 'tradezella')!;
     expect(tradezella.mapping.transforms?.assetType?.Single).toBe('option');
     expect(tradezella.transforms).toBeUndefined();
+  });
+
+  it('generic-idx ships only IDX alias columns + Beli/Jual synonyms, provisional (D2)', () => {
+    const idx = CSV_IMPORT_PRESETS.find((p) => p.id === 'generic-idx')!;
+    expect(idx, 'generic-idx preset missing').toBeDefined();
+    expect(idx.dateFormat).toBe('eu');
+    expect(idx.numberFormat).toBe('eu');
+    expect(idx.mapping.delimiter).toBe(',');
+    expect(idx.mapping.quantityUnit).toBe('lots');
+    // Alias-only mapping: the IDX statement columns, no fabricated columns.
+    expect(idx.mapping.columns).toEqual({
+      symbol: 'Kode Saham',
+      action: 'Jenis Transaksi',
+      quantity: 'Jumlah',
+      price: 'Harga',
+      filledAt: 'Tanggal',
+      fees: 'Komisi',
+    });
+    // Beli/Jual are declared synonyms (the canonical map only has BUY/SELL).
+    expect(idx.mapping.transforms?.action).toEqual({ Beli: 'buy', Jual: 'sell' });
+    // assetType has no IDX-statement column → intentionally left for the user.
+    expect(idx.mapping.columns.assetType).toBeUndefined();
+    // No committed sample: the conformance roster must NOT include it.
+    expect(SAMPLE_FILES['generic-idx']).toBeUndefined();
+    expect(() => assertRowShapeGrounded(idx, null)).not.toThrow();
   });
 
   it('every preset declaring the composed contract form also declares an expiryFormat', () => {

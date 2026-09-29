@@ -32,6 +32,14 @@ import type { CsvPreset } from '../schemas/csv-import';
  *   - tradervue: Tradervue generic import format
  *     (Time, Date, Quantity, Symbol, Side, Price, Option, Commission, …).
  *   - generic-execution: Jurnal ZITN's own canonical one-row-per-fill template.
+ *   - generic-idx: **provisional** IDX broker-statement column aliases
+ *     (Tanggal, Jenis Transaksi, Kode Saham, Jumlah, Harga, Komisi). Added under
+ *     D2 (ZITN-TECH-021) as alias-only mapping help — the server stays the
+ *     authoritative parser. It ships WITHOUT a committed real-export fixture
+ *     (REQ-3.5 not yet met): no owner-verified IDX statement sample exists, so
+ *     the alias vocabulary is provisional and `assetType` is left for the user.
+ *     It is therefore NOT in `CSV_IMPORT_SAMPLE_FILES`, so the conformance suite
+ *     does not run a fabricated sample (which would be "inventing" data).
  */
 export const CSV_IMPORT_PRESETS: CsvPreset[] = [
   {
@@ -141,6 +149,42 @@ export const CSV_IMPORT_PRESETS: CsvPreset[] = [
         price: 'Price',
         filledAt: 'FilledAt',
         fees: 'Fees',
+      },
+    },
+  },
+  {
+    id: 'generic-idx',
+    label: 'IDX broker statement (generic)',
+    rowShape: 'execution',
+    // Indonesian statements: `eu` dates (DD/MM/YYYY) and `eu` numbers
+    // (`.` thousands, `,` decimal). Declared, never guessed — the normalizer
+    // honors the declared format exactly (REQ-5.3/5.4).
+    dateFormat: 'eu',
+    numberFormat: 'eu',
+    mapping: {
+      rowShape: 'execution',
+      contractForm: 'occ-symbol',
+      // IDX statement quantities are quoted in LOTS (1 lot = 100 shares), the
+      // existing `quantityUnit` option (Fase 2b-2) — not new parsing logic.
+      quantityUnit: 'lots',
+      delimiter: ',',
+      // `Jenis Transaksi` carries Beli/Jual; the canonical `action` map only has
+      // BUY/SELL, so the Indonesian synonyms are declared here (REQ-2.3) — the
+      // same `mapping.transforms` path `applyPreset` forwards.
+      transforms: { action: { Beli: 'buy', Jual: 'sell' } },
+      // Column aliases as they appear in common IDX broker statements. `Nilai`
+      // (gross value) and `Pajak` (tax) sit unmapped: Jurnal ZITN derives value from
+      // quantity×price and has no tax field on a fill. `assetType` is deliberately
+      // unmapped — an IDX stock statement has no asset-type column, and setting a
+      // constant default is an engine change (out of scope for a language wave), so
+      // the user completes it in the mapper (REQ-3.4 manual fallback).
+      columns: {
+        symbol: 'Kode Saham',
+        action: 'Jenis Transaksi',
+        quantity: 'Jumlah',
+        price: 'Harga',
+        filledAt: 'Tanggal',
+        fees: 'Komisi',
       },
     },
   },

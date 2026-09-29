@@ -196,7 +196,7 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     policy: 'translate',
     source: 'broker',
     provisional: true,
-    note: 'Kosakata kolom & transaksi broker IDX. Sementara sampai preset impor broker ID (LOCALIZATION.md Fase 2c); tanpa `termKey` karena `id` ≠ `en`.',
+    note: 'Kosakata kolom & transaksi broker IDX. Tetap `provisional` setelah D2 (ZITN-TECH-021): preset `generic-idx` menambahkan alias kolom bergaya statement IDX, tetapi belum ada korpus ekspor broker IDX nyata yang terverifikasi (tanpa fixture, REQ-3.5 belum terpenuhi), jadi kosakata broker ini belum boleh dianggap mapan. Tanpa `termKey` karena `id` ≠ `en`.',
   },
 
   // -------------------------------------------------------------------------

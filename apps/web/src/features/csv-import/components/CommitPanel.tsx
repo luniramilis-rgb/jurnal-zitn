@@ -7,28 +7,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { UpgradeLink } from '@/features/billing/UpgradeLink';
 import { useTierState } from '@/features/billing/useTierState';
+import { useT } from '@/hooks/useLocale';
+import { apiErrorCode } from '@/lib/api-error';
 
 import { useCsvCommit } from '../hooks/useCsvCommit';
+import { commitErrorKey } from '../lib/issueCopy';
 
 interface CommitPanelProps {
   preview: CsvPreviewResponse;
   /** Re-run preview with the current (unchanged) mapping — used by the superseded refusal. */
   onRePreview: () => void;
   isRePreviewing: boolean;
-}
-
-const SUPERSEDED_COPY = 'This preview was replaced by a newer one — re-preview to import it.';
-
-function refusalCode(err: unknown): string | undefined {
-  if (typeof err !== 'object' || err === null) return undefined;
-  const e = err as { error?: { code?: string }; code?: string };
-  return e.error?.code ?? e.code;
-}
-
-function refusalMessage(err: unknown): string {
-  if (typeof err !== 'object' || err === null) return 'Import failed. Please try again.';
-  const e = err as { error?: { message?: string }; message?: string };
-  return e.error?.message ?? e.message ?? 'Import failed. Please try again.';
 }
 
 /**
@@ -43,15 +32,19 @@ function refusalMessage(err: unknown): string {
  *   the commit hook).
  * - Failure keeps the preview/mapping intact; a SUPERSEDED 409 shows the specific
  *   re-preview message rather than a generic error.
+ *
+ * Salinan refusal dipilih dari KODE via `issueCopy.ts` (bukan `message` server
+ * mentah) — ZITN-TECH-021 §5.14 butir 5.
  */
 export function CommitPanel({ preview, onRePreview, isRePreviewing }: CommitPanelProps) {
+  const t = useT();
   const commit = useCsvCommit();
   const { data: tierState } = useTierState();
   const [confirmDuplicates, setConfirmDuplicates] = useState(false);
 
   const result = commit.data as CsvCommitResponse | undefined;
   const error = commit.error;
-  const code = error ? refusalCode(error) : undefined;
+  const code = error ? apiErrorCode(error) : undefined;
   const superseded = code === 'CSV_IMPORT_SUPERSEDED';
   // Plan-tiers L6 refusal (REQ-10.3/11.5) — mapped on the CODE only. The
   // staged preview survives a tier refusal server-side, so the same token is
@@ -62,17 +55,19 @@ export function CommitPanel({ preview, onRePreview, isRePreviewing }: CommitPane
     return (
       <Card className="border-success/50">
         <CardHeader>
-          <CardTitle className="text-base text-success">Import complete</CardTitle>
+          <CardTitle className="text-base text-success">
+            {t('import.commit.successTitle')}
+          </CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
           <p className="text-sm">
-            Added <span className="font-medium">{result.positionsCreated}</span> position
-            {result.positionsCreated === 1 ? '' : 's'} and{' '}
-            <span className="font-medium">{result.fillsCreated}</span> fill
-            {result.fillsCreated === 1 ? '' : 's'} to the target account.
+            {t('import.commit.success', {
+              positions: result.positionsCreated,
+              fills: result.fillsCreated,
+            })}
           </p>
           <Button asChild className="cursor-pointer">
-            <Link to="/positions">View imported positions</Link>
+            <Link to="/positions">{t('import.commit.viewPositions')}</Link>
           </Button>
         </CardContent>
       </Card>
@@ -90,14 +85,10 @@ export function CommitPanel({ preview, onRePreview, isRePreviewing }: CommitPane
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Confirm import</CardTitle>
+        <CardTitle className="text-base">{t('import.commit.title')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {blocked && (
-          <p className="text-sm text-destructive">
-            Fix the blocking errors above before you can import.
-          </p>
-        )}
+        {blocked && <p className="text-sm text-destructive">{t('import.commit.blocked')}</p>}
 
         {needsDupAffirmation && (
           <label className="flex items-start gap-2 rounded-md border border-warning/50 bg-warning/10 p-3 text-sm text-foreground">
@@ -107,10 +98,7 @@ export function CommitPanel({ preview, onRePreview, isRePreviewing }: CommitPane
               checked={confirmDuplicates}
               onChange={(e) => setConfirmDuplicates(e.target.checked)}
             />
-            <span>
-              These trades look like duplicates of trades already in this account. Import them
-              anyway?
-            </span>
+            <span>{t('import.commit.duplicates')}</span>
           </label>
         )}
 
@@ -120,15 +108,12 @@ export function CommitPanel({ preview, onRePreview, isRePreviewing }: CommitPane
               data-testid="csv-tier-refusal"
               className="flex flex-wrap items-center justify-between gap-3 rounded-md border border-destructive/50 bg-destructive/10 p-3"
             >
-              <span className="text-sm text-destructive">
-                You&apos;ve reached your plan&apos;s CSV import limit — this preview stays saved, so
-                you can import it after upgrading without re-uploading.
-              </span>
+              <span className="text-sm text-destructive">{t('import.commit.tierLimit')}</span>
               {tierState?.purchasable && <UpgradeLink surface="csv-import" />}
             </div>
           ) : (
             <p className="text-sm text-destructive">
-              {superseded ? SUPERSEDED_COPY : refusalMessage(error)}
+              {superseded ? t('import.commit.superseded') : t(commitErrorKey(code))}
             </p>
           ))}
 
@@ -140,7 +125,7 @@ export function CommitPanel({ preview, onRePreview, isRePreviewing }: CommitPane
               onClick={onRePreview}
               disabled={isRePreviewing}
             >
-              {isRePreviewing ? 'Re-previewing…' : 'Re-preview'}
+              {isRePreviewing ? t('import.commit.rePreviewing') : t('import.commit.rePreview')}
             </Button>
           ) : (
             <Button
@@ -149,7 +134,7 @@ export function CommitPanel({ preview, onRePreview, isRePreviewing }: CommitPane
               disabled={!canCommit}
               onClick={runCommit}
             >
-              {commit.isPending ? 'Importing…' : 'Confirm import'}
+              {commit.isPending ? t('import.commit.importing') : t('import.commit.submit')}
             </Button>
           )}
         </div>

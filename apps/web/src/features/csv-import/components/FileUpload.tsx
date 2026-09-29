@@ -2,6 +2,7 @@ import { useRef } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
+import { useT } from '@/hooks/useLocale';
 
 interface FileUploadProps {
   file: File | null;
@@ -14,11 +15,12 @@ interface FileUploadProps {
  * capture the `File` here.
  */
 export function FileUpload({ file, onChange }: FileUploadProps) {
+  const t = useT();
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="import-file">CSV file</Label>
+      <Label htmlFor="import-file">{t('import.file.label')}</Label>
       <div className="flex items-center gap-3">
         <input
           ref={inputRef}
@@ -34,10 +36,10 @@ export function FileUpload({ file, onChange }: FileUploadProps) {
           className="cursor-pointer"
           onClick={() => inputRef.current?.click()}
         >
-          Choose file
+          {t('import.file.choose')}
         </Button>
         <span className="text-sm text-muted-foreground">
-          {file ? file.name : 'No file selected'}
+          {file ? file.name : t('import.file.none')}
         </span>
       </div>
     </div>

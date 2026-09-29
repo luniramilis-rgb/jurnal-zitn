@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useT } from '@/hooks/useLocale';
 
 import { PRESET_ONLY_LABELS, targetFieldsForShape, type TargetField } from '../lib/fields';
 
@@ -76,6 +77,7 @@ interface ColumnMapperProps {
 }
 
 export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
+  const t = useT();
   const contractForm = value.mapping.contractForm ?? 'occ-symbol';
   // The shape's fields for the chosen contract form, plus a row for each
   // preset-only key already in the mapping so a preset-mapped Multiplier /
@@ -154,13 +156,13 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
     <div className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-2">
-          <Label htmlFor="import-preset">Preset (optional)</Label>
+          <Label htmlFor="import-preset">{t('import.mapper.preset')}</Label>
           <Select value={value.presetId ?? NO_PRESET} onValueChange={applyPreset}>
             <SelectTrigger id="import-preset" className="w-full">
-              <SelectValue placeholder="No preset" />
+              <SelectValue placeholder={t('import.mapper.noPreset')} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value={NO_PRESET}>No preset (map manually)</SelectItem>
+              <SelectItem value={NO_PRESET}>{t('import.mapper.noPresetManual')}</SelectItem>
               {CSV_IMPORT_PRESETS.map((preset) => (
                 <SelectItem key={preset.id} value={preset.id}>
                   {preset.label}
@@ -171,25 +173,23 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="import-row-shape">Row shape</Label>
+          <Label htmlFor="import-row-shape">{t('import.mapper.rowShape')}</Label>
           <Select value={value.rowShape} onValueChange={(v) => setRowShape(v as RowShape)}>
             <SelectTrigger id="import-row-shape" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="execution">Execution (one row per fill)</SelectItem>
-              <SelectItem value="round-trip">Round-trip (one row per closed trade)</SelectItem>
+              <SelectItem value="execution">{t('import.mapper.execution')}</SelectItem>
+              <SelectItem value="round-trip">{t('import.mapper.roundTrip')}</SelectItem>
             </SelectContent>
           </Select>
-          <p className="text-xs text-muted-foreground">
-            Set independently of any preset. Round-trip is available here even with no preset.
-          </p>
+          <p className="text-xs text-muted-foreground">{t('import.mapper.rowShapeNote')}</p>
         </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <div className="space-y-2">
-          <Label htmlFor="import-timezone">Timezone</Label>
+          <Label htmlFor="import-timezone">{t('import.mapper.timezone')}</Label>
           <Select
             value={value.timezone}
             onValueChange={(tz) => onChange({ ...value, timezone: tz })}
@@ -208,7 +208,7 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="import-date-format">Date format</Label>
+          <Label htmlFor="import-date-format">{t('import.mapper.dateFormat')}</Label>
           <Select
             value={value.dateFormat}
             onValueChange={(v) => onChange({ ...value, dateFormat: v as DateFormat })}
@@ -227,7 +227,7 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="import-number-format">Number format</Label>
+          <Label htmlFor="import-number-format">{t('import.mapper.numberFormat')}</Label>
           <Select
             value={value.numberFormat}
             onValueChange={(v) => onChange({ ...value, numberFormat: v as NumberFormat })}
@@ -246,7 +246,7 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="import-quantity-unit">Quantity unit</Label>
+          <Label htmlFor="import-quantity-unit">{t('import.mapper.quantityUnit')}</Label>
           <Select
             value={value.mapping.quantityUnit ?? 'shares'}
             onValueChange={(v) => setQuantityUnit(v as 'shares' | 'lots')}
@@ -255,38 +255,36 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="shares">Shares</SelectItem>
-              <SelectItem value="lots">Lots (IDX — 1 lot = 100 shares)</SelectItem>
+              <SelectItem value="shares">{t('import.mapper.shares')}</SelectItem>
+              <SelectItem value="lots">{t('import.mapper.lots')}</SelectItem>
             </SelectContent>
           </Select>
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="import-contract-form">Contract form</Label>
+          <Label htmlFor="import-contract-form">{t('import.mapper.contractForm')}</Label>
           <Select value={contractForm} onValueChange={(v) => setContractForm(v as ContractForm)}>
             <SelectTrigger id="import-contract-form" className="w-full">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="occ-symbol">OCC symbol in the Symbol column</SelectItem>
-              <SelectItem value="composed">Separate expiry / strike / call-put columns</SelectItem>
+              <SelectItem value="occ-symbol">{t('import.mapper.contractOcc')}</SelectItem>
+              <SelectItem value="composed">{t('import.mapper.contractComposed')}</SelectItem>
               {contractForm === 'descriptor' && (
                 <SelectItem value="descriptor" disabled>
-                  Descriptor column (set by preset)
+                  {t('import.mapper.contractDescriptor')}
                 </SelectItem>
               )}
             </SelectContent>
           </Select>
           {contractForm === 'occ-symbol' && (
-            <p className="text-xs text-muted-foreground">
-              Option rows carry the OCC contract symbol in the Symbol column.
-            </p>
+            <p className="text-xs text-muted-foreground">{t('import.mapper.occNote')}</p>
           )}
         </div>
 
         {contractForm === 'composed' && (
           <div className="space-y-2">
-            <Label htmlFor="import-expiry-format">Expiry format</Label>
+            <Label htmlFor="import-expiry-format">{t('import.mapper.expiryFormat')}</Label>
             <Select
               value={value.mapping.expiryFormat ?? 'iso'}
               onValueChange={(v) => setExpiryFormat(v as ExpiryFormat)}
@@ -305,7 +303,7 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
       </div>
 
       <div className="space-y-3">
-        <Label>Map columns to fields</Label>
+        <Label>{t('import.mapper.mapColumns')}</Label>
         <div className="space-y-2">
           {fields.map((target) => {
             const mapped = value.mapping.columns[target.field] ?? UNMAPPED;
@@ -320,10 +318,10 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
                   onValueChange={(col) => setColumn(target.field, col)}
                 >
                   <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Not mapped" />
+                    <SelectValue placeholder={t('import.mapper.notMapped')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value={UNMAPPED}>Not mapped</SelectItem>
+                    <SelectItem value={UNMAPPED}>{t('import.mapper.notMapped')}</SelectItem>
                     {columns.map((col) => (
                       <SelectItem key={col} value={col}>
                         {col}
@@ -336,8 +334,7 @@ export function ColumnMapper({ columns, value, onChange }: ColumnMapperProps) {
           })}
         </div>
         <p className="text-xs text-muted-foreground">
-          <span className="text-destructive">*</span> required. For execution rows, map exactly one
-          of Type or Action.
+          <span className="text-destructive">*</span> {t('import.mapper.requiredNote')}
         </p>
       </div>
     </div>

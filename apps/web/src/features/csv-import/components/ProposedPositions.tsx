@@ -1,4 +1,5 @@
 import type { CsvPreviewResponse, ProposedPosition } from '@jurnal-zitn/shared';
+import { formatNumber } from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import { Badge } from '@/components/ui/badge';
@@ -12,6 +13,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { decodeOptionContract } from '@/features/positions/utils/optionContract';
+import { useT } from '@/hooks/useLocale';
+import { formatDateTime, formatMoney } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 /**
@@ -35,6 +38,15 @@ function ContractLabel({ scope }: { scope: ProposedPosition['scope'] }) {
   );
 }
 
+/**
+ * D5 (ZITN-TECH-021 §5.14): harga & quantity saham tetap bergaya titik — trader
+ * IDX membaca titik sebagai pemisah desimal — sehingga diformat dengan locale
+ * `en` (tanpa grouping ribuan), bukan locale tampilan.
+ */
+function formatDot(value: string): string {
+  return formatNumber(value, 'en', { maximumFractionDigits: 8 });
+}
+
 interface ProposedPositionsProps {
   positions: ProposedPosition[];
   errors: CsvPreviewResponse['errors'];
@@ -55,6 +67,7 @@ export function ProposedPositions({
   warnings,
   currencyCode,
 }: ProposedPositionsProps) {
+  const t = useT();
   const errorRows = new Set(errors.map((e) => e.rowNumber).filter((n) => n > 0));
   const warningRows = new Set(
     warnings.map((w) => w.rowNumber).filter((n): n is number => typeof n === 'number' && n > 0),
@@ -64,8 +77,8 @@ export function ProposedPositions({
     return (
       <Card>
         <CardHeader>
-          <CardTitle className="text-base">Proposed positions</CardTitle>
-          <CardDescription>No importable positions were produced.</CardDescription>
+          <CardTitle className="text-base">{t('import.positions.emptyTitle')}</CardTitle>
+          <CardDescription>{t('import.positions.emptyDesc')}</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -74,10 +87,10 @@ export function ProposedPositions({
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base">Proposed positions ({positions.length})</CardTitle>
-        <CardDescription>
-          Each block is one position and its fills, with proposed P&amp;L for closed positions.
-        </CardDescription>
+        <CardTitle className="text-base">
+          {t('import.positions.title', { n: positions.length })}
+        </CardTitle>
+        <CardDescription>{t('import.positions.desc')}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {positions.map((pos, pi) => (
@@ -85,10 +98,14 @@ export function ProposedPositions({
             <div className="flex items-center gap-2">
               <ContractLabel scope={pos.scope} />
               <Badge variant={pos.side === 'long' ? 'default' : 'secondary'}>{pos.side}</Badge>
-              <Badge variant="outline">{pos.closes ? 'closes' : 'open'}</Badge>
-              {pos.scope.assetType === 'option' && <Badge variant="outline">option</Badge>}
+              <Badge variant="outline">
+                {t(pos.closes ? 'import.positions.closes' : 'import.positions.open')}
+              </Badge>
+              {pos.scope.assetType === 'option' && (
+                <Badge variant="outline">{t('import.positions.option')}</Badge>
+              )}
               <span className="ml-auto text-sm">
-                P&amp;L:{' '}
+                {t('import.positions.pnl')}{' '}
                 {pos.closes && pos.proposedPnl !== undefined ? (
                   <Numeric
                     value={pos.proposedPnl}
@@ -104,12 +121,12 @@ export function ProposedPositions({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Row</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead className="text-right">Qty</TableHead>
-                  <TableHead className="text-right">Price</TableHead>
-                  <TableHead className="text-right">Fees</TableHead>
-                  <TableHead>Filled at</TableHead>
+                  <TableHead>{t('import.col.row')}</TableHead>
+                  <TableHead>{t('import.col.type')}</TableHead>
+                  <TableHead className="text-right">{t('pos.col.qty')}</TableHead>
+                  <TableHead className="text-right">{t('import.col.price')}</TableHead>
+                  <TableHead className="text-right">{t('pos.col.fees')}</TableHead>
+                  <TableHead>{t('import.col.filledAt')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -123,10 +140,12 @@ export function ProposedPositions({
                     >
                       <TableCell>{fill.sourceRow}</TableCell>
                       <TableCell>{fill.type}</TableCell>
-                      <TableCell className="text-right">{fill.quantity}</TableCell>
-                      <TableCell className="text-right">{fill.price}</TableCell>
-                      <TableCell className="text-right">{fill.fees}</TableCell>
-                      <TableCell>{fill.filledAt}</TableCell>
+                      <TableCell className="text-right">{formatDot(fill.quantity)}</TableCell>
+                      <TableCell className="text-right">{formatDot(fill.price)}</TableCell>
+                      <TableCell className="text-right">
+                        {formatMoney(fill.fees, currencyCode)}
+                      </TableCell>
+                      <TableCell>{formatDateTime(fill.filledAt)}</TableCell>
                     </TableRow>
                   );
                 })}
