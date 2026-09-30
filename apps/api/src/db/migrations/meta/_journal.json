@@ -309,6 +309,13 @@
       "when": 1790596904608,
       "tag": "0043_playbooks_trade_plans",
       "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1790743831723,
+      "tag": "0044_user_entitled_until",
+      "breakpoints": true
     }
   ]
 }

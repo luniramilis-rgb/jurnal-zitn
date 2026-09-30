@@ -1,8 +1,17 @@
-// Konteks lembar harian ZITN (ZITN-TECH-019): kutipan terpilih dari lembar yang sudah terbit —
-// tanggal, asof, daftar simbol, dan level watch. Jurnal hanya MEMBACA: tanpa iframe, tanpa render
-// ulang lembar, tanpa salinan `signals_*.csv`, dan tanpa harga.
+// Konteks lembar harian ZITN (ZITN-TECH-019). Jurnal hanya MEMBACA: tanpa iframe, tanpa render
+// ulang lembar, tanpa salinan `signals_*.csv`. Sejak ZITN-TECH-029 Fase 3b (D-4(a)/(b)) jembatan
+// juga mengirim **baris lembar ber-harga** untuk workspace berbayar, dirender sebagai tabel di sini.
 
+import { Numeric } from '@/components/Numeric';
 import { Button } from '@/components/ui/button';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { useT } from '@/hooks/useLocale';
 
 import { useSheetContext, type SheetContextEntry } from '../hooks/useSheetContext';
@@ -53,12 +62,17 @@ export function DailySheetContext({ tanggal }: { tanggal: string | null }) {
   }
 
   if (!context || !context.ok) {
-    const message =
-      context?.error === 'belum_tertaut'
+    const paywall = context?.error === 'paywall';
+    const message = paywall
+      ? t('journal.context.paywall')
+      : context?.error === 'belum_tertaut'
         ? t('journal.context.notLinked')
         : context?.error === 'konteks_nonaktif'
           ? t('journal.context.off')
           : t('journal.context.unavailable');
+    const renewHref = `/api/auth/sso/start?redirect=${encodeURIComponent(
+      window.location.pathname + window.location.search,
+    )}`;
 
     return (
       <section className="space-y-3" data-slot="sheet-context-unavailable">
@@ -66,12 +80,24 @@ export function DailySheetContext({ tanggal }: { tanggal: string | null }) {
         <p className="text-muted-foreground text-sm" role="status">
           {message}
         </p>
-        <Button variant="outline" className="cursor-pointer" onClick={() => void query.refetch()}>
-          {t('journal.context.refresh')}
-        </Button>
+        {paywall ? (
+          <a
+            href={renewHref}
+            className="inline-flex h-9 cursor-pointer items-center rounded-md border px-4 text-sm font-medium hover:bg-accent"
+          >
+            {t('journal.context.renew')}
+          </a>
+        ) : (
+          <Button variant="outline" className="cursor-pointer" onClick={() => void query.refetch()}>
+            {t('journal.context.refresh')}
+          </Button>
+        )}
       </section>
     );
   }
+
+  // Defensif: respons lama (atau fixture) mungkin belum membawa `rows`.
+  const rows = context.rows ?? [];
 
   return (
     <section className="space-y-4" data-slot="sheet-context">
@@ -108,6 +134,46 @@ export function DailySheetContext({ tanggal }: { tanggal: string | null }) {
           <p className="text-muted-foreground text-sm">{t('journal.context.none')}</p>
         )}
       </div>
+
+      {rows.length > 0 && (
+        <div className="space-y-2">
+          <h2 className="text-sm font-medium">{t('journal.context.rows')}</h2>
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>{t('journal.context.colTicker')}</TableHead>
+                <TableHead>{t('journal.context.colKind')}</TableHead>
+                <TableHead>{t('journal.context.colEntry')}</TableHead>
+                <TableHead>{t('journal.context.colTarget')}</TableHead>
+                <TableHead>{t('journal.context.colStop')}</TableHead>
+                <TableHead>{t('journal.context.colDistance')}</TableHead>
+                <TableHead>{t('journal.context.colStatus')}</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {rows.map((row) => (
+                <TableRow key={`${row.market}:${row.ticker}`} data-testid="sheet-row">
+                  <TableCell className="font-medium">{row.ticker}</TableCell>
+                  <TableCell>{row.kind ?? '—'}</TableCell>
+                  <TableCell>
+                    <Numeric value={row.entry} kind="decimal" direction="none" />
+                  </TableCell>
+                  <TableCell>
+                    <Numeric value={row.target} kind="decimal" direction="none" />
+                  </TableCell>
+                  <TableCell>
+                    <Numeric value={row.stop} kind="decimal" direction="none" />
+                  </TableCell>
+                  <TableCell>
+                    <Numeric value={row.distance_pct} kind="percent" direction="none" />
+                  </TableCell>
+                  <TableCell>{row.data_status ?? '—'}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
     </section>
   );
 }

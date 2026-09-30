@@ -121,9 +121,12 @@ describe('a session that expires says so on the login page', () => {
     });
 
     // What the address bar actually holds. Written by the interception, and the
-    // only input the page gets.
+    // only input the page gets. Since ZITN-TECH-029 the expiry ALSO carries the
+    // surface the user was on, so the login form returns them there.
     expect(window.location.pathname).toBe('/login');
-    expect(window.location.search).toBe('?expired=true');
+    const params = new URLSearchParams(window.location.search);
+    expect(params.get('expired')).toBe('true');
+    expect(params.get('redirect')).toBe('/dashboard');
 
     // And what the page makes of it.
     expect(await screen.findByText(NOTICE)).toBeTruthy();

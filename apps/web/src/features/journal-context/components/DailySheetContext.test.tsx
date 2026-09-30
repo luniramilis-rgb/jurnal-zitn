@@ -63,6 +63,46 @@ describe('DailySheetContext — konteks lembar (ZITN-TECH-019)', () => {
     expect(screen.getByText('AAAA')).toBeTruthy();
   });
 
+  it('merender baris lembar ber-harga saat jembatan mengirimnya (Fase 3b)', () => {
+    setQuery({
+      data: {
+        ok: true,
+        tersedia: true,
+        tanggal: '2026-09-27',
+        asof: '2026-09-27',
+        simbol: [],
+        level_watch: [],
+        rows: [
+          {
+            market: 'ID',
+            ticker: 'BBBB',
+            name: null,
+            kind: 'signal',
+            date: '2026-09-27',
+            direction: null,
+            order_type: null,
+            rule: null,
+            entry: 1234,
+            target: 1400,
+            stop: 1150,
+            entry_prev_close: null,
+            distance_pct: 1.2,
+            size_qty: null,
+            size_unit: null,
+            data_status: 'OK',
+            evidence_status: null,
+          },
+        ],
+      },
+    });
+
+    render(<DailySheetContext tanggal="2026-09-27" />);
+
+    expect(screen.getByText('Sheet rows')).toBeTruthy();
+    expect(screen.getAllByTestId('sheet-row')).toHaveLength(1);
+    expect(screen.getByText('BBBB')).toBeTruthy();
+  });
+
   it('menjelaskan saat akun belum tertaut ke ZITN (409)', () => {
     setQuery({
       data: {

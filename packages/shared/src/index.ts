@@ -158,6 +158,7 @@ export * from './constants/tags';
 export { CSV_IMPORT_PRESETS } from './constants/csv-import-presets';
 export { kellyFraction, halfKellyFraction, riskOfRuin, riskControlLevel } from './lib/behavior';
 export type { RiskControlLevel, RiskControlReading } from './lib/behavior';
+export { safeLocalRedirect } from './lib/redirect';
 export * from './lib/occ';
 export * from './fees';
 export * from './idx';

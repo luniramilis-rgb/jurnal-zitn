@@ -4,6 +4,7 @@ import {
   BarChart3,
   BookOpen,
   Calculator,
+  CandlestickChart,
   CreditCard,
   Landmark,
   LayoutDashboard,
@@ -195,6 +196,14 @@ export function Sidebar() {
           className={itemClass(expanded)}
         >
           <ItemContent expanded={expanded} label={t('nav.lembar')} Icon={Newspaper} />
+        </Link>
+        <Link
+          to="/chart"
+          aria-label={t('nav.chart')}
+          title={expanded ? undefined : t('nav.chart')}
+          className={itemClass(expanded)}
+        >
+          <ItemContent expanded={expanded} label={t('nav.chart')} Icon={CandlestickChart} />
         </Link>
         <Link
           to="/playbooks"

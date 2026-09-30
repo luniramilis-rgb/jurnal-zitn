@@ -3,6 +3,7 @@ import { createHmac } from 'node:crypto';
 import { describe, expect, it, vi } from 'vitest';
 
 import {
+  fetchCandles,
   fetchSheetContext,
   isContextConfigured,
   signContextToken,
@@ -91,6 +92,7 @@ describe('fetchSheetContext', () => {
         { market: 'US', ticker: 'CCCC' },
       ],
       level_watch: [{ market: 'ID', ticker: 'AAAA' }],
+      rows: [],
     });
 
     const [url, init] = fetchImpl.mock.calls[0] as [string, RequestInit];
@@ -175,9 +177,11 @@ describe('withChartLinks � tautan ke chart ZITN (opsi B)', () => {
       level_watch: [{ market: 'ID', ticker: 'TLKM' }],
     };
     const out = withChartLinks(body, base);
-    expect(out.simbol[0].chartUrl).toBe('https://zenitn.test/daily/chart/?tanggal=2026-09-27#BBRI');
+    expect(out.simbol[0].chartUrl).toBe(
+      'https://zenitn.test/daily/chart/?symbol=BBRI&tf=1Y&tanggal=2026-09-27',
+    );
     expect(out.level_watch[0].chartUrl).toBe(
-      'https://zenitn.test/daily/chart/?tanggal=2026-09-27#TLKM',
+      'https://zenitn.test/daily/chart/?symbol=TLKM&tf=1Y&tanggal=2026-09-27',
     );
     // IDX memakai tanggal, bukan ?pasar (default pasar chart = id).
     expect(out.simbol[0].chartUrl).not.toContain('pasar=');
@@ -195,8 +199,12 @@ describe('withChartLinks � tautan ke chart ZITN (opsi B)', () => {
       level_watch: [{ market: 'US', ticker: 'MSFT' }],
     };
     const out = withChartLinks(body, base);
-    expect(out.simbol[0].chartUrl).toBe('https://zenitn.test/daily/chart/?pasar=us#AAPL');
-    expect(out.level_watch[0].chartUrl).toBe('https://zenitn.test/daily/chart/?pasar=us#MSFT');
+    expect(out.simbol[0].chartUrl).toBe(
+      'https://zenitn.test/daily/chart/?symbol=AAPL&tf=1Y&pasar=us',
+    );
+    expect(out.level_watch[0].chartUrl).toBe(
+      'https://zenitn.test/daily/chart/?symbol=MSFT&tf=1Y&pasar=us',
+    );
     // US menandai pasar lewat ?pasar=us, bukan ?tanggal.
     expect(out.simbol[0].chartUrl).not.toContain('tanggal=');
     // Kode pasar dari ZITN boleh huruf kecil; tautan tetap dibangun.
@@ -204,7 +212,9 @@ describe('withChartLinks � tautan ke chart ZITN (opsi B)', () => {
       { ...body, simbol: [{ market: 'us', ticker: 'AAPL' }], level_watch: [] },
       base,
     );
-    expect(lower.simbol[0].chartUrl).toBe('https://zenitn.test/daily/chart/?pasar=us#AAPL');
+    expect(lower.simbol[0].chartUrl).toBe(
+      'https://zenitn.test/daily/chart/?symbol=AAPL&tf=1Y&pasar=us',
+    );
     // Tidak ada bidang data lain yang ditambah (tanpa harga).
     expect(Object.keys(out.simbol[0]).sort()).toEqual(['chartUrl', 'market', 'ticker']);
   });
@@ -241,5 +251,66 @@ describe('withChartLinks � tautan ke chart ZITN (opsi B)', () => {
       level_watch: [],
     };
     expect(withChartLinks(noDate, base).simbol[0].chartUrl).toBeUndefined();
+  });
+});
+
+describe('fetchCandles — OHLCV melalui jembatan (Fase 3c)', () => {
+  it('memanggil ZITN dan menyaring deret ke OHLCV saja', async () => {
+    const fetchImpl = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          ok: true,
+          market: 'id',
+          symbol: 'BBCA',
+          name: 'Bank Contoh',
+          sector: 'Financials',
+          asof: '2026-09-29',
+          bars: 2,
+          t: ['2026-09-28', '2026-09-29'],
+          o: [1, 2],
+          h: [3, 4],
+          l: [0.5, 1.5],
+          c: [2, 3],
+          v: [10, 20],
+          vwap: { '10': [1, 2] },
+          ma20_vol: [1, 2],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const { status, body } = await fetchCandles({
+      baseUrl: 'https://zitn.test',
+      secret: SECRET,
+      uid: 'u1',
+      market: 'id',
+      ticker: 'bbca',
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+
+    expect(status).toBe(200);
+    expect(body.symbol).toBe('BBCA');
+    expect(body.t).toEqual(['2026-09-28', '2026-09-29']);
+    expect(body.c).toEqual([2, 3]);
+    // Indikator tidak diteruskan (pertahanan berlapis).
+    expect('vwap' in body).toBe(false);
+    expect('ma20_vol' in body).toBe(false);
+
+    const [url] = fetchImpl.mock.calls[0] as [string];
+    expect(url).toContain('/api/journal/candles?market=id&ticker=BBCA');
+  });
+
+  it('ticker tak sah -> 400 tanpa memanggil ZITN', async () => {
+    const fetchImpl = vi.fn();
+    const { status } = await fetchCandles({
+      baseUrl: 'https://zitn.test',
+      secret: SECRET,
+      uid: 'u1',
+      market: 'id',
+      ticker: '../x',
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+    });
+    expect(status).toBe(400);
+    expect(fetchImpl).not.toHaveBeenCalled();
   });
 });

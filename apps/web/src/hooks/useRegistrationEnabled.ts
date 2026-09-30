@@ -6,6 +6,7 @@ import { queryClient } from '@/lib/queryClient';
 interface InstanceConfig {
   registrationEnabled: boolean;
   advisorEnabled: boolean;
+  journalSsoEnabled: boolean;
 }
 
 /**
@@ -70,6 +71,18 @@ export function useRegistrationEnabled(): { registrationEnabled: boolean; isPend
 export function useAdvisorEnabled(): boolean {
   const { data } = useQuery(instanceConfigQuery);
   return data?.advisorEnabled ?? false;
+}
+
+/**
+ * Whether this instance offers the ZITN SSO door on the login page
+ * (ZITN-TECH-029). Courtesy, not control (the route answers 503 without
+ * JOURNAL_SSO_SECRET). FAILS CLOSED: the door is withdrawn by default, so
+ * "not yet known" and "could not ask" both hide it rather than flashing a button
+ * that leads nowhere.
+ */
+export function useJournalSsoEnabled(): boolean {
+  const { data } = useQuery(instanceConfigQuery);
+  return data?.journalSsoEnabled ?? false;
 }
 
 /**

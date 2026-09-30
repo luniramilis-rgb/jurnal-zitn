@@ -1322,6 +1322,34 @@
         ]
       }
     },
+    "/api/auth/sso/start": {
+      "get": {
+        "description": "Public. The login page's \"Continue with ZITN\" door points here: it forwards the browser to ZITN's `/api/journal/sso` bridge, carrying the sanitized local `redirect` target so the round trip returns there. The ZITN base URL stays server-side (never published via /api/config). Fail-closed: 503 when the bridge is unconfigured.\n",
+        "parameters": [
+          {
+            "description": "Local path to return to after login (defaults to /dashboard). Non-local values are ignored.",
+            "in": "query",
+            "name": "redirect",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "302": {
+            "description": "Redirect to ZITN's SSO bridge."
+          },
+          "503": {
+            "description": "ZITN SSO is not configured on this instance."
+          }
+        },
+        "summary": "Begin the ZITN SSO handoff (browser redirect to ZITN).",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/api/auth/verify-email": {
       "post": {
         "description": "Public. Rate limited by client IP (10 / 15 min, the login posture; token guessing is primarily throttled by the token's 256-bit entropy + 24 h TTL). Atomically consumes the single-use verification token and marks the account email-verified in one transaction. Expired, already-consumed, and unrecognized tokens are indistinguishable: one generic 400 INVALID_OR_EXPIRED_TOKEN (the frontend then offers the resend path). Consumption is THIS POST — fetching the emailed GET link never mutates, so prefetchers and link scanners burn nothing. Fully functional when the instance has no email configured (consuming an existing token sends nothing).\n",
@@ -1987,6 +2015,10 @@
                       "description": "False when the operator set DISABLE_ADVISOR, in which case every /api/advisor/* route answers 403 ADVISOR_DISABLED. The server refusal is the control; this field lets the web app hide the surface instead of showing pages that cannot work.\n",
                       "type": "boolean"
                     },
+                    "journalSsoEnabled": {
+                      "description": "False unless the operator opted in (DISABLE_JOURNAL_SSO=false, the default being withdrawn). Posture, not capability: it does NOT report whether JOURNAL_SSO_SECRET is set — without the secret the /api/auth/sso routes answer 503 anyway. Lets the login page show or hide the \"Continue with ZITN\" door.\n",
+                      "type": "boolean"
+                    },
                     "registrationEnabled": {
                       "description": "False when the operator set DISABLE_REGISTRATION, in which case POST /api/auth/register answers 403 REGISTRATION_DISABLED. The server refusal is the control; this field only spares the visitor a wasted form.\n",
                       "type": "boolean"
@@ -1994,7 +2026,8 @@
                   },
                   "required": [
                     "registrationEnabled",
-                    "advisorEnabled"
+                    "advisorEnabled",
+                    "journalSsoEnabled"
                   ],
                   "type": "object"
                 }
@@ -2962,6 +2995,57 @@
         "summary": "Liveness probe (DB connectivity) plus the deployed version.",
         "tags": [
           "Platform"
+        ]
+      }
+    },
+    "/api/journal/candles": {
+      "get": {
+        "description": "Authed. Same bridge and fail-closed posture as `/api/journal/context`: mints a short-lived `journal_context` token and calls ZITN's `/api/journal/candles`. Returns `{ ok, market, symbol, name, sector, asof, bars, t[], o[], h[], l[], c[], v[] }` — OHLCV only (no indicator columns). Prices are for the paid workspace (D-4(a)/(b)).\n",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "market",
+            "required": false,
+            "schema": {
+              "enum": [
+                "id",
+                "us"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "ticker",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The OHLCV series."
+          },
+          "400": {
+            "description": "ticker_tidak_sah — ticker fails the allowlist pattern."
+          },
+          "401": {
+            "description": "Authentication required."
+          },
+          "404": {
+            "description": "tidak_tersedia — no chart payload for that symbol."
+          },
+          "409": {
+            "description": "belum_tertaut — the account is not linked to ZITN."
+          },
+          "503": {
+            "description": "konteks_nonaktif, or ZITN data gates are shut."
+          }
+        },
+        "summary": "Read one symbol's OHLCV candles (context bridge, Fase 3c).",
+        "tags": [
+          "Journal"
         ]
       }
     },

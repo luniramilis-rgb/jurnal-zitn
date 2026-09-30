@@ -12,7 +12,7 @@ import { Hono } from 'hono';
 import { ValidationError } from '@/lib/errors';
 import { authMiddleware } from '@/middleware/auth.middleware';
 
-import { getSheetContextForUser } from './journal-context.service';
+import { getCandlesForUser, getSheetContextForUser } from './journal-context.service';
 
 type Env = { Variables: { userId: string } };
 
@@ -57,6 +57,43 @@ journalContextRouter.get('/context', async (c) => {
   }
 
   const { status, body } = await getSheetContextForUser(userId, raw ?? null);
+  c.header('Cache-Control', 'no-store');
+  return c.json(body, status as 200);
+});
+
+/**
+ * @swagger
+ * /api/journal/candles:
+ *   get:
+ *     summary: Read one symbol's OHLCV candles (context bridge, Fase 3c).
+ *     description: >
+ *       Authed. Same bridge and fail-closed posture as `/api/journal/context`: mints a
+ *       short-lived `journal_context` token and calls ZITN's `/api/journal/candles`. Returns
+ *       `{ ok, market, symbol, name, sector, asof, bars, t[], o[], h[], l[], c[], v[] }` —
+ *       OHLCV only (no indicator columns). Prices are for the paid workspace (D-4(a)/(b)).
+ *     tags: [Journal]
+ *     parameters:
+ *       - in: query
+ *         name: market
+ *         required: false
+ *         schema: { type: string, enum: [id, us] }
+ *       - in: query
+ *         name: ticker
+ *         required: true
+ *         schema: { type: string }
+ *     responses:
+ *       200: { description: The OHLCV series. }
+ *       400: { description: 'ticker_tidak_sah — ticker fails the allowlist pattern.' }
+ *       401: { description: Authentication required. }
+ *       404: { description: 'tidak_tersedia — no chart payload for that symbol.' }
+ *       409: { description: 'belum_tertaut — the account is not linked to ZITN.' }
+ *       503: { description: 'konteks_nonaktif, or ZITN data gates are shut.' }
+ */
+journalContextRouter.get('/candles', async (c) => {
+  const userId = c.get('userId');
+  const ticker = c.req.query('ticker') ?? '';
+  const market = c.req.query('market') === 'us' ? 'us' : 'id';
+  const { status, body } = await getCandlesForUser(userId, market, ticker);
   c.header('Cache-Control', 'no-store');
   return c.json(body, status as 200);
 });

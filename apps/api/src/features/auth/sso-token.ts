@@ -20,6 +20,8 @@ export interface SsoPayload {
   purpose: string;
   uid: string;
   email?: string | null;
+  /** Entitlement (ZITN-TECH-029 Fase 4): ISO akhir langganan, atau null. */
+  ent?: string | null;
   iat?: number;
   exp: number;
   jti: string;
@@ -72,12 +74,14 @@ export function verifySsoToken(
   if (typeof p.jti !== 'string' || p.jti.length < 8 || p.jti.length > 128) return null;
   if (typeof p.exp !== 'number' || !Number.isFinite(p.exp) || p.exp <= nowMs) return null;
   if (p.email !== undefined && p.email !== null && typeof p.email !== 'string') return null;
+  if (p.ent !== undefined && p.ent !== null && typeof p.ent !== 'string') return null;
   if (p.iat !== undefined && (typeof p.iat !== 'number' || !Number.isFinite(p.iat))) return null;
 
   return {
     purpose: p.purpose,
     uid: p.uid,
     email: (p.email as string | null | undefined) ?? null,
+    ent: (p.ent as string | null | undefined) ?? null,
     iat: p.iat as number | undefined,
     exp: p.exp,
     jti: p.jti,

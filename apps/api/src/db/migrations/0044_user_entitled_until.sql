@@ -1,0 +1,1 @@
+ALTER TABLE "users" ADD COLUMN "entitled_until" timestamp with time zone;
