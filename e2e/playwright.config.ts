@@ -131,6 +131,13 @@ const apiEnv: Record<string, string> = {
   EMAIL_FROM: process.env.EMAIL_FROM ?? '',
   EMAIL_FROM_NAME: process.env.EMAIL_FROM_NAME ?? '',
   WEB_BASE_URL: process.env.SMTP_HOST ? (process.env.WEB_BASE_URL ?? new URL(baseURL).origin) : '',
+  // ─── Journal context bridge (soft-paywall e2e) ────────────────────────────
+  // The shared secret ARMS `isContextConfigured`, so the bridge's 409/402
+  // fail-closed branches are reachable in the suite. The base URL is an
+  // unroutable loopback port on purpose: every case that reaches it stops at the
+  // link/entitlement gate BEFORE any ZITN fetch, so no e2e run contacts ZITN.
+  ZITN_BASE_URL: process.env.ZITN_BASE_URL ?? 'http://127.0.0.1:4599',
+  JOURNAL_SSO_SECRET: process.env.JOURNAL_SSO_SECRET ?? 'e2e-journal-sso-secret',
 };
 
 // When BASE_URL points at an externally-managed stack, Playwright should not
