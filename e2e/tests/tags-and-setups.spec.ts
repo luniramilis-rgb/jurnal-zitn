@@ -67,7 +67,7 @@ async function loginViaUi(page: Page, email: string): Promise<void> {
   await page.setExtraHTTPHeaders({ 'X-Forwarded-For': uniqueIp() });
   await page.goto('/login');
   await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
   await expect(page).toHaveURL(/\/dashboard/);
 }

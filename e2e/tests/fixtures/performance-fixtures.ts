@@ -592,7 +592,50 @@ export async function mockAppShell(page: Page): Promise<void> {
   // below. Both `true` is the self-hosted default, so no spec sees a surface
   // hidden out from under it.
   await page.route('**/api/config', (route) =>
-    route.fulfill(json({ registrationEnabled: true, advisorEnabled: true })),
+    route.fulfill(
+      json({ registrationEnabled: true, advisorEnabled: true, journalSsoEnabled: false }),
+    ),
+  );
+  // Playbook pickers are mounted by the position create/edit dialogs, and the
+  // /playbooks page reads the collection — so this is shell surface. Empty is
+  // the neutral answer (no playbooks, so no picker option paints).
+  await page.route(/\/api\/playbooks(\?.*)?$/, (route) => route.fulfill(json({ items: [] })));
+  // The journal context bridge backs /lembar and the context strip. On an
+  // unconfigured instance it is fail-closed, so the neutral shell answer is the
+  // "context off" shape rather than a 200-with-data.
+  await page.route(/\/api\/journal\/context(\?.*)?$/, (route) =>
+    route.fulfill(
+      json({
+        ok: false,
+        tersedia: false,
+        tanggal: null,
+        asof: null,
+        simbol: [],
+        level_watch: [],
+        rows: [],
+        error: 'konteks_nonaktif',
+      }),
+    ),
+  );
+  await page.route(/\/api\/journal\/candles(\?.*)?$/, (route) =>
+    route.fulfill(
+      json({
+        ok: false,
+        market: 'id',
+        symbol: '',
+        name: '',
+        sector: '',
+        asof: null,
+        bars: 0,
+        t: [],
+        o: [],
+        h: [],
+        l: [],
+        c: [],
+        v: [],
+        error: 'konteks_nonaktif',
+      }),
+    ),
   );
   await page.route('**/api/dashboard/layout', (route) =>
     route.fulfill(json(DEFAULT_DASHBOARD_LAYOUT)),

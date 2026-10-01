@@ -4,6 +4,9 @@ import { describe, it, expect } from 'vitest';
 
 import { BODY_LIMIT_BYTES } from '@jurnal-zitn/shared';
 
+// Ukuran yang PASTI melewati batas (batas naik 16 -> 32 KiB di Fase F).
+const OVER = BODY_LIMIT_BYTES + 1024;
+
 function makeApp() {
   return new Hono().put(
     '/test',
@@ -52,10 +55,10 @@ describe('dashboard bodyLimit + bespoke onError', () => {
     expect(json.gotBytes).toBe(body.length);
   });
 
-  it('content-length over cap: 17000 bytes returns 413 with bespoke envelope', async () => {
+  it('content-length over cap returns 413 with bespoke envelope', async () => {
     const app = makeApp();
-    const body = JSON.stringify({ pad: 'a'.repeat(17000 - 10) });
-    expect(body.length).toBe(17000);
+    const body = JSON.stringify({ pad: 'a'.repeat(OVER - 10) });
+    expect(body.length).toBe(OVER);
     const res = await app.request('/test', {
       method: 'PUT',
       body,
@@ -97,13 +100,14 @@ describe('dashboard bodyLimit + bespoke onError', () => {
     expect(json.gotBytes).toBe('{"x":1}'.length);
   });
 
-  it('stream path over cap: 17000 bytes via stream returns 413 with bespoke envelope', async () => {
+  it('stream path over cap returns 413 with bespoke envelope', async () => {
     const app = makeApp();
     const encoder = new TextEncoder();
-    const chunk = 'a'.repeat(1700);
+    const chunk = 'a'.repeat(4096);
+    const times = Math.ceil(OVER / 4096);
     const stream = new ReadableStream({
       start(controller) {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < times; i++) {
           controller.enqueue(encoder.encode(chunk));
         }
         controller.close();
@@ -127,20 +131,21 @@ describe('dashboard bodyLimit + bespoke onError', () => {
     });
   });
 
-  it('deceptive Content-Length: header says 100, stream sends 17000 bytes — returns 413', async () => {
+  it('deceptive Content-Length: header says 100, stream sends an oversize body — returns 200 (bypass pinned)', async () => {
     // FINDING: Hono 4.12.8 bodyLimit trusts Content-Length when present without
     // transfer-encoding (see hono/dist/middleware/body-limit/index.js L26-29).
-    // A deceptive CL=100 short-circuits the streaming size check, so the 17000-
-    // byte body reaches the handler. The handler's c.req.json() then fails to
+    // A deceptive CL=100 short-circuits the streaming size check, so the oversize
+    // body reaches the handler. The handler's c.req.json() then fails to
     // parse the non-JSON garbage payload; the catch returns null and the
     // handler responds 200 / gotBytes:0. This test pins that bypass behaviour
     // so any future Hono upgrade that closes the hole flips the assertion.
     const app = makeApp();
     const encoder = new TextEncoder();
-    const chunk = 'a'.repeat(1700);
+    const chunk = 'a'.repeat(4096);
+    const times = Math.ceil(OVER / 4096);
     const stream = new ReadableStream({
       start(controller) {
-        for (let i = 0; i < 10; i++) {
+        for (let i = 0; i < times; i++) {
           controller.enqueue(encoder.encode(chunk));
         }
         controller.close();

@@ -394,7 +394,7 @@ describe('dashboard routes', () => {
   it('PUT content-length 17KB body returns 413 envelope and does not mutate either table', async () => {
     const { cookie, userId } = await registerAndGetCookie();
 
-    const bigString = 'x'.repeat(17 * 1024);
+    const bigString = 'x'.repeat(BODY_LIMIT_BYTES + 1024);
     const body = JSON.stringify({ pad: bigString });
 
     const res = await app.request('/api/dashboard/layout', {
@@ -431,7 +431,7 @@ describe('dashboard routes', () => {
     const { cookie } = await registerAndGetCookie();
     const widgets = makeValidWidgets();
 
-    // Construct a body that is <= BODY_LIMIT_BYTES (16384). Pad with whitespace
+    // Construct a body that is <= BODY_LIMIT_BYTES. Pad with whitespace
     // (JSON-significant only in arrays/strings → use a config string on widgets).
     const padTarget = BODY_LIMIT_BYTES - 1000;
     const padded = [{ ...widgets[0], config: { pad: 'a'.repeat(padTarget) } }, widgets[1]];

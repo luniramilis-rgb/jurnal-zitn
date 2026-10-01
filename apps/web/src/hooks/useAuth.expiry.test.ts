@@ -199,11 +199,15 @@ describe('a session expiring, and what the remounts afterwards may do', () => {
     await remountAsThePagesWould();
 
     expect(interceptNavigate).toHaveBeenCalledTimes(1);
-    expect(interceptNavigate).toHaveBeenCalledWith({
-      to: '/login',
-      search: { expired: true },
-      replace: true,
-    });
+    // Rute tujuan selalu `/login`; sejak ZITN-TECH-029 search juga membawa
+    // `redirect` (permukaan asal) selain `expired`.
+    expect(interceptNavigate).toHaveBeenCalledWith(
+      expect.objectContaining({
+        to: '/login',
+        search: expect.objectContaining({ expired: true }),
+        replace: true,
+      }),
+    );
   });
 
   it('leaves no user behind for the next mount to read as signed in', async () => {
