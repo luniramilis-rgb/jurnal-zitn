@@ -52,32 +52,3 @@ export async function promoteToAdmin(email: string): Promise<void> {
     await sql.end();
   }
 }
-
-/**
- * Seed the ZITN SSO link + entitlement for a registered user, so the soft-paywall
- * gate can be exercised deterministically: a linked row with a past
- * `entitled_until` must answer 402 `paywall`, and a NULL link must answer 409
- * `belum_tertaut`. Same one-shot connection + `DATABASE_URL` resolution as
- * `promoteToAdmin` (this file stays the e2e suite's only direct DB access;
- * production is untouched).
- */
-export async function setJournalAccess(
-  email: string,
-  access: { zitnUserId: string | null; entitledUntil: Date | null },
-): Promise<void> {
-  const sql = postgres(DATABASE_URL, { max: 1 });
-  try {
-    const result = await sql`
-      UPDATE users
-      SET zitn_user_id = ${access.zitnUserId}, entitled_until = ${access.entitledUntil}
-      WHERE email = ${email}
-    `;
-    if (result.count !== 1) {
-      throw new Error(
-        `setJournalAccess: expected to update exactly 1 row for ${email}, updated ${result.count}.`,
-      );
-    }
-  } finally {
-    await sql.end();
-  }
-}

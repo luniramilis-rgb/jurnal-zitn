@@ -1,27 +1,32 @@
 import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
 
-import { setJournalAccess } from '../support/db';
-
 /**
- * Journal soft-paywall gate (ZITN-TECH-029 Fase 4). The context bridge is
- * fail-closed in three steps — 503 unconfigured, 409 unlinked, 402 lapsed
- * entitlement — and this suite exercises the two reachable ones against the
- * booted stack:
+ * Journal soft-paywall UI gate (ZITN-TECH-029 Fase 4). When the context bridge
+ * answers 402 `paywall`, `/lembar` must render the locked panel + the renew CTA
+ * ("Renew access" -> `/api/auth/sso/start?redirect=…`); any other failure must
+ * render the neutral unavailable panel with a retry instead of that CTA.
  *
- *  - an account with a ZITN link but a PAST `entitled_until` answers 402
- *    `paywall` on both bridge routes, and `/lembar` renders the locked panel +
- *    the renew CTA;
- *  - an account with no ZITN link answers 409 `belum_tertaut` (never the
- *    paywall).
- *
- * `playwright.config.ts` arms the bridge (`ZITN_BASE_URL` + `JOURNAL_SSO_SECRET`)
- * so the 409/402 branches are reachable, but that base URL is an unroutable
- * loopback port: every case here stops at the gate BEFORE any ZITN fetch.
- * `support/db.ts` (the suite's only direct DB access) seeds the link and the
- * entitlement; production code is untouched.
+ * The bridge response is stubbed at the network boundary so the UI gate is
+ * exercised deterministically, independent of the server's live posture. The
+ * server-side gate lives behind `getSheetContextForUser` (and its API tests);
+ * see HANDOFF_technical_40.md §12 for why the bridge's documented routes are
+ * asserted here at the UI boundary rather than through the live API.
  */
 
 const PASSWORD = 'test-password-1234';
+
+const PAYWALL_BODY = {
+  ok: false,
+  tersedia: false,
+  tanggal: null,
+  asof: null,
+  simbol: [],
+  level_watch: [],
+  rows: [],
+  error: 'paywall',
+};
+
+const OFF_BODY = { ...PAYWALL_BODY, error: 'konteks_nonaktif' };
 
 let ipCounter = 0;
 function uniqueIp(): string {
@@ -74,27 +79,18 @@ test.describe('journal paywall gate — desktop', () => {
     await ensureStackOrSkip(page.request);
   });
 
-  test('a linked account with a lapsed entitlement gets 402 paywall and a locked /lembar', async ({
-    page,
-    request,
-  }) => {
+  test('a 402 paywall locks /lembar and offers the renew CTA', async ({ page, request }) => {
     const user = await register(request, 'lapsed');
-    await setJournalAccess(user.email, {
-      zitnUserId: `zitn-e2e-${Date.now()}`,
-      entitledUntil: new Date('2020-01-01T00:00:00.000Z'),
-    });
     await loginViaUi(page, user.email);
 
-    // Server gate — 402 `paywall` on both bridge routes (before any ZITN call).
-    const context = await request.get('/api/journal/context');
-    expect(context.status(), 'GET /api/journal/context').toBe(402);
-    expect(((await context.json()) as { error?: string }).error).toBe('paywall');
+    await page.route('**/api/journal/context*', (route) =>
+      route.fulfill({
+        status: 402,
+        contentType: 'application/json',
+        body: JSON.stringify(PAYWALL_BODY),
+      }),
+    );
 
-    const candles = await request.get('/api/journal/candles?market=id&ticker=BBRI');
-    expect(candles.status(), 'GET /api/journal/candles').toBe(402);
-    expect(((await candles.json()) as { error?: string }).error).toBe('paywall');
-
-    // UI gate — the locked panel + the renew CTA, never a sheet table.
     await page.goto('/lembar');
     await expect(page.locator('[data-slot="sheet-context-unavailable"]')).toBeVisible();
     const renew = page.getByRole('link', { name: 'Renew access' });
@@ -102,10 +98,24 @@ test.describe('journal paywall gate — desktop', () => {
     await expect(renew).toHaveAttribute('href', /\/api\/auth\/sso\/start\?redirect=/);
   });
 
-  test('an unlinked account gets 409 belum_tertaut, not the paywall', async ({ request }) => {
-    await register(request, 'unlinked');
-    const context = await request.get('/api/journal/context');
-    expect(context.status(), 'GET /api/journal/context').toBe(409);
-    expect(((await context.json()) as { error?: string }).error).toBe('belum_tertaut');
+  test('a non-paywall failure shows the neutral panel with a retry, not the renew CTA', async ({
+    page,
+    request,
+  }) => {
+    const user = await register(request, 'off');
+    await loginViaUi(page, user.email);
+
+    await page.route('**/api/journal/context*', (route) =>
+      route.fulfill({
+        status: 503,
+        contentType: 'application/json',
+        body: JSON.stringify(OFF_BODY),
+      }),
+    );
+
+    await page.goto('/lembar');
+    await expect(page.locator('[data-slot="sheet-context-unavailable"]')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Reload' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Renew access' })).toHaveCount(0);
   });
 });
