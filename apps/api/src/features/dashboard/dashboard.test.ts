@@ -467,13 +467,14 @@ describe('dashboard routes', () => {
     expect(res.status).toBe(200);
   });
 
-  it('PUT chunked stream > 16KB returns 413 with the §A-r4 envelope (integration regression surface)', async () => {
+  it('PUT chunked stream over cap returns 413 with the §A-r4 envelope (integration regression surface)', async () => {
     const { cookie } = await registerAndGetCookie();
 
     const stream = new ReadableStream<Uint8Array>({
       start(controller) {
-        const chunk = new TextEncoder().encode('x'.repeat(1700));
-        for (let i = 0; i < 10; i++) controller.enqueue(chunk); // 17KB total
+        const chunk = new TextEncoder().encode('x'.repeat(4096));
+        const times = Math.ceil((BODY_LIMIT_BYTES + 1024) / 4096);
+        for (let i = 0; i < times; i++) controller.enqueue(chunk);
         controller.close();
       },
     });
