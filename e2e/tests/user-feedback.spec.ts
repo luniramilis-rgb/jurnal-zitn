@@ -59,9 +59,6 @@ const SURVEY_ID = '00000000-0000-4000-8000-0000000000a1';
 const RATING_QID = '00000000-0000-4000-8000-0000000000b2';
 const TEXT_QID = '00000000-0000-4000-8000-0000000000c3';
 const FEEDBACK_SURVEY = `${SURVEY_ID}:${RATING_QID}:${TEXT_QID}`;
-// The two keyed response properties the sent payload carries.
-const RATING_RESPONSE_KEY = `$survey_response_${RATING_QID}`;
-const TEXT_RESPONSE_KEY = `$survey_response_${TEXT_QID}`;
 
 const TAB = '[data-testid="feedback-tab"]';
 const POPOVER = '[data-testid="feedback-popover"]';
@@ -514,24 +511,28 @@ test.describe('user feedback — desktop', () => {
   });
 
   // -------------------------------------------------------------------------
-  // A programmatic drawer change closes the popover as a dismissal (deviation 3).
+  // A programmatic drawer change closes the popover. F0b removed the PostHog
+  // survey, so a close is a close — never a dismissal event, never a write.
   // -------------------------------------------------------------------------
-  test('a synthetic cross-tab drawer-open closes the popover and captures a dismissal', async ({
+  test('a synthetic cross-tab drawer-open closes the popover and posts nothing', async ({
     page,
     request,
   }) => {
-    test.fixme(
-      true,
-      'obsolete setelah F0b (survey PostHog dihapus) — tulis ulang untuk POST /api/feedback',
-    );
     test.setTimeout(45_000);
     const h = await installFeedbackHarness(page);
     const user = await registerUser(request, 'progchange');
     await loginViaUi(page, user.email);
     await awaitCanary(h);
 
+    // Record every write the surface could make; a close must make none.
+    const posts: string[] = [];
+    page.on('request', (req) => {
+      if (req.method() === 'POST' && new URL(req.url()).pathname === '/api/feedback') {
+        posts.push(req.postData() ?? '');
+      }
+    });
+
     await openPopover(page);
-    await h.waitForEvent((e) => e.event === 'survey shown', 'survey shown');
 
     // Dispatch a cross-tab storage change — the shipped handler needs only
     // key + newValue. Drawer opens (snaps), the tab shifts, the popover closes.
@@ -547,98 +548,69 @@ test.describe('user feedback — desktop', () => {
     await expect(page.getByTestId('feedback-popover')).toHaveCount(0);
     await expect(page.getByTestId('side-drawer')).toHaveAttribute('data-state', 'open');
 
-    // The dismissal lands in a SUBSEQUENT /e/ batch (wait by path, not "next").
-    await h.waitForEvent(
-      (e) =>
-        e.event === 'survey dismissed' &&
-        (e.properties?.['$survey_id'] as string) === SURVEY_ID &&
-        typeof e.properties?.['$survey_submission_id'] === 'string',
-      'survey dismissed (programmatic)',
-    );
+    // Let any (nonexistent) telemetry flush, then assert the F0b contract: the
+    // old PostHog survey is gone, and a close-without-send never POSTs.
+    await page.waitForTimeout(1_000);
+    expect(h.surveyEvents(), 'no survey event after a programmatic close').toEqual([]);
+    expect(posts, 'a close-without-send never POSTs /api/feedback').toEqual([]);
   });
 
   // -------------------------------------------------------------------------
-  // Wire contract — no capture on mount; the sent payload keeps the .csv and
-  // redacts the secret; the sent-timer close returns focus to the tab; a
-  // close-without-send is a text-less dismissal; no survey storage/bundle after.
+  // Wire contract — no telemetry on mount; the composer POSTs the type + the
+  // message + the page URL to our own /api/feedback; the sent-timer close
+  // returns focus to the tab; a close-without-send posts nothing.
   // -------------------------------------------------------------------------
-  test('sent payload keeps the .csv and redacts the secret; dismissal carries no text', async ({
+  test('the composer POSTs type/message/pageUrl to /api/feedback with no telemetry', async ({
     page,
     request,
   }) => {
-    test.fixme(
-      true,
-      'obsolete setelah F0b (survey PostHog dihapus) — tulis ulang untuk POST /api/feedback',
-    );
     test.setTimeout(60_000);
     const h = await installFeedbackHarness(page);
     const user = await registerUser(request, 'wire');
     await loginViaUi(page, user.email);
     await awaitCanary(h);
 
-    // No capture on mount — no survey event before the popover ever opened.
+    interface Posted {
+      type?: string;
+      message?: string;
+      pageUrl?: string;
+      source?: string;
+    }
+    const posts: Posted[] = [];
+    page.on('request', (req) => {
+      if (req.method() === 'POST' && new URL(req.url()).pathname === '/api/feedback') {
+        posts.push(req.postDataJSON() as Posted);
+      }
+    });
+
+    // No telemetry on mount — the surface is no longer survey-gated.
     expect(h.surveyEvents(), 'no survey event on mount').toEqual([]);
 
-    // Open → rate → type (a .csv filename + an sk- secret) → Send.
+    // Open → pick a type → type (a .csv filename + an sk- secret) → Send.
     await openPopover(page);
-    await page.getByRole('radio', { name: '3' }).click();
-    await page
-      .getByLabel('Details (optional)')
-      .fill('import broke on report-2024.csv key sk-abc123XYZ456');
+    await page.getByRole('radio', { name: 'Bug' }).click();
+    const message = 'import broke on report-2024.csv key sk-abc123XYZ456';
+    await page.getByLabel('Message').fill(message);
     // `exact` so the name does not also match the tab (aria-label "Send feedback").
     await page.getByRole('button', { name: 'Send', exact: true }).click();
     await expect(page.getByText('Sent. Thank you.')).toBeVisible();
 
-    await h.waitForEvent((e) => e.event === 'survey sent', 'survey sent');
-    const sent = h.allEvents().find((e) => e.event === 'survey sent');
-    expect(sent, 'survey sent event present').toBeTruthy();
-    const props = sent!.properties ?? {};
-    expect(props['$survey_id']).toBe(SURVEY_ID);
-    expect(typeof props['$survey_submission_id']).toBe('string');
-    expect(props['$survey_completed']).toBe(true);
-    expect(props[RATING_RESPONSE_KEY]).toBe(3);
-    const answer = props[TEXT_RESPONSE_KEY] as string;
-    // The .csv filename survives; the secret is redacted; the raw key is gone.
-    expect(answer).toContain('report-2024.csv');
-    expect(answer).toContain('[redacted]');
-    expect(answer).not.toContain('sk-abc123XYZ456');
+    // The write is a single authed POST to OUR API carrying the exact body. There
+    // is no third-party copy: the old survey's redaction died with the survey.
+    await expect.poll(() => posts.length).toBe(1);
+    expect(posts[0]).toMatchObject({ type: 'bug', message, source: 'jurnal' });
+    expect(posts[0].pageUrl, 'pageUrl is the sender page').toContain('/dashboard');
+    expect(h.surveyEvents(), 'no survey telemetry from a send').toEqual([]);
 
     // The 3 s sent-timer close returns focus to the tab (a genuine Radix path).
     await expect(page.getByTestId('feedback-popover')).toHaveCount(0, { timeout: 8_000 });
     await expect(page.locator(TAB)).toBeFocused();
 
-    // Open → close-without-send ⇒ survey dismissed, no text under any key.
+    // Open → close-without-send ⇒ nothing posted.
     await openPopover(page);
     await page.keyboard.press('Escape');
     await expect(page.getByTestId('feedback-popover')).toHaveCount(0);
-    await h.waitForEvent((e) => e.event === 'survey dismissed', 'survey dismissed');
-    const dismissed = h.allEvents().find((e) => e.event === 'survey dismissed');
-    const dProps = dismissed!.properties ?? {};
-    expect(Object.keys(dProps)).toEqual(
-      expect.arrayContaining(['$survey_id', '$survey_submission_id']),
-    );
-    expect(dProps[TEXT_RESPONSE_KEY]).toBeUndefined();
-    for (const key of Object.keys(dProps)) {
-      expect(key.startsWith('$survey_response'), `dismissed carries no response key (${key})`).toBe(
-        false,
-      );
-    }
-
-    // Storage/bundle absence — after the flow, after the canary.
-    const surveyKeys = await page.evaluate(() =>
-      Object.keys(window.localStorage).filter(
-        (k) =>
-          k.startsWith('seenSurvey_') ||
-          k.startsWith('inProgressSurvey_') ||
-          k.startsWith('abandonedSurvey_') ||
-          k === 'lastSeenSurveyDate',
-      ),
-    );
-    expect(surveyKeys, 'no survey localStorage keys persist').toEqual([]);
-    expect(
-      h.routed.filter((r) => /surveys/i.test(r.pathname)).map((r) => r.pathname),
-      'no surveys bundle requested',
-    ).toEqual([]);
+    expect(posts, 'close without send posts nothing new').toHaveLength(1);
   });
 
   // -------------------------------------------------------------------------

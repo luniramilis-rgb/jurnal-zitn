@@ -8,7 +8,7 @@ import { expect, test, type APIRequestContext, type Page } from '@playwright/tes
  * steps of the spec:
  *
  *   1. Monthly preset; the May 2026 `breakdown-table` row, the calendar's
- *      March month total and its day cells all agree on net P&L.
+ *      May month total and its day cells all agree on net P&L.
  *   2. A full same-tab document load of the stale `tz=UTC` URL after the
  *      reporting zone changed to Asia/Tokyo re-buckets the NVDA close from the
  *      1 May cell to the 2 May cell (04:30 JST), and back when restored.
@@ -290,7 +290,7 @@ test.describe('calendar and breakdowns', () => {
     let staleUtcUrl = '';
 
     // ---- Step 1: monthly preset, May 2026 calendar reconciles ------------
-    await test.step('1. March calendar day cells and month total match the breakdown row', async () => {
+    await test.step('1. May calendar day cells and month total match the breakdown row', async () => {
       // A complete monthly window whose `end` sits in the past (every demo close
       // is ≤ 2026-09-04). The bare-URL monthly default ends at start-of-tomorrow,
       // and step 2 resyncs the reporting zone to Asia/Tokyo — a zone ahead of UTC
@@ -321,18 +321,18 @@ test.describe('calendar and breakdowns', () => {
       await expect(page).toHaveURL(/month=2026-05/);
 
       // The month header total equals the "May 2026" breakdown-table row net.
-      const marchRow = page
+      const mayRow = page
         .locator(`${PAGE} [data-testid="breakdown-table"] tbody tr`)
         .filter({ hasText: 'May 2026' });
-      await expect(marchRow).toHaveCount(1);
-      const marchRowNet = (await cellNumeric(marchRow, 5)).trim();
+      await expect(mayRow).toHaveCount(1);
+      const mayRowNet = (await cellNumeric(mayRow, 5)).trim();
       const monthTotalText = (
         (await page
           .locator('[data-testid="calendar-month-total"] [data-testid="numeric"]')
           .first()
           .textContent()) ?? ''
       ).trim();
-      expect(monthTotalText).toBe(marchRowNet);
+      expect(monthTotalText).toBe(mayRowNet);
 
       // The active day cells sum (as exact minor units) to that same figure.
       const dayCells = page.locator(`${PAGE} [data-testid="pnl-calendar"] tbody td[aria-label]`);
@@ -348,7 +348,7 @@ test.describe('calendar and breakdowns', () => {
         activeDays += 1;
       }
       expect(activeDays).toBeGreaterThan(0);
-      expect(sumCents).toBe(moneyToCents(marchRowNet));
+      expect(sumCents).toBe(moneyToCents(mayRowNet));
 
       staleUtcUrl = page.url();
       expect(staleUtcUrl).toMatch(/tz=UTC/);
