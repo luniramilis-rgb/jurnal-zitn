@@ -140,7 +140,7 @@ app.route('/api/changelog', changelogRouter);
 app.route('/api/csv-import', csvImport);
 app.route('/api/dashboard', dashboardRoute);
 app.route('/api/feedback', feedbackRouter);
-app.route('/api/journal/context', journalContextRouter);
+app.route('/api/journal', journalContextRouter);
 app.route('/api/playbooks', playbookRouter);
 app.route('/api/trade-plans', tradePlanRouter);
 app.route('/api/options', optionsRouter);
