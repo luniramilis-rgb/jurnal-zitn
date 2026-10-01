@@ -102,7 +102,7 @@ export const widgetRegistry: Record<WidgetType, WidgetDefinition> = {
   },
   'daily-sheet': {
     type: 'daily-sheet',
-    displayName: 'Today’s Sheet',
+    displayName: 'Today’s Scanner',
     displayNameKey: 'widget.dailySheet',
     component: lazy(() => import('./DailySheetWidget')),
     minSize: PerWidgetMinSize['daily-sheet'],

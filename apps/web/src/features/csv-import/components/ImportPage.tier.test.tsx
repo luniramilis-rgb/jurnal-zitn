@@ -368,7 +368,7 @@ describe('CommitPanel — TIER_LIMIT_CSV_IMPORTS mapping', () => {
     expect((confirm as HTMLButtonElement).disabled).toBe(false);
   });
 
-  it('renders other refusals as the plain message (no tier banner)', () => {
+  it('renders an unknown refusal code as a local explanation, never the raw server text', () => {
     commitState.current = {
       mutate: vi.fn(),
       isPending: false,
@@ -378,6 +378,9 @@ describe('CommitPanel — TIER_LIMIT_CSV_IMPORTS mapping', () => {
     render(<CommitPanel preview={PREVIEW} onRePreview={vi.fn()} isRePreviewing={false} />);
 
     expect(screen.queryByTestId('csv-tier-refusal')).toBeNull();
-    expect(screen.getByText('Something broke')).toBeTruthy();
+    // ZITN-TECH-021 §5.14 butir 5: refusal copy is chosen by CODE from the
+    // dictionary; the English `message` is never rendered.
+    expect(screen.queryByText('Something broke')).toBeNull();
+    expect(screen.getByText('Import failed. Please try again.')).toBeTruthy();
   });
 });

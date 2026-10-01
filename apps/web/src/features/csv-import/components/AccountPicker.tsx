@@ -9,6 +9,7 @@ import {
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { isAccountWritable } from '@/features/billing/tier-usage';
 import { useTierState } from '@/features/billing/useTierState';
+import { useT } from '@/hooks/useLocale';
 
 interface AccountPickerProps {
   value: string | null;
@@ -24,30 +25,32 @@ interface AccountPickerProps {
  * instead of inviting a commit-time 403. Self-host/Pro/admin see no change.
  */
 export function AccountPicker({ value, onChange }: AccountPickerProps) {
+  const t = useT();
   const { data: accounts, isLoading, isError } = useAccounts();
   const { data: tierState } = useTierState();
 
   return (
     <div className="space-y-2">
-      <Label htmlFor="import-account">Target account</Label>
-      {isLoading && <p className="text-sm text-muted-foreground">Loading accounts…</p>}
-      {isError && <p className="text-sm text-destructive">Could not load accounts. Try again.</p>}
+      <Label htmlFor="import-account">{t('import.account.label')}</Label>
+      {isLoading && <p className="text-sm text-muted-foreground">{t('import.account.loading')}</p>}
+      {isError && <p className="text-sm text-destructive">{t('import.account.error')}</p>}
       {!isLoading && !isError && accounts && accounts.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          Create an account first — imported trades need a target account.
-        </p>
+        <p className="text-sm text-muted-foreground">{t('import.account.empty')}</p>
       )}
       {!isLoading && !isError && accounts && accounts.length > 0 && (
         <Select value={value ?? undefined} onValueChange={onChange}>
           <SelectTrigger id="import-account" className="w-full">
-            <SelectValue placeholder="Select an account" />
+            <SelectValue placeholder={t('import.account.placeholder')} />
           </SelectTrigger>
           <SelectContent>
             {accounts.map((account) => {
               const writable = isAccountWritable(tierState, account.id);
               return (
                 <SelectItem key={account.id} value={account.id} disabled={!writable}>
-                  {account.name} ({account.currency}){writable ? '' : ' — read-only on your plan'}
+                  {t(writable ? 'import.account.option' : 'import.account.optionReadOnly', {
+                    name: account.name,
+                    currency: account.currency,
+                  })}
                 </SelectItem>
               );
             })}

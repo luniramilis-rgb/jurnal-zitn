@@ -189,15 +189,27 @@ describe('F0 widget package', () => {
     expect(container.textContent).toContain("Couldn't load the daily sheet");
   });
 
-  it('daily sheet: lists tickers and carries NO price (D12)', () => {
+  it('daily sheet: links tickers and the CTA to the chart, carries NO price (D12)', () => {
     vi.mocked(useSheetContext).mockReturnValue({
       data: {
         ok: true,
         tersedia: true,
         tanggal: '2026-09-28',
         asof: '2026-09-28',
-        simbol: [{ market: 'ID', ticker: 'BBRI' }],
-        level_watch: [{ market: 'US', ticker: 'AAPL' }],
+        simbol: [
+          {
+            market: 'ID',
+            ticker: 'BBRI',
+            chartUrl: 'https://zenitn.test/daily/chart/?tanggal=2026-09-28#BBRI',
+          },
+        ],
+        level_watch: [
+          {
+            market: 'US',
+            ticker: 'AAPL',
+            chartUrl: 'https://zenitn.test/daily/chart/?pasar=us#AAPL',
+          },
+        ],
       },
       isLoading: false,
       refetch: vi.fn(),
@@ -209,9 +221,26 @@ describe('F0 widget package', () => {
     // No price/currency figure of any kind: no "Rp", "$", and no decimal amount.
     expect(text).not.toMatch(/Rp|\$|€|£/);
     expect(text).not.toMatch(/\d+[.,]\d{2}/);
-    // The only link is to the sheet surface, never a market-data URL.
-    const links = Array.from(container.querySelectorAll('a'));
-    expect(links.map((a) => a.getAttribute('href'))).toContain('/lembar');
+
+    const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href'));
+    // The sheet surface stays reachable...
+    expect(hrefs).toContain('/lembar');
+    // ...and each linked ticker opens the ZITN chart (IDX & US) in a new tab.
+    const tickerLinks = Array.from(
+      container.querySelectorAll('a[data-slot="sheet-context-ticker-link"]'),
+    );
+    expect(tickerLinks.map((a) => a.getAttribute('href'))).toEqual([
+      'https://zenitn.test/daily/chart/?tanggal=2026-09-28#BBRI',
+      'https://zenitn.test/daily/chart/?pasar=us#AAPL',
+    ]);
+    const cta = container.querySelector('a[data-slot="sheet-context-open-chart"]');
+    expect(cta?.getAttribute('href')).toBe(
+      'https://zenitn.test/daily/chart/?tanggal=2026-09-28#BBRI',
+    );
+    for (const link of [...tickerLinks, cta]) {
+      expect(link?.getAttribute('target')).toBe('_blank');
+      expect(link?.getAttribute('rel')).toBe('noopener');
+    }
   });
 
   it('record completeness: empty state when every process count is zero', () => {

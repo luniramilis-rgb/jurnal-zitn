@@ -24,6 +24,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useT } from '@/hooks/useLocale';
 import { formatMoney } from '@/lib/format';
 
 import { useRecordCashMovement } from '../hooks/useCashMovements';
@@ -89,6 +90,7 @@ function parseAmount(raw: string | undefined): number | null {
  * mark-to-market for open positions.
  */
 export function RecordCashMovementDialog({ account, open, onOpenChange }: Props) {
+  const t = useT();
   const record = useRecordCashMovement(account.id);
 
   const form = useForm<CashMovementFormValues>({
@@ -120,16 +122,13 @@ export function RecordCashMovementDialog({ account, open, onOpenChange }: Props)
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Record a deposit or withdrawal</DialogTitle>
-          <DialogDescription>
-            Record money you moved into or out of this brokerage account. Jurnal ZITN adds one
-            ledger entry in the account&apos;s currency and moves the balance by the amount.
-          </DialogDescription>
+          <DialogTitle>{t('cash.title.record')}</DialogTitle>
+          <DialogDescription>{t('cash.desc.record')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="cashMovementType">Type</Label>
+            <Label htmlFor="cashMovementType">{t('cash.field.type')}</Label>
             <Select
               value={type}
               onValueChange={(val) => form.setValue('type', val as 'deposit' | 'withdrawal')}
@@ -138,19 +137,21 @@ export function RecordCashMovementDialog({ account, open, onOpenChange }: Props)
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="deposit">Deposit</SelectItem>
-                <SelectItem value="withdrawal">Withdrawal</SelectItem>
+                <SelectItem value="deposit">{t('cash.type.deposit')}</SelectItem>
+                <SelectItem value="withdrawal">{t('cash.type.withdrawal')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="cashMovementAmount">Amount ({account.currency})</Label>
+            <Label htmlFor="cashMovementAmount">
+              {t('cash.field.amount', { currency: account.currency })}
+            </Label>
             <Input
               id="cashMovementAmount"
               inputMode="decimal"
               autoComplete="off"
-              placeholder="0.00"
+              placeholder={t('placeholder.amount')}
               {...form.register('amount', {
                 setValueAs: (v: unknown) => (typeof v === 'string' ? v.trim() : v),
               })}
@@ -158,7 +159,7 @@ export function RecordCashMovementDialog({ account, open, onOpenChange }: Props)
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="cashMovementOccurredAt">Date and time</Label>
+            <Label htmlFor="cashMovementOccurredAt">{t('cash.field.dateTime')}</Label>
             <Input
               id="cashMovementOccurredAt"
               type="datetime-local"
@@ -167,14 +168,14 @@ export function RecordCashMovementDialog({ account, open, onOpenChange }: Props)
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Current balance</span>
+            <span className="text-muted-foreground">{t('acct.reconcile.current')}</span>
             <span className="font-medium" data-testid="cash-movement-current-balance">
               {formatMoney(current.toString(), account.currency)}
             </span>
           </div>
 
           <div className="flex items-center justify-between border-t pt-3 text-sm">
-            <span className="text-muted-foreground">Resulting balance</span>
+            <span className="text-muted-foreground">{t('cash.field.resulting')}</span>
             {resulting === null ? (
               <span className="text-muted-foreground" data-testid="cash-movement-resulting-balance">
                 —
@@ -188,8 +189,7 @@ export function RecordCashMovementDialog({ account, open, onOpenChange }: Props)
 
           {resulting !== null && resulting < 0 && (
             <p className="text-sm text-warning" data-testid="cash-movement-negative-warning">
-              The balance will go below zero. Jurnal ZITN&apos;s balance is cash only and does not
-              include the market value of open positions.
+              {t('cash.warn.negative')}
             </p>
           )}
 
@@ -200,7 +200,7 @@ export function RecordCashMovementDialog({ account, open, onOpenChange }: Props)
               className="cursor-pointer"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t('action.cancel')}
             </Button>
             <Button
               type="submit"
@@ -208,10 +208,10 @@ export function RecordCashMovementDialog({ account, open, onOpenChange }: Props)
               disabled={parsed === null || record.isPending}
             >
               {record.isPending
-                ? 'Recording…'
+                ? t('cash.action.recording')
                 : type === 'deposit'
-                  ? 'Record deposit'
-                  : 'Record withdrawal'}
+                  ? t('cash.action.recordDeposit')
+                  : t('cash.action.recordWithdrawal')}
             </Button>
           </DialogFooter>
         </form>

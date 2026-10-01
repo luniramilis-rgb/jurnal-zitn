@@ -16,12 +16,13 @@ import { config, envSchema } from '@/lib/config';
  * EQUALITY against this array, not containment, so adding a second field to the
  * response reds the build and forces the decision to be made deliberately.
  */
-const ALLOWED_KEYS = ['registrationEnabled', 'advisorEnabled'];
+const ALLOWED_KEYS = ['registrationEnabled', 'advisorEnabled', 'journalSsoEnabled'];
 
 describe('GET /api/config', () => {
   afterEach(() => {
     config.DISABLE_REGISTRATION = false;
     config.DISABLE_ADVISOR = false;
+    config.DISABLE_JOURNAL_SSO = true;
     config.STRIPE_SECRET_KEY = undefined;
     config.STRIPE_WEBHOOK_SECRET = undefined;
     config.STRIPE_PRO_PRICE_ID = undefined;
@@ -40,7 +41,11 @@ describe('GET /api/config', () => {
     const res = await app.request('/api/config');
 
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ registrationEnabled: true, advisorEnabled: true });
+    expect(await res.json()).toEqual({
+      registrationEnabled: true,
+      advisorEnabled: true,
+      journalSsoEnabled: false,
+    });
   });
 
   // 2. The other state. isRegistrationEnabled() reads config live, so no module
@@ -51,7 +56,11 @@ describe('GET /api/config', () => {
     const res = await app.request('/api/config');
 
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ registrationEnabled: false, advisorEnabled: true });
+    expect(await res.json()).toEqual({
+      registrationEnabled: false,
+      advisorEnabled: true,
+      journalSsoEnabled: false,
+    });
   });
 
   // 2b. The advisor posture, independently of sign-up. Same live read.
@@ -61,7 +70,24 @@ describe('GET /api/config', () => {
     const res = await app.request('/api/config');
 
     expect(res.status).toBe(200);
-    expect(await res.json()).toEqual({ registrationEnabled: true, advisorEnabled: false });
+    expect(await res.json()).toEqual({
+      registrationEnabled: true,
+      advisorEnabled: false,
+      journalSsoEnabled: false,
+    });
+  });
+
+  // 2d. The journal-SSO door, independently. Withdrawn by default; an operator
+  //     opts in with DISABLE_JOURNAL_SSO=false. Posture only — it says nothing
+  //     about whether JOURNAL_SSO_SECRET is configured.
+  it('reports the journal SSO door only when the operator opted in', async () => {
+    config.DISABLE_JOURNAL_SSO = false;
+
+    const res = await app.request('/api/config');
+
+    expect(res.status).toBe(200);
+    expect((await res.json()).journalSsoEnabled).toBe(true);
+    expect(envSchema.shape.DISABLE_JOURNAL_SSO.parse(undefined)).toBe(true);
   });
 
   // 2c. The SHIPPED default is withdrawn: an instance that never set the
@@ -126,7 +152,13 @@ describe('GET /api/config', () => {
     const raw = await res.text();
 
     expect(res.status).toBe(200);
-    expect(raw).toBe(JSON.stringify({ registrationEnabled: true, advisorEnabled: true }));
+    expect(raw).toBe(
+      JSON.stringify({
+        registrationEnabled: true,
+        advisorEnabled: true,
+        journalSsoEnabled: false,
+      }),
+    );
     for (const secret of [
       'sk_test_secret_value',
       'whsec_secret_value',

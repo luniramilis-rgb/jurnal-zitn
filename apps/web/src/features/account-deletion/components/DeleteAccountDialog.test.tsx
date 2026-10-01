@@ -2,6 +2,8 @@
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { formatDate } from '@jurnal-zitn/shared';
+
 import { setAppLocale } from '@/lib/locale';
 
 import { DeleteAccountDialog } from './DeleteAccountDialog';
@@ -84,7 +86,11 @@ describe('DeleteAccountDialog', () => {
     };
     render(<DeleteAccountDialog onClose={vi.fn()} />);
     expect(
-      screen.getByText(new RegExp(`will be deleted on ${new Date(future).toLocaleDateString()}`)),
+      screen.getByText(
+        new RegExp(
+          `will be deleted on ${formatDate(future, 'en').replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`,
+        ),
+      ),
     ).toBeTruthy();
   });
 

@@ -7,23 +7,47 @@ export const EM_DASH = '—';
 /** Display string for missing numeric stats. */
 export const NULL_PLACEHOLDER = EM_DASH;
 
+const NUMBER_FORMAT_CACHE = new Map<string, Intl.NumberFormat>();
+const DATE_TIME_FORMAT_CACHE = new Map<string, Intl.DateTimeFormat>();
+
+/**
+ * Reuse one `Intl` formatter per `locale + options` instead of constructing a new one for
+ * every cell — the csv-import preview formats up to `CSV_IMPORT_MAX_ROWS` rows in one render
+ * (ZITN-TECH-025 review, performance track). Keyed by locale so a locale switch is honoured.
+ */
+function numberFormat(options: Intl.NumberFormatOptions): Intl.NumberFormat {
+  const locale = getAppLocale();
+  const cacheKey = `${locale}|${JSON.stringify(options)}`;
+  let formatter = NUMBER_FORMAT_CACHE.get(cacheKey);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(locale, options);
+    NUMBER_FORMAT_CACHE.set(cacheKey, formatter);
+  }
+  return formatter;
+}
+
+function dateTimeFormat(options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+  const locale = getAppLocale();
+  const cacheKey = `${locale}|${JSON.stringify(options)}`;
+  let formatter = DATE_TIME_FORMAT_CACHE.get(cacheKey);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, options);
+    DATE_TIME_FORMAT_CACHE.set(cacheKey, formatter);
+  }
+  return formatter;
+}
+
 /**
  * Canonical on-screen money rendering. SUFFIX-LESS: a USD amount renders as
  * `$1,234.50` — the trailing ` USD` code suffix was dropped so every caller
  * (P&L surfaces, expenses, fees, tax, billing) renders one canonical way.
  */
 export function formatCurrency(amount: number, currencyCode: string): string {
-  return new Intl.NumberFormat(getAppLocale(), {
-    style: 'currency',
-    currency: currencyCode,
-  }).format(amount);
+  return numberFormat({ style: 'currency', currency: currencyCode }).format(amount);
 }
 
 export function formatMoney(decimalString: string, currencyCode: string): string {
-  return new Intl.NumberFormat(getAppLocale(), {
-    style: 'currency',
-    currency: currencyCode,
-  }).format(Number(decimalString));
+  return numberFormat({ style: 'currency', currency: currencyCode }).format(Number(decimalString));
 }
 
 /**
@@ -33,10 +57,7 @@ export function formatMoney(decimalString: string, currencyCode: string): string
  * to `Intl.NumberFormat` (e.g. `style: 'currency'`, `minimumFractionDigits`).
  */
 export function formatSigned(value: number, opts: Intl.NumberFormatOptions = {}): string {
-  return new Intl.NumberFormat(getAppLocale(), {
-    ...opts,
-    signDisplay: 'exceptZero',
-  }).format(value);
+  return numberFormat({ ...opts, signDisplay: 'exceptZero' }).format(value);
 }
 
 /**
@@ -49,7 +70,7 @@ export function formatSigned(value: number, opts: Intl.NumberFormatOptions = {})
  * DEFERRED (d-cc56d2ab). Do NOT bind it to any surface here.
  */
 export function formatAccounting(value: number, currency: string): string {
-  return new Intl.NumberFormat(getAppLocale(), {
+  return numberFormat({
     style: 'currency',
     currency,
     currencySign: 'accounting',
@@ -102,6 +123,18 @@ export function formatProfitFactor(
   if (pf !== null) return pf.toFixed(2);
   if (hasWins && !hasLosses) return '∞'; // ∞
   return NULL_PLACEHOLDER;
+}
+
+/**
+ * Locale-aware date+time for an INSTANT (ledger `occurredAt` stamps). Unlike
+ * `formatDate` in `@jurnal-zitn/shared` (which pins UTC for date-only values),
+ * this renders in the viewer's local zone — the same behavior the old
+ * `new Date(iso).toLocaleString()` had, but pinned to the app locale (R13-b).
+ */
+export function formatDateTime(iso: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return dateTimeFormat({ dateStyle: 'medium', timeStyle: 'short' }).format(date);
 }
 
 export function formatRelativeTime(iso: string, now: Date = new Date()): string {

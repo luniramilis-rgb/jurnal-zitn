@@ -32,6 +32,23 @@ import type { CsvPreset } from '../schemas/csv-import';
  *   - tradervue: Tradervue generic import format
  *     (Time, Date, Quantity, Symbol, Side, Price, Option, Commission, …).
  *   - generic-execution: Jurnal ZITN's own canonical one-row-per-fill template.
+ *   - generic-idx: **provisional, labels unverified** IDX broker preset, added
+ *     under D2 (ZITN-TECH-021) as alias-only mapping help — the server stays the
+ *     authoritative parser. The Indonesian alias vocabulary (Tanggal, Jenis
+ *     Transaksi, Kode Saham, Jumlah, Harga, Komisi) is NOT verified against real
+ *     broker artifacts: the owner's real PT Korea Investment and Sekuritas
+ *     Indonesia documents (ZITN-TECH-021 §5.24 Statement of Account, §5.25 Trade
+ *     Confirmation) carry ENGLISH headers (STOCK, Amount Buy/Sell, Quantity,
+ *     Price, Gross Amount, Commission, VAT, Levy, Stamp Duty, Sales Tax, Trade
+ *     Date) — none of the Indonesian aliases appear. Those real artifacts are
+ *     PDF, not CSV, so they cannot be uploaded through this path at all.
+ *     Real-document numbers are US (comma thousands, dot decimal; e.g.
+ *     999,999.99) while dates are EU (DD/MM/YYYY); the preset's
+ *     `numberFormat: 'eu'` is therefore an UNVALIDATED assumption (EU dates are
+ *     corroborated; the only real samples we have use US numbers). It ships
+ *     WITHOUT a committed real-export fixture (REQ-3.5 not met) and is NOT in
+ *     `CSV_IMPORT_SAMPLE_FILES`, so the conformance suite never runs a fabricated
+ *     sample. `assetType` is left for the user.
  */
 export const CSV_IMPORT_PRESETS: CsvPreset[] = [
   {
@@ -141,6 +158,45 @@ export const CSV_IMPORT_PRESETS: CsvPreset[] = [
         price: 'Price',
         filledAt: 'FilledAt',
         fees: 'Fees',
+      },
+    },
+  },
+  {
+    id: 'generic-idx',
+    label: 'IDX broker statement (generic, unverified labels)',
+    rowShape: 'execution',
+    // EU dates (DD/MM/YYYY) are corroborated by the real trade confirmations.
+    // `eu` numbers (`.` thousands, `,` decimal) are an UNVALIDATED assumption:
+    // the only real samples record numbers in US format (§5.24/§5.25), and the
+    // alias headers themselves are unverified. Declared, never guessed — the
+    // normalizer honors the declared format exactly (REQ-5.3/5.4).
+    dateFormat: 'eu',
+    numberFormat: 'eu',
+    mapping: {
+      rowShape: 'execution',
+      contractForm: 'occ-symbol',
+      // IDX statement quantities are quoted in LOTS (1 lot = 100 shares), the
+      // existing `quantityUnit` option (Fase 2b-2) — not new parsing logic.
+      quantityUnit: 'lots',
+      delimiter: ',',
+      // `Jenis Transaksi` carries Beli/Jual; the canonical `action` map only has
+      // BUY/SELL, so the Indonesian synonyms are declared here (REQ-2.3) — the
+      // same `mapping.transforms` path `applyPreset` forwards.
+      transforms: { action: { Beli: 'buy', Jual: 'sell' } },
+      // Column aliases (UNVERIFIED — see the module doc comment: real artifacts
+      // carry English headers). `Nilai` (gross value) and `Pajak` (tax) sit
+      // unmapped: Jurnal ZITN derives value from quantity×price and has no tax
+      // field on a fill. `assetType` is deliberately unmapped — an IDX stock
+      // statement has no asset-type column, and setting a constant default is an
+      // engine change (out of scope for a language wave), so the user completes it
+      // in the mapper (REQ-3.4 manual fallback).
+      columns: {
+        symbol: 'Kode Saham',
+        action: 'Jenis Transaksi',
+        quantity: 'Jumlah',
+        price: 'Harga',
+        filledAt: 'Tanggal',
+        fees: 'Komisi',
       },
     },
   },

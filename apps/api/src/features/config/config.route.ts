@@ -1,6 +1,6 @@
 import { Hono } from 'hono';
 
-import { isAdvisorEnabled, isRegistrationEnabled } from '@/lib/config';
+import { isAdvisorEnabled, isJournalSsoEnabled, isRegistrationEnabled } from '@/lib/config';
 
 // ---------------------------------------------------------------------------
 // Public configuration (REQ-9.4/9.5).
@@ -64,7 +64,7 @@ const configRouter = new Hono();
  *           application/json:
  *             schema:
  *               type: object
- *               required: [registrationEnabled, advisorEnabled]
+ *               required: [registrationEnabled, advisorEnabled, journalSsoEnabled]
  *               additionalProperties: false
  *               properties:
  *                 registrationEnabled:
@@ -82,11 +82,23 @@ const configRouter = new Hono();
  *                     ADVISOR_DISABLED. The server refusal is the control;
  *                     this field lets the web app hide the surface instead of
  *                     showing pages that cannot work.
+ *                 journalSsoEnabled:
+ *                   type: boolean
+ *                   description: >
+ *                     False unless the operator opted in (DISABLE_JOURNAL_SSO=false,
+ *                     the default being withdrawn). Posture, not capability: it
+ *                     does NOT report whether JOURNAL_SSO_SECRET is set — without
+ *                     the secret the /api/auth/sso routes answer 503 anyway. Lets
+ *                     the login page show or hide the "Continue with ZITN" door.
  */
 configRouter.get('/', (c) => {
   c.header('Cache-Control', CACHE_CONTROL);
   return c.json(
-    { registrationEnabled: isRegistrationEnabled(), advisorEnabled: isAdvisorEnabled() },
+    {
+      registrationEnabled: isRegistrationEnabled(),
+      advisorEnabled: isAdvisorEnabled(),
+      journalSsoEnabled: isJournalSsoEnabled(),
+    },
     200,
   );
 });

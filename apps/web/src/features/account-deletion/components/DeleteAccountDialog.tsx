@@ -9,7 +9,7 @@
 
 import { useState } from 'react';
 
-import type { MessageKey } from '@jurnal-zitn/shared';
+import { formatDate, type MessageKey } from '@jurnal-zitn/shared';
 
 import { RetentionSummary } from '@/components/account-deletion/RetentionSummary';
 import { Button } from '@/components/ui/button';
@@ -25,7 +25,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTierState } from '@/features/billing/useTierState';
 import { useWalletBalance } from '@/features/billing/useWalletBalance';
-import { useT } from '@/hooks/useLocale';
+import { useLocale, useT } from '@/hooks/useLocale';
 
 import { useDeleteAccount } from '../hooks/useAccountDeletion';
 
@@ -50,6 +50,7 @@ interface DeleteAccountDialogProps {
 
 export function DeleteAccountDialog({ onClose }: DeleteAccountDialogProps) {
   const t = useT();
+  const { locale } = useLocale();
   const [password, setPassword] = useState('');
   const balance = useWalletBalance();
   const tier = useTierState();
@@ -69,7 +70,7 @@ export function DeleteAccountDialog({ onClose }: DeleteAccountDialogProps) {
   const periodEnd = subscription ? new Date(subscription.currentPeriodEnd) : null;
   const timingLine =
     periodEnd !== null && periodEnd.getTime() > Date.now()
-      ? t('settings.delete.timingScheduled', { date: periodEnd.toLocaleDateString() })
+      ? t('settings.delete.timingScheduled', { date: formatDate(periodEnd, locale) })
       : t('settings.delete.timingImmediate');
 
   const submit = () => {

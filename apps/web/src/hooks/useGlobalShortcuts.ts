@@ -16,6 +16,7 @@ export const SHORTCUT_SEQUENCES = [
   { key: 'd', path: '/dashboard', labelKey: 'shortcut.dashboard' },
   { key: 'l', path: '/lembar', labelKey: 'shortcut.lembar' },
   { key: 'p', path: '/positions', labelKey: 'shortcut.positions' },
+  { key: 'k', path: '/chart', labelKey: 'shortcut.chart' },
   { key: 'b', path: '/playbooks', labelKey: 'shortcut.playbooks' },
   { key: 't', path: '/trade-plans', labelKey: 'shortcut.tradePlans' },
   { key: 'c', path: '/calculator', labelKey: 'shortcut.calculator' },

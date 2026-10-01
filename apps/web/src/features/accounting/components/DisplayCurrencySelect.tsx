@@ -14,6 +14,7 @@ import {
   useDisplayCurrencyQuery,
 } from '@/features/accounting/hooks/useDisplayCurrency';
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
+import { useT } from '@/hooks/useLocale';
 
 /**
  * Dropdown of the currencies the user currently has accounts in. Saves the
@@ -23,6 +24,7 @@ import { useAccounts } from '@/features/accounts/hooks/useAccounts';
  * Mounted on the settings route alongside `ExchangeRatesPage`.
  */
 export function DisplayCurrencySelect() {
+  const t = useT();
   const { data: accounts, isLoading: accountsLoading } = useAccounts();
   const { data: currentDisplayCurrency, isLoading: currencyLoading } = useDisplayCurrencyQuery();
   const mutation = useDisplayCurrencyMutation();
@@ -39,20 +41,15 @@ export function DisplayCurrencySelect() {
   return (
     <div className="space-y-4 rounded-md border p-4">
       <div>
-        <h2 className="text-lg font-semibold">Display currency</h2>
-        <p className="mt-1 text-sm text-muted-foreground">
-          The currency used for the dashboard cross-currency total. Per-account balances stay in
-          their native currency.
-        </p>
+        <h2 className="text-lg font-semibold">{t('displayCur.title')}</h2>
+        <p className="mt-1 text-sm text-muted-foreground">{t('displayCur.desc')}</p>
       </div>
       <div className="space-y-2">
-        <Label htmlFor="displayCurrency">Currency</Label>
+        <Label htmlFor="displayCurrency">{t('displayCur.field')}</Label>
         {isLoading ? (
           <Skeleton className="h-9 w-48" />
         ) : hasNoAccounts ? (
-          <p className="text-sm text-muted-foreground">
-            Create an account to choose a display currency.
-          </p>
+          <p className="text-sm text-muted-foreground">{t('displayCur.noAccounts')}</p>
         ) : (
           <Select
             value={selected}
@@ -60,7 +57,7 @@ export function DisplayCurrencySelect() {
             disabled={mutation.isPending}
           >
             <SelectTrigger id="displayCurrency" className="w-48 cursor-pointer">
-              <SelectValue placeholder="Select currency" />
+              <SelectValue placeholder={t('displayCur.placeholder')} />
             </SelectTrigger>
             <SelectContent>
               {currencyOptions.map((code) => (

@@ -161,6 +161,17 @@ export const envSchema = z.object({
     .enum(['true', 'false'])
     .default('true')
     .transform((v) => v === 'true'),
+  // Journal SSO posture (ZITN-TECH-029). The "Continue with ZITN" door is offered
+  // only when an operator says so — withdrawn BY DEFAULT (a stock self-host has no
+  // ZITN to talk to). Same idiom as DISABLE_ADVISOR: an operator POSTURE, not a
+  // capability probe. The actual control stays JOURNAL_SSO_SECRET: without it the
+  // /api/auth/sso routes answer 503 regardless of this flag. /api/config reports
+  // `journalSsoEnabled` so the login page shows the door — and nothing about the
+  // deployment's infrastructure. Opt in with DISABLE_JOURNAL_SSO=false.
+  DISABLE_JOURNAL_SSO: z
+    .enum(['true', 'false'])
+    .default('true')
+    .transform((v) => v === 'true'),
   // Changelog (REQ-3). Both optional with defaults — zero new required config.
   // GitHub repo as an owner/repo slug, NEVER a URL. The negative lookahead
   // rejects whole-segment '.'/'..' while dots inside repo names stay legal
@@ -547,6 +558,16 @@ export function isRegistrationEnabled(): boolean {
  */
 export function isAdvisorEnabled(): boolean {
   return !config.DISABLE_ADVISOR;
+}
+
+/**
+ * Whether this instance offers the ZITN SSO door on the login page
+ * (ZITN-TECH-029). Posture (operator set DISABLE_JOURNAL_SSO=false), read live;
+ * the CONTROL remains JOURNAL_SSO_SECRET — without it, /api/auth/sso answers 503
+ * whether or not this reports true.
+ */
+export function isJournalSsoEnabled(): boolean {
+  return !config.DISABLE_JOURNAL_SSO;
 }
 
 /** True when the Prometheus exposition surface is enabled (REQ-1.1). */

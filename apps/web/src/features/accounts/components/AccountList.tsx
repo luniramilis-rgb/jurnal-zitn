@@ -35,6 +35,7 @@ import { writabilityRestricted } from '@/features/billing/tier-usage';
 import { UpgradeLink } from '@/features/billing/UpgradeLink';
 import { useTierState } from '@/features/billing/useTierState';
 import { useDemoAccount } from '@/features/onboarding/hooks/useDemoAccount';
+import { useT } from '@/hooks/useLocale';
 
 import {
   useAccounts,
@@ -46,6 +47,7 @@ import {
 import { AccountDialog } from './AccountDialog';
 
 export function AccountList() {
+  const t = useT();
   const { data: accounts, isLoading } = useAccounts();
   const deleteAccount = useDeleteAccount();
   const setWritable = useSetWritableAccount();
@@ -87,6 +89,19 @@ export function AccountList() {
   const accountsUsed = tierState?.usage?.accounts.used ?? 0;
   const atCap = accountsCap !== null && accountsUsed >= accountsCap;
 
+  // One key per (plural × restriction) case: English needs "account"/"accounts"
+  // and the optional writable clause, and neither is assembled in JSX
+  // (ZITN-TECH-021 §5.13 butir 2). Indonesian does not pluralise, so its four
+  // values differ only by the trailing writable sentence.
+  const capBodyKey =
+    accountsCap === 1
+      ? restricted
+        ? 'acct.cap.bodyRestrictedOne'
+        : 'acct.cap.bodyOne'
+      : restricted
+        ? 'acct.cap.bodyRestrictedMany'
+        : 'acct.cap.bodyMany';
+
   if (isLoading) {
     return (
       <div className="space-y-3">
@@ -103,10 +118,10 @@ export function AccountList() {
           its first step's anchor — the same `data-tour` contract the positions
           list and the account dialog already use. */}
       <PageHeader
-        page="Accounts"
+        page={t('page.accounts')}
         right={
           <Button className="cursor-pointer" data-tour="account-new" onClick={beginCreate}>
-            New Account
+            {t('acct.list.new')}
           </Button>
         }
       />
@@ -118,11 +133,9 @@ export function AccountList() {
           className="mb-4 flex items-start justify-between gap-4"
         >
           <div>
-            <AlertTitle>Account limit reached</AlertTitle>
+            <AlertTitle>{t('acct.cap.title')}</AlertTitle>
             <AlertDescription>
-              You&apos;re using {accountsUsed} of {accountsCap} account
-              {accountsCap === 1 ? '' : 's'} on your plan.
-              {restricted ? ' Only the writable account accepts new positions.' : ''}
+              {t(capBodyKey, { used: accountsUsed, cap: accountsCap ?? 0 })}
             </AlertDescription>
           </div>
           {tierState?.purchasable && <UpgradeLink surface="accounts" className="shrink-0" />}
@@ -130,15 +143,13 @@ export function AccountList() {
       )}
 
       {!accounts?.length ? (
-        <div className="py-12 text-center text-muted-foreground">
-          No accounts yet. Create one to start tracking positions.
-        </div>
+        <div className="py-12 text-center text-muted-foreground">{t('acct.list.empty')}</div>
       ) : (
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Currency</TableHead>
+              <TableHead>{t('common.name')}</TableHead>
+              <TableHead>{t('common.currency')}</TableHead>
               <TableHead className="w-12" />
             </TableRow>
           </TableHeader>
@@ -153,7 +164,7 @@ export function AccountList() {
                         carries it. */}
                     {account.isDefault && (
                       <Badge variant="secondary" data-testid={`default-badge-${account.id}`}>
-                        Default
+                        {t('acct.badge.default')}
                       </Badge>
                     )}
                     {/* Writability badge + make-writable action (D18) — only
@@ -162,12 +173,12 @@ export function AccountList() {
                     {restricted &&
                       (account.id === writableAccountId ? (
                         <Badge variant="secondary" data-testid={`writable-badge-${account.id}`}>
-                          Writable
+                          {t('acct.badge.writable')}
                         </Badge>
                       ) : (
                         <>
                           <Badge variant="outline" data-testid={`readonly-badge-${account.id}`}>
-                            Read-only
+                            {t('acct.badge.readonly')}
                           </Badge>
                           <Button
                             variant="outline"
@@ -176,7 +187,7 @@ export function AccountList() {
                             disabled={setWritable.isPending}
                             onClick={() => setWritable.mutate(account.id)}
                           >
-                            Make writable
+                            {t('acct.action.makeWritable')}
                           </Button>
                         </>
                       ))}
@@ -198,7 +209,7 @@ export function AccountList() {
                           setDialogOpen(true);
                         }}
                       >
-                        Edit
+                        {t('common.edit')}
                       </DropdownMenuItem>
                       {/* Withheld from the current default (nothing to do) and
                           from the sample account (the server refuses it). */}
@@ -208,14 +219,14 @@ export function AccountList() {
                           disabled={setDefault.isPending}
                           onClick={() => setDefault.mutate(account.id)}
                         >
-                          Make default
+                          {t('acct.action.makeDefault')}
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem
                         className="cursor-pointer text-destructive"
                         onClick={() => setDeleteTarget(account)}
                       >
-                        Delete
+                        {t('common.delete')}
                       </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
@@ -267,16 +278,12 @@ export function AccountList() {
       >
         <AlertDialogContent data-testid="demo-teardown-confirm">
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove the sample data?</AlertDialogTitle>
-            <AlertDialogDescription>
-              Your own accounts and the sample account cannot both exist, so creating an account
-              removes the sample account and every trade in it. You can add sample data again once
-              you have no accounts of your own.
-            </AlertDialogDescription>
+            <AlertDialogTitle>{t('acct.demo.title')}</AlertDialogTitle>
+            <AlertDialogDescription>{t('acct.demo.body')}</AlertDialogDescription>
           </AlertDialogHeader>
           {demoTeardownFailed && (
             <p role="alert" data-testid="demo-teardown-error" className="text-sm text-destructive">
-              The sample data could not be removed, so your account has not been created. Try again.
+              {t('acct.demo.error')}
             </p>
           )}
           <AlertDialogFooter>
@@ -284,7 +291,7 @@ export function AccountList() {
               className="cursor-pointer"
               aria-disabled={isTearingDown || undefined}
             >
-              Cancel
+              {t('action.cancel')}
             </AlertDialogCancel>
             <AlertDialogAction
               className="cursor-pointer aria-disabled:cursor-not-allowed aria-disabled:opacity-50"
@@ -303,7 +310,7 @@ export function AccountList() {
                 });
               }}
             >
-              {isTearingDown ? 'Removing…' : 'Remove and continue'}
+              {t(isTearingDown ? 'acct.demo.removing' : 'acct.demo.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -312,13 +319,13 @@ export function AccountList() {
       <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete account</AlertDialogTitle>
+            <AlertDialogTitle>{t('acct.delete.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete "{deleteTarget?.name}"? This action cannot be undone.
+              {t('acct.delete.body', { name: deleteTarget?.name ?? '' })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="cursor-pointer"
               onClick={() => {
@@ -328,7 +335,7 @@ export function AccountList() {
                 }
               }}
             >
-              Delete
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

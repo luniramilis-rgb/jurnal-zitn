@@ -271,7 +271,7 @@ export function FillDialog({
                     form.setValue('price', roundToIdxTick(raw), { shouldValidate: true });
                   },
                 })}
-                placeholder="0.00"
+                placeholder={t('pos.placeholder.amount')}
               />
               {idxMode && (
                 <p className="text-xs text-muted-foreground">{t('pos.fill.priceTick')}</p>
@@ -382,13 +382,17 @@ export function FillDialog({
                     tabIndex={-1}
                     className="bg-muted text-muted-foreground"
                     value={previewFee ?? ''}
-                    placeholder="Enter price and quantity"
+                    placeholder={t('pos.fill.enterPriceQty')}
                   />
                   <p className="text-xs text-muted-foreground">{t('pos.fill.calcFromSchedule')}</p>
                 </>
               ) : (
                 <>
-                  <Input id="fees" {...form.register('fees')} placeholder="0.00" />
+                  <Input
+                    id="fees"
+                    {...form.register('fees')}
+                    placeholder={t('pos.placeholder.amount')}
+                  />
                   {feeIsCalculable && feeOverride && (
                     <p className="text-xs text-muted-foreground">{t('pos.fill.addedOnTop')}</p>
                   )}

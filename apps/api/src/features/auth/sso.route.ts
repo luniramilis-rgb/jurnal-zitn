@@ -14,6 +14,9 @@
 import { Hono } from 'hono';
 import { setCookie } from 'hono/cookie';
 
+import { safeLocalRedirect } from '@jurnal-zitn/shared';
+
+import { config, isSsoConfigured } from '@/lib/config';
 import { sessionCookieOptions } from '@/lib/cookie-policy';
 
 import { ssoRedirectTarget } from './sso-redirect';
@@ -51,7 +54,39 @@ const sso = new Hono();
 sso.get('/sso', async (c) => {
   const { token } = await exchangeSsoToken(c.req.query('token'));
   setCookie(c, 'session', token, sessionCookieOptions());
-  return c.redirect(ssoRedirectTarget(c.req.query('tanggal')), 302);
+  return c.redirect(ssoRedirectTarget(c.req.query('tanggal'), c.req.query('redirect')), 302);
+});
+
+/**
+ * @swagger
+ * /api/auth/sso/start:
+ *   get:
+ *     summary: Begin the ZITN SSO handoff (browser redirect to ZITN).
+ *     description: >
+ *       Public. The login page's "Continue with ZITN" door points here: it
+ *       forwards the browser to ZITN's `/api/journal/sso` bridge, carrying the
+ *       sanitized local `redirect` target so the round trip returns there. The
+ *       ZITN base URL stays server-side (never published via /api/config).
+ *       Fail-closed: 503 when the bridge is unconfigured.
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: query
+ *         name: redirect
+ *         required: false
+ *         schema: { type: string }
+ *         description: Local path to return to after login (defaults to /dashboard). Non-local values are ignored.
+ *     responses:
+ *       302: { description: Redirect to ZITN's SSO bridge. }
+ *       503: { description: ZITN SSO is not configured on this instance. }
+ */
+sso.get('/sso/start', (c) => {
+  if (!isSsoConfigured() || !config.ZITN_BASE_URL) {
+    return c.json({ ok: false, error: 'journal_sso_nonaktif' }, 503);
+  }
+  const redirect = safeLocalRedirect(c.req.query('redirect'));
+  const target = new URL('/api/journal/sso', config.ZITN_BASE_URL);
+  target.searchParams.set('redirect', redirect);
+  return c.redirect(target.toString(), 302);
 });
 
 /**

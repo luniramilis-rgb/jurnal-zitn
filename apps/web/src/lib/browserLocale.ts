@@ -6,7 +6,8 @@ import { type AppLocale } from '@jurnal-zitn/shared';
  * `navigator.language` (mis. `en-US`, `id-ID`) tidak persis sama dengan locale
  * yang didukung (`en` | `id`), jadi kami memetakan lewat prefiks bahasa utama.
  * `undefined` berarti "jangan semai" — sama seperti timezone, kami tidak pernah
- * menulis nilai yang tak dikenal; server sudah punya default `id`.
+ * menulis nilai yang tak dikenal; server memakai `DEFAULT_LOCALE` bersama
+ * (`packages/shared/src/i18n.ts`) saat preferensi pengguna belum ada.
  */
 export function detectBrowserLocale(): AppLocale | undefined {
   const candidates: string[] = [];

@@ -6,6 +6,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { AccountBalance } from '@/features/accounting/components/AccountBalance';
 import { LedgerView } from '@/features/accounting/components/LedgerView';
 import { useAccount } from '@/features/accounting/hooks/useAccount';
+import { useT } from '@/hooks/useLocale';
 
 // NOTE: this page composes `AccountBalance` (native account currency) and
 // `LedgerView` (also native account currency); nothing on this page is
@@ -18,6 +19,7 @@ import { useAccount } from '@/features/accounting/hooks/useAccount';
 // also invalidate `['accounts', 'detail', accountId]`.
 
 function AccountDetailPage({ accountId }: { accountId: string }) {
+  const t = useT();
   const { data: account, isLoading } = useAccount(accountId);
 
   if (isLoading) {
@@ -33,10 +35,10 @@ function AccountDetailPage({ accountId }: { accountId: string }) {
   if (!account) {
     return (
       <div className="py-12 text-center text-muted-foreground">
-        Account not found.
+        {t('acct.detail.notFound')}
         <div className="mt-4">
           <Button asChild variant="outline" className="cursor-pointer">
-            <Link to="/accounts">Back to accounts</Link>
+            <Link to="/accounts">{t('acct.detail.backToAccounts')}</Link>
           </Button>
         </div>
       </div>
@@ -54,7 +56,7 @@ function AccountDetailPage({ accountId }: { accountId: string }) {
         </div>
         <div className="flex items-center gap-2">
           <Button asChild variant="outline" className="cursor-pointer">
-            <Link to="/accounts">Back</Link>
+            <Link to="/accounts">{t('acct.detail.back')}</Link>
           </Button>
           {/* The app-wide drawer opener — this page has no PageHeader, so its
               own header row carries the slot. */}
@@ -65,7 +67,7 @@ function AccountDetailPage({ accountId }: { accountId: string }) {
       <AccountBalance account={account} />
 
       <div>
-        <h2 className="mb-3 text-lg font-semibold">Ledger</h2>
+        <h2 className="mb-3 text-lg font-semibold">{t('acct.detail.ledger')}</h2>
         <LedgerView accountId={account.id} currency={account.currency} />
       </div>
     </div>

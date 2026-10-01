@@ -2,6 +2,8 @@ import Decimal from 'decimal.js';
 
 import {
   computePphFinal,
+  formatDate,
+  formatNumber,
   PPH_FINAL_RATE_PERCENT,
   resolveLocale,
   translate,
@@ -411,6 +413,7 @@ function composeDisclaimer(
   jurisdiction: TaxJurisdiction,
   year: number,
   ratesAsOf: string | null,
+  pphRate: string,
 ): string {
   // Currency-conversion stability paragraph: branch by past-vs-current year.
   // `ratesAsOf` is null only when displayCurrency is null (no conversion
@@ -420,7 +423,8 @@ function composeDisclaimer(
     ratesAsOf === null
       ? translate(locale, 'tax.disc.stabilityNone')
       : translate(locale, isPastYear ? 'tax.disc.stabilityPast' : 'tax.disc.stabilityCurrent', {
-          date: ratesAsOf,
+          // `ratesAsOf` ISO (YYYY-MM-DD) diformat per locale sebelum disisipkan (rubrik R13).
+          date: formatDate(ratesAsOf, locale),
         });
 
   const jurisdictionKey =
@@ -432,9 +436,16 @@ function composeDisclaimer(
           ? 'tax.disc.recID'
           : 'tax.disc.recOther';
 
+  // Tarif PPh final disisipkan sebagai `{rate}` (rubrik R8: dari respons/konstanta
+  // kanonik, bukan literal di kamus) dan diformat per locale dulu (rubrik R13) agar
+  // salinan ID memakai pemisah koma. Hanya `tax.disc.recID` yang memakai placeholder ini.
+  const jurisdictionCopy = translate(locale, jurisdictionKey, {
+    rate: formatNumber(pphRate, locale),
+  });
+
   return [
     translate(locale, 'tax.disc.preamble'),
-    translate(locale, jurisdictionKey),
+    jurisdictionCopy,
     translate(locale, 'tax.disc.reconcile'),
     // Wash-sale/superficial-loss hanya relevan US/CA; IDX memakai PPh final.
     ...(jurisdiction === 'US' || jurisdiction === 'CA'
@@ -612,7 +623,13 @@ export async function getTaxSummary(userId: string, year: number): Promise<TaxSu
       excludedCurrencies: [],
       ratesAsOf: null,
       usedRates: [],
-      disclaimer: composeDisclaimer(locale, jurisdiction, year, null),
+      disclaimer: composeDisclaimer(
+        locale,
+        jurisdiction,
+        year,
+        null,
+        pphFinal?.rate ?? PPH_FINAL_RATE_PERCENT,
+      ),
     };
   }
 
@@ -700,6 +717,12 @@ export async function getTaxSummary(userId: string, year: number): Promise<TaxSu
     excludedCurrencies: Array.from(excludedSet),
     ratesAsOf,
     usedRates,
-    disclaimer: composeDisclaimer(locale, jurisdiction, year, ratesAsOf),
+    disclaimer: composeDisclaimer(
+      locale,
+      jurisdiction,
+      year,
+      ratesAsOf,
+      pphFinal?.rate ?? PPH_FINAL_RATE_PERCENT,
+    ),
   };
 }

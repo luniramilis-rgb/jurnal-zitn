@@ -165,6 +165,53 @@ Basis Tradr berorientasi AS (USD, NYSE, fee per saham, opsi OCC, wash-sale). Ren
 
 **Verifikasi Fase 1:** `pnpm -r check-types` + `eslint` bersih; `idx-defaults.test.ts` + `AccountDialog.test.tsx` hijau; DB lokal menerapkan `0039` (default `Asia/Jakarta`, check `expenses_currency_chk` memuat `IDR`).
 
+## F2 — draf ID brokerages + accounts (ZITN-TECH-021 §5.7/§5.13) — 2026-09-28
+
+- **Cabang:** `l10n-f2` (dari `l10n-id`). Commit kamus `4b125ea`, brokerages `15ae67d`,
+  accounts + rute `160143d`, koreksi review §5.16 `87d6a3f`, dokumen ini + paket.
+- **Status:** **diratifikasi `sah`** (pemilik "F2 OK", 2026-09-28) untuk ketiga rute; entri manifest
+  `brokerages`/`accounts`/`accounts/$accountId` = `sah`, hash dijaga `i18n-review.test.ts`.
+- **Kamus:** `broker.*`, `acct.*`, `common.*` (chrome umum: Nama/Catatan/Mata uang/Tutup/Lihat/Ubah/
+  Hapus/Simpan/Buat/Konfirmasi/Lanjutkan/Tidak ada), `page.accounts`, `page.brokerages`.
+- **Taat §5.13:** entity (`&apos;`/`&#39;`) → karakter asli di kamus; kalimat tak dirakit di JSX
+  (plural EN pakai kunci `…One`/`…Many`, ID satu kunci); judul halaman lewat `t()` (bukan prop literal);
+  `DISCLAIMER` preset IDX dipindah ke `broker.preset.idxNotes` (id/en) dengan persen dari
+  `formatNumber`, dan kalimat keraguan "perkiraan… periksa dan sesuaikan" **dipertahankan** (R8).
+- **Glosarium tidak diubah**; entri lapis `broker` tetap `provisional`.
+- **Verifikasi:** `eslint` bersih; `tsc --noEmit` 0 error (shared+web); uji web F2 **51** + uji shared
+  **740** hijau. Paket: `apps/web/docs/i18n-review-packet-{brokerages,accounts}.md`; lembar mesin
+  `apps/web/docs/i18n-coverage-{brokerages,accounts}*.md`.
+- **Sisa (temuan paket):** toast hooks (`useBrokerages`/`useAccounts`) & galat server masih EN;
+  badan F3 `LedgerView`/`AccountBalance` belum dilokalisasi; `DeleteBrokerageDialog` belum tersambung
+  (salinannya ditandai tidak-relevan, bug menu Hapus jadi tiket produk terpisah).
+
+## F3 — draf ID ledger/buku besar + kurs/mata uang tampilan (ZITN-TECH-021 §5.7/§5.14) — 2026-09-28
+
+- **Cabang:** `l10n-f3` (dari `l10n-id`). Lingkup: `features/accounting/components` (7 komponen) yang
+  dirender di dua rute: `accounts/$accountId` (AccountBalance + LedgerView + dua dialog) dan
+  `settings/profile` (DisplayCurrencySelect + ExchangeRatesPage + RateChangeConfirmModal).
+- **Status:** **`sedang`** (belum diratifikasi). Entri manifest `accounts/$accountId` turun
+  `sah` → `sedang` (hash `497a9d36` → `3ccfb1af`); entri baru `settings/profile` (Lapis 1) `sedang`.
+  Karena status disetel `sedang` lebih dulu, `--emit-manifest` tidak auto-membalik ke `perlu-ulang`
+  (bila `sah`, guard `i18n-review.test.ts` akan membaliknya). Rute `sah` lain tidak drift.
+- **Kamus:** `acct.balance.*`, `acct.reconcile.*`, `cash.*`, `ledger.*`, `fx.*`, `displayCur.*`,
+  `page.exchangeRates`, `placeholder.amount`, `action.reset`.
+- **Taat §5.13/§5.14:** entity (`&apos;`/`&amp;` di ReconcileBalanceDialog & RecordCashMovementDialog)
+  → karakter asli; `LedgerView` baris kalimat dirakit (`formatMoney` + `{' '}`) → satu kunci
+  `ledger.delete.body` `{amount}`/`{entryType}`; `formatNumber` lokal → `formatLedgerAmount`;
+  R13-b `LedgerView.tsx:147` → `formatDateTime` (`lib/format.ts`); R13-c `row.rate` →
+  `formatNumber` presisi tinggi (id `0,000065`); R14 `0.00`×2 + `e.g., 0.92` ikut locale.
+- **Glosarium tidak diubah**; istilah broker (saldo/kas/penarikan/deposit) mengikuti lapis ii, tidak
+  ditambahkan ke `glossary.ts`.
+- **Verifikasi:** `eslint` bersih; `tsc --noEmit` 0 error (shared+web); uji web F3 + guard
+  **8 berkas / 63 uji** hijau; uji shared **740** hijau; entity 0 di lingkup F3.
+  Paket: `apps/web/docs/i18n-review-packet-accounting.md`; lembar mesin
+  `apps/web/docs/i18n-coverage-accounting.md` + `i18n-coverage-accounting-scan.md`.
+- **Sisa (temuan paket):** toast hooks (`useCashMovements`/`useReconcileBalance`/`useExchangeRates`/
+  `useDisplayCurrency`) & galat server masih EN; pesan zod `occurredAt` tidak-relevan (R0);
+  nama mata uang `SUPPORTED_CURRENCIES[].name` EN (keputusan produk); angka before/after modal kurs
+  kehilangan tebal (keputusan pemilik).
+
 ## Catatan uji
 
 - `format.test.ts` + `i18n.test.ts` **hijau** dengan `id-ID`.
@@ -178,3 +225,85 @@ Basis Tradr berorientasi AS (USD, NYSE, fee per saham, opsi OCC, wash-sale). Ren
   padanan yang menyesatkan.
 - Angka/harga tetap dari sumber kanonik; lokalisasi hanya format tampilan.
 - Tidak menambah klaim; disclaimer tetap.
+
+## Tinjauan manual per halaman (ZITN-TECH-021) — mulai 2026-09-28
+
+Kebijakan: **istilah pasar tetap EN, kalimat penjelas ID, chrome ID**; tinjauan manual per
+halaman **wajib**, dengan penegakan otomatis anti-busuk. Rujukan: `ZITN-TECH-021` §2/§4/§5.
+
+- **Gate rilis:** `DEFAULT_LOCALE` **tetap `'id'`** (`packages/shared/src/i18n.ts`) — bukan ditahan
+  di `'en'`; pengguna berbahasa Inggris mendapat `'en'` lewat penyemaian sekali
+  `detectBrowserLocale()` di `apps/web/src/hooks/useLocale.tsx`. Yang bergerak selama jendela tinjau
+  adalah status `sah` per rute, bukan default bahasa. Uji: `packages/shared/src/i18n.test.ts`.
+- **Glosarium:** `packages/shared/src/glossary.ts` — satu-satunya tempat keputusan istilah
+  (`policy: keep-en | translate | free`, plus `source` tiga lapis: regulasi / broker / metrik).
+  Namespace `term.*` di kamus (nilai identik `id`/`en`). Lint: `glossary.test.ts`.
+- **Alat:** `node scripts/i18n-coverage.mjs` (lembar kerja `key → en → id` + salinan ID setelah
+  substitusi + literal JSX belum-terekstrak: teks JSX, atribut, dan placeholder numerik R14;
+  tulis UTF-8 eksplisit). Overlay dev `VITE_I18N_DEBUG=1` menandai fallback / kalimat `id === en`.
+- **R13 (nilai kanonik):** angka/tanggal diformat per locale **sebelum** masuk `translate()` —
+  `formatNumber`/`formatDate` di `packages/shared/src/i18n.ts` (dipakai web **dan** server, karena
+  disclaimer dirender server). Bukti: `{rate}` → "0,1" (id). Tanpa ini nilai kanonik "0.1"
+  bocor jadi "0.1%" di salinan ID.
+- **R14 (placeholder):** placeholder numerik/tanggal di form harus ikut locale (mis. "0,00" bukan
+  "0.00") — dicatat oleh alat, perbaikan menyusul per halaman.
+- **Paket tinjau halaman kalibrasi:** `apps/web/docs/i18n-review-packet-tax-summary.md`
+  (+ lampiran mesin `apps/web/docs/i18n-coverage-tax-summary.md`).
+- **Penegak:** `apps/web/src/i18n-review.manifest.json` + `i18n-review.test.ts` — hash himpunan
+  kunci per rute; drift pada rute `sah`/Lapis 1 → CI gagal sampai ditinjau ulang.
+  Regenerasi: `node scripts/i18n-coverage.mjs --emit-manifest`.
+
+### Lembar tinjau per rute
+
+| Rute                     | Kelas    | Keadaan diuji                                                                                  | Peninjau                                                | Tanggal    | Commit           | Status   | Catatan                                                                                                                                                                                                                                                               |
+| ------------------------ | -------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------- | ---------- | ---------------- | -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `accounting/tax-summary` | Lapis 1  | kosong/loading/galat/1 baris/penuh + kurs hilang                                               | sesi `ses_f1614741bffeFv4Hxmb2QQGGz0`                   | 2026-09-28 | `c5cf71f`        | `sedang` | Verdict kalibrasi: diterima dengan perbaikan (6 temuan + R0 subjudul); paket di `apps/web/docs/i18n-review-packet-tax-summary.md`; menunggu ratifikasi pemilik                                                                                                        |
+| `accounting/fee-rollup`  | Lapis 1  | "Enter rate" → kamus (F5 pengerasan); sisa literal belum                                       | — (menunggu ratifikasi)                                 | 2026-09-29 | F5 (lihat git)   | `belum`  | SUB-C `634d567`; paket `apps/web/docs/i18n-review-packet-hardening.md`                                                                                                                                                                                                |
+| `accounting/expenses`    | Lapis 1  | —                                                                                              | —                                                       | —          | —                | `belum`  |                                                                                                                                                                                                                                                                       |
+| `settings/billing`       | Lapis 1  | 20 uji (PlanCard 13 + rute 4 + guard D1 3); saldo termuat/UsageHistory belum                   | — (menunggu ratifikasi)                                 | 2026-09-29 | F5 (lihat git)   | `sedang` | SUB-B `a04bc18`; R12 label `UpgradeLink` jadi kunci; D1 guard IDR gagal-loud; entity bersih; paket `apps/web/docs/i18n-review-packet-billing.md`                                                                                                                      |
+| `calculator`             | Lapis 1  | 7 placeholder R14 + 2 teks (F5 pengerasan); sisa literal belum                                 | — (menunggu ratifikasi)                                 | 2026-09-29 | F5 (lihat git)   | `belum`  | SUB-C `634d567`; paket `apps/web/docs/i18n-review-packet-hardening.md`                                                                                                                                                                                                |
+| `positions/$positionId`  | Lapis 1  | teks + R13-b + placeholder + `formatPriceDecimal` (F5 pengerasan); sisa belum                  | — (menunggu ratifikasi)                                 | 2026-09-29 | F5 (lihat git)   | `belum`  | SUB-C `634d567`; paket `apps/web/docs/i18n-review-packet-hardening.md`                                                                                                                                                                                                |
+| `import`                 | Lapis 1  | 38 uji web csv-import (lihat paket §b); sisanya belum                                          | — (menunggu ratifikasi pemilik)                         | 2026-09-29 | F4 (lihat git)   | `sedang` | F4; paket `apps/web/docs/i18n-review-packet-import.md` + lampiran `i18n-coverage-import.md`; label EN keras→kamus; R13-c/D5 (harga/quantity titik, rupiah grouping); galat mapper via peta kode `lib/issueCopy.ts`; D2 preset `generic-idx` provisional tanpa fixture |
+| `settings/account`       | Lapis 1  | account-deletion tanggal locale-aware (R13-b); sisa belum                                      | — (menunggu ratifikasi)                                 | 2026-09-29 | F5 (lihat git)   | `belum`  | SUB-C `634d567`; paket `apps/web/docs/i18n-review-packet-hardening.md`                                                                                                                                                                                                |
+| `brokerages`             | 1+chrome | buat + preset (2 uji); lain lihat paket                                                        | pemilik (F2 OK) + sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | `87d6a3f`        | `sah`    | F2; paket `apps/web/docs/i18n-review-packet-brokerages.md`; disclaimer preset IDX pindah ke kamus (R8 terjaga); §5.16 koreksi (inventaris, `$`→netral, label risiko)                                                                                                  |
+| `accounts`               | 3        | 26 uji daftar/dialog (cap, demo, default, risiko)                                              | pemilik (F2 OK) + sesi `ses_f1614741bffeFv4Hxmb2QQGGz0` | 2026-09-28 | `87d6a3f`        | `sah`    | F2; paket `apps/web/docs/i18n-review-packet-accounts.md`; perakitan `account{s}`/klausa writable → 4 kunci (`acct.cap.body*`); label risiko locale                                                                                                                    |
+| `accounts/$accountId`    | 3        | 11 uji komponen ledger/akun + e2e render + reconcile/deposit (lihat paket)                     | — (menunggu ratifikasi; F2 chrome pemilik "F2 OK")      | 2026-09-28 | `f3` (lihat git) | `sedang` | F2 chrome (judul + Kembali/Buku besar) sempat `sah`; badan F3 (AccountBalance/LedgerView/dialog) kini lewat kamus → status turun `sedang`. Hash `497a9d36`→`3ccfb1af`                                                                                                 |
+| `settings/profile`       | Lapis 1  | `ExchangeRatesPage`/`DisplayCurrencySelect`/modal kurs (e2e `ledger-balances.spec.ts:658,722`) | — (menunggu ratifikasi)                                 | 2026-09-28 | `f3` (lihat git) | `sedang` | F3; paket `apps/web/docs/i18n-review-packet-accounting.md`; R13-b/R13-c/R14 (kurs presisi tinggi, tanggal berlaku, placeholder 0,92)                                                                                                                                  |
+
+**Urutan Lapis:** 1 = angka/uang/klaim (tabel di atas + disclaimer pajak + email); 2 = dashboard +
+widget, `positions/index`, `performance`, drawer; 3 = chrome, settings umum, changelog, admin,
+tour/onboarding. Rute opsi gaya AS ditinjau terakhir atau ditandai "EN sengaja" (Fase 4).
+
+**Catatan gate (perlu diketahui pemilik):** `DEFAULT_LOCALE` sendiri belum cukup memaksa EN untuk
+pengguna — `LocaleProvider` menyemai bahasa dari browser (`detectBrowserLocale`) saat `users.locale`
+NULL, sehingga peramban `id` tetap mendapat `id`. Bila tujuan gate adalah "semua pengguna melihat EN
+selama jendela", penyemaian itu perlu ditahan sementara; keputusan ada di pemilik.
+
+### Glosarium ringkas (awal; sementara)
+
+| Istilah                                                                 | id                      | policy      | Lapis sumber                                |
+| ----------------------------------------------------------------------- | ----------------------- | ----------- | ------------------------------------------- |
+| Position                                                                | **Posisi**              | `translate` | broker (sementara)                          |
+| Fill                                                                    | Fill                    | `keep-en`   | metrik                                      |
+| Stop Loss / Take Profit                                                 | Stop Loss / Take Profit | `keep-en`   | metrik                                      |
+| Lot                                                                     | Lot                     | `free`      | regulasi (IDX)                              |
+| PPh Final                                                               | PPh Final               | `free`      | regulasi                                    |
+| P&L / Drawdown / Slippage / Tick / Win rate / Risk of ruin / Wash sales | (EN)                    | `keep-en`   | metrik                                      |
+| Equity                                                                  | **Ekuitas**             | `translate` | metrik (koreksi: copy lama pakai "Ekuitas") |
+| Breakeven                                                               | **Impas**               | `translate` | metrik (koreksi: copy lama pakai "Impas")   |
+| Win rate / Risk of ruin / Wash sales                                    | (EN)                    | `keep-en`   | metrik (hasil = milik pengguna, K11)        |
+
+Istilah yang copy lamanya sudah mapan dan mengalahkan usulan keep-en awal ditulis sebagai
+**keputusan final** di `GLOSSARY_RECONCILIATION` (`packages/shared/src/glossary.ts`), bukan
+sekadar catatan: `equity → "Ekuitas"`, `breakeven → "Impas"`. Daftar `keep-en` selebihnya masih
+**menunggu konfirmasi pemilik** (`ZITN-TECH-021` §7 butir 2).
+
+**F7 — parkir (arahan prioritas "bahasa dulu, pengaman menyusul"):** R13-b 9 situs tanggal,
+R14 (tool `scripts/i18n-coverage.mjs` melaporkan **19** placeholder numerik bergaya EN — 12× `"0.00"`,
+2× `"100.00"`, 2× `"150.00"`, 1× `"0.0822"`, 1× `"0.30"`, 1× `"0.0440"`; hitungan manual peninjau
+(11–12× `"0.00"` + `"150.00"`) **BERBEDA** — selaraskan sebelum F7), dan lint otomatis tambahan
+(`toLocaleDateString()` tanpa locale; kalimat template literal).
+Gelombang **F2 selesai & diratifikasi** (`brokerages`, `accounts`, `accounts/$accountId` → `sah`),
+jadi bukan lagi butir parkir. Butir stale "keputusan gate `DEFAULT_LOCALE`" dihapus (sudah diputuskan
+B1: default tetap `id` + penyemian browser). Tercatat sebagai `parkedItems` di
+`apps/web/src/i18n-review.manifest.json`.

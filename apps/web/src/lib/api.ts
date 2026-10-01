@@ -242,6 +242,11 @@ function redirectToLogin(): never {
   // Before the navigation, so each owner tears its state down while the page
   // it belongs to is still on screen.
   announceSessionExpired();
+  // Carry the surface the user was on so /login returns them there after they
+  // sign back in (ZITN-TECH-029) — an expiry is a detour, not a dead end.
+  const here =
+    typeof window === 'undefined' ? '' : `${window.location.pathname}${window.location.search}`;
+  const returnTo = here.startsWith('/') && !here.startsWith('/login') ? here : '';
   if (router) {
     // A BOOLEAN, not the string 'true'. The router JSON-encodes any string
     // value that is itself parseable JSON, so `'true'` reaches the address bar
@@ -249,9 +254,13 @@ function redirectToLogin(): never {
     // raw query, matched none of it. A boolean is written through bare, so
     // this navigation lands on the same `?expired=true` as the two hard
     // navigations below and in the CSV preview's own 401 handling.
-    router.navigate({ to: '/login', search: { expired: true }, replace: true });
+    router.navigate({
+      to: '/login',
+      search: { expired: true, ...(returnTo ? { redirect: returnTo } : {}) },
+      replace: true,
+    });
   } else {
-    window.location.href = '/login?expired=true';
+    window.location.href = `/login?expired=true${returnTo ? `&redirect=${encodeURIComponent(returnTo)}` : ''}`;
   }
   const unauthorizedError = new Error('Unauthorized') as Error & { status?: number };
   unauthorizedError.status = 401;

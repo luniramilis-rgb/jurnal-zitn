@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
-import { type Brokerage, FeeScheduleSchema } from '@jurnal-zitn/shared';
+import { type Brokerage, FeeScheduleSchema, formatNumber } from '@jurnal-zitn/shared';
 
 import {
   AlertDialog,
@@ -27,6 +27,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useLocale, useT } from '@/hooks/useLocale';
 
 import {
   useCreateBrokerage,
@@ -65,6 +66,8 @@ interface BrokerageDialogProps {
 }
 
 export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDialogProps) {
+  const t = useT();
+  const { locale } = useLocale();
   const isEdit = !!brokerage;
   const isView = isEdit && brokerage.isSystem;
 
@@ -88,7 +91,16 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
   const isPending =
     createBrokerage.isPending || updateBrokerage.isPending || duplicateBrokerage.isPending;
 
-  const [presetNotes, setPresetNotes] = useState<string | null>(null);
+  const [selectedPresetId, setSelectedPresetId] = useState<string | null>(null);
+  const selectedPreset = IDX_BROKER_PRESETS.find((p) => p.id === selectedPresetId) ?? null;
+  // Catatan preset adalah salinan (bukan label istilah): nilai persen diformat per locale
+  // (rubrik R13/D5) dan keraguan "perkiraan… periksa dan sesuaikan" dipertahankan (rubrik R8).
+  const presetNotes = selectedPreset
+    ? t('broker.preset.idxNotes', {
+        buy: formatNumber(selectedPreset.percentBuy, locale),
+        sell: formatNumber(selectedPreset.percentSell, locale),
+      })
+    : null;
 
   // Fill the form from an IDX preset: the percent fees persist through the
   // extended create payload, so a preset is created already configured instead
@@ -96,14 +108,20 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
   function applyPreset(presetId: string) {
     const preset = IDX_BROKER_PRESETS.find((p) => p.id === presetId);
     if (!preset) {
-      setPresetNotes(null);
+      setSelectedPresetId(null);
       return;
     }
     form.setValue('name', preset.name);
-    form.setValue('notes', preset.notes);
+    form.setValue(
+      'notes',
+      t('broker.preset.idxNotes', {
+        buy: formatNumber(preset.percentBuy, locale),
+        sell: formatNumber(preset.percentSell, locale),
+      }),
+    );
     form.setValue('feeSchedule.stockPercentBuy', preset.percentBuy);
     form.setValue('feeSchedule.stockPercentSell', preset.percentSell);
-    setPresetNotes(preset.notes);
+    setSelectedPresetId(preset.id);
   }
 
   function hasFeeChanges(data: BrokerageFormValues): boolean {
@@ -162,7 +180,8 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
     onOpenChange(false);
   }
 
-  const title = isView ? 'View System Brokerage' : isEdit ? 'Edit Brokerage' : 'New Brokerage';
+  const title = t(isView ? 'broker.title.view' : isEdit ? 'broker.title.edit' : 'broker.title.new');
+  const referencedPositions = positionCount.data?.count ?? 0;
 
   return (
     <>
@@ -173,11 +192,11 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
           </DialogHeader>
           <form onSubmit={onSubmit} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="brokerage-name">Name</Label>
+              <Label htmlFor="brokerage-name">{t('common.name')}</Label>
               <Input
                 id="brokerage-name"
                 {...form.register('name')}
-                placeholder="e.g., Interactive Brokers"
+                placeholder={t('broker.field.namePlaceholder')}
                 disabled={isView}
               />
               {form.formState.errors.name && (
@@ -186,21 +205,21 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="brokerage-notes">Notes</Label>
+              <Label htmlFor="brokerage-notes">{t('common.notes')}</Label>
               <Textarea
                 id="brokerage-notes"
                 {...form.register('notes')}
-                placeholder="Optional notes"
+                placeholder={t('broker.field.notesPlaceholder')}
                 disabled={isView}
               />
             </div>
 
             {!isEdit && (
               <div className="space-y-2">
-                <Label htmlFor="brokerage-preset">Preset broker IDX</Label>
+                <Label htmlFor="brokerage-preset">{t('broker.field.preset')}</Label>
                 <Select onValueChange={applyPreset}>
                   <SelectTrigger id="brokerage-preset" className="cursor-pointer">
-                    <SelectValue placeholder="Pilih preset…" />
+                    <SelectValue placeholder={t('broker.field.presetPlaceholder')} />
                   </SelectTrigger>
                   <SelectContent>
                     {IDX_BROKER_PRESETS.map((preset) => (
@@ -225,7 +244,7 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
                     className="cursor-pointer"
                     onClick={() => onOpenChange(false)}
                   >
-                    Close
+                    {t('common.close')}
                   </Button>
                   <Button
                     type="button"
@@ -233,7 +252,9 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
                     disabled={isPending}
                     onClick={handleDuplicate}
                   >
-                    {duplicateBrokerage.isPending ? 'Copying...' : 'Create Editable Copy'}
+                    {duplicateBrokerage.isPending
+                      ? t('broker.action.duplicating')
+                      : t('broker.action.duplicate')}
                   </Button>
                 </>
               ) : (
@@ -244,10 +265,10 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
                     className="cursor-pointer"
                     onClick={() => onOpenChange(false)}
                   >
-                    Cancel
+                    {t('action.cancel')}
                   </Button>
                   <Button type="submit" className="cursor-pointer" disabled={isPending}>
-                    {isPending ? 'Saving...' : isEdit ? 'Save' : 'Create'}
+                    {isPending ? t('common.saving') : t(isEdit ? 'common.save' : 'common.create')}
                   </Button>
                 </>
               )}
@@ -259,15 +280,18 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
       <AlertDialog open={confirmOpen} onOpenChange={setConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm Fee Schedule Change</AlertDialogTitle>
+            <AlertDialogTitle>{t('broker.confirmFee.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This brokerage is referenced by {positionCount.data?.count ?? 0} position
-              {(positionCount.data?.count ?? 0) === 1 ? '' : 's'}. Changing the fee schedule will
-              affect fee calculations for those positions.
+              {t(
+                referencedPositions === 1
+                  ? 'broker.confirmFee.bodyOne'
+                  : 'broker.confirmFee.bodyMany',
+                { count: referencedPositions },
+              )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="cursor-pointer"
               onClick={async () => {
@@ -277,7 +301,7 @@ export function BrokerageDialog({ open, onOpenChange, brokerage }: BrokerageDial
                 }
               }}
             >
-              Confirm
+              {t('common.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

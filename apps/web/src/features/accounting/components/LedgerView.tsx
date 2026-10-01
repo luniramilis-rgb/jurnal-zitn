@@ -28,7 +28,8 @@ import {
 } from '@/components/ui/table';
 import { useReverseCashMovement } from '@/features/accounting/hooks/useCashMovements';
 import { useLedgerQuery } from '@/features/accounting/hooks/useLedger';
-import { formatMoney } from '@/lib/format';
+import { useT } from '@/hooks/useLocale';
+import { formatDateTime, formatMoney } from '@/lib/format';
 
 const PAGE_SIZE = 50;
 
@@ -41,12 +42,14 @@ const REVERSAL_TYPES = new Set<LedgerEntry['entryType']>([
   'withdrawal_reversal',
 ]);
 
-// Map a cash-movement entry type to its user-facing noun. A deposit and its
+// Map a cash-movement entry type to its dictionary key. A deposit and its
 // reversal both read "Deposit"; a withdrawal and its reversal "Withdrawal".
-// Everything else (trades, balance adjustments) returns null.
-function cashMovementLabel(t: LedgerEntry['entryType']): 'Deposit' | 'Withdrawal' | null {
-  if (t === 'deposit' || t === 'deposit_reversal') return 'Deposit';
-  if (t === 'withdrawal' || t === 'withdrawal_reversal') return 'Withdrawal';
+// Everything else (trades, balance adjustments) returns null. The key (not a
+// baked string) is returned so the caller renders it through `t()`.
+type CashLabelKey = 'cash.type.deposit' | 'cash.type.withdrawal';
+function cashMovementLabelKey(t: LedgerEntry['entryType']): CashLabelKey | null {
+  if (t === 'deposit' || t === 'deposit_reversal') return 'cash.type.deposit';
+  if (t === 'withdrawal' || t === 'withdrawal_reversal') return 'cash.type.withdrawal';
   return null;
 }
 
@@ -81,13 +84,14 @@ function computeRunningBalances(
   return balances;
 }
 
-function formatNumber(n: number, currency: string): string {
+function formatLedgerAmount(n: number, currency: string): string {
   // Round to 4dp to match ledger amount precision before formatting.
   const rounded = Math.round(n * 10000) / 10000;
   return formatMoney(rounded.toString(), currency);
 }
 
 export function LedgerView({ accountId, currency }: Props) {
+  const t = useT();
   const [page, setPage] = useState(1);
   const [deleteTarget, setDeleteTarget] = useState<LedgerEntry | null>(null);
   const { data, isLoading } = useLedgerQuery({ accountId, page });
@@ -104,12 +108,7 @@ export function LedgerView({ accountId, currency }: Props) {
   }
 
   if (!data || data.entries.length === 0) {
-    return (
-      <EmptyState
-        title="No activity yet"
-        description="No activity yet — record a deposit or close a position to see ledger entries here"
-      />
-    );
+    return <EmptyState title={t('ledger.empty.title')} description={t('ledger.empty.desc')} />;
   }
 
   const runningBalances = computeRunningBalances(data.entries, data.runningBalanceAtFirstRow);
@@ -119,13 +118,13 @@ export function LedgerView({ accountId, currency }: Props) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead>Occurred at</TableHead>
-            <TableHead>Position</TableHead>
-            <TableHead className="text-right">Debit</TableHead>
-            <TableHead className="text-right">Credit</TableHead>
-            <TableHead className="text-right">Balance</TableHead>
+            <TableHead>{t('ledger.col.occurredAt')}</TableHead>
+            <TableHead>{t('ledger.col.position')}</TableHead>
+            <TableHead className="text-right">{t('ledger.col.debit')}</TableHead>
+            <TableHead className="text-right">{t('ledger.col.credit')}</TableHead>
+            <TableHead className="text-right">{t('ledger.col.balance')}</TableHead>
             <TableHead>
-              <span className="sr-only">Actions</span>
+              <span className="sr-only">{t('pos.col.actions')}</span>
             </TableHead>
           </TableRow>
         </TableHeader>
@@ -137,19 +136,19 @@ export function LedgerView({ accountId, currency }: Props) {
             // positionId-null branch below would label it "(deleted)" and read
             // as an orphaned trade row. The same holds for cash movements.
             const isAdjustment = entry.entryType === 'balance_adjustment';
-            const cashLabel = cashMovementLabel(entry.entryType);
+            const cashLabelKey = cashMovementLabelKey(entry.entryType);
             // Only originating movements are reversible; a reversal row is not
             // itself deletable (Req 7.2).
             const isCashMovement =
               entry.entryType === 'deposit' || entry.entryType === 'withdrawal';
             return (
               <TableRow key={entry.id}>
-                <TableCell>{new Date(entry.occurredAt).toLocaleString()}</TableCell>
+                <TableCell>{formatDateTime(entry.occurredAt)}</TableCell>
                 <TableCell>
                   {isAdjustment ? (
-                    <Badge variant="secondary">Balance adjustment</Badge>
-                  ) : cashLabel !== null ? (
-                    <Badge variant="secondary">{cashLabel}</Badge>
+                    <Badge variant="secondary">{t('ledger.badge.adjustment')}</Badge>
+                  ) : cashLabelKey !== null ? (
+                    <Badge variant="secondary">{t(cashLabelKey)}</Badge>
                   ) : entry.positionId ? (
                     <Link
                       to="/positions/$positionId"
@@ -160,12 +159,14 @@ export function LedgerView({ accountId, currency }: Props) {
                     </Link>
                   ) : (
                     <span className="text-muted-foreground">
-                      {entry.symbol ? `${entry.symbol} (deleted)` : '(deleted)'}
+                      {entry.symbol
+                        ? t('ledger.deletedSymbol', { symbol: entry.symbol })
+                        : t('ledger.deleted')}
                     </span>
                   )}
                   {isReversal && (
                     <Badge variant="outline" className="ml-2">
-                      (reversal)
+                      {t('ledger.badge.reversal')}
                     </Badge>
                   )}
                 </TableCell>
@@ -176,7 +177,7 @@ export function LedgerView({ accountId, currency }: Props) {
                   {entry.direction === 'credit' ? formatMoney(entry.amount, entry.currency) : '—'}
                 </TableCell>
                 <TableCell className="text-right font-medium">
-                  {formatNumber(runningBalances[i], currency)}
+                  {formatLedgerAmount(runningBalances[i], currency)}
                 </TableCell>
                 <TableCell className="text-right">
                   {isCashMovement ? (
@@ -184,7 +185,11 @@ export function LedgerView({ accountId, currency }: Props) {
                       variant="ghost"
                       size="icon-sm"
                       className="cursor-pointer text-muted-foreground"
-                      aria-label={`Delete ${cashLabel?.toLowerCase()}`}
+                      aria-label={
+                        entry.entryType === 'deposit'
+                          ? t('ledger.action.deleteDepositAria')
+                          : t('ledger.action.deleteWithdrawalAria')
+                      }
                       data-testid="ledger-delete-cash-movement"
                       onClick={() => setDeleteTarget(entry)}
                     >
@@ -206,10 +211,10 @@ export function LedgerView({ accountId, currency }: Props) {
             disabled={page === 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
           >
-            Previous
+            {t('ledger.pag.previous')}
           </Button>
           <span className="text-sm text-muted-foreground">
-            Page {page} · {PAGE_SIZE} per page
+            {t('ledger.pag.status', { page, size: PAGE_SIZE })}
           </span>
           <Button
             variant="outline"
@@ -217,7 +222,7 @@ export function LedgerView({ accountId, currency }: Props) {
             disabled={!data.hasMore}
             onClick={() => setPage((p) => p + 1)}
           >
-            Next
+            {t('ledger.pag.next')}
           </Button>
         </div>
       )}
@@ -229,21 +234,22 @@ export function LedgerView({ accountId, currency }: Props) {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Delete {deleteTarget ? cashMovementLabel(deleteTarget.entryType) : ''}?
+              {deleteTarget
+                ? t('ledger.delete.title', {
+                    type: t(cashMovementLabelKey(deleteTarget.entryType) ?? 'cash.type.deposit'),
+                  })
+                : ''}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              {deleteTarget && (
-                <>
-                  Jurnal ZITN adds a reversal entry for{' '}
-                  {formatMoney(deleteTarget.amount, deleteTarget.currency)} and keeps the original.
-                  The balance returns to what it was before this{' '}
-                  {cashMovementLabel(deleteTarget.entryType)}.
-                </>
-              )}
+              {deleteTarget &&
+                t('ledger.delete.body', {
+                  amount: formatMoney(deleteTarget.amount, deleteTarget.currency),
+                  entryType: t(cashMovementLabelKey(deleteTarget.entryType) ?? 'cash.type.deposit'),
+                })}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel className="cursor-pointer">Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="cursor-pointer">{t('action.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="cursor-pointer"
               onClick={() => {
@@ -251,7 +257,7 @@ export function LedgerView({ accountId, currency }: Props) {
                 setDeleteTarget(null);
               }}
             >
-              Delete
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

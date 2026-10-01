@@ -11,9 +11,10 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
-import type { TierLimits, TierState } from '@jurnal-zitn/shared';
+import { formatDate, type TierLimits, type TierState } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
+import { setAppLocale } from '@/lib/locale';
 import { captureClientEvent } from '@/lib/telemetry/posthog';
 
 import { PlanCard, type PlanCardProps } from './PlanCard';
@@ -50,8 +51,9 @@ const PRO_LIMITS: TierLimits = {
 };
 
 const PERIOD_END = '2026-08-15T12:00:00.000Z';
-// Same formatter as PlanCard — keeps the assertion timezone-independent.
-const PERIOD_END_DAY = new Date(PERIOD_END).toLocaleDateString('en-US', {
+// Same formatter as PlanCard (shared locale-aware `formatDate`) — keeps the
+// assertion timezone-independent (UTC-pinned).
+const PERIOD_END_DAY = formatDate(PERIOD_END, 'en', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
@@ -113,6 +115,8 @@ function renderCard(props: PlanCardProps = {}) {
 const originalLocation = window.location;
 
 beforeEach(() => {
+  // The copy assertions are English; pin the display locale (DEFAULT_LOCALE is 'id').
+  setAppLocale('en');
   // jsdom's real Location rejects cross-document navigation; replace it so the
   // subscribe/portal redirects can be observed.
   Object.defineProperty(window, 'location', {
@@ -123,6 +127,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
+  setAppLocale('id');
   cleanup();
   Object.defineProperty(window, 'location', {
     configurable: true,

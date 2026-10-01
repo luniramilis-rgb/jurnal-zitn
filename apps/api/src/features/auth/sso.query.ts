@@ -21,6 +21,24 @@ export function linkUserZitnId(db: DB, userId: string, zitnUserId: string) {
   return db.update(users).set({ zitnUserId, updatedAt: new Date() }).where(eq(users.id, userId));
 }
 
+/** Simpan entitlement dari SSO (ZITN-TECH-029 Fase 4); `null` = tidak berhak. */
+export function setUserEntitlement(db: DB, userId: string, until: Date | null) {
+  return db
+    .update(users)
+    .set({ entitledUntil: until, updatedAt: new Date() })
+    .where(eq(users.id, userId));
+}
+
+/** Akhir entitlement pengguna (null bila tak pernah diisi / tidak berhak). */
+export async function selectEntitlementByUserId(db: DB, userId: string): Promise<Date | null> {
+  const [row] = await db
+    .select({ entitledUntil: users.entitledUntil })
+    .from(users)
+    .where(eq(users.id, userId))
+    .limit(1);
+  return row?.entitledUntil ?? null;
+}
+
 /**
  * ZITN user id linked to a journal account (`null` when the row predates SSO).
  * Dipakai jembatan konteks: hanya akun yang datang lewat SSO ZITN yang boleh membaca lembar.

@@ -9,6 +9,7 @@ import {
   feedbackMainGutterClasses,
 } from '@/features/feedback/components/FeedbackSurface';
 import { DemoBanner } from '@/features/onboarding/components/DemoBanner';
+import { ContextStrip } from '@/features/workspace/components/ContextStrip';
 import { useAuth } from '@/hooks/useAuth';
 import { useReportingTimezoneBackfill } from '@/hooks/useUserTimezone';
 import { cn } from '@/lib/utils';
@@ -58,6 +59,7 @@ function AuthLayout() {
               invented figures without it. The notice is app-wide and persistent
               for exactly that reason, and it carries the action that removes the
               data. It renders nothing at all when there is no sample data. */}
+          <ContextStrip />
           <DemoBanner />
           <Outlet />
         </main>

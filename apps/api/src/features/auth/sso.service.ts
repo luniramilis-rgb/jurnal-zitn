@@ -28,6 +28,7 @@ import {
   deleteExpiredSsoTokens,
   linkUserZitnId,
   selectUserByZitnId,
+  setUserEntitlement,
 } from './sso.query';
 
 const BCRYPT_COST = 10;
@@ -90,6 +91,9 @@ export async function exchangeSsoToken(rawToken: unknown): Promise<SsoExchangeRe
   }
 
   const user = await resolveUser(payload);
+  // Simpan entitlement dari token SSO (Fase 4). ISO tak sah -> null (tidak berhak; fail-closed).
+  const entMs = typeof payload.ent === 'string' ? Date.parse(payload.ent) : Number.NaN;
+  await setUserEntitlement(db, user.id, Number.isFinite(entMs) ? new Date(entMs) : null);
   const token = await createSessionForUser(user.id);
 
   // Best-effort prune of expired nonces; never fails the login.

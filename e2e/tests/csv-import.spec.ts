@@ -233,7 +233,7 @@ test.describe('csv-import', () => {
 
     // Success panel → the import is complete and links to /positions.
     await expect(page.getByText('Import complete')).toBeVisible();
-    await expect(page.getByText(/Added\s+1\s+position/)).toBeVisible();
+    await expect(page.getByText(/1 position\(s\).*added/)).toBeVisible();
 
     // Imported position is visible on /positions with correct net P&L:
     // (123.10 − 121.50) × 100 − 1 (exit fee) − 1 (entry fee) = $158.00.
@@ -325,7 +325,7 @@ test.describe('csv-import', () => {
     const confirmBtn = page.getByRole('button', { name: 'Confirm import' });
     await expect(confirmBtn).toBeEnabled();
     await confirmBtn.click();
-    await expect(page.getByText(/Added\s+2\s+positions/)).toBeVisible();
+    await expect(page.getByText(/2 position\(s\).*added/)).toBeVisible();
 
     await page.getByRole('link', { name: 'View imported positions' }).click();
     await expect(page.getByRole('row').filter({ hasText: 'MSFT' })).toBeVisible();
@@ -393,7 +393,7 @@ test.describe('csv-import', () => {
     await confirmBtn.click();
 
     await expect(page.getByText('Import complete')).toBeVisible();
-    await expect(page.getByText(/Added\s+2\s+positions/)).toBeVisible();
+    await expect(page.getByText(/2 position\(s\).*added/)).toBeVisible();
 
     await page.getByRole('link', { name: 'View imported positions' }).click();
     await expect(page).toHaveURL(/\/positions/);

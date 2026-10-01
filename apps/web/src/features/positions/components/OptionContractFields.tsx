@@ -88,7 +88,7 @@ export function OptionContractFields({ value, onChange, errors }: OptionContract
           id="occ-strike"
           type="text"
           inputMode="decimal"
-          placeholder="150.00"
+          placeholder={t('pos.occ.strikePlaceholder')}
           value={value.strike}
           onChange={(e) => onChange({ ...value, strike: e.target.value })}
           aria-invalid={errors?.strike ? true : undefined}

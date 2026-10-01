@@ -319,8 +319,8 @@ describe('CoachMark copy is accurate against the shipped UI', () => {
       ['Close Position', 'features/positions/components/PositionDetail.tsx', 'pos.action.close'],
     ],
     'csv-import': [
-      ['Imports are additive', 'features/csv-import/components/ImportPage.tsx'],
-      ['Pick a preset', 'features/csv-import/components/ImportPage.tsx'],
+      ['Imports are additive', 'features/csv-import/components/ImportPage.tsx', 'import.intro'],
+      ['Pick a preset', 'features/csv-import/components/ImportPage.tsx', 'import.step3.desc'],
     ],
     'options-tools': [
       ['Black-Scholes', 'features/options/components/BlackScholesCard.tsx'],

@@ -2,6 +2,8 @@
 import { render, screen, fireEvent, cleanup } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+import { formatDate } from '@jurnal-zitn/shared';
+
 import { setAppLocale } from '@/lib/locale';
 
 import { DeleteAccountSection } from './DeleteAccountSection';
@@ -78,7 +80,7 @@ describe('DeleteAccountSection', () => {
 
     const line = screen.getByTestId('deletion-scheduled');
     expect(line.textContent).toContain('Deletion scheduled for');
-    expect(line.textContent).toContain(new Date('2026-10-01T00:00:00.000Z').toLocaleDateString());
+    expect(line.textContent).toContain(formatDate('2026-10-01T00:00:00.000Z', 'en'));
 
     const cancelBtn = screen.getByRole('button', { name: 'Cancel deletion' });
     // Neutral, not destructive (Req 8.4 cancel is a reversal, not a delete).

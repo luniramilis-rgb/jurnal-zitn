@@ -5,6 +5,7 @@ import { BillingPanel } from '@/features/billing/BillingPanel';
 import { PlanCard } from '@/features/billing/PlanCard';
 import { UsageHistory } from '@/features/billing/UsageHistory';
 import { useBillingConfig } from '@/features/billing/useWalletBalance';
+import { useT } from '@/hooks/useLocale';
 import { useAdvisorEnabled } from '@/hooks/useRegistrationEnabled';
 
 // Stripe Checkout returns to `?subscription=confirming` (REQ-2.6); the cancel
@@ -16,6 +17,7 @@ const BillingSearchSchema = z.object({
 });
 
 function SettingsBilling() {
+  const t = useT();
   const { subscription } = Route.useSearch();
   const { data: config, isLoading } = useBillingConfig();
   // Credits fund platform (non-BYOK) advisor usage — with the advisor
@@ -27,11 +29,11 @@ function SettingsBilling() {
   return (
     <div className="space-y-8" data-slot="settings-billing">
       <div>
-        <h2 className="text-lg font-medium">Billing</h2>
+        <h2 className="text-lg font-medium">{t('settings.billing.title')}</h2>
         <p className="text-sm text-muted-foreground">
           {advisorEnabled
-            ? 'View your credit balance, buy credits, and review usage.'
-            : 'Manage your subscription.'}
+            ? t('settings.billing.subtitleCredits')
+            : t('settings.billing.subtitleManage')}
         </p>
       </div>
 
@@ -44,7 +46,7 @@ function SettingsBilling() {
 
       {advisorEnabled &&
         (isLoading ? (
-          <p className="text-sm text-muted-foreground">Loading…</p>
+          <p className="text-sm text-muted-foreground">{t('billing.loading')}</p>
         ) : config?.enabled ? (
           <>
             <BillingPanel packs={config.packs} />
@@ -54,7 +56,7 @@ function SettingsBilling() {
           // Graceful absence (REQ-7.4): Stripe is not configured on this instance,
           // so there is nothing to purchase. The rest of settings is unaffected.
           <p className="text-sm text-muted-foreground" data-testid="billing-disabled">
-            Billing is not enabled on this instance.
+            {t('settings.billing.disabled')}
           </p>
         ))}
     </div>

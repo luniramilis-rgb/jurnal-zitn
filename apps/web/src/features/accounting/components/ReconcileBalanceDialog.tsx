@@ -19,6 +19,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useT } from '@/hooks/useLocale';
 import { formatMoney } from '@/lib/format';
 
 import { useReconcileBalance } from '../hooks/useReconcileBalance';
@@ -66,6 +67,7 @@ function parseTarget(raw: string | undefined): number | null {
  * know which figure to type. Open positions deliberately do not block or warn.
  */
 export function ReconcileBalanceDialog({ account, open, onOpenChange }: Props) {
+  const t = useT();
   const reconcile = useReconcileBalance(account.id);
 
   const form = useForm<ReconcileBalanceInput>({
@@ -93,30 +95,25 @@ export function ReconcileBalanceDialog({ account, open, onOpenChange }: Props) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Reconcile cash balance</DialogTitle>
-          <DialogDescription>
-            Jurnal ZITN tracks this account&apos;s cash balance: your starting balance plus realized
-            P&amp;L from closed trades. It does not include the market value of open positions.
-            Enter the cash balance this account should show — Jurnal ZITN posts a single adjusting
-            entry for the difference.
-          </DialogDescription>
+          <DialogTitle>{t('acct.reconcile.title')}</DialogTitle>
+          <DialogDescription>{t('acct.reconcile.desc')}</DialogDescription>
         </DialogHeader>
 
         <form onSubmit={onSubmit} className="space-y-4">
           <div className="flex items-center justify-between text-sm">
-            <span className="text-muted-foreground">Current balance</span>
+            <span className="text-muted-foreground">{t('acct.reconcile.current')}</span>
             <span className="font-medium" data-testid="reconcile-current-balance">
               {formatMoney(current.toString(), account.currency)}
             </span>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="targetBalance">Actual cash balance</Label>
+            <Label htmlFor="targetBalance">{t('acct.reconcile.target')}</Label>
             <Input
               id="targetBalance"
               inputMode="decimal"
               autoComplete="off"
-              placeholder="0.00"
+              placeholder={t('placeholder.amount')}
               {...form.register('targetBalance', {
                 setValueAs: (v: unknown) => (typeof v === 'string' ? v.trim() : v),
               })}
@@ -129,18 +126,20 @@ export function ReconcileBalanceDialog({ account, open, onOpenChange }: Props) {
           </div>
 
           <div className="flex items-center justify-between border-t pt-3 text-sm">
-            <span className="text-muted-foreground">Adjustment</span>
+            <span className="text-muted-foreground">{t('acct.reconcile.adjustment')}</span>
             {delta === null ? (
               <span className="text-muted-foreground">—</span>
             ) : isNoop ? (
               <span className="text-muted-foreground" data-testid="reconcile-adjustment">
-                No change — the balance already matches
+                {t('acct.reconcile.noChange')}
               </span>
             ) : (
               <span className="font-medium" data-testid="reconcile-adjustment">
                 {delta > 0 ? '+' : '−'}
                 {formatMoney(Math.abs(delta).toString(), account.currency)}{' '}
-                <span className="text-muted-foreground">({delta > 0 ? 'credit' : 'debit'})</span>
+                <span className="text-muted-foreground">
+                  ({t(delta > 0 ? 'acct.reconcile.credit' : 'acct.reconcile.debit')})
+                </span>
               </span>
             )}
           </div>
@@ -152,14 +151,14 @@ export function ReconcileBalanceDialog({ account, open, onOpenChange }: Props) {
               className="cursor-pointer"
               onClick={() => onOpenChange(false)}
             >
-              Cancel
+              {t('action.cancel')}
             </Button>
             <Button
               type="submit"
               className="cursor-pointer"
               disabled={delta === null || isNoop || reconcile.isPending}
             >
-              {reconcile.isPending ? 'Posting…' : 'Post adjustment'}
+              {reconcile.isPending ? t('acct.reconcile.posting') : t('acct.reconcile.submit')}
             </Button>
           </DialogFooter>
         </form>

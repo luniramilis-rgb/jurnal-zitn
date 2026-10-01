@@ -20,3 +20,29 @@ describe('ssoRedirectTarget — konteks tanggal dari tautan lembar', () => {
     expect(ssoRedirectTarget('../../etc/passwd')).toBe('/');
   });
 });
+
+describe('ssoRedirectTarget — redirect lokal pasca-login (ZITN-TECH-029)', () => {
+  it('menghormati redirect lokal yang aman', () => {
+    expect(ssoRedirectTarget(undefined, '/advertising')).toBe('/advertising');
+    expect(ssoRedirectTarget(undefined, '/lembar?tanggal=2026-09-25')).toBe(
+      '/lembar?tanggal=2026-09-25',
+    );
+  });
+
+  it('redirect yang aman menang atas tanggal', () => {
+    expect(ssoRedirectTarget('2026-09-25', '/advertising')).toBe('/advertising');
+  });
+
+  it('jatuh ke perilaku tanggal bila redirect kosong', () => {
+    expect(ssoRedirectTarget('2026-09-25', '')).toBe('/lembar?tanggal=2026-09-25');
+    expect(ssoRedirectTarget('2026-09-25', undefined)).toBe('/lembar?tanggal=2026-09-25');
+  });
+
+  it('mengabaikan redirect tak aman lalu jatuh ke tanggal/`/`', () => {
+    expect(ssoRedirectTarget('2026-09-25', 'https://evil.example')).toBe(
+      '/lembar?tanggal=2026-09-25',
+    );
+    expect(ssoRedirectTarget(undefined, '//evil.example')).toBe('/');
+    expect(ssoRedirectTarget(undefined, 'javascript:alert(1)')).toBe('/');
+  });
+});

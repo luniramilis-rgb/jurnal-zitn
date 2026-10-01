@@ -2,6 +2,8 @@ import { Link, useNavigate } from '@tanstack/react-router';
 import { Tag } from 'lucide-react';
 import { useState } from 'react';
 
+import { formatPriceDecimal } from '@jurnal-zitn/shared';
+
 import { DrawerToggle } from '@/components/layout/DrawerToggle';
 import { Numeric } from '@/components/Numeric';
 import {
@@ -153,7 +155,7 @@ export function PositionDetailView({ positionId }: Props) {
               onClick={() => setTagsOpen(true)}
             >
               <Tag className="size-4" />
-              Edit tags
+              {t('pos.detail.editTags')}
             </Button>
           </div>
         </div>
@@ -230,7 +232,7 @@ export function PositionDetailView({ positionId }: Props) {
           </CardHeader>
           <CardContent>
             <p className="text-lg font-semibold">
-              {position.avgEntryPrice !== null ? position.avgEntryPrice.toFixed(4) : '—'}
+              {position.avgEntryPrice !== null ? formatPriceDecimal(position.avgEntryPrice) : '—'}
             </p>
           </CardContent>
         </Card>
@@ -242,7 +244,7 @@ export function PositionDetailView({ positionId }: Props) {
           </CardHeader>
           <CardContent>
             <p className="text-lg font-semibold">
-              {position.avgExitPrice !== null ? position.avgExitPrice.toFixed(4) : '—'}
+              {position.avgExitPrice !== null ? formatPriceDecimal(position.avgExitPrice) : '—'}
             </p>
           </CardContent>
         </Card>
@@ -406,7 +408,7 @@ export function PositionDetailView({ positionId }: Props) {
               className="cursor-pointer"
               onClick={() => setFillDialogOpen(true)}
             >
-              Add Fill
+              {t('pos.detail.addFill')}
             </Button>
           )}
         </div>

@@ -23,6 +23,9 @@ export const users = pgTable(
     // created through email/password. Unique so one ZITN user maps to exactly one journal
     // account; email is only a fallback link and may change on the ZITN side.
     zitnUserId: varchar('zitn_user_id', { length: 64 }).unique(),
+    // ZITN-TECH-029 Fase 4: akhir entitlement dari SSO ZITN, untuk gerbang lunak (soft paywall).
+    // Diisi saat penukaran SSO; NULL = tidak berhak. Nilai jauh di masa depan = pemilik.
+    entitledUntil: timestamp('entitled_until', { withTimezone: true }),
     isAdmin: boolean('is_admin').notNull().default(false),
     // Default TRUE = the REQ-6.1 grandfathering (PostgreSQL fast-default backfills all
     // existing rows as verified, D10). Registration always writes the value explicitly.

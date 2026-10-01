@@ -29,6 +29,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useT } from '@/hooks/useLocale';
+import { formatDateTime } from '@/lib/format';
 
 import { useDeleteFill } from '../hooks/usePosition';
 
@@ -65,7 +66,7 @@ export function FillTable({ fills, positionId, positionStatus }: Props) {
           {fills.length === 0 ? (
             <TableRow>
               <TableCell colSpan={7} className="text-center text-muted-foreground py-6">
-                No fills yet
+                {t('pos.fill.none')}
               </TableCell>
             </TableRow>
           ) : (
@@ -79,7 +80,7 @@ export function FillTable({ fills, positionId, positionStatus }: Props) {
                 <TableCell className="text-right">{fill.price}</TableCell>
                 <TableCell className="text-right">{fill.quantity}</TableCell>
                 <TableCell className="text-right">{fill.fees}</TableCell>
-                <TableCell>{new Date(fill.filledAt).toLocaleString()}</TableCell>
+                <TableCell>{formatDateTime(fill.filledAt)}</TableCell>
                 <TableCell className="max-w-32 truncate">{fill.notes || '—'}</TableCell>
                 <TableCell>
                   <DropdownMenu>

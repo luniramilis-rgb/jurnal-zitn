@@ -601,7 +601,7 @@ export function CalculatorForm() {
                 className="cursor-pointer"
                 onClick={() => setChainOpen(true)}
               >
-                Select from options chain
+                {t('calc.options.selectFromChain')}
               </Button>
               <DialogContent className="max-w-3xl">
                 <DialogHeader>
@@ -636,7 +636,7 @@ export function CalculatorForm() {
             id="entryPrice"
             type="text"
             inputMode="decimal"
-            placeholder="0.00"
+            placeholder={t('calc.placeholder.amount')}
             {...register('entryPrice')}
           />
           {errors.entryPrice && (
@@ -650,7 +650,7 @@ export function CalculatorForm() {
             id="stopLoss"
             type="text"
             inputMode="decimal"
-            placeholder="0.00"
+            placeholder={t('calc.placeholder.amount')}
             {...register('stopLoss')}
           />
           {errors.stopLoss && <p className="text-sm text-destructive">{errors.stopLoss.message}</p>}
@@ -662,7 +662,7 @@ export function CalculatorForm() {
             id="targetPrice"
             type="text"
             inputMode="decimal"
-            placeholder="0.00"
+            placeholder={t('calc.placeholder.amount')}
             {...register('targetPrice', {
               setValueAs: (v) => (v === '' ? undefined : v),
             })}
@@ -696,7 +696,7 @@ export function CalculatorForm() {
                 id="dollarRisk"
                 type="text"
                 inputMode="decimal"
-                placeholder="0.00"
+                placeholder={t('calc.placeholder.amount')}
                 {...register('dollarRisk', {
                   setValueAs: (v) => (v === '' ? undefined : v),
                 })}
@@ -715,7 +715,7 @@ export function CalculatorForm() {
                   id="balance"
                   type="text"
                   inputMode="decimal"
-                  placeholder="0.00"
+                  placeholder={t('calc.placeholder.amount')}
                   {...register('balance', {
                     setValueAs: (v) => (v === '' ? undefined : v),
                     // Fires only on user input, not on programmatic setValue, so
@@ -734,7 +734,7 @@ export function CalculatorForm() {
                   id="riskPercent"
                   type="text"
                   inputMode="decimal"
-                  placeholder="0.00"
+                  placeholder={t('calc.placeholder.amount')}
                   {...register('riskPercent', {
                     setValueAs: (v) => (v === '' ? undefined : v),
                   })}
@@ -815,7 +815,7 @@ export function CalculatorForm() {
                 id="manualFees"
                 type="text"
                 inputMode="decimal"
-                placeholder="0.00"
+                placeholder={t('calc.placeholder.amount')}
                 {...register('manualFees', {
                   setValueAs: (v) => (v === '' ? undefined : v),
                 })}

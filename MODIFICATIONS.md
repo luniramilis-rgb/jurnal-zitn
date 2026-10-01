@@ -44,3 +44,10 @@ here.
   exact attribution line: `portions derived from Journedge, MIT`.
 - Journedge is distributed under the MIT License; its copyright notice and permission text must be
   preserved verbatim in any redistributed port.
+
+## Third-party assets (vendored, not npm)
+
+- **Lightweight Charts** (TradingView) � Apache License 2.0. Vendored as a standalone script at
+  `apps/web/public/vendor/lightweight-charts.standalone.production.js`, with its
+  `lightweight-charts.LICENSE.txt` and `lightweight-charts.NOTICE.txt` alongside, for the internal
+  `/chart` surface (ZITN-TECH-029 Fase 3c). No npm dependency; licence and notice text ship verbatim.

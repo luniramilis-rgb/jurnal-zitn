@@ -1,10 +1,25 @@
 import { z } from 'zod';
 
+import { TERM_MESSAGES } from './glossary';
+
 /**
  * Infrastruktur i18n dua bahasa (ZITN-TECH-017 A0): **Indonesia (id)** & **Inggris (en)**.
  *
  * Kamus ringan berbasis kunci stabil, dipakai bersama web (UI) dan API (email/pesan galat)
- * agar satu sumber. Default & fallback = `id` (pasar utama IDX).
+ * agar satu sumber. Pasar utama IDX, bahasa utama ID, EN = fallback teknis.
+ *
+ * **Gate bahasa (ZITN-TECH-021 §6, keputusan pemilik B1 2026-09-28).** `DEFAULT_LOCALE` adalah
+ * **pasar utama**: `id`. Pengguna ber-bahasa Inggris mendapat `en` lewat penyemian sekali dari
+ * `detectBrowserLocale()` (`apps/web/src/hooks/useLocale.tsx`) — bukan lewat default yang dipaksa
+ * EN. Menahan default di `en` pernah dipertimbangkan, tetapi ditolak karena `users.locale` kosong
+ * untuk semua pengguna sehingga permukaan sebelum-masuk (login/register/reset), email sebelum
+ * login, dan shell web akan tampil EN bagi pengguna ID.
+ *
+ * Selama jendela tinjau manual per halaman (TECH-021 §5), `DEFAULT_LOCALE` **tetap** `id`; yang
+ * bergerak adalah status `sah` per rute di `LOCALIZATION.md`, bukan default bahasa.
+ *
+ * Namespace `term.*` berasal dari `glossary.ts` (nilai identik `id`/`en`) — satu-satunya
+ * tempat keputusan istilah pasar.
  */
 
 export const SUPPORTED_LOCALES = ['id', 'en'] as const;
@@ -31,6 +46,8 @@ const ID_MESSAGES = {
   'app.update.dismiss': 'Nanti saja',
   'auth.field.email': 'Email',
   'auth.field.password': 'Kata sandi',
+  'auth.field.showPassword': 'Tampilkan kata sandi',
+  'auth.field.hidePassword': 'Sembunyikan kata sandi',
   'auth.field.newPassword': 'Kata sandi baru',
   'auth.field.confirmPassword': 'Konfirmasi kata sandi',
   'auth.error.unexpected': 'Terjadi kesalahan tak terduga',
@@ -43,8 +60,16 @@ const ID_MESSAGES = {
   'auth.login.expired': 'Sesi berakhir. Silakan masuk lagi.',
   'auth.login.deleted': 'Akun Anda telah dihapus.',
   'auth.login.forgot': 'Lupa kata sandi?',
+  'auth.login.or': 'atau',
+  'auth.login.continueWithZitn': 'Lanjutkan dengan ZITN',
   'auth.login.noAccount': 'Belum punya akun?',
   'auth.login.register': 'Daftar',
+  'ctx.tanggal': 'Tanggal',
+  'ctx.symbol': 'Simbol',
+  'ctx.tf': 'Timeframe',
+  'ctx.account': 'Akun',
+  'ctx.sheet': 'Buka lembar hari itu',
+  'ctx.chart': 'Buka chart',
   'auth.forgot.title': 'Atur ulang kata sandi',
   'auth.forgot.sent':
     'Jika akun untuk alamat itu ada, tautan atur ulang sedang dikirim — periksa kotak masuk Anda.',
@@ -147,7 +172,7 @@ const ID_MESSAGES = {
     'kredit dompet yang tidak terpakai dihapus bersama akun, tidak dikembalikan.',
   'retention.docsLink': 'Apa yang dihapus dan apa yang disimpan',
   'nav.dashboard': 'Dasbor',
-  'nav.lembar': 'Lembar harian',
+  'nav.lembar': 'Pemindai',
   'nav.advisor': 'Advisor',
   'nav.positions': 'Posisi',
   'nav.calculator': 'Kalkulator',
@@ -164,7 +189,7 @@ const ID_MESSAGES = {
   'nav.logout': 'Keluar',
   'nav.collapse': 'Ciutkan bilah samping',
   'nav.expand': 'Bentangkan bilah samping',
-  'journal.context.title': 'Lembar harian',
+  'journal.context.title': 'Pemindai',
   'journal.context.subtitle':
     'Kutipan konteks dari lembar ZITN — bukan seluruh lembar dan bukan salinan data.',
   'journal.context.date': 'Tanggal lembar',
@@ -175,8 +200,18 @@ const ID_MESSAGES = {
   'journal.context.chart': 'chart',
   'journal.context.openChart': 'Buka chart di Lembar Harian',
   'journal.context.watch': 'Level watch',
+  'journal.context.rows': 'Baris lembar',
+  'journal.context.colTicker': 'Simbol',
+  'journal.context.colKind': 'Jenis',
+  'journal.context.colEntry': 'Masuk',
+  'journal.context.colTarget': 'Target',
+  'journal.context.colStop': 'Stop',
+  'journal.context.colDistance': 'Jarak %',
+  'journal.context.colStatus': 'Status',
   'journal.context.none': 'Tidak ada simbol pada lembar itu.',
   'journal.context.unavailable': 'Lembar untuk tanggal ini tidak tersedia.',
+  'journal.context.paywall': 'Langganan Anda tidak aktif. Perpanjang untuk membuka lembar & chart.',
+  'journal.context.renew': 'Perpanjang akses',
   'journal.context.notLinked':
     'Akun ini belum tertaut ke ZITN. Masuk lewat ZITN agar konteks lembar bisa dibaca.',
   'journal.context.off': 'Konteks lembar sedang tidak tersedia.',
@@ -195,7 +230,7 @@ const ID_MESSAGES = {
   'widget.pnlCalendar': 'Kalender P&L',
   'widget.dimensionBreakdown': 'Rincian Dimensi',
   'widget.idxTaxFees': 'Pajak & Fee IDX',
-  'widget.dailySheet': 'Lembar Hari Ini',
+  'widget.dailySheet': 'Pemindai Hari Ini',
   'widget.recordCompleteness': 'Kelengkapan Catatan',
   'action.cancel': 'Batal',
   'dashboard.resetLayout': 'Atur ulang tata letak',
@@ -522,6 +557,17 @@ const ID_MESSAGES = {
   'pos.field.playbookNone': 'Tanpa playbook',
   'nav.playbooks': 'Playbook',
   'nav.tradePlans': 'Rencana',
+  'nav.chart': 'Chart',
+  'chart.title': 'Chart',
+  'chart.noSymbol': 'Pilih emiten dari lembar atau tautan chart.',
+  'chart.loading': 'Memuat chart…',
+  'chart.failed': 'Gagal memuat Lightweight Charts.',
+  'chart.unavailable': 'Data chart tidak tersedia untuk emiten ini.',
+  'chart.notLinked': 'Akun belum tertaut ke ZITN.',
+  'chart.off': 'Konteks lembar nonaktif di instance ini.',
+  'chart.footnote':
+    'Chart dari data ZITN; jurnal hanya membaca. Zona waktu harga mengikuti sumber.',
+  'shortcut.chart': 'Chart',
   'pb.title': 'Playbook',
   'pb.new': 'Playbook baru',
   'pb.name': 'Nama',
@@ -573,7 +619,7 @@ const ID_MESSAGES = {
   'shortcut.hint': 'Tekan g lalu huruf. Tidak aktif saat mengetik.',
   'shortcut.help': 'Buka daftar pintasan',
   'shortcut.dashboard': 'Dasbor',
-  'shortcut.lembar': 'Lembar',
+  'shortcut.lembar': 'Pemindai',
   'shortcut.positions': 'Posisi',
   'shortcut.playbooks': 'Playbook',
   'shortcut.tradePlans': 'Rencana',
@@ -592,7 +638,9 @@ const ID_MESSAGES = {
   'calc.sizing.roundsToZero':
     'Nilai berisiko tidak menutup satu saham/kontrak pada jarak stop ini, sehingga ukuran dibulatkan ke nol. Ukuran hanya bergerak mengikuti jarak stop dan nilai berisiko.',
   'tax.page.title': 'Ringkasan Pajak',
-  'tax.subtitle': 'P&L realisasi, pengeluaran tercatat, dan posisi bertanda untuk tahun terpilih.',
+  'tax.subtitle': 'P&L realisasi dan pengeluaran tercatat untuk tahun terpilih.',
+  'tax.subtitleFlags':
+    'P&L realisasi, pengeluaran tercatat, dan posisi bertanda untuk tahun terpilih.',
   'tax.field.year': 'Tahun',
   'tax.field.jurisdiction': 'Yurisdiksi',
   'tax.disclaimer.trigger': 'Disclaimer — baca sebelum memakai angka ini',
@@ -612,9 +660,12 @@ const ID_MESSAGES = {
   'tax.pphTitle': 'PPh Final ({rate}%)',
   'tax.pphSell': 'Penjualan {currency}',
   'tax.pphEmpty': 'Belum ada penjualan tahun ini.',
-  'tax.pphNote': 'Estimasi 0,1% dari nilai penjualan; bukan perhitungan pajak resmi.',
+  'tax.pphNote': 'Estimasi {rate}% dari nilai penjualan; bukan perhitungan pajak resmi.',
   'tax.washSales': 'Wash sales ({n})',
   'tax.superficial': 'Kerugian superficial ({n})',
+  'tax.jurisdiction.us': 'United States',
+  'tax.jurisdiction.ca': 'Canada',
+  'tax.jurisdiction.id': 'Indonesia',
   'tax.jurisdiction.other': 'Lainnya',
   'expense.cat.data_subscription': 'Langganan data',
   'expense.cat.platform_fee': 'Biaya platform',
@@ -714,7 +765,7 @@ const ID_MESSAGES = {
   'tax.disc.recCA':
     'Biaya komisi yang dibayar lewat fill sudah termasuk dalam laba/rugi realisasi di atas (sesuai perlakuan adjusted cost base CRA). Tarif inklusi capital gains 50% TIDAK diterapkan oleh Jurnal ZITN — P&L realisasi yang ditampilkan adalah angka sebelum tarif inklusi.',
   'tax.disc.recID':
-    'Pajak: Jurnal ZITN menampilkan **PPh final 0,1% dari nilai penjualan** (bukan perhitungan pajak resmi). Angka di bawah hanya agregat komputasional dari data transaksi Anda; konsultasikan dengan konsultan pajak.',
+    'Pajak: Jurnal ZITN menampilkan **PPh final {rate}% dari nilai penjualan** (bukan perhitungan pajak resmi). Angka di bawah hanya agregat komputasional dari data transaksi Anda; konsultasikan dengan konsultan pajak.',
   'tax.disc.recOther':
     'Jurnal ZITN tidak mendukung aturan pajak khusus untuk yurisdiksi Anda. Angka di bawah hanya agregat komputasional; konsultasikan dengan konsultan pajak setempat.',
   'tax.disc.reconcile':
@@ -739,6 +790,452 @@ const ID_MESSAGES = {
   'err.emailNotConfigured': 'Instance ini tidak mengonfigurasi email.',
   'err.registrationDisabled': 'Pendaftaran akun baru ditutup.',
   'err.invalidTimezone': 'Zona waktu tidak valid.',
+  // Chrome umum (bukan istilah pasar) — nilai ID penuh (ZITN-TECH-021 §2).
+  'common.name': 'Nama',
+  'common.notes': 'Catatan',
+  'common.currency': 'Mata uang',
+  'common.close': 'Tutup',
+  'common.view': 'Lihat',
+  'common.edit': 'Ubah',
+  'common.delete': 'Hapus',
+  'common.save': 'Simpan',
+  'common.saving': 'Menyimpan…',
+  'common.create': 'Buat',
+  'common.confirm': 'Konfirmasi',
+  'common.continue': 'Lanjutkan',
+  'common.none': 'Tidak ada',
+  'page.accounts': 'Akun',
+  'page.brokerages': 'Broker',
+  // Brokerages (F2, ZITN-TECH-021 §5.7).
+  'broker.title.view': 'Lihat broker sistem',
+  'broker.title.edit': 'Ubah broker',
+  'broker.title.new': 'Broker baru',
+  'broker.field.namePlaceholder': 'mis. Interactive Brokers',
+  'broker.field.notesPlaceholder': 'Catatan opsional',
+  'broker.field.preset': 'Preset broker IDX',
+  'broker.field.presetPlaceholder': 'Pilih preset…',
+  'broker.action.duplicating': 'Menyalin…',
+  'broker.action.duplicate': 'Buat salinan yang dapat diubah',
+  'broker.confirmFee.title': 'Konfirmasi perubahan jadwal biaya',
+  'broker.confirmFee.bodyOne':
+    'Broker ini dipakai oleh {count} posisi. Mengubah jadwal biaya akan memengaruhi perhitungan biaya posisi tersebut.',
+  'broker.confirmFee.bodyMany':
+    'Broker ini dipakai oleh {count} posisi. Mengubah jadwal biaya akan memengaruhi perhitungan biaya posisi tersebut.',
+  'broker.fee.perShare': '{amount}/saham',
+  'broker.fee.perContract': '{amount}/kontrak',
+  'broker.fee.none': 'Belum ada biaya dikonfigurasi',
+  'broker.list.new': 'Broker baru',
+  'broker.list.empty': 'Belum ada broker. Buat satu untuk mulai melacak biaya.',
+  'broker.col.type': 'Jenis',
+  'broker.col.feeSummary': 'Ringkasan biaya',
+  'broker.row.approx': 'Tarif perkiraan — periksa dengan broker Anda',
+  'broker.type.system': 'Sistem',
+  'broker.type.custom': 'Kustom',
+  'broker.delete.title': 'Hapus broker',
+  'broker.delete.body': 'Yakin ingin menghapus "{name}"? Tindakan ini tidak dapat dibatalkan.',
+  'broker.delete.bodyReferenced':
+    'Yakin ingin menghapus "{name}"? Tindakan ini tidak dapat dibatalkan. Akun berikut memakai broker ini dan perlu dialihkan: {names}.',
+  'broker.fee.stock': 'Biaya saham',
+  'broker.fee.options': 'Biaya opsi',
+  'broker.fee.perShareCommission': 'Komisi per saham',
+  'broker.fee.minPerFill': 'Min per Fill',
+  'broker.fee.maxPerFill': 'Maks per Fill',
+  'broker.fee.percentBuy': 'Komisi % (beli)',
+  'broker.fee.percentSell': 'Komisi % (jual)',
+  'broker.fee.perContractCommission': 'Komisi per kontrak',
+  'broker.fee.perContractExchangeFee': 'Biaya bursa per kontrak',
+  // Catatan preset IDX: keraguan ("perkiraan… periksa dan sesuaikan") WAJIB tetap (rubrik R8).
+  'broker.preset.idxNotes':
+    'Perkiraan komisi {buy}% beli / {sell}% jual (termasuk levy). Angka dapat berbeda per sekuritas/promo — periksa dan sesuaikan dengan tarif broker Anda.',
+  // Accounts (F2, ZITN-TECH-021 §5.7).
+  'acct.title.edit': 'Ubah akun',
+  'acct.title.new': 'Akun baru',
+  'acct.list.new': 'Akun baru',
+  'acct.list.empty': 'Belum ada akun. Buat satu untuk mulai melacak posisi.',
+  'acct.cap.title': 'Batas akun tercapai',
+  'acct.cap.bodyOne': 'Anda memakai {used} dari {cap} akun pada paket Anda.',
+  'acct.cap.bodyMany': 'Anda memakai {used} dari {cap} akun pada paket Anda.',
+  'acct.cap.bodyRestrictedOne':
+    'Anda memakai {used} dari {cap} akun pada paket Anda. Hanya akun yang dapat ditulis yang menerima posisi baru.',
+  'acct.cap.bodyRestrictedMany':
+    'Anda memakai {used} dari {cap} akun pada paket Anda. Hanya akun yang dapat ditulis yang menerima posisi baru.',
+  'acct.badge.default': 'Utama',
+  'acct.badge.writable': 'Dapat ditulis',
+  'acct.badge.readonly': 'Hanya baca',
+  'acct.action.makeWritable': 'Jadikan dapat ditulis',
+  'acct.action.makeDefault': 'Jadikan utama',
+  'acct.demo.title': 'Hapus data contoh?',
+  'acct.demo.body':
+    'Akun Anda dan akun contoh tidak dapat ada bersamaan, jadi membuat akun akan menghapus akun contoh beserta seluruh transaksinya. Anda dapat menambahkan data contoh lagi setelah tidak punya akun sendiri.',
+  'acct.demo.error': 'Data contoh tidak dapat dihapus, jadi akun Anda belum dibuat. Coba lagi.',
+  'acct.demo.removing': 'Menghapus…',
+  'acct.demo.confirm': 'Hapus dan lanjutkan',
+  'acct.delete.title': 'Hapus akun',
+  'acct.delete.body': 'Yakin ingin menghapus "{name}"? Tindakan ini tidak dapat dibatalkan.',
+  'acct.tier.refused': 'Anda telah mencapai batas akun paket Anda.',
+  'acct.field.namePlaceholder': 'mis. IBKR Utama',
+  'acct.field.timezone': 'Zona waktu hari perdagangan',
+  'acct.field.timezoneHelp':
+    'Menentukan hari perdagangan untuk akun ini — dipakai untuk memutuskan apakah posisi dapat dimasukkan kembali pada hari yang sama. Ini bukan zona waktu pelaporan Anda, yang mengelompokkan P&L dan diatur di pengaturan.',
+  'acct.field.startingBalance': 'Saldo awal',
+  'acct.field.startingBalancePlaceholder': '0,00',
+  'acct.field.defaultRisk': 'Risiko bawaan %',
+  'acct.field.defaultRiskHelp':
+    'Porsi saldo akun ini yang Anda risikokan pada satu transaksi — ini mengisi awal kalkulator ukuran posisi, dan Anda dapat menimpanya pada perhitungan mana pun. Angka kedua adalah biaya yang timbul jika sepuluh transaksi berturut-turut merugi.',
+  'acct.risk.preset1Label': '1%',
+  'acct.risk.preset1Note': '10 kerugian: -10%',
+  'acct.risk.preset2Label': '2%',
+  'acct.risk.preset2Note': '10 kerugian: -18%',
+  'acct.risk.preset3Label': '3%',
+  'acct.risk.preset3Note': '10 kerugian: -26%',
+  'acct.risk.current': 'pengaturan saat ini',
+  'acct.risk.none': 'Tanpa aturan',
+  'acct.risk.noneNote': 'atur per perhitungan',
+  'acct.field.brokerage': 'Broker',
+  'acct.brokerage.systemPresets': 'Preset sistem',
+  'acct.brokerage.yours': 'Broker Anda',
+  'acct.warn.usdFees':
+    'Preset ini mengasumsikan biaya USD — jumlahnya mungkin tidak mencerminkan biaya setelah penyesuaian mata uang yang akurat.',
+  'acct.confirmBrokerage.title': 'Ganti broker?',
+  'acct.confirmBrokerage.bodyOne':
+    'Akun ini memiliki {count} posisi. Mengubah broker akan memengaruhi perhitungan biaya untuk posisi yang ada.',
+  'acct.confirmBrokerage.bodyMany':
+    'Akun ini memiliki {count} posisi. Mengubah broker akan memengaruhi perhitungan biaya untuk posisi yang ada.',
+  'acct.detail.notFound': 'Akun tidak ditemukan.',
+  'acct.detail.backToAccounts': 'Kembali ke akun',
+  'acct.detail.back': 'Kembali',
+  'acct.detail.ledger': 'Buku besar',
+  // Accounting/ledger & FX (F3, ZITN-TECH-021 §5.7/§5.14). Chrome ID, kalimat penjelas ID.
+  // Entity `&apos;`/`&amp;` sudah jadi karakter asli (rubrik §5.13-1).
+  'page.exchangeRates': 'Kurs',
+  'placeholder.amount': '0,00',
+  'action.reset': 'Reset',
+  'acct.balance.title': 'Saldo',
+  'acct.balance.cashButton': 'Deposit / penarikan',
+  'acct.balance.reconcile': 'Rekonsiliasi',
+  'acct.balance.cash': 'Kas',
+  'acct.balance.positions': 'Posisi',
+  'acct.balance.costBasisNote': 'Posisi terbuka pada harga perolehan — bukan nilai pasar.',
+  'displayCur.title': 'Mata uang tampilan',
+  'displayCur.desc':
+    'Mata uang yang dipakai untuk total lintas mata uang di dasbor. Saldo per akun tetap dalam mata uang aslinya.',
+  'displayCur.field': 'Mata uang',
+  'displayCur.noAccounts': 'Buat akun untuk memilih mata uang tampilan.',
+  'displayCur.placeholder': 'Pilih mata uang',
+  'fx.subtitle': 'Kelola kurs yang dipakai untuk mengubah saldo akun ke mata uang tampilan Anda.',
+  'fx.field.base': 'Mata uang dasar',
+  'fx.field.quote': 'Mata uang kutipan',
+  'fx.field.rate': 'Kurs ({base} → {quote})',
+  'fx.field.ratePlaceholder': 'mis. 0,92',
+  'fx.field.effectiveDate': 'Tanggal berlaku',
+  'fx.utcNote':
+    'Kurs disimpan sebagai tanggal UTC. Tanggal yang Anda masukkan bisa tertinggal satu hari dari tanggal lokal Anda tergantung zona waktu Anda.',
+  'fx.action.save': 'Simpan kurs',
+  'fx.list.title': 'Kurs tersimpan',
+  'fx.list.empty': 'Belum ada kurs. Tambahkan satu di atas untuk mulai mengubah saldo.',
+  'fx.col.pair': 'Pasangan',
+  'fx.col.rate': 'Kurs',
+  'fx.col.effectiveDate': 'Tanggal berlaku',
+  'fx.delete.title': 'Hapus kurs',
+  'fx.delete.body':
+    'Hapus kurs {base} → {quote} yang berlaku {date}? Tindakan ini tidak dapat dibatalkan.',
+  'fx.confirm.title': 'Konfirmasi perubahan kurs',
+  'fx.confirm.body':
+    'Perubahan kurs ini memperbarui total yang ditampilkan dari {before} menjadi sekitar {after}. Total tepat saat disimpan bisa berbeda bila tab lain atau perubahan berurutan mengubah kurs terkait. Lanjutkan?',
+  'acct.reconcile.title': 'Rekonsiliasi saldo kas',
+  'acct.reconcile.desc':
+    'Jurnal ZITN melacak saldo kas akun ini: saldo awal Anda ditambah P&L realisasi dari posisi yang sudah ditutup. Nilai pasar posisi terbuka tidak termasuk. Masukkan saldo kas yang seharusnya ditampilkan akun ini — Jurnal ZITN membuat satu entri penyesuaian untuk selisihnya.',
+  'acct.reconcile.current': 'Saldo saat ini',
+  'acct.reconcile.target': 'Saldo kas aktual',
+  'acct.reconcile.adjustment': 'Penyesuaian',
+  'acct.reconcile.noChange': 'Tidak ada perubahan — saldo sudah cocok',
+  'acct.reconcile.credit': 'kredit',
+  'acct.reconcile.debit': 'debit',
+  'acct.reconcile.posting': 'Memposting…',
+  'acct.reconcile.submit': 'Posting penyesuaian',
+  'cash.title.record': 'Catat deposit atau penarikan',
+  'cash.desc.record':
+    'Catat uang yang Anda pindahkan masuk atau keluar dari akun broker ini. Jurnal ZITN menambah satu entri buku besar dalam mata uang akun dan menggeser saldo sebesar jumlahnya.',
+  'cash.field.type': 'Jenis',
+  'cash.type.deposit': 'Deposit',
+  'cash.type.withdrawal': 'Penarikan',
+  'cash.field.amount': 'Jumlah ({currency})',
+  'cash.field.dateTime': 'Tanggal dan waktu',
+  'cash.field.resulting': 'Saldo setelahnya',
+  'cash.warn.negative':
+    'Saldo akan di bawah nol. Saldo Jurnal ZITN hanya kas dan tidak termasuk nilai pasar posisi terbuka.',
+  'cash.action.recording': 'Mencatat…',
+  'cash.action.recordDeposit': 'Catat deposit',
+  'cash.action.recordWithdrawal': 'Catat penarikan',
+  'ledger.empty.title': 'Belum ada aktivitas',
+  'ledger.empty.desc':
+    'Belum ada aktivitas — catat deposit atau tutup posisi untuk melihat entri buku besar di sini',
+  'ledger.col.occurredAt': 'Waktu',
+  'ledger.col.position': 'Posisi',
+  'ledger.col.debit': 'Debit',
+  'ledger.col.credit': 'Kredit',
+  'ledger.col.balance': 'Saldo',
+  'ledger.badge.adjustment': 'Penyesuaian saldo',
+  'ledger.badge.reversal': '(pembalikan)',
+  'ledger.deleted': '(dihapus)',
+  'ledger.deletedSymbol': '{symbol} (dihapus)',
+  'ledger.action.deleteDepositAria': 'Hapus deposit',
+  'ledger.action.deleteWithdrawalAria': 'Hapus penarikan',
+  'ledger.pag.previous': 'Sebelumnya',
+  'ledger.pag.next': 'Berikutnya',
+  'ledger.pag.status': 'Halaman {page} · {size} per halaman',
+  'ledger.delete.title': 'Hapus {type}?',
+  'ledger.delete.body':
+    'Jurnal ZITN menambahkan entri pembalikan untuk {amount} dan menyimpan entri aslinya. Saldo kembali seperti sebelum {entryType} ini.',
+  // Istilah pasar (glossary.ts) — nilai identik `id`/`en`.
+  ...TERM_MESSAGES,
+  // --- F4: csv-import (rute /import). Error/peringatan mapper dijelaskan per kode. ---
+  'page.import': 'Impor dari CSV',
+  'import.loading': 'Memuat impor…',
+  'import.intro':
+    'Impor bersifat menambah — posisi dan fill ditambahkan ke akun tujuan. Biaya diambil dari CSV kecuali kolom biaya tidak dipetakan.',
+  'import.guideLink': 'Baca panduan impor',
+  'import.remainingOne': '{remaining} dari {cap} impor CSV tersisa pada paket Anda.',
+  'import.remainingMany': '{remaining} dari {cap} impor CSV tersisa pada paket Anda.',
+  'import.step1.title': '1. Akun tujuan',
+  'import.step1.desc': 'Ke mana perdagangan yang diimpor akan ditambahkan.',
+  'import.step2.title': '2. Unggah berkas',
+  'import.step2.desc': 'Server mengurai dan memvalidasi berkas.',
+  'import.step3.title': '3. Petakan kolom',
+  'import.step3.desc':
+    'Pilih preset untuk mengisi otomatis, lalu sesuaikan — atau petakan setiap field secara manual. Atur bentuk baris terpisah dari preset mana pun.',
+  'import.missingRequired': 'Petakan semua field wajib untuk melanjutkan: {fields}.',
+  'import.preview.submit': 'Pratinjau impor',
+  'import.preview.pending': 'Membuat pratinjau…',
+  'import.preview.failedTitle': 'Pratinjau gagal',
+  'import.preview.failed': 'Pratinjau gagal. Silakan coba lagi.',
+  'import.account.label': 'Akun tujuan',
+  'import.account.loading': 'Memuat akun…',
+  'import.account.error': 'Tidak dapat memuat akun. Coba lagi.',
+  'import.account.empty': 'Buat akun dulu — perdagangan yang diimpor memerlukan akun tujuan.',
+  'import.account.placeholder': 'Pilih akun',
+  'import.account.option': '{name} ({currency})',
+  'import.account.optionReadOnly': '{name} ({currency}) — hanya-baca pada paket Anda',
+  'import.file.label': 'Berkas CSV',
+  'import.file.choose': 'Pilih berkas',
+  'import.file.none': 'Tidak ada berkas dipilih',
+  'import.mapper.preset': 'Preset (opsional)',
+  'import.mapper.noPreset': 'Tanpa preset',
+  'import.mapper.noPresetManual': 'Tanpa preset (petakan manual)',
+  'import.mapper.rowShape': 'Bentuk baris',
+  'import.mapper.rowShapeNote':
+    'Atur terpisah dari preset mana pun. Round-trip tersedia di sini meski tanpa preset.',
+  'import.mapper.execution': 'Execution (satu baris per fill)',
+  'import.mapper.roundTrip': 'Round-trip (satu baris per perdagangan yang sudah ditutup)',
+  'import.mapper.timezone': 'Zona waktu',
+  'import.mapper.dateFormat': 'Format tanggal',
+  'import.mapper.numberFormat': 'Format angka',
+  'import.mapper.quantityUnit': 'Satuan kuantitas',
+  'import.mapper.shares': 'Saham',
+  'import.mapper.lots': 'Lot (IDX — 1 lot = 100 saham)',
+  'import.mapper.contractForm': 'Bentuk kontrak',
+  'import.mapper.contractOcc': 'Simbol OCC di kolom Symbol',
+  'import.mapper.contractComposed': 'Kolom kedaluwarsa / strike / call-put terpisah',
+  'import.mapper.contractDescriptor': 'Kolom deskriptor (diatur preset)',
+  'import.mapper.occNote': 'Baris opsi memuat simbol kontrak OCC di kolom Symbol.',
+  'import.mapper.expiryFormat': 'Format kedaluwarsa',
+  'import.mapper.mapColumns': 'Petakan kolom ke field',
+  'import.mapper.notMapped': 'Belum dipetakan',
+  'import.mapper.requiredNote':
+    'wajib. Untuk baris execution, petakan tepat satu dari Type atau Action.',
+  'import.commit.successTitle': 'Impor selesai',
+  'import.commit.success': '{positions} posisi dan {fills} fill ditambahkan ke akun tujuan.',
+  'import.commit.viewPositions': 'Lihat posisi yang diimpor',
+  'import.commit.title': 'Konfirmasi impor',
+  'import.commit.blocked': 'Perbaiki galat yang menghalangi di atas sebelum dapat mengimpor.',
+  'import.commit.duplicates':
+    'Perdagangan ini tampak duplikat dari yang sudah ada di akun ini. Tetap impor?',
+  'import.commit.tierLimit':
+    'Batas impor CSV paket Anda telah tercapai — pratinjau ini tetap tersimpan, jadi Anda dapat mengimpornya setelah upgrade tanpa mengunggah ulang.',
+  'import.commit.rePreviewing': 'Membuat pratinjau ulang…',
+  'import.commit.rePreview': 'Pratinjau ulang',
+  'import.commit.submit': 'Konfirmasi impor',
+  'import.commit.importing': 'Mengimpor…',
+  'import.commit.superseded':
+    'Pratinjau ini digantikan oleh yang lebih baru — buat pratinjau ulang untuk mengimpornya.',
+  'import.commit.err.expired':
+    'Pratinjau ini telah kedaluwarsa — buat pratinjau ulang untuk mengimpor.',
+  'import.commit.err.inProgress': 'Impor untuk pratinjau ini sedang berjalan.',
+  'import.commit.err.blocked':
+    'Pratinjau ini memiliki galat yang menghalangi dan tidak dapat diimpor.',
+  'import.commit.err.duplicates': 'Tampak seperti duplikat — konfirmasi untuk tetap mengimpor.',
+  'import.commit.err.tierAccount':
+    'Akun ini tidak dapat ditulis pada paket Anda saat ini. Impor CSV hanya dapat menargetkan akun yang ditetapkan — ubah penetapan atau upgrade.',
+  'import.commit.err.tierPositions':
+    'Impor ini akan melampaui batas posisi paket Anda. Upgrade untuk menambah batas.',
+  'import.commit.err.tierImports':
+    'Batas impor CSV paket Anda telah habis. Upgrade untuk impor tanpa batas.',
+  'import.commit.err.failed': 'Impor gagal. Silakan coba lagi.',
+  'import.preview.err.noRows': 'Tidak ada baris yang dapat diimpor di berkas ini.',
+  'import.preview.err.tooManyRows':
+    'Berkas ini memiliki terlalu banyak baris untuk diimpor; bagi menjadi beberapa berkas.',
+  'import.preview.err.resultTooLarge':
+    'Impor memiliki terlalu banyak baris/galat untuk diproses; bagi berkas.',
+  'import.preview.err.inProgress': 'Impor sedang diselesaikan; coba lagi sebentar lagi.',
+  'import.preview.err.payloadTooLarge': 'Berkas terlalu besar untuk diunggah.',
+  'import.preview.err.requestTooLarge': 'Opsi permintaan impor terlalu besar.',
+  'import.preview.err.notUtf8': 'Berkas bukan teks UTF-8 yang valid.',
+  'import.preview.err.invalidRequest': 'Opsi permintaan impor tidak valid.',
+  'import.summary.rowsParsed': 'Baris diurai',
+  'import.summary.rowsValid': 'Baris valid',
+  'import.summary.rowsWithErrors': 'Baris dengan galat',
+  'import.summary.positions': 'Posisi',
+  'import.summary.fills': 'Fill',
+  'import.summary.segmentation':
+    'Fill dikelompokkan menjadi posisi berdasarkan simbol dan arah. Setiap posisi berjalan dari entri pertamanya sampai kembali flat; posisi baru dimulai setelahnya. Impor ini bersifat menambah — posisi dan fill ini ditambahkan ke akun tujuan.',
+  'import.issue.errorsTitle': 'Galat yang menghalangi ({n})',
+  'import.issue.warningsTitle': 'Peringatan ({n})',
+  'import.issue.row': 'Baris {row}',
+  'import.issue.column': 'kolom "{column}"',
+  'import.issue.field': 'field {field}',
+  'import.positions.title': 'Posisi yang diusulkan ({n})',
+  'import.positions.emptyTitle': 'Posisi yang diusulkan',
+  'import.positions.emptyDesc': 'Tidak ada posisi yang dapat diimpor yang dihasilkan.',
+  'import.positions.desc':
+    'Setiap blok adalah satu posisi dan fill-nya, dengan P&L yang diusulkan untuk posisi yang sudah ditutup.',
+  'import.positions.pnl': 'P&L:',
+  'import.positions.closes': 'closes',
+  'import.positions.open': 'open',
+  'import.positions.option': 'option',
+  'import.col.row': 'Baris',
+  'import.col.type': 'Jenis',
+  'import.col.price': 'Harga',
+  'import.col.filledAt': 'Waktu eksekusi',
+  'import.err.mappingFieldMissing': 'Field wajib "{field}" belum dipetakan ke kolom.',
+  'import.err.mappingTypeOrActionRequired':
+    'Pemetaan execution harus memetakan tepat satu dari "type" atau "action".',
+  'import.err.mappingTypeOrActionExclusive':
+    'Pemetaan execution harus memetakan tepat satu dari "type" atau "action" — jangan keduanya.',
+  'import.err.mappingExpiryFormatMissing': 'Bentuk kontrak composed memerlukan format kedaluwarsa.',
+  'import.err.mappingColumnAbsent': 'Field dipetakan ke kolom "{column}" yang tidak ada di berkas.',
+  'import.err.transformNoMatch': 'Nilai di kolom ini tidak dikenali untuk field tersebut.',
+  'import.err.rowMissingRequired': 'Baris kehilangan field wajib "{field}" untuk bentuk baris ini.',
+  'import.err.rowMissingTypeOrAction':
+    'Baris kehilangan "type" dan "action"; tepat satu diperlukan.',
+  'import.err.fieldInvalid': 'Nilai baris tidak valid untuk field "{field}".',
+  'import.err.numberUnparseable':
+    'Nilai di kolom ini bukan angka yang valid untuk format angka yang dipilih.',
+  'import.err.numberEmpty': 'Nilai angka kosong.',
+  'import.err.numberMagnitudeTooLarge': 'Nilai melampaui batas magnitudo yang dapat diwakili.',
+  'import.err.dateUnparseable':
+    'Nilai di kolom ini bukan tanggal/waktu yang valid untuk format tanggal yang dipilih.',
+  'import.err.dateFormatMismatch': 'Nilai tidak cocok dengan format tanggal yang dipilih.',
+  'import.err.dateInvalid': 'Nilai bukan tanggal kalender yang nyata.',
+  'import.err.invalidTimezone': 'Zona waktu impor bukan zona IANA yang valid.',
+  'import.err.quantitySignContradiction':
+    'Tanda kuantitas menyatakan jual, tetapi aksi baris menyatakan beli (atau sebaliknya).',
+  'import.err.truncated': 'Daftar galat dipotong; masih ada galat lain yang tidak ditampilkan.',
+  'import.err.contractFieldOnStock':
+    'Baris saham membawa kolom kontrak opsi; hapus kolom itu atau tetapkan jenis aset opsi.',
+  'import.err.contractFormMissing': 'Baris opsi, tetapi pemetaan tidak menyatakan bentuk kontrak.',
+  'import.err.contractFieldMissing': 'Baris opsi kehilangan kolom {field}.',
+  'import.err.optionMultiplierUnsupported': 'Jurnal ZITN hanya mewakili kontrak opsi 100 saham.',
+  'import.err.optionEventNotSupported':
+    'Peristiwa siklus hidup opsi (assignment/exercise/expiration) belum didukung; tutup atau hapus kontrak secara manual.',
+  'import.err.optionFractionalQuantity': 'Kuantitas opsi harus bilangan bulat.',
+  'import.err.descriptorUnparseable':
+    'Deskriptor opsi tidak dapat dibaca sebagai format Tradervue.',
+  'import.err.occNoFormMatch': 'Simbol tidak cocok dengan format simbol OCC mana pun.',
+  'import.err.occTooLong': 'Simbol OCC melebihi panjang yang diizinkan.',
+  'import.err.occBadCharset': 'Simbol OCC memuat karakter yang tidak diizinkan.',
+  'import.err.occCanonicalLength': 'Bentuk kanonik OCC harus 21 karakter.',
+  'import.err.occPre2000': 'Kedaluwarsa OCC sebelum tahun 2000 tidak didukung.',
+  'import.err.occBadDate': 'Tanggal kedaluwarsa OCC bukan tanggal kalender yang valid.',
+  'import.err.occStrikeZero': 'Strike harus lebih besar dari nol.',
+  'import.err.occStrikeRange': 'Strike harus lebih dari 0 dan kurang dari 100.000.',
+  'import.err.occStrikePrecision': 'Strike memerlukan lebih dari 3 angka desimal.',
+  'import.err.occDateRange': 'Kedaluwarsa OCC harus antara 2000-01-01 dan 2049-12-31.',
+  'import.err.occBadUnderlying': 'Simbol aset dasar tidak valid.',
+  'import.err.occCompactTooLong': 'Simbol OCC ringkas melebihi 20 karakter.',
+  'import.err.occStrikeNotRepresentable': 'Strike tidak dapat diwakili pada presisi yang didukung.',
+  'import.err.segmentCrossesFlat':
+    'Kuantitas keluar melewati posisi nol; keluar tidak boleh melebihi kuantitas masuk.',
+  'import.err.segmentTypeContradiction':
+    'Jenis baris ini bertentangan dengan posisi berjalan (masuk/keluar yang terbentuk).',
+  'import.err.segmentSideContradiction':
+    'Sisi baris ini bertentangan dengan sisi saat segmen posisi dibuka.',
+  'import.err.exitBeforeEntry': 'Tidak bisa keluar sebelum ada baris masuk.',
+  'import.err.exitExceedsEntry': 'Kuantitas keluar melebihi kuantitas masuk yang tersedia.',
+  'import.err.segmentNotReconciled':
+    'Posisi harus keluar penuh untuk ditutup (kuantitas keluar ≠ kuantitas masuk).',
+  'import.err.closeBeforeOpen': 'Tanggal tutup tidak boleh mendahului tanggal buka.',
+  'import.err.unknown': 'Baris ini memiliki galat yang belum dapat dijelaskan.',
+  'import.warn.rounded': 'Nilai angka dibulatkan ke 8 angka desimal.',
+  'import.warn.noFeesColumn': 'Tidak ada kolom biaya yang dipetakan; biaya fill default ke 0.',
+  'import.warn.currencyMismatch':
+    'Berkas tampak memakai mata uang yang berbeda dari akun; nilai diimpor apa adanya, tidak dikonversi.',
+  'import.warn.withinFileDuplicate': 'Baris ini tampak duplikat di dalam berkas.',
+  'import.warn.partialDuplicate':
+    'Baris ini tampak duplikat dari transaksi yang sudah ada di akun ini.',
+  'import.warn.directionInferred': 'Arah (beli/jual) disimpulkan dari tanda kuantitas.',
+  'import.warn.derivedExpiry':
+    'Tanggal kedaluwarsa diturunkan dari bentuk bulanan (Jumat ketiga); dapat berbeda dari tanggal OCC broker.',
+  'import.warn.unknown': 'Peringatan ini belum dapat dijelaskan.',
+  // --- F5: billing (rute /settings/billing). Permukaan uang/penawaran → cakupan 100% (R12). ---
+  'settings.billing.title': 'Tagihan',
+  'settings.billing.subtitleCredits': 'Lihat saldo kredit Anda, beli kredit, dan tinjau pemakaian.',
+  'settings.billing.subtitleManage': 'Kelola langganan Anda.',
+  'settings.billing.disabled': 'Penagihan tidak aktif di instance ini.',
+  'billing.loading': 'Memuat…',
+  'billing.balance.title': 'Saldo',
+  'billing.balance.error': 'Tidak dapat memuat saldo.',
+  'billing.balance.approxUsd': '≈ {amount} (perkiraan)',
+  'billing.buyCredits': 'Beli kredit',
+  'billing.checkout.error': 'Tidak dapat memulai checkout. Coba lagi.',
+  'billing.portal.error': 'Tidak dapat membuka portal penagihan. Coba lagi.',
+  'billing.pack.credits': '{n} credits',
+  'billing.plan.pro': 'Paket Pro',
+  'billing.plan.free': 'Paket Free',
+  'billing.plan.perMonth': '{price} / bulan',
+  'billing.plan.proUntil': 'Pro sampai {date}',
+  'billing.plan.renews': 'Diperbarui {date}',
+  'billing.plan.pastDue':
+    'Pembayaran terlambat — perbarui metode pembayaran untuk mempertahankan Pro.',
+  'billing.upgrade': 'Upgrade ke Pro',
+  'billing.manage': 'Kelola langganan',
+  'billing.unavailable':
+    'Penagihan sementara tidak tersedia — pengelolaan langganan akan kembali segera.',
+  'billing.unlimited': 'Tanpa batas',
+  'billing.lever.accounts': 'Akun terhubung',
+  'billing.lever.positions': 'Posisi',
+  'billing.lever.platformTurns': 'Giliran Advisor / bulan',
+  'billing.lever.images': 'Unggahan gambar Advisor / bulan',
+  'billing.lever.csvImports': 'Impor CSV (seumur paket)',
+  'billing.usage.accounts': 'Akun terhubung',
+  'billing.usage.positions': 'Posisi',
+  'billing.usage.platformTurns': 'Giliran Advisor bulan ini',
+  'billing.usage.images': 'Unggahan gambar bulan ini',
+  'billing.usage.csvImports': 'Impor CSV',
+  'billing.confirming.title': 'Mengonfirmasi langganan Anda…',
+  'billing.confirming.desc': 'Biasanya hanya butuh beberapa detik.',
+  'billing.confirming.capped':
+    'Masih mengonfirmasi — bisa sampai satu menit; cek lagi atau hubungi dukungan bila terus berlanjut.',
+  'billing.history.title': 'Riwayat pemakaian',
+  'billing.history.error': 'Tidak dapat memuat riwayat.',
+  'billing.history.empty': 'Belum ada aktivitas.',
+  'billing.history.loadMore': 'Muat lebih banyak',
+  'billing.kind.purchase': 'Pembelian',
+  'billing.kind.usage': 'Pemakaian',
+  'billing.kind.reversal': 'Pembalikan',
+  'billing.usage.detail': '{provider} · {model} · {input} masuk / {output} keluar token',
+  // --- Pengerasan F5: calculator, positions, fee-rollup (residu tak-terpeta). ---
+  'calc.placeholder.amount': '0,00',
+  'calc.options.selectFromChain': 'Pilih dari rantai opsi',
+  'calc.sizing.limitedByBuyingPower': 'Ukuran posisi dibatasi oleh daya beli akun',
+  'fee.enterRate': 'Masukkan kurs',
+  'pos.fill.none': 'Belum ada fill',
+  'pos.detail.editTags': 'Ubah tag',
+  'pos.detail.addFill': 'Tambah Fill',
+  'pos.shots.unavailable': 'Gambar tidak lagi tersedia',
+  'pos.shots.tooLarge': 'Gambar itu terlalu besar untuk diunggah.',
+  'pos.occ.strikePlaceholder': '150,00',
+  'pos.placeholder.amount': '0,00',
+  'pos.fill.enterPriceQty': 'Masukkan harga dan kuantitas',
 } as const;
 
 export type MessageKey = keyof typeof ID_MESSAGES;
@@ -760,6 +1257,8 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'app.update.dismiss': 'Not now',
   'auth.field.email': 'Email',
   'auth.field.password': 'Password',
+  'auth.field.showPassword': 'Show password',
+  'auth.field.hidePassword': 'Hide password',
   'auth.field.newPassword': 'New password',
   'auth.field.confirmPassword': 'Confirm password',
   'auth.error.unexpected': 'An unexpected error occurred',
@@ -772,8 +1271,16 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'auth.login.expired': 'Session expired. Please log in again.',
   'auth.login.deleted': 'Your account was deleted.',
   'auth.login.forgot': 'Forgot password?',
+  'auth.login.or': 'or',
+  'auth.login.continueWithZitn': 'Continue with ZITN',
   'auth.login.noAccount': "Don't have an account?",
   'auth.login.register': 'Register',
+  'ctx.tanggal': 'Date',
+  'ctx.symbol': 'Symbol',
+  'ctx.tf': 'Timeframe',
+  'ctx.account': 'Account',
+  'ctx.sheet': "Open that day's sheet",
+  'ctx.chart': 'Open chart',
   'auth.forgot.title': 'Reset your password',
   'auth.forgot.sent':
     'If an account exists for that address, a reset link is on its way — check your inbox.',
@@ -876,7 +1383,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
     'unused wallet credits are deleted with the account, not refunded.',
   'retention.docsLink': 'What deletion removes and what it keeps',
   'nav.dashboard': 'Dashboard',
-  'nav.lembar': 'Daily sheet',
+  'nav.lembar': 'Scanner',
   'nav.advisor': 'Advisor',
   'nav.positions': 'Positions',
   'nav.calculator': 'Calculator',
@@ -893,7 +1400,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'nav.logout': 'Log out',
   'nav.collapse': 'Collapse sidebar',
   'nav.expand': 'Expand sidebar',
-  'journal.context.title': 'Daily sheet',
+  'journal.context.title': 'Scanner',
   'journal.context.subtitle':
     'A context snippet from the ZITN daily sheet — not the whole sheet, not a data copy.',
   'journal.context.date': 'Sheet date',
@@ -904,8 +1411,19 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'journal.context.chart': 'chart',
   'journal.context.openChart': 'Open the chart in the Daily sheet',
   'journal.context.watch': 'Watch levels',
+  'journal.context.rows': 'Sheet rows',
+  'journal.context.colTicker': 'Symbol',
+  'journal.context.colKind': 'Kind',
+  'journal.context.colEntry': 'Entry',
+  'journal.context.colTarget': 'Target',
+  'journal.context.colStop': 'Stop',
+  'journal.context.colDistance': 'Distance %',
+  'journal.context.colStatus': 'Status',
   'journal.context.none': 'No symbols on that sheet.',
   'journal.context.unavailable': 'No sheet is available for this date.',
+  'journal.context.paywall':
+    'Your subscription is not active. Renew to unlock the sheet and chart.',
+  'journal.context.renew': 'Renew access',
   'journal.context.notLinked':
     'This account is not linked to ZITN. Sign in through ZITN to read the sheet context.',
   'journal.context.off': 'Sheet context is currently unavailable.',
@@ -924,7 +1442,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'widget.pnlCalendar': 'P&L Calendar',
   'widget.dimensionBreakdown': 'Dimension Breakdown',
   'widget.idxTaxFees': 'IDX Tax & Fees',
-  'widget.dailySheet': 'Today’s Sheet',
+  'widget.dailySheet': 'Today’s Scanner',
   'widget.recordCompleteness': 'Record Completeness',
   'action.cancel': 'Cancel',
   'dashboard.resetLayout': 'Reset layout',
@@ -1252,6 +1770,17 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'pos.field.playbookNone': 'No playbook',
   'nav.playbooks': 'Playbooks',
   'nav.tradePlans': 'Plans',
+  'nav.chart': 'Chart',
+  'chart.title': 'Chart',
+  'chart.noSymbol': 'Pick a symbol from the sheet or a chart link.',
+  'chart.loading': 'Loading chart…',
+  'chart.failed': 'Failed to load Lightweight Charts.',
+  'chart.unavailable': 'No chart data for this symbol.',
+  'chart.notLinked': 'The account is not linked to ZITN.',
+  'chart.off': 'The sheet context is off on this instance.',
+  'chart.footnote':
+    'Chart from ZITN data; the journal only reads. Price timezone follows the source.',
+  'shortcut.chart': 'Chart',
   'pb.title': 'Playbooks',
   'pb.new': 'New playbook',
   'pb.name': 'Name',
@@ -1303,7 +1832,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'shortcut.hint': 'Press g then a letter. Inactive while typing.',
   'shortcut.help': 'Open this list',
   'shortcut.dashboard': 'Dashboard',
-  'shortcut.lembar': 'Daily sheet',
+  'shortcut.lembar': 'Scanner',
   'shortcut.positions': 'Positions',
   'shortcut.playbooks': 'Playbooks',
   'shortcut.tradePlans': 'Plans',
@@ -1323,7 +1852,9 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'calc.sizing.roundsToZero':
     'The amount at risk does not cover one share/contract at this stop distance, so the size rounds down to zero. Size moves only with the stop distance and the amount at risk.',
   'tax.page.title': 'Tax Summary',
-  'tax.subtitle': 'Realised P&L, tracked expenses, and flagged positions for the selected year.',
+  'tax.subtitle': 'Realised P&L and tracked expenses for the selected year.',
+  'tax.subtitleFlags':
+    'Realised P&L, tracked expenses, and flagged positions for the selected year.',
   'tax.field.year': 'Year',
   'tax.field.jurisdiction': 'Jurisdiction',
   'tax.disclaimer.trigger': 'Disclaimer — please read before using these figures',
@@ -1343,9 +1874,12 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'tax.pphTitle': 'PPh Final ({rate}%)',
   'tax.pphSell': 'Sales {currency}',
   'tax.pphEmpty': 'No sales this year.',
-  'tax.pphNote': 'Estimated 0.1% of sale proceeds; not an official tax computation.',
+  'tax.pphNote': 'Estimated {rate}% of sale proceeds; not an official tax computation.',
   'tax.washSales': 'Wash sales ({n})',
   'tax.superficial': 'Superficial losses ({n})',
+  'tax.jurisdiction.us': 'United States',
+  'tax.jurisdiction.ca': 'Canada',
+  'tax.jurisdiction.id': 'Indonesia',
   'tax.jurisdiction.other': 'Other',
   'expense.cat.data_subscription': 'Data subscription',
   'expense.cat.platform_fee': 'Platform fee',
@@ -1446,7 +1980,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'tax.disc.recCA':
     "Commission fees paid through fills are already incorporated into the realised gain/loss above (consistent with the CRA's adjusted cost base treatment). The 50% capital-gains inclusion rate is NOT applied by Jurnal ZITN — the realised P&L shown is the pre-inclusion-rate figure.",
   'tax.disc.recID':
-    'Tax: Jurnal ZITN shows the **0.1% final income tax on sale proceeds** (not an official tax computation). The figures below are computational aggregates of your transaction data; consult a tax professional.',
+    'Tax: Jurnal ZITN shows the **{rate}% final income tax on sale proceeds** (not an official tax computation). The figures below are computational aggregates of your transaction data; consult a tax professional.',
   'tax.disc.recOther':
     'Jurnal ZITN does not support jurisdiction-specific tax rules for your jurisdiction. The figures below are computational aggregates only; consult a local tax professional.',
   'tax.disc.reconcile':
@@ -1471,6 +2005,450 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'err.emailNotConfigured': 'This instance has no email configured.',
   'err.registrationDisabled': 'New account signups are closed.',
   'err.invalidTimezone': 'Invalid timezone.',
+  // Chrome umum (bukan istilah pasar) — nilai ID penuh (ZITN-TECH-021 §2).
+  'common.name': 'Name',
+  'common.notes': 'Notes',
+  'common.currency': 'Currency',
+  'common.close': 'Close',
+  'common.view': 'View',
+  'common.edit': 'Edit',
+  'common.delete': 'Delete',
+  'common.save': 'Save',
+  'common.saving': 'Saving...',
+  'common.create': 'Create',
+  'common.confirm': 'Confirm',
+  'common.continue': 'Continue',
+  'common.none': 'None',
+  'page.accounts': 'Accounts',
+  'page.brokerages': 'Brokerages',
+  // Brokerages (F2, ZITN-TECH-021 §5.7).
+  'broker.title.view': 'View System Brokerage',
+  'broker.title.edit': 'Edit Brokerage',
+  'broker.title.new': 'New Brokerage',
+  'broker.field.namePlaceholder': 'e.g., Interactive Brokers',
+  'broker.field.notesPlaceholder': 'Optional notes',
+  'broker.field.preset': 'Broker preset',
+  'broker.field.presetPlaceholder': 'Choose a preset…',
+  'broker.action.duplicating': 'Copying...',
+  'broker.action.duplicate': 'Create Editable Copy',
+  'broker.confirmFee.title': 'Confirm Fee Schedule Change',
+  'broker.confirmFee.bodyOne':
+    'This brokerage is referenced by {count} position. Changing the fee schedule will affect fee calculations for that position.',
+  'broker.confirmFee.bodyMany':
+    'This brokerage is referenced by {count} positions. Changing the fee schedule will affect fee calculations for those positions.',
+  'broker.fee.perShare': '{amount}/share',
+  'broker.fee.perContract': '{amount}/contract',
+  'broker.fee.none': 'No fees configured',
+  'broker.list.new': 'New Brokerage',
+  'broker.list.empty': 'No brokerages yet. Create one to start tracking fees.',
+  'broker.col.type': 'Type',
+  'broker.col.feeSummary': 'Fee Summary',
+  'broker.row.approx': 'Approximate rates — verify with your broker',
+  'broker.type.system': 'System',
+  'broker.type.custom': 'Custom',
+  'broker.delete.title': 'Delete Brokerage',
+  'broker.delete.body': 'Are you sure you want to delete "{name}"? This action cannot be undone.',
+  'broker.delete.bodyReferenced':
+    'Are you sure you want to delete "{name}"? This action cannot be undone. The following accounts reference this brokerage and will need to be reassigned: {names}.',
+  'broker.fee.stock': 'Stock Fees',
+  'broker.fee.options': 'Options Fees',
+  'broker.fee.perShareCommission': 'Per Share Commission',
+  'broker.fee.minPerFill': 'Min Per Fill',
+  'broker.fee.maxPerFill': 'Max Per Fill',
+  'broker.fee.percentBuy': '% Commission (Buy)',
+  'broker.fee.percentSell': '% Commission (Sell)',
+  'broker.fee.perContractCommission': 'Per Contract Commission',
+  'broker.fee.perContractExchangeFee': 'Per Contract Exchange Fee',
+  'broker.preset.idxNotes':
+    "Estimated commission {buy}% buy / {sell}% sell (including levy). Figures may differ per security/promo — check and adjust to your broker's rates.",
+  // Accounts (F2, ZITN-TECH-021 §5.7).
+  'acct.title.edit': 'Edit Account',
+  'acct.title.new': 'New Account',
+  'acct.list.new': 'New Account',
+  'acct.list.empty': 'No accounts yet. Create one to start tracking positions.',
+  'acct.cap.title': 'Account limit reached',
+  'acct.cap.bodyOne': "You're using {used} of {cap} account on your plan.",
+  'acct.cap.bodyMany': "You're using {used} of {cap} accounts on your plan.",
+  'acct.cap.bodyRestrictedOne':
+    "You're using {used} of {cap} account on your plan. Only the writable account accepts new positions.",
+  'acct.cap.bodyRestrictedMany':
+    "You're using {used} of {cap} accounts on your plan. Only the writable account accepts new positions.",
+  'acct.badge.default': 'Default',
+  'acct.badge.writable': 'Writable',
+  'acct.badge.readonly': 'Read-only',
+  'acct.action.makeWritable': 'Make writable',
+  'acct.action.makeDefault': 'Make default',
+  'acct.demo.title': 'Remove the sample data?',
+  'acct.demo.body':
+    'Your own accounts and the sample account cannot both exist, so creating an account removes the sample account and every trade in it. You can add sample data again once you have no accounts of your own.',
+  'acct.demo.error':
+    'The sample data could not be removed, so your account has not been created. Try again.',
+  'acct.demo.removing': 'Removing…',
+  'acct.demo.confirm': 'Remove and continue',
+  'acct.delete.title': 'Delete account',
+  'acct.delete.body': 'Are you sure you want to delete "{name}"? This action cannot be undone.',
+  'acct.tier.refused': "You've reached your plan's account limit.",
+  'acct.field.namePlaceholder': 'e.g., IBKR Main',
+  'acct.field.timezone': 'Trading-day timezone',
+  'acct.field.timezoneHelp':
+    'Defines the trading day for this account — used to decide whether a position can be re-entered the same day. It is not your reporting timezone, which buckets your P&L and is set in settings.',
+  'acct.field.startingBalance': 'Starting balance',
+  'acct.field.startingBalancePlaceholder': '0.00',
+  'acct.field.defaultRisk': 'Default risk %',
+  'acct.field.defaultRiskHelp':
+    "The share of this account's balance you risk on a single trade — it prefills the position-size calculator, and you can override it on any one calculation. The second figure is what ten losing trades in a row would cost.",
+  'acct.risk.preset1Label': '1%',
+  'acct.risk.preset1Note': '10 losses: -10%',
+  'acct.risk.preset2Label': '2%',
+  'acct.risk.preset2Note': '10 losses: -18%',
+  'acct.risk.preset3Label': '3%',
+  'acct.risk.preset3Note': '10 losses: -26%',
+  'acct.risk.current': 'current setting',
+  'acct.risk.none': 'No rule',
+  'acct.risk.noneNote': 'set it per calculation',
+  'acct.field.brokerage': 'Brokerage',
+  'acct.brokerage.systemPresets': 'System Presets',
+  'acct.brokerage.yours': 'Your Brokerages',
+  'acct.warn.usdFees':
+    'This preset assumes USD fees — amounts may not reflect accurate currency-adjusted costs.',
+  'acct.confirmBrokerage.title': 'Change brokerage?',
+  'acct.confirmBrokerage.bodyOne':
+    'This account has {count} position. Changing the brokerage will affect fee calculations for existing positions.',
+  'acct.confirmBrokerage.bodyMany':
+    'This account has {count} positions. Changing the brokerage will affect fee calculations for existing positions.',
+  'acct.detail.notFound': 'Account not found.',
+  'acct.detail.backToAccounts': 'Back to accounts',
+  'acct.detail.back': 'Back',
+  'acct.detail.ledger': 'Ledger',
+  // Accounting/ledger & FX (F3, ZITN-TECH-021 §5.7/§5.14).
+  'page.exchangeRates': 'Exchange Rates',
+  'placeholder.amount': '0.00',
+  'action.reset': 'Reset',
+  'acct.balance.title': 'Balance',
+  'acct.balance.cashButton': 'Deposit / withdrawal',
+  'acct.balance.reconcile': 'Reconcile',
+  'acct.balance.cash': 'Cash',
+  'acct.balance.positions': 'Positions',
+  'acct.balance.costBasisNote': 'Open positions at cost basis — not market value.',
+  'displayCur.title': 'Display currency',
+  'displayCur.desc':
+    'The currency used for the dashboard cross-currency total. Per-account balances stay in their native currency.',
+  'displayCur.field': 'Currency',
+  'displayCur.noAccounts': 'Create an account to choose a display currency.',
+  'displayCur.placeholder': 'Select currency',
+  'fx.subtitle': 'Manage the rates used to convert account balances into your display currency.',
+  'fx.field.base': 'Base currency',
+  'fx.field.quote': 'Quote currency',
+  'fx.field.rate': 'Rate ({base} → {quote})',
+  'fx.field.ratePlaceholder': 'e.g., 0.92',
+  'fx.field.effectiveDate': 'Effective date',
+  'fx.utcNote':
+    'Rates are stored as UTC dates. Your entered date may be one day behind your local date depending on your timezone.',
+  'fx.action.save': 'Save rate',
+  'fx.list.title': 'Saved rates',
+  'fx.list.empty': 'No rates yet. Add one above to start converting balances.',
+  'fx.col.pair': 'Pair',
+  'fx.col.rate': 'Rate',
+  'fx.col.effectiveDate': 'Effective date',
+  'fx.delete.title': 'Delete exchange rate',
+  'fx.delete.body': 'Delete the {base} → {quote} rate effective {date}? This cannot be undone.',
+  'fx.confirm.title': 'Confirm rate change',
+  'fx.confirm.body':
+    'This rate change updates your displayed total from {before} to approximately {after}. The exact total at commit time may differ if other tabs or sequential edits change related rates. Continue?',
+  'acct.reconcile.title': 'Reconcile cash balance',
+  'acct.reconcile.desc':
+    "Jurnal ZITN tracks this account's cash balance: your starting balance plus realized P&L from closed trades. It does not include the market value of open positions. Enter the cash balance this account should show — Jurnal ZITN posts a single adjusting entry for the difference.",
+  'acct.reconcile.current': 'Current balance',
+  'acct.reconcile.target': 'Actual cash balance',
+  'acct.reconcile.adjustment': 'Adjustment',
+  'acct.reconcile.noChange': 'No change — the balance already matches',
+  'acct.reconcile.credit': 'credit',
+  'acct.reconcile.debit': 'debit',
+  'acct.reconcile.posting': 'Posting…',
+  'acct.reconcile.submit': 'Post adjustment',
+  'cash.title.record': 'Record a deposit or withdrawal',
+  'cash.desc.record':
+    "Record money you moved into or out of this brokerage account. Jurnal ZITN adds one ledger entry in the account's currency and moves the balance by the amount.",
+  'cash.field.type': 'Type',
+  'cash.type.deposit': 'Deposit',
+  'cash.type.withdrawal': 'Withdrawal',
+  'cash.field.amount': 'Amount ({currency})',
+  'cash.field.dateTime': 'Date and time',
+  'cash.field.resulting': 'Resulting balance',
+  'cash.warn.negative':
+    "The balance will go below zero. Jurnal ZITN's balance is cash only and does not include the market value of open positions.",
+  'cash.action.recording': 'Recording…',
+  'cash.action.recordDeposit': 'Record deposit',
+  'cash.action.recordWithdrawal': 'Record withdrawal',
+  'ledger.empty.title': 'No activity yet',
+  'ledger.empty.desc':
+    'No activity yet — record a deposit or close a position to see ledger entries here',
+  'ledger.col.occurredAt': 'Occurred at',
+  'ledger.col.position': 'Position',
+  'ledger.col.debit': 'Debit',
+  'ledger.col.credit': 'Credit',
+  'ledger.col.balance': 'Balance',
+  'ledger.badge.adjustment': 'Balance adjustment',
+  'ledger.badge.reversal': '(reversal)',
+  'ledger.deleted': '(deleted)',
+  'ledger.deletedSymbol': '{symbol} (deleted)',
+  'ledger.action.deleteDepositAria': 'Delete deposit',
+  'ledger.action.deleteWithdrawalAria': 'Delete withdrawal',
+  'ledger.pag.previous': 'Previous',
+  'ledger.pag.next': 'Next',
+  'ledger.pag.status': 'Page {page} · {size} per page',
+  'ledger.delete.title': 'Delete {type}?',
+  'ledger.delete.body':
+    'Jurnal ZITN adds a reversal entry for {amount} and keeps the original. The balance returns to what it was before this {entryType}.',
+  // Istilah pasar (glossary.ts) — nilai identik `id`/`en`.
+  ...TERM_MESSAGES,
+  // --- F4: csv-import (/import route). Mapper errors/warnings explained per code. ---
+  'page.import': 'Import trades from CSV',
+  'import.loading': 'Loading import…',
+  'import.intro':
+    'Imports are additive — they add positions and fills to the target account. Fees come from the CSV unless no fees column is mapped.',
+  'import.guideLink': 'Read the import guide',
+  'import.remainingOne': '{remaining} of {cap} CSV import remaining on your plan.',
+  'import.remainingMany': '{remaining} of {cap} CSV imports remaining on your plan.',
+  'import.step1.title': '1. Target account',
+  'import.step1.desc': 'Where the imported trades will be added.',
+  'import.step2.title': '2. Upload file',
+  'import.step2.desc': 'The server parses and validates the file.',
+  'import.step3.title': '3. Map columns',
+  'import.step3.desc':
+    'Pick a preset to auto-fill, then adjust — or map every field by hand. Set the row shape independently of any preset.',
+  'import.missingRequired': 'Map all required fields to continue: {fields}.',
+  'import.preview.submit': 'Preview import',
+  'import.preview.pending': 'Previewing…',
+  'import.preview.failedTitle': 'Preview failed',
+  'import.preview.failed': 'Preview failed. Please try again.',
+  'import.account.label': 'Target account',
+  'import.account.loading': 'Loading accounts…',
+  'import.account.error': 'Could not load accounts. Try again.',
+  'import.account.empty': 'Create an account first — imported trades need a target account.',
+  'import.account.placeholder': 'Select an account',
+  'import.account.option': '{name} ({currency})',
+  'import.account.optionReadOnly': '{name} ({currency}) — read-only on your plan',
+  'import.file.label': 'CSV file',
+  'import.file.choose': 'Choose file',
+  'import.file.none': 'No file selected',
+  'import.mapper.preset': 'Preset (optional)',
+  'import.mapper.noPreset': 'No preset',
+  'import.mapper.noPresetManual': 'No preset (map manually)',
+  'import.mapper.rowShape': 'Row shape',
+  'import.mapper.rowShapeNote':
+    'Set independently of any preset. Round-trip is available here even with no preset.',
+  'import.mapper.execution': 'Execution (one row per fill)',
+  'import.mapper.roundTrip': 'Round-trip (one row per closed trade)',
+  'import.mapper.timezone': 'Timezone',
+  'import.mapper.dateFormat': 'Date format',
+  'import.mapper.numberFormat': 'Number format',
+  'import.mapper.quantityUnit': 'Quantity unit',
+  'import.mapper.shares': 'Shares',
+  'import.mapper.lots': 'Lots (IDX — 1 lot = 100 shares)',
+  'import.mapper.contractForm': 'Contract form',
+  'import.mapper.contractOcc': 'OCC symbol in the Symbol column',
+  'import.mapper.contractComposed': 'Separate expiry / strike / call-put columns',
+  'import.mapper.contractDescriptor': 'Descriptor column (set by preset)',
+  'import.mapper.occNote': 'Option rows carry the OCC contract symbol in the Symbol column.',
+  'import.mapper.expiryFormat': 'Expiry format',
+  'import.mapper.mapColumns': 'Map columns to fields',
+  'import.mapper.notMapped': 'Not mapped',
+  'import.mapper.requiredNote': 'required. For execution rows, map exactly one of Type or Action.',
+  'import.commit.successTitle': 'Import complete',
+  'import.commit.success':
+    '{positions} position(s) and {fills} fill(s) added to the target account.',
+  'import.commit.viewPositions': 'View imported positions',
+  'import.commit.title': 'Confirm import',
+  'import.commit.blocked': 'Fix the blocking errors above before you can import.',
+  'import.commit.duplicates':
+    'These trades look like duplicates of trades already in this account. Import them anyway?',
+  'import.commit.tierLimit':
+    "You've reached your plan's CSV import limit — this preview stays saved, so you can import it after upgrading without re-uploading.",
+  'import.commit.rePreviewing': 'Re-previewing…',
+  'import.commit.rePreview': 'Re-preview',
+  'import.commit.submit': 'Confirm import',
+  'import.commit.importing': 'Importing…',
+  'import.commit.superseded': 'This preview was replaced by a newer one — re-preview to import it.',
+  'import.commit.err.expired': 'This preview has expired — re-preview to import.',
+  'import.commit.err.inProgress': 'An import for this preview is already running.',
+  'import.commit.err.blocked': 'This preview has blocking errors and cannot be imported.',
+  'import.commit.err.duplicates': 'These look like duplicates — confirm to import anyway.',
+  'import.commit.err.tierAccount':
+    'This account is not writable on your current plan. CSV imports can only target your designated writable account — change the designation or upgrade.',
+  'import.commit.err.tierPositions':
+    'This import would exceed your plan\u2019s position limit. Upgrade to raise the cap.',
+  'import.commit.err.tierImports':
+    'Your plan\u2019s CSV import limit is used up. Upgrade for unlimited imports.',
+  'import.commit.err.failed': 'Import failed. Please try again.',
+  'import.preview.err.noRows': 'No importable rows found in the file.',
+  'import.preview.err.tooManyRows':
+    'The file has too many rows to import; split it into smaller files.',
+  'import.preview.err.resultTooLarge':
+    'The import has too many rows/errors to process; split the file.',
+  'import.preview.err.inProgress': 'An import is finishing; try again shortly.',
+  'import.preview.err.payloadTooLarge': 'The file is too large to upload.',
+  'import.preview.err.requestTooLarge': 'The import request options are too large.',
+  'import.preview.err.notUtf8': 'The file is not valid UTF-8 text.',
+  'import.preview.err.invalidRequest': 'The import request options are not valid.',
+  'import.summary.rowsParsed': 'Rows parsed',
+  'import.summary.rowsValid': 'Rows valid',
+  'import.summary.rowsWithErrors': 'Rows with errors',
+  'import.summary.positions': 'Positions',
+  'import.summary.fills': 'Fills',
+  'import.summary.segmentation':
+    'Fills are grouped into positions by symbol and direction. Each position runs from its first entry until it returns to flat; a new position starts after that. This import is additive — it adds these positions and fills to the target account.',
+  'import.issue.errorsTitle': 'Blocking errors ({n})',
+  'import.issue.warningsTitle': 'Warnings ({n})',
+  'import.issue.row': 'Row {row}',
+  'import.issue.column': 'column "{column}"',
+  'import.issue.field': 'field {field}',
+  'import.positions.title': 'Proposed positions ({n})',
+  'import.positions.emptyTitle': 'Proposed positions',
+  'import.positions.emptyDesc': 'No importable positions were produced.',
+  'import.positions.desc':
+    'Each block is one position and its fills, with proposed P&L for closed positions.',
+  'import.positions.pnl': 'P&L:',
+  'import.positions.closes': 'closes',
+  'import.positions.open': 'open',
+  'import.positions.option': 'option',
+  'import.col.row': 'Row',
+  'import.col.type': 'Type',
+  'import.col.price': 'Price',
+  'import.col.filledAt': 'Filled at',
+  'import.err.mappingFieldMissing': 'Required field "{field}" is not mapped to a column.',
+  'import.err.mappingTypeOrActionRequired':
+    'An execution mapping must map exactly one of "type" or "action".',
+  'import.err.mappingTypeOrActionExclusive':
+    'An execution mapping must map exactly one of "type" or "action", not both.',
+  'import.err.mappingExpiryFormatMissing': 'The composed contract form needs an expiry format.',
+  'import.err.mappingColumnAbsent':
+    'A field is mapped to column "{column}", which is not in the file.',
+  'import.err.transformNoMatch': 'A value in this column has no matching transform for its field.',
+  'import.err.rowMissingRequired':
+    'The row is missing required field "{field}" for this row shape.',
+  'import.err.rowMissingTypeOrAction':
+    'The row is missing both "type" and "action"; exactly one is required.',
+  'import.err.fieldInvalid': 'A row value is not valid for field "{field}".',
+  'import.err.numberUnparseable':
+    'A value in this column is not a valid number for the selected number format.',
+  'import.err.numberEmpty': 'Empty numeric value.',
+  'import.err.numberMagnitudeTooLarge': 'A value exceeds the maximum representable magnitude.',
+  'import.err.dateUnparseable':
+    'A value in this column is not a valid date/time for the selected date format.',
+  'import.err.dateFormatMismatch': 'A value does not match the selected date format.',
+  'import.err.dateInvalid': 'A value is not a real calendar date.',
+  'import.err.invalidTimezone': 'The import timezone is not a valid IANA timezone.',
+  'import.err.quantitySignContradiction':
+    'The quantity sign says sell, but the row action says buy (or the reverse).',
+  'import.err.truncated': 'The error list was capped; more errors are not shown.',
+  'import.err.contractFieldOnStock':
+    'A stock row carries an option contract column; remove it or set the asset type to option.',
+  'import.err.contractFormMissing':
+    'This is an option row, but the mapping declares no contract form.',
+  'import.err.contractFieldMissing': 'The option row is missing its {field} column.',
+  'import.err.optionMultiplierUnsupported':
+    'Jurnal ZITN represents only 100-share option contracts.',
+  'import.err.optionEventNotSupported':
+    'Option lifecycle events (assignment/exercise/expiration) are not supported yet; close or remove the contract by hand.',
+  'import.err.optionFractionalQuantity': 'Option quantity must be a whole number.',
+  'import.err.descriptorUnparseable':
+    'The option descriptor could not be parsed as a Tradervue descriptor.',
+  'import.err.occNoFormMatch': 'The symbol matches no OCC symbol form.',
+  'import.err.occTooLong': 'The OCC symbol exceeds the allowed length.',
+  'import.err.occBadCharset': 'The OCC symbol contains disallowed characters.',
+  'import.err.occCanonicalLength': 'The OCC-21 canonical form must be 21 characters.',
+  'import.err.occPre2000': 'OCC symbols with a pre-2000 expiry are not supported.',
+  'import.err.occBadDate': 'The OCC expiration is not a valid calendar date.',
+  'import.err.occStrikeZero': 'Strike must be greater than zero.',
+  'import.err.occStrikeRange': 'Strike must be > 0 and < 100,000.',
+  'import.err.occStrikePrecision': 'Strike requires more than 3 decimal places.',
+  'import.err.occDateRange': 'The OCC expiration must be between 2000-01-01 and 2049-12-31.',
+  'import.err.occBadUnderlying': 'The underlying symbol is not valid.',
+  'import.err.occCompactTooLong': 'The compact OCC symbol exceeds 20 characters.',
+  'import.err.occStrikeNotRepresentable': 'Strike is not representable at the supported precision.',
+  'import.err.segmentCrossesFlat':
+    'The exit quantity reverses the position past flat; an exit may not exceed the open quantity.',
+  'import.err.segmentTypeContradiction':
+    'This row type contradicts the running position (the entry/exit it forms).',
+  'import.err.segmentSideContradiction':
+    'This row side contradicts the side the position segment opened with.',
+  'import.err.exitBeforeEntry': 'Cannot exit before an entry fill.',
+  'import.err.exitExceedsEntry': 'The exit quantity would exceed the available entry quantity.',
+  'import.err.segmentNotReconciled':
+    'A position must be fully exited to close (exit quantity ≠ entry quantity).',
+  'import.err.closeBeforeOpen': 'The close date cannot precede the open date.',
+  'import.err.unknown': 'This row has an error that cannot be explained yet.',
+  'import.warn.rounded': 'A number was rounded to 8 decimal places.',
+  'import.warn.noFeesColumn': 'No fees column was mapped; fills default to 0 fees.',
+  'import.warn.currencyMismatch':
+    'The file appears to use a different currency than the account; values are imported as-is, not converted.',
+  'import.warn.withinFileDuplicate': 'This row looks like a duplicate within the file.',
+  'import.warn.partialDuplicate':
+    'This row looks like a duplicate of a trade already in this account.',
+  'import.warn.directionInferred': 'The direction (buy/sell) was inferred from the quantity sign.',
+  'import.warn.derivedExpiry':
+    'The expiry was derived from the monthly form (third Friday); it may differ from the broker\u2019s OCC expiration date.',
+  'import.warn.unknown': 'This warning cannot be explained yet.',
+  // --- F5: billing (/settings/billing route). Money/offer surface → 100% coverage (R12). ---
+  'settings.billing.title': 'Billing',
+  'settings.billing.subtitleCredits': 'View your credit balance, buy credits, and review usage.',
+  'settings.billing.subtitleManage': 'Manage your subscription.',
+  'settings.billing.disabled': 'Billing is not enabled on this instance.',
+  'billing.loading': 'Loading…',
+  'billing.balance.title': 'Balance',
+  'billing.balance.error': "Couldn't load balance.",
+  'billing.balance.approxUsd': '≈ {amount} (approx.)',
+  'billing.buyCredits': 'Buy credits',
+  'billing.checkout.error': "Couldn't start checkout. Try again.",
+  'billing.portal.error': "Couldn't open the billing portal. Try again.",
+  'billing.pack.credits': '{n} credits',
+  'billing.plan.pro': 'Pro plan',
+  'billing.plan.free': 'Free plan',
+  'billing.plan.perMonth': '{price} / month',
+  'billing.plan.proUntil': 'Pro until {date}',
+  'billing.plan.renews': 'Renews {date}',
+  'billing.plan.pastDue': 'Payment past due — update your payment method to keep Pro.',
+  'billing.upgrade': 'Upgrade to Pro',
+  'billing.manage': 'Manage subscription',
+  'billing.unavailable':
+    'Billing is temporarily unavailable — subscription management will return shortly.',
+  'billing.unlimited': 'Unlimited',
+  'billing.lever.accounts': 'Connected accounts',
+  'billing.lever.positions': 'Positions',
+  'billing.lever.platformTurns': 'Advisor turns / month',
+  'billing.lever.images': 'Advisor image uploads / month',
+  'billing.lever.csvImports': 'CSV imports (lifetime)',
+  'billing.usage.accounts': 'Connected accounts',
+  'billing.usage.positions': 'Positions',
+  'billing.usage.platformTurns': 'Advisor turns this month',
+  'billing.usage.images': 'Image uploads this month',
+  'billing.usage.csvImports': 'CSV imports',
+  'billing.confirming.title': 'Confirming your subscription…',
+  'billing.confirming.desc': 'This usually takes a few seconds.',
+  'billing.confirming.capped':
+    'Still confirming — this can take a minute; check back or contact support if it persists.',
+  'billing.history.title': 'Usage history',
+  'billing.history.error': "Couldn't load history.",
+  'billing.history.empty': 'No activity yet.',
+  'billing.history.loadMore': 'Load more',
+  'billing.kind.purchase': 'Purchase',
+  'billing.kind.usage': 'Usage',
+  'billing.kind.reversal': 'Reversal',
+  'billing.usage.detail': '{provider} · {model} · {input} in / {output} out tokens',
+  // --- Hardening F5: calculator, positions, fee-rollup (unmapped residue). ---
+  'calc.placeholder.amount': '0.00',
+  'calc.options.selectFromChain': 'Select from options chain',
+  'calc.sizing.limitedByBuyingPower': 'Position size limited by account buying power',
+  'fee.enterRate': 'Enter rate',
+  'pos.fill.none': 'No fills yet',
+  'pos.detail.editTags': 'Edit tags',
+  'pos.detail.addFill': 'Add Fill',
+  'pos.shots.unavailable': 'Image no longer available',
+  'pos.shots.tooLarge': 'That image is too large to upload.',
+  'pos.occ.strikePlaceholder': '150.00',
+  'pos.placeholder.amount': '0.00',
+  'pos.fill.enterPriceQty': 'Enter price and quantity',
 };
 
 export const MESSAGES: Record<AppLocale, Record<MessageKey, string>> = {
@@ -1478,14 +2456,14 @@ export const MESSAGES: Record<AppLocale, Record<MessageKey, string>> = {
   en: EN_MESSAGES,
 };
 
-/** Normalisasi nilai apa pun menjadi locale yang didukung (fallback `id`). */
+/** Normalisasi nilai apa pun menjadi locale yang didukung (fallback `DEFAULT_LOCALE`). */
 export function resolveLocale(value: unknown): AppLocale {
   return typeof value === 'string' && (SUPPORTED_LOCALES as readonly string[]).includes(value)
     ? (value as AppLocale)
     : DEFAULT_LOCALE;
 }
 
-/** Terjemahkan `key` untuk `locale`, ganti `{nama}` dengan `vars`; fallback ke `id`, lalu key. */
+/** Terjemahkan `key` untuk `locale`, ganti `{nama}` dengan `vars`; fallback ke `DEFAULT_LOCALE`, lalu key. */
 export function translate(
   locale: unknown,
   key: MessageKey,
@@ -1499,6 +2477,90 @@ export function translate(
     }
   }
   return out;
+}
+
+const LOCALE_TAGS: Record<AppLocale, string> = { id: 'id-ID', en: 'en-US' };
+
+const NUMBER_FORMAT_CACHE = new Map<string, Intl.NumberFormat>();
+const DATE_FORMAT_CACHE = new Map<string, Intl.DateTimeFormat>();
+
+/**
+ * Reuse one `Intl` formatter per `locale + options` instead of constructing a new one per
+ * call — tables can format thousands of cells in a single render (ZITN-TECH-025 review,
+ * performance track).
+ */
+function getNumberFormat(locale: string, options: Intl.NumberFormatOptions): Intl.NumberFormat {
+  const cacheKey = `${locale}|${JSON.stringify(options)}`;
+  let formatter = NUMBER_FORMAT_CACHE.get(cacheKey);
+  if (!formatter) {
+    formatter = new Intl.NumberFormat(locale, options);
+    NUMBER_FORMAT_CACHE.set(cacheKey, formatter);
+  }
+  return formatter;
+}
+
+function getDateFormat(locale: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat {
+  const cacheKey = `${locale}|${JSON.stringify(options)}`;
+  let formatter = DATE_FORMAT_CACHE.get(cacheKey);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, options);
+    DATE_FORMAT_CACHE.set(cacheKey, formatter);
+  }
+  return formatter;
+}
+
+/**
+ * Format angka per locale tampilan **sebelum** masuk `translate()` (rubrik R13).
+ *
+ * `translate()` hanya substitusi string, jadi nilai kanonik seperti `PPH_FINAL_RATE_PERCENT = '0.1'`
+ * akan tampil "0.1%" pada salinan ID. Helper ini menghasilkan "0,1%" (id) / "0.1%" (en) tanpa
+ * mengubah angka kanoniknya. Dipakai web dan server (disclaimer dirender server).
+ */
+export function formatNumber(
+  value: string | number,
+  locale: unknown,
+  options?: Intl.NumberFormatOptions,
+): string {
+  const numeric = typeof value === 'number' ? value : Number(value);
+  if (!Number.isFinite(numeric)) return String(value);
+  return getNumberFormat(LOCALE_TAGS[resolveLocale(locale)], {
+    useGrouping: false,
+    maximumFractionDigits: 10,
+    ...options,
+  }).format(numeric);
+}
+
+/**
+ * Format harga/kuantitas dalam **gaya titik** (D5, ZITN-TECH-021 §5.14): trader IDX
+ * membaca `.` sebagai pemisah desimal, dan field kelas ini **tidak** boleh memakai
+ * grouping ribuan. Satu mekanisme untuk kelas "harga" — menggantikan `toFixed()`
+ * ad-hoc di komponen (mis. `PositionDetail`), tanpa mengubah nilai tersimpan.
+ * Dibatasi 8 desimal (presisi kuantisasi engine) dan sengaja memakai locale `en`.
+ */
+export function formatPriceDecimal(value: string | number, maximumFractionDigits = 8): string {
+  return formatNumber(value, 'en', { maximumFractionDigits });
+}
+
+/**
+ * Format tanggal per locale tampilan sebelum masuk `translate()` (rubrik R13).
+ * `timeZone: 'UTC'` mencegah pergeseran hari untuk nilai tanggal-saja (`YYYY-MM-DD`,
+ * termasuk `ratesAsOf`). Nilai tak valid dikembalikan apa adanya.
+ */
+export function formatDate(
+  value: string | number | Date,
+  locale: unknown,
+  options?: Intl.DateTimeFormatOptions,
+): string {
+  const date = value instanceof Date ? value : new Date(value);
+  if (Number.isNaN(date.getTime()))
+    return value instanceof Date ? value.toISOString() : String(value);
+  return getDateFormat(LOCALE_TAGS[resolveLocale(locale)], {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+    timeZone: 'UTC',
+    ...options,
+  }).format(date);
 }
 
 /** True bila kedua kamus memuat himpunan kunci yang sama (penjaga kelengkapan). */

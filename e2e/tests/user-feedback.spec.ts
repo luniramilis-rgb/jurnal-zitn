@@ -154,7 +154,7 @@ async function loginViaUi(page: Page, email: string): Promise<void> {
   await page.setExtraHTTPHeaders({ 'X-Forwarded-For': uniqueIp() });
   await page.goto('/login');
   await page.getByLabel('Email').fill(email);
-  await page.getByLabel('Password').fill(PASSWORD);
+  await page.getByLabel('Password', { exact: true }).fill(PASSWORD);
   await page.getByRole('button', { name: 'Log in' }).click();
   await expect(page).toHaveURL(/\/dashboard/);
 }
@@ -520,6 +520,10 @@ test.describe('user feedback — desktop', () => {
     page,
     request,
   }) => {
+    test.fixme(
+      true,
+      'obsolete setelah F0b (survey PostHog dihapus) — tulis ulang untuk POST /api/feedback',
+    );
     test.setTimeout(45_000);
     const h = await installFeedbackHarness(page);
     const user = await registerUser(request, 'progchange');
@@ -562,6 +566,10 @@ test.describe('user feedback — desktop', () => {
     page,
     request,
   }) => {
+    test.fixme(
+      true,
+      'obsolete setelah F0b (survey PostHog dihapus) — tulis ulang untuk POST /api/feedback',
+    );
     test.setTimeout(60_000);
     const h = await installFeedbackHarness(page);
     const user = await registerUser(request, 'wire');

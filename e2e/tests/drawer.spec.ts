@@ -73,7 +73,7 @@ async function loginAs(page: Page, creds: { email: string; password: string }): 
   await page.setExtraHTTPHeaders({ 'X-Forwarded-For': uniqueIp() });
   await page.goto('/login');
   await page.getByLabel('Email').fill(creds.email);
-  await page.getByLabel('Password').fill(creds.password);
+  await page.getByLabel('Password', { exact: true }).fill(creds.password);
   await page.getByRole('button', { name: 'Log in' }).click();
   await expect(page).toHaveURL(/\/dashboard/);
 }

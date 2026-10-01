@@ -11,12 +11,50 @@ import {
 } from 'react';
 import type { ReactNode } from 'react';
 
-import { resolveLocale, translate, type AppLocale, type MessageKey } from '@jurnal-zitn/shared';
+import {
+  MESSAGES,
+  resolveLocale,
+  translate,
+  type AppLocale,
+  type MessageKey,
+} from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 import { detectBrowserLocale } from '@/lib/browserLocale';
 import { getAppLocale, setAppLocale } from '@/lib/locale';
 import { useEventBusSubscribe } from '@/stores/event-bus.store';
+
+declare global {
+  interface ImportMetaEnv {
+    readonly DEV?: boolean;
+    readonly VITE_I18N_DEBUG?: string;
+  }
+  interface ImportMeta {
+    readonly env: ImportMetaEnv;
+  }
+}
+
+/**
+ * Overlay tinjau dev (ZITN-TECH-021 §5.4). Aktif hanya bila `VITE_I18N_DEBUG=1`
+ * pada build dev: menandai string yang jatuh ke fallback locale dan kalimat yang
+ * `id === en` (kandidat belum diterjemahkan), agar peninjau menilai terjemahan,
+ * bukan mencari string mentah. Tidak berpengaruh pada produksi/uji.
+ */
+const I18N_DEBUG = import.meta.env.DEV === true && import.meta.env.VITE_I18N_DEBUG === '1';
+
+function markDebug(locale: AppLocale, key: MessageKey, value: string): string {
+  if (!I18N_DEBUG) return value;
+  const markers: string[] = [];
+  const activeCatalog = MESSAGES[locale] as Record<string, string | undefined>;
+  if (activeCatalog[key] === undefined) markers.push('fallback');
+  if (
+    MESSAGES.id[key] === MESSAGES.en[key] &&
+    MESSAGES.id[key].trim().split(/\s+/).filter(Boolean).length >= 3
+  ) {
+    markers.push('id=en');
+  }
+  return markers.length === 0 ? value : `${value} ⟦${markers.join(',')}⟧`;
+}
 
 const STORAGE_KEY = 'jurnal_zitn_locale';
 
@@ -154,7 +192,8 @@ export function useLocale(): LocaleContextValue {
 export function useT(): (key: MessageKey, vars?: Record<string, string | number>) => string {
   const { locale } = useLocale();
   return useCallback(
-    (key: MessageKey, vars?: Record<string, string | number>) => translate(locale, key, vars),
+    (key: MessageKey, vars?: Record<string, string | number>) =>
+      markDebug(locale, key, translate(locale, key, vars)),
     [locale],
   );
 }

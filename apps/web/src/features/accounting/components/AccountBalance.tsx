@@ -4,6 +4,7 @@ import type { Account } from '@jurnal-zitn/shared';
 
 import { Button } from '@/components/ui/button';
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { useT } from '@/hooks/useLocale';
 import { formatMoney } from '@/lib/format';
 
 import { ReconcileBalanceDialog } from './ReconcileBalanceDialog';
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function AccountBalance({ account }: Props) {
+  const t = useT();
   const [reconcileOpen, setReconcileOpen] = useState(false);
   const [cashOpen, setCashOpen] = useState(false);
 
@@ -26,7 +28,7 @@ export function AccountBalance({ account }: Props) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Balance</CardTitle>
+        <CardTitle>{t('acct.balance.title')}</CardTitle>
         <CardAction>
           <div className="flex gap-2">
             <Button
@@ -35,7 +37,7 @@ export function AccountBalance({ account }: Props) {
               className="cursor-pointer"
               onClick={() => setCashOpen(true)}
             >
-              Deposit / withdrawal
+              {t('acct.balance.cashButton')}
             </Button>
             <Button
               variant="outline"
@@ -43,7 +45,7 @@ export function AccountBalance({ account }: Props) {
               className="cursor-pointer"
               onClick={() => setReconcileOpen(true)}
             >
-              Reconcile
+              {t('acct.balance.reconcile')}
             </Button>
           </div>
         </CardAction>
@@ -67,20 +69,18 @@ export function AccountBalance({ account }: Props) {
         {account.cash !== undefined && account.positionValue !== undefined && (
           <div className="mt-4 space-y-1 border-t pt-3">
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-muted-foreground">Cash</span>
+              <span className="text-sm text-muted-foreground">{t('acct.balance.cash')}</span>
               <span className="text-sm font-medium" data-testid="account-cash">
                 {formatMoney(account.cash, account.currency)}
               </span>
             </div>
             <div className="flex items-baseline justify-between">
-              <span className="text-sm text-muted-foreground">Positions</span>
+              <span className="text-sm text-muted-foreground">{t('acct.balance.positions')}</span>
               <span className="text-sm font-medium" data-testid="account-position-value">
                 {formatMoney(account.positionValue, account.currency)}
               </span>
             </div>
-            <p className="pt-1 text-xs text-muted-foreground">
-              Open positions at cost basis — not market value.
-            </p>
+            <p className="pt-1 text-xs text-muted-foreground">{t('acct.balance.costBasisNote')}</p>
           </div>
         )}
       </CardContent>

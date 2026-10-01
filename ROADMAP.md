@@ -15,7 +15,10 @@ UI ekspor data, penyembunyian fitur opsi AS, impor CSV IDX, CI/uji ber-Postgres,
 
 ## Keputusan yang perlu pemilik
 
-1. **Bahasa**: paksa `id-ID` (sekarang) atau tambah **toggle ID/EN** di `/akun/`.
+1. ~~**Bahasa**: paksa `id-ID` (sekarang) atau tambah **toggle ID/EN** di `/akun/`.~~
+   ✅ **tertutup 2026-09-28** (`ZITN-TECH-021`): pasar utama ID, bahasa utama ID, EN = fallback
+   teknis; istilah pasar tetap EN, kalimat penjelas ID, chrome ID; tinjauan manual per halaman
+   wajib. Gate `DEFAULT_LOCALE` **tetap `'id'`** (EN lewat penyemaian browser), bukan ditahan `'en'`; yang bergerak selama tinjau adalah status `sah` per rute (§6).
 2. **Fitur opsi AS**: sembunyikan penuh untuk IDX, atau biarkan mati karena vendor tak dikonfigurasi.
 3. **Nilai identitas ZITN** untuk mengganti default upstream: slug repo GitHub (changelog),
    URL docs, UA/URL kontak SEC.

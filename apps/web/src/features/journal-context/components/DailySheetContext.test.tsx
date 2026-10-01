@@ -54,13 +54,53 @@ describe('DailySheetContext — konteks lembar (ZITN-TECH-019)', () => {
 
     render(<DailySheetContext tanggal="2026-09-27" />);
 
-    expect(screen.getByRole('heading', { name: 'Daily sheet' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Scanner' })).toBeTruthy();
     // Tanggal dan asof sama-sama "2026-09-27" pada kasus ini.
     expect(screen.getAllByText('2026-09-27').length).toBeGreaterThan(0);
     // Simbol & level watch adalah ticker + pasar, bukan harga.
     expect(screen.getByText('BBBB')).toBeTruthy();
     expect(screen.getByText('CCCC')).toBeTruthy();
     expect(screen.getByText('AAAA')).toBeTruthy();
+  });
+
+  it('merender baris lembar ber-harga saat jembatan mengirimnya (Fase 3b)', () => {
+    setQuery({
+      data: {
+        ok: true,
+        tersedia: true,
+        tanggal: '2026-09-27',
+        asof: '2026-09-27',
+        simbol: [],
+        level_watch: [],
+        rows: [
+          {
+            market: 'ID',
+            ticker: 'BBBB',
+            name: null,
+            kind: 'signal',
+            date: '2026-09-27',
+            direction: null,
+            order_type: null,
+            rule: null,
+            entry: 1234,
+            target: 1400,
+            stop: 1150,
+            entry_prev_close: null,
+            distance_pct: 1.2,
+            size_qty: null,
+            size_unit: null,
+            data_status: 'OK',
+            evidence_status: null,
+          },
+        ],
+      },
+    });
+
+    render(<DailySheetContext tanggal="2026-09-27" />);
+
+    expect(screen.getByText('Sheet rows')).toBeTruthy();
+    expect(screen.getAllByTestId('sheet-row')).toHaveLength(1);
+    expect(screen.getByText('BBBB')).toBeTruthy();
   });
 
   it('menjelaskan saat akun belum tertaut ke ZITN (409)', () => {
@@ -113,7 +153,7 @@ describe('DailySheetContext — konteks lembar (ZITN-TECH-019)', () => {
   });
 });
 
-it('menautkan simbol ID ke chart ZITN (opsi B) tanpa menggambar chart', () => {
+it('menautkan simbol IDX & US ke chart ZITN (ZITN-TECH-025) di tab baru, tanpa menggambar chart', () => {
   setQuery({
     data: {
       ok: true,
@@ -126,18 +166,30 @@ it('menautkan simbol ID ke chart ZITN (opsi B) tanpa menggambar chart', () => {
           ticker: 'BBRI',
           chartUrl: 'https://zenitn.test/daily/chart/?tanggal=2026-09-27#BBRI',
         },
+        {
+          market: 'US',
+          ticker: 'AAPL',
+          chartUrl: 'https://zenitn.test/daily/chart/?pasar=us#AAPL',
+        },
       ],
-      level_watch: [{ market: 'US', ticker: 'AAPL' }],
+      level_watch: [{ market: 'US', ticker: 'MSFT' }],
     },
   });
 
   render(<DailySheetContext tanggal="2026-09-27" />);
 
   const links = screen.getAllByRole('link', { name: 'Open the chart in the Daily sheet' });
-  // Hanya entri pasar ID yang bertaut; pasar US tetap teks biasa.
-  expect(links).toHaveLength(1);
-  expect(links[0].getAttribute('href')).toBe(
+  // Tautan mengikuti chartUrl dari ZITN (IDX & US); entri tanpa chartUrl tetap teks biasa.
+  expect(links).toHaveLength(2);
+  expect(links.map((a) => a.getAttribute('href'))).toEqual([
     'https://zenitn.test/daily/chart/?tanggal=2026-09-27#BBRI',
-  );
-  expect(screen.getByText('AAPL')).toBeTruthy();
+    'https://zenitn.test/daily/chart/?pasar=us#AAPL',
+  ]);
+  // Tab baru agar jurnal tetap terbuka.
+  for (const link of links) {
+    expect(link.getAttribute('target')).toBe('_blank');
+    expect(link.getAttribute('rel')).toBe('noopener');
+  }
+  // Entri tanpa chartUrl tetap teks biasa (bukan tautan harga apa pun).
+  expect(screen.getByText('MSFT')).toBeTruthy();
 });

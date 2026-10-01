@@ -1,11 +1,13 @@
 import { Link } from '@tanstack/react-router';
 
+import { formatNumber } from '@jurnal-zitn/shared';
+
 import { EmptyState } from '@/components/EmptyState';
 import { Numeric } from '@/components/Numeric';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useFeeRollup } from '@/features/expenses/hooks/useFeeRollup';
 import { useTaxSummary } from '@/features/expenses/hooks/useTaxSummary';
-import { useT } from '@/hooks/useLocale';
+import { useLocale, useT } from '@/hooks/useLocale';
 
 /**
  * IdxTaxFeesWidget — Fase F0 (ZITN-TECH-017 §10.3). A compact IDX-specific
@@ -18,6 +20,7 @@ import { useT } from '@/hooks/useLocale';
  */
 function IdxTaxFeesWidget() {
   const t = useT();
+  const { locale } = useLocale();
   const year = new Date().getUTCFullYear();
   const tax = useTaxSummary(year);
   const fees = useFeeRollup(year);
@@ -51,7 +54,7 @@ function IdxTaxFeesWidget() {
       <dl className="space-y-2 text-sm">
         <div className="space-y-1">
           <dt className="font-mono text-xs uppercase tracking-[0.1em] text-muted-foreground">
-            {pph ? t('tax.pphTitle', { rate: pph.rate }) : t('w.idxTax.pph')}
+            {pph ? t('tax.pphTitle', { rate: formatNumber(pph.rate, locale) }) : t('w.idxTax.pph')}
           </dt>
           <dd>
             {pphRows.length > 0 ? (
