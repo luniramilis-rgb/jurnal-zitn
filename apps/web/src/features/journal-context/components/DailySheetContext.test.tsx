@@ -54,7 +54,7 @@ describe('DailySheetContext — konteks lembar (ZITN-TECH-019)', () => {
 
     render(<DailySheetContext tanggal="2026-09-27" />);
 
-    expect(screen.getByRole('heading', { name: 'Daily sheet' })).toBeTruthy();
+    expect(screen.getByRole('heading', { name: 'Scanner' })).toBeTruthy();
     // Tanggal dan asof sama-sama "2026-09-27" pada kasus ini.
     expect(screen.getAllByText('2026-09-27').length).toBeGreaterThan(0);
     // Simbol & level watch adalah ticker + pasar, bukan harga.
