@@ -251,16 +251,17 @@ test.describe('Dashboard — desktop', () => {
     const user = await registerUser(request, 'addpopover');
     await loginViaUi(page, user.email);
 
-    // The five defaults are placed, so the picker lists exactly the one type
-    // that is NOT in the default roster: position-sizing (Req 10.2).
+    // The five defaults are placed, so the picker lists the seven types that
+    // are NOT in the default roster: position-sizing, pnl-calendar,
+    // dimension-breakdown, idx-tax-fees, daily-sheet, record-completeness and
+    // risk-control (F0 +5, F3 +1). position-sizing is among them (Req 10.2).
     await ensureDefaultLayoutPopulated(page);
     await page.locator('[data-slot="add-widget-trigger"]').first().click();
     const defaultsList = page.locator('[data-slot="add-widget-list"]');
-    await expect(defaultsList.locator('[data-slot="add-widget-item"]')).toHaveCount(1);
-    await expect(defaultsList.locator('[data-slot="add-widget-item"]')).toHaveAttribute(
-      'data-widget-type',
-      'position-sizing',
-    );
+    await expect(defaultsList.locator('[data-slot="add-widget-item"]')).toHaveCount(7);
+    await expect(
+      defaultsList.locator('[data-slot="add-widget-item"][data-widget-type="position-sizing"]'),
+    ).toBeVisible();
     await page.keyboard.press('Escape');
 
     // Wait for the on-mount widget config fix-up (PerformanceChartWidget seeds
@@ -284,7 +285,7 @@ test.describe('Dashboard — desktop', () => {
     // Persist an EMPTY layout via the authenticated request fixture (register
     // logged it in) and reload → the genuine empty-grid state. (The "Your
     // dashboard is empty" state only renders once a zero-widget layout is
-    // saved.) Now the picker lists all six available widget types.
+    // saved.) Now the picker lists all twelve available widget types.
     const seedRes = await request.put('/api/dashboard/layout', { data: { widgets: [] } });
     expect(seedRes.status(), 'PUT empty layout').toBe(200);
     await page.reload();
@@ -295,7 +296,7 @@ test.describe('Dashboard — desktop', () => {
     await page.locator('[data-slot="add-widget-trigger"]').first().click();
     const list = page.locator('[data-slot="add-widget-list"]');
     await expect(list).toBeVisible();
-    await expect(list.locator('[data-slot="add-widget-item"]')).toHaveCount(6);
+    await expect(list.locator('[data-slot="add-widget-item"]')).toHaveCount(12);
 
     // Two adds inside the 300ms debounce (Req 7.1). scheduleLayoutWrite merges
     // both onto one pending body and does not touch the query cache until the

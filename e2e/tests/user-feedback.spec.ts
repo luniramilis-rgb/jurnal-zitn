@@ -520,6 +520,10 @@ test.describe('user feedback — desktop', () => {
     page,
     request,
   }) => {
+    test.fixme(
+      true,
+      'obsolete setelah F0b (survey PostHog dihapus) — tulis ulang untuk POST /api/feedback',
+    );
     test.setTimeout(45_000);
     const h = await installFeedbackHarness(page);
     const user = await registerUser(request, 'progchange');
@@ -562,6 +566,10 @@ test.describe('user feedback — desktop', () => {
     page,
     request,
   }) => {
+    test.fixme(
+      true,
+      'obsolete setelah F0b (survey PostHog dihapus) — tulis ulang untuk POST /api/feedback',
+    );
     test.setTimeout(60_000);
     const h = await installFeedbackHarness(page);
     const user = await registerUser(request, 'wire');
