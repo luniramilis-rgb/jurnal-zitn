@@ -118,4 +118,18 @@ test.describe('journal paywall gate — desktop', () => {
     await expect(page.getByRole('button', { name: 'Reload' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Renew access' })).toHaveCount(0);
   });
+
+  // Regression for the bridge mount: with the route wired, an authed call reaches
+  // the fail-closed gate (503 `konteks_nonaktif` while unconfigured), never a 404.
+  test('the bridge routes are mounted: 503 konteks_nonaktif, not 404', async ({ request }) => {
+    await register(request, 'mounted');
+
+    const context = await request.get('/api/journal/context');
+    expect(context.status(), 'GET /api/journal/context').toBe(503);
+    expect(((await context.json()) as { error?: string }).error).toBe('konteks_nonaktif');
+
+    const candles = await request.get('/api/journal/candles?market=id&ticker=BBRI');
+    expect(candles.status(), 'GET /api/journal/candles').toBe(503);
+    expect(((await candles.json()) as { error?: string }).error).toBe('konteks_nonaktif');
+  });
 });
