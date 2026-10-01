@@ -61,7 +61,15 @@ export default tseslint.config(
     // `.astro/` holds the types Astro generates from the content collections.
     // It is build output, not source, and it does not satisfy this config's
     // rules (it uses `any` and a triple-slash reference).
-    ignores: ['**/node_modules/**', '**/dist/**', '**/coverage/**', '**/.astro/**'],
+    // Vendored third-party assets (e.g. Lightweight Charts standalone) are not our
+    // source and do not satisfy this config's style rules.
+    ignores: [
+      '**/node_modules/**',
+      '**/dist/**',
+      '**/coverage/**',
+      '**/.astro/**',
+      '**/public/vendor/**',
+    ],
   },
   ...tseslint.configs.recommended,
   {

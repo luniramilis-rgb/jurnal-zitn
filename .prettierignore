@@ -23,3 +23,7 @@ apps/docs/src/content/docs/user-guide/reference/plan-limits.mdx
 # The generator writes the ciJobs array expanded; prettier 3.8.1 collapses it, so
 # formatting this file makes the gate fail on every pull request.
 apps/docs/src/content/docs/self-hosting/explanation/_how-its-built.json
+
+# Vendored third-party assets (Lightweight Charts standalone + its licence text)
+# are shipped verbatim and must not be reformatted.
+apps/web/public/vendor/**
