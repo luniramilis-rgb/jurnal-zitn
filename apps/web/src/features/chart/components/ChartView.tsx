@@ -2,9 +2,11 @@ import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import { SymbolAutocomplete } from '@/components/SymbolAutocomplete';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { parseContext } from '@/features/workspace/context';
 import { useT } from '@/hooks/useLocale';
+import { cn } from '@/lib/utils';
 
 import { isChartRange, toCandlePoints, type ChartRange } from '../candles';
 import { useCandles } from '../hooks/useCandles';
@@ -33,6 +35,8 @@ export function ChartView() {
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [chartError, setChartError] = useState<string | null>(null);
+  const [us, setUs] = useState(market === 'us');
+  const [ticker, setTicker] = useState('');
 
   useEffect(() => {
     if (!symbol || points.length === 0) return;
@@ -70,27 +74,75 @@ export function ChartView() {
   }, [symbol, points, t]);
 
   if (!symbol) {
+    // The symbol search is US-only (SEC), while the chart defaults to IDX. Offer
+    // both markets explicitly: IDX takes a typed ticker; S&P 500 uses the
+    // autocomplete and carries `pasar=us` so the bridge looks in the right book.
+    const openChart = (raw: string, isUs: boolean) => {
+      const next = raw.trim().toUpperCase();
+      if (!next) return;
+      void navigate({
+        to: '/chart',
+        search: { symbol: next, tf: range, ...(isUs ? { pasar: 'us' } : {}) },
+      });
+    };
+
     return (
-      <section className="space-y-3" data-testid="chart-empty">
-        <h1 className="text-lg font-semibold">{t('chart.title')}</h1>
-        <p className="text-muted-foreground text-sm">{t('chart.noSymbol')}</p>
-        <div className="max-w-xs space-y-2">
-          <Label htmlFor="chart-symbol">{t('journal.context.colTicker')}</Label>
-          <SymbolAutocomplete
-            id="chart-symbol"
-            value=""
-            placeholder={t('calc.field.symbolPlaceholder')}
-            onChange={(ticker) =>
-              void navigate({
-                to: '/chart',
-                search: {
-                  symbol: ticker,
-                  tf: range,
-                  ...(market === 'us' ? { pasar: 'us' } : {}),
-                },
-              })
-            }
-          />
+      <section className="space-y-4" data-testid="chart-empty">
+        <div className="space-y-1">
+          <h1 className="text-lg font-semibold">{t('chart.title')}</h1>
+          <p className="text-muted-foreground text-sm">{t('chart.noSymbol')}</p>
+        </div>
+        <div className="max-w-xs space-y-3">
+          <div className="flex gap-2">
+            <button
+              type="button"
+              aria-pressed={!us}
+              onClick={() => setUs(false)}
+              className={cn(
+                'rounded-md border px-3 py-1.5 text-sm',
+                !us ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50',
+              )}
+            >
+              IDX
+            </button>
+            <button
+              type="button"
+              aria-pressed={us}
+              onClick={() => setUs(true)}
+              className={cn(
+                'rounded-md border px-3 py-1.5 text-sm',
+                us ? 'bg-accent text-accent-foreground' : 'hover:bg-accent/50',
+              )}
+            >
+              S&amp;P 500
+            </button>
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="chart-symbol">{t('journal.context.colTicker')}</Label>
+            {us ? (
+              <SymbolAutocomplete
+                id="chart-symbol"
+                value=""
+                placeholder={t('calc.field.symbolPlaceholder')}
+                onChange={(next) => openChart(next, true)}
+              />
+            ) : (
+              <Input
+                id="chart-symbol"
+                value={ticker}
+                placeholder="BBRI"
+                autoCapitalize="characters"
+                spellCheck={false}
+                onChange={(e) => setTicker(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    openChart(ticker, false);
+                  }
+                }}
+              />
+            )}
+          </div>
         </div>
       </section>
     );
