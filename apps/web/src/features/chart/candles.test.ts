@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 
 import { describe, expect, it } from 'vitest';
 
@@ -48,8 +49,10 @@ describe('vendored Lightweight Charts contract (ZITN-TECH-029)', () => {
   // v5 (`addSeries` + `CandlestickSeries`), and `lwc.ts`/`ChartView.tsx` target
   // that API. Swapping the bundle without updating the code (or vice versa) fails
   // here or in typecheck, instead of silently rendering "chart.failed".
+  // Resolved from the test runner's cwd (the web package root), not
+  // `import.meta.url` — the latter is not a `file:` URL under the CI module runner.
   const source = readFileSync(
-    new URL('../../../public/vendor/lightweight-charts.standalone.production.js', import.meta.url),
+    resolve(process.cwd(), 'public/vendor/lightweight-charts.standalone.production.js'),
     'utf8',
   );
 
