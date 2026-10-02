@@ -52,7 +52,7 @@ export function ChartView() {
           rightPriceScale: { borderColor: '#272c36' },
           timeScale: { borderColor: '#272c36' },
         });
-        const series = chart.addCandlestickSeries();
+        const series = chart.addSeries(api.CandlestickSeries, {});
         series.setData(points);
         chart.timeScale().fitContent();
       })

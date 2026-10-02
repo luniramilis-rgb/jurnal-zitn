@@ -12,7 +12,7 @@ export interface LwcSeries {
 }
 
 export interface LwcChart {
-  addCandlestickSeries(options?: unknown): LwcSeries;
+  addSeries(definition: unknown, options?: unknown): LwcSeries;
   timeScale(): { fitContent(): void; applyOptions?(options: unknown): void };
   applyOptions(options: unknown): void;
   remove(): void;
@@ -20,6 +20,8 @@ export interface LwcChart {
 
 export interface LwcApi {
   createChart(container: HTMLElement, options?: unknown): LwcChart;
+  /** Series definition for `addSeries` (Lightweight Charts v5 API). */
+  CandlestickSeries: unknown;
 }
 
 export const LWC_SRC = '/vendor/lightweight-charts.standalone.production.js';
