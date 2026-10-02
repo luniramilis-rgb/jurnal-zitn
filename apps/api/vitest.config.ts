@@ -27,6 +27,8 @@ export default defineConfig({
       POSTHOG_HOST: '',
       // Opt back in to the advisor for the suites (see vitest.workspace.ts).
       DISABLE_ADVISOR: 'false',
+      // G1: the product default is closed; the suite registers its own users.
+      DISABLE_REGISTRATION: 'false',
     },
   },
 });
