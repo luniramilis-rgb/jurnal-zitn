@@ -147,7 +147,7 @@ export const envSchema = z.object({
   // code change and no frontend rebuild.
   DISABLE_REGISTRATION: z
     .enum(['true', 'false'])
-    .default('false')
+    .default('true')
     .transform((v) => v === 'true'),
   // The AI advisor is withdrawn BY DEFAULT while it is reworked — on every
   // instance, hosted or self-hosted. Same idiom as DISABLE_REGISTRATION: an

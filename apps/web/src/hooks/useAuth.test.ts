@@ -5,6 +5,7 @@ import { createElement, type ReactNode } from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { api, markSessionConfirmed, markSessionEnded, markSessionStarted } from '@/lib/api';
+import { hardRedirectToLogin } from '@/lib/auth-redirect';
 import { DRAWER_STORAGE_KEY, useDrawerStore } from '@/stores/drawer.store';
 import { eventBus } from '@/stores/event-bus.store';
 
@@ -12,8 +13,8 @@ import { useAuth, useLogin } from './useAuth';
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
-const navigate = vi.fn();
-vi.mock('@tanstack/react-router', () => ({ useRouter: () => ({ navigate }) }));
+// G1 (D-G1): logout reloads /login full-page (production nginx 302s it to ZITN).
+vi.mock('@/lib/auth-redirect', () => ({ hardRedirectToLogin: vi.fn() }));
 
 vi.mock('@/lib/api', () => ({
   api: { get: vi.fn(), post: vi.fn() },
@@ -71,7 +72,7 @@ describe('useAuth — logging out announces the end of the session', () => {
     result.current.logout.mutate();
 
     await waitFor(() => expect(seen).toEqual(['cache-cleared', 'auth:logout']));
-    expect(navigate).toHaveBeenCalledWith({ to: '/login' });
+    expect(vi.mocked(hardRedirectToLogin)).toHaveBeenCalled();
   });
 
   it('publishes it even when the logout request fails', async () => {

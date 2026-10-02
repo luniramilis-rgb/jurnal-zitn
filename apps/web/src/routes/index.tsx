@@ -1,6 +1,8 @@
 import { createFileRoute, Navigate } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 import { useSessionPresence } from '@/hooks/useAuth';
+import { hardRedirectToLogin } from '@/lib/auth-redirect';
 
 /**
  * `/` — the address people actually type, and the one the route tree never had.
@@ -28,6 +30,13 @@ import { useSessionPresence } from '@/hooks/useAuth';
 function IndexRoute() {
   const { isLoading, isAuthenticated } = useSessionPresence();
 
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      // G1 (D-G1): full-page so production nginx 302s /login to ZITN's SSO.
+      hardRedirectToLogin();
+    }
+  }, [isLoading, isAuthenticated]);
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -40,7 +49,7 @@ function IndexRoute() {
     return <Navigate to="/dashboard" replace />;
   }
 
-  return <Navigate to="/login" replace />;
+  return null;
 }
 
 export const Route = createFileRoute('/')({
