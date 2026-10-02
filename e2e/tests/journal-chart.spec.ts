@@ -122,22 +122,10 @@ test.describe('journal chart — desktop', () => {
     await expect(page.getByTestId('chart-canvas')).toHaveCount(0);
   });
 
-  test('the empty /chart state offers an emitter picker that draws the chart', async ({
-    page,
-    request,
-  }) => {
-    const user = await register(request, 'picker');
+  test('the empty /chart state charts a typed IDX ticker', async ({ page, request }) => {
+    const user = await register(request, 'idx');
     await loginViaUi(page, user.email);
 
-    await page.route('**/api/symbols/search*', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          results: [{ ticker: 'BBRI', name: 'Bank Rakyat Indonesia', exchange: 'IDX' }],
-        }),
-      }),
-    );
     await page.route('**/api/journal/candles*', (route) =>
       route.fulfill({
         status: 200,
@@ -150,13 +138,52 @@ test.describe('journal chart — desktop', () => {
     const empty = page.getByTestId('chart-empty');
     await expect(empty).toBeVisible();
 
-    // Pick from the emitter combobox -> the URL gains the symbol and the chart draws.
-    await empty.getByRole('combobox').fill('BBRI');
-    // The autocomplete listbox portals to document.body, so the option is not a
-    // descendant of the (non-portalled) `chart-empty` section.
-    await page.getByRole('option', { name: /BBRI/ }).click();
+    // IDX is the default market: type a ticker and press Enter.
+    await empty.getByRole('textbox').fill('bbri');
+    await empty.getByRole('textbox').press('Enter');
 
     await expect(page).toHaveURL(/[?&]symbol=BBRI/);
+    await expect(page).not.toHaveURL(/pasar=us/);
+    await expect(page.getByTestId('chart-canvas').locator('canvas').first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByRole('alert')).toHaveCount(0);
+  });
+
+  test('the empty /chart state charts a picked S&P 500 emitter', async ({ page, request }) => {
+    const user = await register(request, 'us');
+    await loginViaUi(page, user.email);
+
+    await page.route('**/api/symbols/search*', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          results: [{ ticker: 'AAPL', name: 'Apple Inc.', exchange: 'NASDAQ' }],
+        }),
+      }),
+    );
+    await page.route('**/api/journal/candles*', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ...CANDLES, market: 'us', symbol: 'AAPL' }),
+      }),
+    );
+
+    await page.goto('/chart');
+    const empty = page.getByTestId('chart-empty');
+    await expect(empty).toBeVisible();
+
+    // US market: switch, search, pick; the URL must carry `pasar=us`.
+    await empty.getByRole('button', { name: 'S&P 500' }).click();
+    await empty.getByRole('combobox').fill('AAPL');
+    // The autocomplete listbox portals to document.body, so the option is not a
+    // descendant of the (non-portalled) `chart-empty` section.
+    await page.getByRole('option', { name: /AAPL/ }).click();
+
+    await expect(page).toHaveURL(/[?&]symbol=AAPL/);
+    await expect(page).toHaveURL(/pasar=us/);
     await expect(page.getByTestId('chart-canvas').locator('canvas').first()).toBeVisible({
       timeout: 15_000,
     });

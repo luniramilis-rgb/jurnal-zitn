@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
 import { describe, expect, it } from 'vitest';
 
 import { isChartRange, toCandlePoints } from './candles';
@@ -38,5 +41,35 @@ describe('isChartRange', () => {
     expect(isChartRange('max')).toBe(true);
     expect(isChartRange('5Y')).toBe(false);
     expect(isChartRange(null)).toBe(false);
+  });
+});
+
+describe('vendored Lightweight Charts contract (ZITN-TECH-029)', () => {
+  // Guards the v4 → v5 drift that broke the journal chart: the vendored bundle is
+  // v5 (`addSeries` + `CandlestickSeries`), and `lwc.ts`/`ChartView.tsx` target
+  // that API. Swapping the bundle without updating the code (or vice versa) fails
+  // here or in typecheck, instead of silently rendering "chart.failed".
+  // The runner's cwd differs by invocation (repo root in CI, the web package
+  // locally), so try both roots rather than assume one.
+  const source = (() => {
+    const candidates = [
+      resolve(process.cwd(), 'apps/web/public/vendor/lightweight-charts.standalone.production.js'),
+      resolve(process.cwd(), 'public/vendor/lightweight-charts.standalone.production.js'),
+    ];
+    for (const candidate of candidates) {
+      try {
+        return readFileSync(candidate, 'utf8');
+      } catch {
+        // Try the next root.
+      }
+    }
+    throw new Error('Lightweight Charts vendor bundle not found');
+  })();
+
+  it('ships the v5 API the chart code calls', () => {
+    expect(source).toMatch(/Lightweight Charts[^\n]*v5\./);
+    expect(source).toContain('addSeries');
+    expect(source).toContain('CandlestickSeries');
+    expect(source).not.toContain('addCandlestickSeries');
   });
 });
