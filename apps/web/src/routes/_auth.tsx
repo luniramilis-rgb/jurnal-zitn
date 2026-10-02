@@ -5,6 +5,7 @@ import { DrawerToggleRefProvider } from '@/components/layout/DrawerToggleRefCont
 import { GlobalShortcuts } from '@/components/layout/GlobalShortcuts';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { SideDrawer } from '@/components/layout/SideDrawer';
+import { ZitnAppBar } from '@/components/layout/ZitnAppBar';
 import {
   FeedbackSurface,
   feedbackMainGutterClasses,
@@ -63,6 +64,9 @@ function AuthLayout() {
             feedbackMainGutterClasses(drawerOpen),
           )}
         >
+          {/* G2 (A1): the shared ZITN chrome — a top strip above the journal's
+              own sidebar, so the feature navigation stays intact. */}
+          <ZitnAppBar />
           {/* Sample data reaches every derived surface in the app, so the notice
               saying so is mounted HERE rather than on the dashboard — one
               mount, above every route's content, and no page can render

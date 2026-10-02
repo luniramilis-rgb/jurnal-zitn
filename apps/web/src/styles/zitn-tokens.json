@@ -1,0 +1,20 @@
+{
+  "source": "src/trutova/core/theme.py",
+  "themeColor": "#0f1115",
+  "fontStack": "ui-sans-serif,system-ui,\"Segoe UI\",Arial,sans-serif",
+  "tokens": {
+    "bg": "#0f1115",
+    "card": "#171a21",
+    "line": "#272c36",
+    "ink": "#e8eaee",
+    "muted": "#9aa3af",
+    "accent": "#f59e0b",
+    "ok": "#22c55e",
+    "warn": "#ef4444",
+    "up": "#4ade80",
+    "down": "#f87171",
+    "accent-soft": "rgba(245,158,11,.12)",
+    "accent-line": "rgba(245,158,11,.35)",
+    "overlay": "rgba(15,17,21,.92)"
+  }
+}
