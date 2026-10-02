@@ -21,10 +21,8 @@ import { Route as AuthSettingsRouteImport } from './routes/_auth.settings'
 import { Route as AuthPlaybooksRouteImport } from './routes/_auth.playbooks'
 import { Route as AuthPerformanceRouteImport } from './routes/_auth.performance'
 import { Route as AuthOptionsRouteImport } from './routes/_auth.options'
-import { Route as AuthLembarRouteImport } from './routes/_auth.lembar'
 import { Route as AuthImportRouteImport } from './routes/_auth.import'
 import { Route as AuthDashboardRouteImport } from './routes/_auth.dashboard'
-import { Route as AuthChartRouteImport } from './routes/_auth.chart'
 import { Route as AuthChangelogRouteImport } from './routes/_auth.changelog'
 import { Route as AuthCalculatorRouteImport } from './routes/_auth.calculator'
 import { Route as AuthBrokeragesRouteImport } from './routes/_auth.brokerages'
@@ -106,11 +104,6 @@ const AuthOptionsRoute = AuthOptionsRouteImport.update({
   path: '/options',
   getParentRoute: () => AuthRoute,
 } as any)
-const AuthLembarRoute = AuthLembarRouteImport.update({
-  id: '/lembar',
-  path: '/lembar',
-  getParentRoute: () => AuthRoute,
-} as any)
 const AuthImportRoute = AuthImportRouteImport.update({
   id: '/import',
   path: '/import',
@@ -119,11 +112,6 @@ const AuthImportRoute = AuthImportRouteImport.update({
 const AuthDashboardRoute = AuthDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
-  getParentRoute: () => AuthRoute,
-} as any)
-const AuthChartRoute = AuthChartRouteImport.update({
-  id: '/chart',
-  path: '/chart',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthChangelogRoute = AuthChangelogRouteImport.update({
@@ -245,10 +233,8 @@ export interface FileRoutesByFullPath {
   '/brokerages': typeof AuthBrokeragesRoute
   '/calculator': typeof AuthCalculatorRoute
   '/changelog': typeof AuthChangelogRoute
-  '/chart': typeof AuthChartRoute
   '/dashboard': typeof AuthDashboardRoute
   '/import': typeof AuthImportRoute
-  '/lembar': typeof AuthLembarRoute
   '/options': typeof AuthOptionsRoute
   '/performance': typeof AuthPerformanceRoute
   '/playbooks': typeof AuthPlaybooksRoute
@@ -283,10 +269,8 @@ export interface FileRoutesByTo {
   '/brokerages': typeof AuthBrokeragesRoute
   '/calculator': typeof AuthCalculatorRoute
   '/changelog': typeof AuthChangelogRoute
-  '/chart': typeof AuthChartRoute
   '/dashboard': typeof AuthDashboardRoute
   '/import': typeof AuthImportRoute
-  '/lembar': typeof AuthLembarRoute
   '/options': typeof AuthOptionsRoute
   '/performance': typeof AuthPerformanceRoute
   '/playbooks': typeof AuthPlaybooksRoute
@@ -323,10 +307,8 @@ export interface FileRoutesById {
   '/_auth/brokerages': typeof AuthBrokeragesRoute
   '/_auth/calculator': typeof AuthCalculatorRoute
   '/_auth/changelog': typeof AuthChangelogRoute
-  '/_auth/chart': typeof AuthChartRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_auth/import': typeof AuthImportRoute
-  '/_auth/lembar': typeof AuthLembarRoute
   '/_auth/options': typeof AuthOptionsRoute
   '/_auth/performance': typeof AuthPerformanceRoute
   '/_auth/playbooks': typeof AuthPlaybooksRoute
@@ -363,10 +345,8 @@ export interface FileRouteTypes {
     | '/brokerages'
     | '/calculator'
     | '/changelog'
-    | '/chart'
     | '/dashboard'
     | '/import'
-    | '/lembar'
     | '/options'
     | '/performance'
     | '/playbooks'
@@ -401,10 +381,8 @@ export interface FileRouteTypes {
     | '/brokerages'
     | '/calculator'
     | '/changelog'
-    | '/chart'
     | '/dashboard'
     | '/import'
-    | '/lembar'
     | '/options'
     | '/performance'
     | '/playbooks'
@@ -440,10 +418,8 @@ export interface FileRouteTypes {
     | '/_auth/brokerages'
     | '/_auth/calculator'
     | '/_auth/changelog'
-    | '/_auth/chart'
     | '/_auth/dashboard'
     | '/_auth/import'
-    | '/_auth/lembar'
     | '/_auth/options'
     | '/_auth/performance'
     | '/_auth/playbooks'
@@ -563,13 +539,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthOptionsRouteImport
       parentRoute: typeof AuthRoute
     }
-    '/_auth/lembar': {
-      id: '/_auth/lembar'
-      path: '/lembar'
-      fullPath: '/lembar'
-      preLoaderRoute: typeof AuthLembarRouteImport
-      parentRoute: typeof AuthRoute
-    }
     '/_auth/import': {
       id: '/_auth/import'
       path: '/import'
@@ -582,13 +551,6 @@ declare module '@tanstack/react-router' {
       path: '/dashboard'
       fullPath: '/dashboard'
       preLoaderRoute: typeof AuthDashboardRouteImport
-      parentRoute: typeof AuthRoute
-    }
-    '/_auth/chart': {
-      id: '/_auth/chart'
-      path: '/chart'
-      fullPath: '/chart'
-      preLoaderRoute: typeof AuthChartRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/changelog': {
@@ -785,10 +747,8 @@ interface AuthRouteChildren {
   AuthBrokeragesRoute: typeof AuthBrokeragesRoute
   AuthCalculatorRoute: typeof AuthCalculatorRoute
   AuthChangelogRoute: typeof AuthChangelogRoute
-  AuthChartRoute: typeof AuthChartRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthImportRoute: typeof AuthImportRoute
-  AuthLembarRoute: typeof AuthLembarRoute
   AuthOptionsRoute: typeof AuthOptionsRoute
   AuthPerformanceRoute: typeof AuthPerformanceRoute
   AuthPlaybooksRoute: typeof AuthPlaybooksRoute
@@ -809,10 +769,8 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthBrokeragesRoute: AuthBrokeragesRoute,
   AuthCalculatorRoute: AuthCalculatorRoute,
   AuthChangelogRoute: AuthChangelogRoute,
-  AuthChartRoute: AuthChartRoute,
   AuthDashboardRoute: AuthDashboardRoute,
   AuthImportRoute: AuthImportRoute,
-  AuthLembarRoute: AuthLembarRoute,
   AuthOptionsRoute: AuthOptionsRoute,
   AuthPerformanceRoute: AuthPerformanceRoute,
   AuthPlaybooksRoute: AuthPlaybooksRoute,
