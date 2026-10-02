@@ -152,7 +152,9 @@ test.describe('journal chart — desktop', () => {
 
     // Pick from the emitter combobox -> the URL gains the symbol and the chart draws.
     await empty.getByRole('combobox').fill('BBRI');
-    await empty.getByRole('option', { name: /BBRI/ }).click();
+    // The autocomplete listbox portals to document.body, so the option is not a
+    // descendant of the (non-portalled) `chart-empty` section.
+    await page.getByRole('option', { name: /BBRI/ }).click();
 
     await expect(page).toHaveURL(/[?&]symbol=BBRI/);
     await expect(page.getByTestId('chart-canvas').locator('canvas').first()).toBeVisible({
