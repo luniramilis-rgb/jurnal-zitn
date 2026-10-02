@@ -314,3 +314,31 @@
 [data-radix-popper-content-wrapper]:has(> [data-coach-mark]) {
   pointer-events: none;
 }
+
+/* G2 (A1): the shared ZITN app-bar strip. Its token values are set inline from
+   the generated `src/styles/zitn-tokens.json` (never hand-copied); the colors
+   live here so the utilities stay within the design system (design-lint). */
+.zitn-appbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: 1rem;
+  row-gap: 0.25rem;
+  margin-bottom: 1rem;
+  border: 1px solid var(--z-line);
+  border-radius: 0.375rem;
+  background: var(--z-bg);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+.zitn-appbar a {
+  color: var(--z-muted);
+  text-decoration: none;
+}
+.zitn-appbar a:hover {
+  color: var(--z-accent);
+}
+.zitn-appbar a[aria-current='page'] {
+  color: var(--z-accent);
+  font-weight: 500;
+}

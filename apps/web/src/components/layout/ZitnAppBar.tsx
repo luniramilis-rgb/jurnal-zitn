@@ -50,24 +50,15 @@ export function ZitnAppBar() {
       aria-label="Navigasi aplikasi"
       data-testid="zitn-app-bar"
       style={style}
-      className="mb-4 flex flex-wrap items-center gap-x-4 gap-y-1 rounded-md border border-[var(--z-line)] bg-[var(--z-bg)] px-4 py-2 text-sm"
+      className="zitn-appbar"
     >
       {ITEMS.map((item) =>
         item.external ? (
-          <a
-            key={item.key}
-            href={item.href}
-            className="text-[var(--z-muted)] transition-colors hover:text-[var(--z-accent)]"
-          >
+          <a key={item.key} href={item.href}>
             {item.label}
           </a>
         ) : (
-          <Link
-            key={item.key}
-            to="/dashboard"
-            aria-current="page"
-            className="font-medium text-[var(--z-accent)]"
-          >
+          <Link key={item.key} to="/dashboard" aria-current="page">
             {item.label}
           </Link>
         ),
