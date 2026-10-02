@@ -1,4 +1,4 @@
-import { Link, useLocation } from '@tanstack/react-router';
+import { useLocation } from '@tanstack/react-router';
 
 import { useT } from '@/hooks/useLocale';
 
@@ -6,20 +6,18 @@ import { hasContext, parseContext } from '../context';
 
 /**
  * ContextStrip — Fase 3 (ZITN-TECH-029). A slim, app-wide strip that shows the
- * context the URL is carrying (`tanggal · simbol · timeframe · akun`) and gives a
- * one-click way back to that day's sheet. It renders nothing when the URL carries
- * no context, so it never adds chrome to a plain page.
+ * context the URL is carrying (`tanggal · simbol · timeframe · akun`). It renders
+ * nothing when the URL carries no context, so it never adds chrome to a plain page.
  *
- * Pure reader: no data, no computation — the "one thread of context" made visible.
+ * G4 (D-G3): it no longer links to the removed `/lembar` & `/chart` journal
+ * routes — the journal still carries the context, but sheet/chart live on ZITN.
+ * Pure reader: no data, no computation.
  */
 export function ContextStrip() {
   const t = useT();
   const { searchStr } = useLocation();
   const ctx = parseContext(searchStr);
   if (!hasContext(ctx)) return null;
-
-  const params = new URLSearchParams(searchStr);
-  const market = params.get('market') === 'us' || params.get('pasar') === 'us' ? 'us' : 'id';
 
   const chips: { label: string; value: string }[] = [];
   if (ctx.tanggal) chips.push({ label: t('ctx.tanggal'), value: ctx.tanggal });
@@ -41,25 +39,6 @@ export function ContextStrip() {
           <span className="font-medium text-foreground">{chip.value}</span>
         </span>
       ))}
-      {/* Benang konteks: tautan antar-permukaan jurnal yang MEMBAWA konteks (Fase 3c). */}
-      {ctx.tanggal && (
-        <Link to="/lembar" search={{ tanggal: ctx.tanggal }} className="cursor-pointer underline">
-          {t('ctx.sheet')}
-        </Link>
-      )}
-      {ctx.symbol && (
-        <Link
-          to="/chart"
-          search={{
-            symbol: ctx.symbol,
-            ...(ctx.tf ? { tf: ctx.tf } : {}),
-            ...(market === 'us' ? { pasar: 'us' } : {}),
-          }}
-          className="cursor-pointer underline"
-        >
-          {t('ctx.chart')}
-        </Link>
-      )}
     </div>
   );
 }

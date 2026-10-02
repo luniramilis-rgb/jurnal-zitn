@@ -223,23 +223,23 @@ describe('F0 widget package', () => {
     expect(text).not.toMatch(/\d+[.,]\d{2}/);
 
     const hrefs = Array.from(container.querySelectorAll('a')).map((a) => a.getAttribute('href'));
-    // The sheet surface stays reachable...
-    expect(hrefs).toContain('/lembar');
-    // ...and each linked ticker opens the ZITN chart (IDX & US) in a new tab.
+    // G4 (D-G3): the sheet surface now lives on ZITN (the journal `/lembar` is gone).
+    expect(hrefs).toContain('https://zeninthenoise.com/daily/');
+    // G5 (D-G4): each ticker deep-links the ZITN chart (IDX & US) in a new tab.
     const tickerLinks = Array.from(
       container.querySelectorAll('a[data-slot="sheet-context-ticker-link"]'),
     );
     expect(tickerLinks.map((a) => a.getAttribute('href'))).toEqual([
-      'https://zenitn.test/daily/chart/?tanggal=2026-09-28#BBRI',
-      'https://zenitn.test/daily/chart/?pasar=us#AAPL',
+      'https://zeninthenoise.com/daily/chart/?symbol=BBRI&tf=1Y',
+      'https://zeninthenoise.com/daily/chart/?symbol=AAPL&tf=1Y&pasar=us',
     ]);
     const cta = container.querySelector('a[data-slot="sheet-context-open-chart"]');
     expect(cta?.getAttribute('href')).toBe(
-      'https://zenitn.test/daily/chart/?tanggal=2026-09-28#BBRI',
+      'https://zeninthenoise.com/daily/chart/?symbol=BBRI&tf=1Y',
     );
     for (const link of [...tickerLinks, cta]) {
       expect(link?.getAttribute('target')).toBe('_blank');
-      expect(link?.getAttribute('rel')).toBe('noopener');
+      expect(link?.getAttribute('rel')).toBe('noopener noreferrer');
     }
   });
 

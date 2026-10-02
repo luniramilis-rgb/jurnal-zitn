@@ -4,7 +4,6 @@ import {
   BarChart3,
   BookOpen,
   Calculator,
-  CandlestickChart,
   CreditCard,
   Landmark,
   LayoutDashboard,
@@ -12,7 +11,6 @@ import {
   ListChecks,
   LogOut,
   Megaphone,
-  Newspaper,
   PanelLeftClose,
   PanelLeftOpen,
   Receipt,
@@ -188,22 +186,6 @@ export function Sidebar() {
           className={itemClass(expanded)}
         >
           <ItemContent expanded={expanded} label={t('nav.dashboard')} Icon={LayoutDashboard} />
-        </Link>
-        <Link
-          to="/lembar"
-          aria-label={t('nav.lembar')}
-          title={expanded ? undefined : t('nav.lembar')}
-          className={itemClass(expanded)}
-        >
-          <ItemContent expanded={expanded} label={t('nav.lembar')} Icon={Newspaper} />
-        </Link>
-        <Link
-          to="/chart"
-          aria-label={t('nav.chart')}
-          title={expanded ? undefined : t('nav.chart')}
-          className={itemClass(expanded)}
-        >
-          <ItemContent expanded={expanded} label={t('nav.chart')} Icon={CandlestickChart} />
         </Link>
         <Link
           to="/playbooks"
