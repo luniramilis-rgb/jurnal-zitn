@@ -49,12 +49,22 @@ describe('vendored Lightweight Charts contract (ZITN-TECH-029)', () => {
   // v5 (`addSeries` + `CandlestickSeries`), and `lwc.ts`/`ChartView.tsx` target
   // that API. Swapping the bundle without updating the code (or vice versa) fails
   // here or in typecheck, instead of silently rendering "chart.failed".
-  // Resolved from the test runner's cwd (the web package root), not
-  // `import.meta.url` — the latter is not a `file:` URL under the CI module runner.
-  const source = readFileSync(
-    resolve(process.cwd(), 'public/vendor/lightweight-charts.standalone.production.js'),
-    'utf8',
-  );
+  // The runner's cwd differs by invocation (repo root in CI, the web package
+  // locally), so try both roots rather than assume one.
+  const source = (() => {
+    const candidates = [
+      resolve(process.cwd(), 'apps/web/public/vendor/lightweight-charts.standalone.production.js'),
+      resolve(process.cwd(), 'public/vendor/lightweight-charts.standalone.production.js'),
+    ];
+    for (const candidate of candidates) {
+      try {
+        return readFileSync(candidate, 'utf8');
+      } catch {
+        // Try the next root.
+      }
+    }
+    throw new Error('Lightweight Charts vendor bundle not found');
+  })();
 
   it('ships the v5 API the chart code calls', () => {
     expect(source).toMatch(/Lightweight Charts[^\n]*v5\./);
