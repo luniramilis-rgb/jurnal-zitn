@@ -1,6 +1,8 @@
-import { useLocation } from '@tanstack/react-router';
+import { useLocation, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
+import { SymbolAutocomplete } from '@/components/SymbolAutocomplete';
+import { Label } from '@/components/ui/label';
 import { parseContext } from '@/features/workspace/context';
 import { useT } from '@/hooks/useLocale';
 
@@ -17,6 +19,7 @@ import { loadLwc, type LwcChart } from '../lwc';
  */
 export function ChartView() {
   const t = useT();
+  const navigate = useNavigate();
   const { searchStr } = useLocation();
   const params = new URLSearchParams(searchStr);
   const ctx = parseContext(searchStr);
@@ -71,6 +74,24 @@ export function ChartView() {
       <section className="space-y-3" data-testid="chart-empty">
         <h1 className="text-lg font-semibold">{t('chart.title')}</h1>
         <p className="text-muted-foreground text-sm">{t('chart.noSymbol')}</p>
+        <div className="max-w-xs space-y-2">
+          <Label htmlFor="chart-symbol">{t('journal.context.colTicker')}</Label>
+          <SymbolAutocomplete
+            id="chart-symbol"
+            value=""
+            placeholder={t('calc.field.symbolPlaceholder')}
+            onChange={(ticker) =>
+              void navigate({
+                to: '/chart',
+                search: {
+                  symbol: ticker,
+                  tf: range,
+                  ...(market === 'us' ? { pasar: 'us' } : {}),
+                },
+              })
+            }
+          />
+        </div>
       </section>
     );
   }

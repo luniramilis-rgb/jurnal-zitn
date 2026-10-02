@@ -121,4 +121,43 @@ test.describe('journal chart — desktop', () => {
     await expect(page.getByTestId('chart-empty')).toBeVisible();
     await expect(page.getByTestId('chart-canvas')).toHaveCount(0);
   });
+
+  test('the empty /chart state offers an emitter picker that draws the chart', async ({
+    page,
+    request,
+  }) => {
+    const user = await register(request, 'picker');
+    await loginViaUi(page, user.email);
+
+    await page.route('**/api/symbols/search*', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          results: [{ ticker: 'BBRI', name: 'Bank Rakyat Indonesia', exchange: 'IDX' }],
+        }),
+      }),
+    );
+    await page.route('**/api/journal/candles*', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(CANDLES),
+      }),
+    );
+
+    await page.goto('/chart');
+    const empty = page.getByTestId('chart-empty');
+    await expect(empty).toBeVisible();
+
+    // Pick from the emitter combobox -> the URL gains the symbol and the chart draws.
+    await empty.getByRole('combobox').fill('BBRI');
+    await empty.getByRole('option', { name: /BBRI/ }).click();
+
+    await expect(page).toHaveURL(/[?&]symbol=BBRI/);
+    await expect(page.getByTestId('chart-canvas').locator('canvas').first()).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByRole('alert')).toHaveCount(0);
+  });
 });
