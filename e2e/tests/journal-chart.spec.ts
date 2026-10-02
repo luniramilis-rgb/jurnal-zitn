@@ -105,6 +105,12 @@ test.describe('journal chart — desktop', () => {
     const canvasBox = page.getByTestId('chart-canvas');
     await expect(canvasBox).toBeVisible();
     await expect(canvasBox.locator('canvas').first()).toBeVisible({ timeout: 15_000 });
+
+    // The vendored bundle is Lightweight Charts v5 (`addSeries`); a v4
+    // `addCandlestickSeries` call would throw into the surface's error alert.
+    // Asserting its absence is what makes this test a real draw regression, not
+    // just a "container mounted" check.
+    await expect(page.getByRole('alert')).toHaveCount(0);
   });
 
   test('a missing symbol shows the empty state, not a canvas', async ({ page, request }) => {
