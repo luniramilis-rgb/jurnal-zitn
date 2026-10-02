@@ -53,6 +53,8 @@ export default defineWorkspace([
         // shipped, so the test env opts back in exactly as an operator would; the
         // default-posture tests flip `config.DISABLE_ADVISOR` explicitly.
         DISABLE_ADVISOR: 'false',
+        // G1: the product default is closed; the suites register their own users.
+        DISABLE_REGISTRATION: 'false',
         REDIS_URL: '',
         DIRECT_DATABASE_URL: '',
         DB_TRANSACTION_POOLER: 'false',
