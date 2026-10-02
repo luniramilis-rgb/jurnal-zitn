@@ -84,6 +84,17 @@ server {
         add_header Cache-Control "public, max-age=31536000, immutable" always;
     }
 
+    # G1 (ZITN-TECH-017 §11, D-G1): one identity — ZITN. The credential paths are
+    # answered at the edge with a 302 into the ZITN SSO entry (`/jurnal` triggers
+    # the bridge and returns the visitor to the journal with a session). Exact
+    # matches so they win over the SPA fallback below; the SPA keeps its own
+    # forms for dev/e2e and as a fallback.
+    location = /login { return 302 https://zeninthenoise.com/jurnal; }
+    location = /register { return 302 https://zeninthenoise.com/jurnal; }
+    location = /forgot-password { return 302 https://zeninthenoise.com/jurnal; }
+    location = /reset-password { return 302 https://zeninthenoise.com/jurnal; }
+    location = /verify-email { return 302 https://zeninthenoise.com/jurnal; }
+
     # SPA fallback (Req 2.3). index.html itself must not be cached so a new
     # deploy is picked up immediately.
     location / {

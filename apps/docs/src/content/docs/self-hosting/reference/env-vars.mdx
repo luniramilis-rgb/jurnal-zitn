@@ -60,7 +60,7 @@ is **absent, not broken**: nothing logs an error and no outbound call is made.
 | Variable | Default | Notes |
 | --- | --- | --- |
 | `SESSION_SECRET` | **Required** | Generate (≥32 chars): `openssl rand -base64 24` |
-| `DISABLE_REGISTRATION` | `false` | Close public sign-up. `true` makes POST /api/auth/register refuse with 403 REGISTRATION_DISABLED, whatever the client. Sign-in, password reset and every existing account are unaffected — only account creation is gated. Use it to run a private instance once your own accounts exist. Reopening sign-up is this variable plus an api restart; nothing is rebuilt. The SPA reads the same posture and shows a closed-signups notice on /register instead of a form it cannot submit; NEWSLETTER_URL (Web section) optionally adds a link to it. |
+| `DISABLE_REGISTRATION` | `true` | Close public sign-up. `true` makes POST /api/auth/register refuse with 403 REGISTRATION_DISABLED, whatever the client. Sign-in, password reset and every existing account are unaffected — only account creation is gated. Default is `true` (fail-closed): ZITN is the single identity, so the hosted product keeps local sign-up closed. Set `false` only to run a private self-hosted instance with local accounts; the CLI (`jurnal-zitn create-user`) works either way. In production the edge also 302s /register (and /login, /forgot-password, /reset-password, /verify-email) to ZITN (docker/nginx.conf.template). |
 
 ## Server
 

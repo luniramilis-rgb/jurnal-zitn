@@ -94,9 +94,11 @@ describe('GET /api/config', () => {
   //     variable does not offer the advisor. The test env opts in (vitest pins
   //     DISABLE_ADVISOR=false), so this asks the schema directly rather than the
   //     running config. Flip this assertion when the advisor returns.
-  it('withdraws the advisor by default (schema default, not the test env)', () => {
+  it('withdraws the advisor and local registration by default (schema, not test env)', () => {
     expect(envSchema.shape.DISABLE_ADVISOR.parse(undefined)).toBe(true);
-    expect(envSchema.shape.DISABLE_REGISTRATION.parse(undefined)).toBe(false);
+    // G1 (D-G1): fail-closed — ZITN is the single identity; the schema default
+    // closes local sign-up (the test env opts back in).
+    expect(envSchema.shape.DISABLE_REGISTRATION.parse(undefined)).toBe(true);
   });
 
   // 3. THE TRIPWIRE. The response key set EQUALS the allow-list — a second

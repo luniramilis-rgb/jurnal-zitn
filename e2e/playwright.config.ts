@@ -104,6 +104,10 @@ const apiEnv: Record<string, string> = {
   // it is reworked. The advisor specs exercise code that is still shipped, so
   // the suite opts back in exactly as an operator would.
   DISABLE_ADVISOR: 'false',
+  // G1 (D-G1): the product keeps local sign-up closed (config default true now).
+  // The suite creates its own accounts, so it opts back in exactly as an
+  // operator would — mirroring DISABLE_ADVISOR above.
+  DISABLE_REGISTRATION: 'false',
   // ─── Transactional email pass-through (transactional-email Task 17) ──────
   // Mailpit being reachable does NOT configure the API — these exports do.
   // Every default is '' (config.ts's empty-tolerant preprocess: all-empty ⇒

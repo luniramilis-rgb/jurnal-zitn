@@ -1,5 +1,4 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useRouter } from '@tanstack/react-router';
 
 import type { User } from '@jurnal-zitn/shared';
 
@@ -11,6 +10,7 @@ import {
   setIsLoggingOut,
   type RequestOptions,
 } from '@/lib/api';
+import { hardRedirectToLogin } from '@/lib/auth-redirect';
 import { clearClientSessionState } from '@/lib/sessionTeardown';
 
 /**
@@ -159,7 +159,6 @@ export function useSessionPresence() {
 
 export function useAuth() {
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   const { data: user, isLoading } = useQuery<User>({
     queryKey: ['auth', 'me'],
@@ -187,7 +186,9 @@ export function useAuth() {
       // as a second one ending — the teardown below already announced it.
       markSessionEnded();
       clearClientSessionState(queryClient);
-      router.navigate({ to: '/login' });
+      // G1 (D-G1): a FULL-PAGE load so production nginx 302s /login to ZITN,
+      // clearing the journal session and leaving no half-dead session behind.
+      hardRedirectToLogin();
     },
   });
 

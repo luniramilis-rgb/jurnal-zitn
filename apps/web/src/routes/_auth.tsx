@@ -1,4 +1,5 @@
-import { createFileRoute, Navigate, Outlet } from '@tanstack/react-router';
+import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { useEffect } from 'react';
 
 import { DrawerToggleRefProvider } from '@/components/layout/DrawerToggleRefContext';
 import { GlobalShortcuts } from '@/components/layout/GlobalShortcuts';
@@ -12,6 +13,7 @@ import { DemoBanner } from '@/features/onboarding/components/DemoBanner';
 import { ContextStrip } from '@/features/workspace/components/ContextStrip';
 import { useAuth } from '@/hooks/useAuth';
 import { useReportingTimezoneBackfill } from '@/hooks/useUserTimezone';
+import { hardRedirectToLogin } from '@/lib/auth-redirect';
 import { cn } from '@/lib/utils';
 import { useDrawerStore } from '@/stores/drawer.store';
 import { EventBusBridge } from '@/stores/EventBusBridge';
@@ -29,6 +31,14 @@ function AuthLayout() {
   // whether or not it has anything to do.
   useReportingTimezoneBackfill();
 
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      // G1 (D-G1): a FULL-PAGE load so production nginx 302s /login to ZITN's
+      // SSO entry; in dev/e2e the SPA's own /login form is the fallback.
+      hardRedirectToLogin();
+    }
+  }, [isLoading, isAuthenticated]);
+
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -38,7 +48,7 @@ function AuthLayout() {
   }
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return null;
   }
 
   return (

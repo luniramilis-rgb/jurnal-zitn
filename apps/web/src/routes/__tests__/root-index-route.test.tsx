@@ -17,6 +17,7 @@ import {
   markSessionStarted,
   setRouter,
 } from '@/lib/api';
+import { hardRedirectToLogin } from '@/lib/auth-redirect';
 
 import { Route as RootRoute } from '../__root';
 import { Route as IndexRoute } from '../index';
@@ -25,6 +26,10 @@ import { Route as LoginRoute } from '../login';
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true;
 
 vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() }, Toaster: () => null }));
+
+// G1 (D-G1): the anonymous front door reloads /login full-page (which production
+// nginx 302s to ZITN). Mocked so jsdom does not try to navigate.
+vi.mock('@/lib/auth-redirect', () => ({ hardRedirectToLogin: vi.fn() }));
 
 // THE BARE ORIGIN IS A ROUTE, and it is not the 404 page.
 //
@@ -128,12 +133,12 @@ describe('the bare origin while logged out', () => {
     );
   });
 
-  it('sends the visitor to the login page instead of a not-found page', async () => {
-    const { router } = renderAt('/');
+  it('reloads /login for the anonymous visitor instead of a not-found page', async () => {
+    renderAt('/');
     await settle();
 
-    expect(router.state.location.pathname).toBe('/login');
-    expect(screen.getByText('Log in', { selector: '[data-slot="card-title"]' })).toBeTruthy();
+    // G1 (D-G1): a FULL-PAGE load so production nginx 302s /login to ZITN.
+    expect(vi.mocked(hardRedirectToLogin)).toHaveBeenCalled();
     expect(screen.queryByText('Page not found')).toBeNull();
   });
 
