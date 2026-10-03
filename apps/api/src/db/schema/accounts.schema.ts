@@ -21,6 +21,9 @@ export const accounts = pgTable(
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
     name: varchar('name', { length: 100 }).notNull(),
+    // Base currency of the account (ZITN-TECH-022 §5.1): IDX holdings → IDR, US
+    // equities → USD. Ledger rows keep their RAW amount+currency; the converted
+    // value is derived on READ (packages/shared/src/fx.ts), never frozen.
     currency: varchar('currency', { length: 3 }).notNull(),
     // IANA zone name. Defines the account's *trading day* — the calendar day
     // openedAt/closedAt are compared in for R13's same-day reopen rule, so an
