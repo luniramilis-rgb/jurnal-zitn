@@ -14,6 +14,6 @@
 # dua baris `image:` saat naik versi; lihat §7.10 untuk update/rollback.
 services:
   api:
-    image: ghcr.io/luniramilis-rgb/jurnal-zitn-api:sha-adf615c6178511713ee5ec55eefa7619be46235d
+    image: ghcr.io/luniramilis-rgb/jurnal-zitn-api:sha-1b2fecf275f9b29bd4d86bf08b347da018890fcc
   web:
-    image: ghcr.io/luniramilis-rgb/jurnal-zitn-web:sha-adf615c6178511713ee5ec55eefa7619be46235d
+    image: ghcr.io/luniramilis-rgb/jurnal-zitn-web:sha-1b2fecf275f9b29bd4d86bf08b347da018890fcc
