@@ -5,6 +5,7 @@ import {
   varchar,
   text,
   numeric,
+  date,
   timestamp,
   index,
   check,
@@ -27,6 +28,10 @@ export const tradePlans = pgTable(
       .references(() => users.id, { onDelete: 'cascade' }),
     symbol: varchar('symbol', { length: 32 }).notNull(),
     side: varchar('side', { length: 5 }).notNull(),
+    // Prefill dari Pemindai ZITN (ZITN-TECH-043): pasar + tanggal sinyal/lembar. `market`
+    // default 'id' agar draf lama tetap sah; `signal_date` nullable (draf manual boleh kosong).
+    market: varchar('market', { length: 4 }).notNull().default('id'),
+    signalDate: date('signal_date'),
     thesis: text('thesis'),
     playbookId: uuid('playbook_id'),
     entryZoneLow: numeric('entry_zone_low', { precision: 18, scale: 8 }),
@@ -42,6 +47,7 @@ export const tradePlans = pgTable(
     index('trade_plans_user_id_idx').on(table.userId),
     index('trade_plans_user_id_status_idx').on(table.userId, table.status),
     check('trade_plans_side_chk', sql`${table.side} IN ('long','short')`),
+    check('trade_plans_market_chk', sql`${table.market} IN ('id','us')`),
     check(
       'trade_plans_status_chk',
       sql`${table.status} IN ('pending','executed','missed','cancelled')`,

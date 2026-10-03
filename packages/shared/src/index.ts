@@ -376,8 +376,10 @@ export type {
 export {
   TRADE_PLAN_STATUSES,
   TRADE_PLAN_SIDES,
+  TRADE_PLAN_MARKETS,
   TradePlanStatusSchema,
   TradePlanSideSchema,
+  TradePlanMarketSchema,
   TradePlanSchema,
   CreateTradePlanInputSchema,
   UpdateTradePlanInputSchema,
@@ -387,6 +389,7 @@ export {
 } from './schemas/trade-plan';
 export type {
   TradePlanStatus,
+  TradePlanMarket,
   TradePlan,
   CreateTradePlanInput,
   UpdateTradePlanInput,

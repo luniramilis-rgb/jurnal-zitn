@@ -16,6 +16,7 @@ import { setCookie } from 'hono/cookie';
 
 import { safeLocalRedirect } from '@jurnal-zitn/shared';
 
+import { createOrFocusPendingPlan } from '@/features/trade-plans/trade-plan.service';
 import { config, isSsoConfigured } from '@/lib/config';
 import { sessionCookieOptions } from '@/lib/cookie-policy';
 
@@ -23,6 +24,8 @@ import { ssoRedirectTarget } from './sso-redirect';
 import { exchangeSsoToken } from './sso.service';
 
 const sso = new Hono();
+const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
+const TICKER_RE = /^[A-Z0-9.\-]{1,12}$/;
 
 /**
  * @swagger
@@ -46,14 +49,45 @@ const sso = new Hono();
  *         description: >
  *           Optional lembar date (`YYYY-MM-DD`) carried from the ZITN lembar link; on success the
  *           redirect becomes `/lembar?tanggal=…` so the journal can show "that day's sheet" context.
+ *       - in: query
+ *         name: add
+ *         required: false
+ *         schema: { type: string }
+ *         description: >
+ *           Optional ticker from Pemindai ZITN's "Tambah ke Jurnal" (ZITN-TECH-043). On success the
+ *           journal creates (or focuses) an idempotent Pending F4 draft for this symbol+market and
+ *           redirects to `/trade-plans?focus=<id>`. Identity only — no levels.
+ *       - in: query
+ *         name: pasar
+ *         required: false
+ *         schema: { type: string, enum: [id, us] }
+ *         description: Market of the added ticker (`id` default, `us` for S&P 500).
  *     responses:
- *       302: { description: Session started; redirect to `/` (or `/lembar?tanggal=…`). }
+ *       302: { description: Session started; redirect to `/` (or `/lembar?tanggal=…`, or the draft). }
  *       401: { description: Invalid, expired, or replayed token. }
  *       503: { description: ZITN SSO is not configured on this instance. }
  */
 sso.get('/sso', async (c) => {
-  const { token } = await exchangeSsoToken(c.req.query('token'));
+  const { token, userId } = await exchangeSsoToken(c.req.query('token'));
   setCookie(c, 'session', token, sessionCookieOptions());
+
+  // "Tambah ke Jurnal" (ZITN-TECH-043): identitas saja — buat/fokus draf F4 idempoten.
+  const add = (c.req.query('add') || '').trim().toUpperCase();
+  if (TICKER_RE.test(add) && userId) {
+    const pasar = c.req.query('pasar') === 'us' ? 'us' : 'id';
+    const tanggal = (c.req.query('tanggal') || '').trim();
+    try {
+      const { plan } = await createOrFocusPendingPlan(userId, {
+        symbol: add,
+        market: pasar,
+        signalDate: DATE_RE.test(tanggal) ? tanggal : null,
+      });
+      return c.redirect(`/trade-plans?focus=${plan.id}`, 302);
+    } catch {
+      // Jangan gagalkan login karena draf; jatuh ke perilaku redirect biasa.
+    }
+  }
+
   return c.redirect(ssoRedirectTarget(c.req.query('tanggal'), c.req.query('redirect')), 302);
 });
 

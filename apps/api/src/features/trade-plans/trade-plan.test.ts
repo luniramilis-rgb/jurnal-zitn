@@ -5,6 +5,8 @@ import app from '@/app';
 import { db } from '@/db';
 import { tradePlans, users } from '@/db/schema';
 
+import { createOrFocusPendingPlan, setTradePlanStatus } from './trade-plan.service';
+
 // F4 pre-trade plans (ZITN-TECH-017 §10.8): CRUD + the forward-only lifecycle.
 
 let ipCounter = 0;
@@ -129,5 +131,50 @@ describe('trade plans CRUD + lifecycle', () => {
       await authed('POST', '/api/trade-plans', a.cookie, { symbol: 'MSFT', side: 'long' })
     ).json()) as { id: string };
     expect((await authed('GET', `/api/trade-plans/${plan.id}`, b.cookie)).status).toBe(404);
+  });
+
+  it('stores the ZITN prefill (market + signalDate) on create', async () => {
+    const { cookie } = await register();
+    const res = await authed('POST', '/api/trade-plans', cookie, {
+      symbol: 'AAPL',
+      side: 'long',
+      market: 'us',
+      signalDate: '2026-09-30',
+    });
+    expect(res.status).toBe(201);
+    const plan = (await res.json()) as { market: string; signalDate: string | null };
+    expect(plan.market).toBe('us');
+    expect(plan.signalDate).toBe('2026-09-30');
+  });
+});
+
+describe('create-or-focus (Tambah ke Jurnal, ZITN-TECH-043)', () => {
+  it('is idempotent per (symbol, market) and never focuses a terminal plan', async () => {
+    const { id } = await register();
+
+    const a = await createOrFocusPendingPlan(id, {
+      symbol: 'BBCA',
+      market: 'id',
+      signalDate: '2026-09-30',
+    });
+    expect(a.focused).toBe(false);
+    expect(a.plan.market).toBe('id');
+    expect(a.plan.signalDate).toBe('2026-09-30');
+
+    // Same symbol+market, still Pending -> focus the existing draft.
+    const b = await createOrFocusPendingPlan(id, { symbol: 'BBCA', market: 'id' });
+    expect(b.focused).toBe(true);
+    expect(b.plan.id).toBe(a.plan.id);
+
+    // Different market -> a distinct draft.
+    const c = await createOrFocusPendingPlan(id, { symbol: 'BBCA', market: 'us' });
+    expect(c.focused).toBe(false);
+    expect(c.plan.id).not.toBe(a.plan.id);
+
+    // Terminal plan is not re-focused; a fresh Pending draft is made.
+    await setTradePlanStatus(id, a.plan.id, 'executed');
+    const d = await createOrFocusPendingPlan(id, { symbol: 'BBCA', market: 'id' });
+    expect(d.focused).toBe(false);
+    expect(d.plan.id).not.toBe(a.plan.id);
   });
 });
