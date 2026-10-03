@@ -418,3 +418,12 @@ export {
 } from './constants/dashboard-defaults';
 export type { DefaultWidgetSpec } from './constants/dashboard-defaults';
 export { reconcileStoredLayout, isDefaultGeometry, carryConfig } from './utils/dashboard-layout';
+export {
+  FX_SOURCES,
+  FX_SOURCE_PRIORITY,
+  FxRateSchema,
+  fxSourceRank,
+  pickFxRate,
+  revalue,
+} from './fx';
+export type { FxSource, FxRate } from './fx';
