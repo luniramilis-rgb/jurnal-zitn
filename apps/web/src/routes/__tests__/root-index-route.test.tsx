@@ -65,8 +65,13 @@ function buildRouter(initialPath: string) {
     path: '/dashboard',
     component: () => <div>dashboard-stub</div>,
   });
+  const cekRisiko = createRoute({
+    getParentRoute: () => rootRoute as any,
+    path: '/cek-risiko',
+    component: () => <div>cek-risiko-stub</div>,
+  });
 
-  const routeTree = rootRoute.addChildren([index, login, dashboard]);
+  const routeTree = rootRoute.addChildren([index, login, dashboard, cekRisiko]);
 
   return createRouter({
     routeTree: routeTree as any,
@@ -182,11 +187,11 @@ describe('the bare origin while signed in', () => {
     );
   });
 
-  it('sends the user to the dashboard', async () => {
+  it('sends the user to Cek Risiko (the journal’s new face)', async () => {
     const { router } = renderAt('/');
     await settle();
 
-    expect(router.state.location.pathname).toBe('/dashboard');
+    expect(router.state.location.pathname).toBe('/cek-risiko');
     expect(screen.queryByText('Page not found')).toBeNull();
   });
 });

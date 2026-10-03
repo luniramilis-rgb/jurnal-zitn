@@ -46,7 +46,10 @@ function IndexRoute() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/dashboard" replace />;
+    // Fase H: the journal's new face is Cek Risiko. Post-SSO landings resolve to
+    // `/` (sso-redirect.ts), so signing in now arrives at the calculator rather
+    // than the full journal. Full mode remains one tap away (and at `/dashboard`).
+    return <Navigate to="/cek-risiko" replace />;
   }
 
   return null;

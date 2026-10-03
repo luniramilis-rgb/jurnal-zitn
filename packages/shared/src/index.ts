@@ -162,6 +162,7 @@ export { safeLocalRedirect } from './lib/redirect';
 export * from './lib/occ';
 export * from './fees';
 export * from './idx';
+export * from './cek-risiko';
 export * from './i18n';
 export { calculateTrade } from './calculator';
 export {

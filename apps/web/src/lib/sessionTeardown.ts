@@ -56,5 +56,14 @@ export function clearClientSessionState(client: QueryClient = singletonQueryClie
   // second user on the same tab must start with an empty store.
   clearTzProvenance();
   client.clear();
+  // Drop the offline shell too (Fase H SW), so a signed-out tab cannot keep
+  // serving cached assets. Best-effort: no SW / no DOM is fine.
+  try {
+    if (typeof navigator !== 'undefined') {
+      navigator.serviceWorker?.controller?.postMessage({ type: 'CLEAR_CACHE' });
+    }
+  } catch {
+    /* no service worker — offline cache is a best-effort enhancement */
+  }
   eventBus.publish('auth:logout', {});
 }

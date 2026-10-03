@@ -110,6 +110,43 @@ memuat uji default yang sudah dipin, jadi ditunda sebagai commit tersendiri bila
 
 ---
 
+## Fase H — Cek Risiko (wajah baru jurnal) — ✅ SELESAI 2026-10-03
+
+**Status: terimplementasi 2026-10-03** — mesin `packages/shared/src/cek-risiko.ts`, permukaan
+`apps/web/src/features/cek-risiko/` di rute `/cek-risiko`, "Simpan ke Catatan" lewat mesin jurnal
+(`POST /positions` + `/fills`), nav `ZitnAppBar` + ZITN `theme.py` (`Cek Risiko`), PWA
+(`manifest.webmanifest` + `sw.js`). **Tayang menunggu deploy + verifikasi pemilik.**
+
+**Keputusan pemilik (2026-10-03):** "Cek Risiko" = **wajah baru jurnal** (**mesin yang sama**, bukan
+aplikasi baru); judul halaman _"Cek Risiko — Hitung lot, biaya, dan batas rugi"_; **rute `/cek-risiko/`**.
+**Nav:** `Beranda | Pemindai | Chart | Cek Risiko | Akun`.
+**Nasib jurnal = opsi A:** keluar dari nav + fitur lanjutan di balik **Mode lengkap**; **mesin tetap**;
+pensiun penuh ditinjau dengan ambang (mis. 8 minggu & pemakaian Mode lengkap < 5%) — bila pensiun: wajib
+ekspor/migrasi data + pertahankan ekspor/hapus.
+**D-H1..D-H5:** (b) dua mode · (a) verdict 3 tingkat · "Simpan ke Catatan" **aktif v1** · di dalam app SSO · rumus ditampilkan (dilipat).
+
+Ringkasan pola + analisis perilaku target market: **`ZITN-TECH-017 §12`**
+(repo ZITN, `docs/product/HANDOFF_technical_17.md`).
+Klarifikasi: kalkulator **di dalam produk** (bukan publik). Tujuan: menjawab "boleh beli berapa lot"
+dan mencatat **sebagai efek samping**. **Tanpa gudang data kedua** (memakai mesin jurnal).
+
+**Pola yang diadopsi (port rumus, bukan kode):** shell `form → hasil` (`calc-trade`, MIT) ·
+verdict warna (`propfirm-calculator`) · gauge risiko (`trade-risk-calibrator`) ·
+**rumus ditampilkan** (`yusuf-gadelrab/risk-tools`) · aturan IDX lot/fraksi/ARA-ARB/fee/PPh
+(`Yuukinaesa/Saham`).
+
+| #   | Pekerjaan                                                                               | Biaya |
+| --- | --------------------------------------------------------------------------------------- | ----- |
+| H1  | Kalkulator satu layar, 2 mode (`Hitung Lot` / `Biaya & Pajak`), hasil + verdict + rumus | S–M   |
+| H2  | "Simpan ke Catatan" → posisi di mesin jurnal (UI ringkas, Mode lengkap di balik tombol) | S     |
+
+**Pagar:** alat hitung dari angka pengguna (bukan saran); tanpa prediksi/sinyal/target; tanpa telemetry;
+PWA offline; hindari `Hafzan risk-toolkit` (proprietary) & `mfat/PSCalc` (GPL-3.0).
+
+**Estimasi:** ≈1–2 minggu · **Keputusan D-H1…D-H5 + opsi A: ✅ DISETUJUI 2026-10-03.**
+
+---
+
 ## Definition of done per fase
 
 - **A**: `pnpm -r check-types` + `pnpm test` (CI dengan Postgres) hijau; `eslint` bersih; tiap batch
@@ -119,3 +156,7 @@ memuat uji default yang sudah dipin, jadi ditunda sebagai commit tersendiri bila
 - **D**: opsional, hanya setelah A–C stabil.
 - **F**: fungsi analitik beruji vitest; `advisor`/`options` tak dapat diakses; kamus `id`/`en` lengkap;
   `pnpm -r check-types`/`eslint`/`pnpm test` (CI ber-Postgres) hijau; tanpa regresi jalur IDX.
+- **G**: registrasi tertutup; `/login` → ZITN; `_auth.*` tanpa sesi → SSO; logout bersih dua sisi;
+  app bar tampil + active state + chip sesi; tab Pemindai/Chart hilang dari nav; klik ticker → chart ZITN.
+- **H**: kalkulator satu layar (2 mode) dengan hasil + verdict + rumus; aturan IDX (lot/fraksi/ARA-ARB/fee/PPh)
+  benar; "Simpan ke Catatan" membuat posisi di mesin jurnal; PWA offline; nol telemetry; i18n `id`.

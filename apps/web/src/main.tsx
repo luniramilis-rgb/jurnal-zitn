@@ -7,12 +7,16 @@ import { createRoot } from 'react-dom/client';
 import { LocaleProvider } from './hooks/useLocale';
 import { setRouter } from './lib/api';
 import { installChunkRecovery } from './lib/chunkRecovery';
+import { registerServiceWorker } from './lib/pwa';
 import { queryClient } from './lib/queryClient';
 import { initPostHogClient } from './lib/telemetry/posthog';
 import { routeTree } from './routeTree.gen';
 import './index.css';
 const router = createRouter({ routeTree });
 setRouter(router);
+
+// PWA offline (Fase H): best-effort, production-only, no telemetry.
+registerServiceWorker();
 
 // Register the single chunk-preload-error listener before render, so it exists
 // before any lazy import can fail (design Component 3).

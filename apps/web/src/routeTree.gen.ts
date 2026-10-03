@@ -24,6 +24,7 @@ import { Route as AuthOptionsRouteImport } from './routes/_auth.options'
 import { Route as AuthImportRouteImport } from './routes/_auth.import'
 import { Route as AuthDashboardRouteImport } from './routes/_auth.dashboard'
 import { Route as AuthChangelogRouteImport } from './routes/_auth.changelog'
+import { Route as AuthCekRisikoRouteImport } from './routes/_auth.cek-risiko'
 import { Route as AuthCalculatorRouteImport } from './routes/_auth.calculator'
 import { Route as AuthBrokeragesRouteImport } from './routes/_auth.brokerages'
 import { Route as AuthAdminRouteImport } from './routes/_auth.admin'
@@ -117,6 +118,11 @@ const AuthDashboardRoute = AuthDashboardRouteImport.update({
 const AuthChangelogRoute = AuthChangelogRouteImport.update({
   id: '/changelog',
   path: '/changelog',
+  getParentRoute: () => AuthRoute,
+} as any)
+const AuthCekRisikoRoute = AuthCekRisikoRouteImport.update({
+  id: '/cek-risiko',
+  path: '/cek-risiko',
   getParentRoute: () => AuthRoute,
 } as any)
 const AuthCalculatorRoute = AuthCalculatorRouteImport.update({
@@ -232,6 +238,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AuthAdminRoute
   '/brokerages': typeof AuthBrokeragesRoute
   '/calculator': typeof AuthCalculatorRoute
+  '/cek-risiko': typeof AuthCekRisikoRoute
   '/changelog': typeof AuthChangelogRoute
   '/dashboard': typeof AuthDashboardRoute
   '/import': typeof AuthImportRoute
@@ -268,6 +275,7 @@ export interface FileRoutesByTo {
   '/admin': typeof AuthAdminRoute
   '/brokerages': typeof AuthBrokeragesRoute
   '/calculator': typeof AuthCalculatorRoute
+  '/cek-risiko': typeof AuthCekRisikoRoute
   '/changelog': typeof AuthChangelogRoute
   '/dashboard': typeof AuthDashboardRoute
   '/import': typeof AuthImportRoute
@@ -306,6 +314,7 @@ export interface FileRoutesById {
   '/_auth/admin': typeof AuthAdminRoute
   '/_auth/brokerages': typeof AuthBrokeragesRoute
   '/_auth/calculator': typeof AuthCalculatorRoute
+  '/_auth/cek-risiko': typeof AuthCekRisikoRoute
   '/_auth/changelog': typeof AuthChangelogRoute
   '/_auth/dashboard': typeof AuthDashboardRoute
   '/_auth/import': typeof AuthImportRoute
@@ -344,6 +353,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/brokerages'
     | '/calculator'
+    | '/cek-risiko'
     | '/changelog'
     | '/dashboard'
     | '/import'
@@ -380,6 +390,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/brokerages'
     | '/calculator'
+    | '/cek-risiko'
     | '/changelog'
     | '/dashboard'
     | '/import'
@@ -417,6 +428,7 @@ export interface FileRouteTypes {
     | '/_auth/admin'
     | '/_auth/brokerages'
     | '/_auth/calculator'
+    | '/_auth/cek-risiko'
     | '/_auth/changelog'
     | '/_auth/dashboard'
     | '/_auth/import'
@@ -558,6 +570,13 @@ declare module '@tanstack/react-router' {
       path: '/changelog'
       fullPath: '/changelog'
       preLoaderRoute: typeof AuthChangelogRouteImport
+      parentRoute: typeof AuthRoute
+    }
+    '/_auth/cek-risiko': {
+      id: '/_auth/cek-risiko'
+      path: '/cek-risiko'
+      fullPath: '/cek-risiko'
+      preLoaderRoute: typeof AuthCekRisikoRouteImport
       parentRoute: typeof AuthRoute
     }
     '/_auth/calculator': {
@@ -746,6 +765,7 @@ interface AuthRouteChildren {
   AuthAdminRoute: typeof AuthAdminRoute
   AuthBrokeragesRoute: typeof AuthBrokeragesRoute
   AuthCalculatorRoute: typeof AuthCalculatorRoute
+  AuthCekRisikoRoute: typeof AuthCekRisikoRoute
   AuthChangelogRoute: typeof AuthChangelogRoute
   AuthDashboardRoute: typeof AuthDashboardRoute
   AuthImportRoute: typeof AuthImportRoute
@@ -768,6 +788,7 @@ const AuthRouteChildren: AuthRouteChildren = {
   AuthAdminRoute: AuthAdminRoute,
   AuthBrokeragesRoute: AuthBrokeragesRoute,
   AuthCalculatorRoute: AuthCalculatorRoute,
+  AuthCekRisikoRoute: AuthCekRisikoRoute,
   AuthChangelogRoute: AuthChangelogRoute,
   AuthDashboardRoute: AuthDashboardRoute,
   AuthImportRoute: AuthImportRoute,

@@ -151,6 +151,11 @@ export default defineConfig({
   reporter: isCI ? [['github'], ['list']] : 'list',
   use: {
     baseURL,
+    // The app registers a service worker on the production build (`vite preview`).
+    // A controlling SW makes its asset requests from the worker context, which
+    // `page.route` cannot intercept — the update-flow specs stub a lazy chunk with
+    // a 404 to force the chunk-load fallback, so blocking SWs keeps them honest.
+    serviceWorkers: 'block',
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
     // The suite asserts the English copy, and a signed-out first paint now keeps
