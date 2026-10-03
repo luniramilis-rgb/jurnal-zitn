@@ -1,6 +1,7 @@
 {
   "_comment": "Per-widget gzipped chunk caps in bytes. Task 47 / design §W-r3. Keys for widgets are the source filename (relative to apps/web/) of the lazy-imported widget module — check-bundle-size.mjs resolves these via Vite's build manifest. 'dashboard-entry' is the dashboard route's initial chunk (entry components + registry shells + gridstack + event-bus store + theme hook, EXCLUSIVE of lazy widget chunks).",
-  "totalBundle": 512000,
+  "_totalBundle_note": "Raised 512000 -> 524288 (512 KiB) on 2026-10-03: the ZITN-TECH-044 Indonesian localization wave added ~100 onboarding/walkthrough strings to the shared dictionary, which ships in the entry chunk. Largest chunk measured 514307 B gzipped in CI. Still a hard cap; a further localization wave should evaluate lazy-loading the non-default locale rather than raising again.",
+  "totalBundle": 524288,
   "dashboardEntry": {
     "source": "src/routes/_auth.dashboard.tsx",
     "maxBytes": 30720

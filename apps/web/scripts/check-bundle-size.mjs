@@ -4,7 +4,8 @@
 // Enforces six things against the post-build artifact:
 //
 //   1. Total bundle gate (unchanged from pre-Task-47): the largest emitted
-//      JS chunk must be <= 500 KB gzipped.
+//      JS chunk must be <= budgets.totalBundle gzipped (512 KiB since the
+//      ZITN-TECH-044 localization wave; was 500 KiB).
 //   2. Dashboard route initial chunk: <= 30 KB gzipped (entry components +
 //      registry shells + dnd-kit core + event-bus store + theme hook,
 //      EXCLUSIVE of lazy widget chunks).
