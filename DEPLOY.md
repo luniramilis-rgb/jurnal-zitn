@@ -369,6 +369,37 @@ Migrasi berjalan otomatis saat `api` boot; perhatikan log `Config loaded`.
 Rilis (`v*`) membangun image multi-arch + GitHub Release; `:edge`/`:sha-<commit>` hanya dari run
 manual **Images (edge)** (hemat kuota — lihat catatan di header workflow itu).
 
+### 7.11 Deploy otomatis (opsional)
+
+`.github/workflows/deploy.yml` mengalirkan **push → CI → deploy** tanpa langkah manual. Defaultnya
+**mati (inert)**: kedua job dijaga `vars.AUTO_DEPLOY_ENABLED == 'true'`, jadi tak ada yang berjalan
+sampai pemilik mengaktifkannya.
+
+Aktifkan (sekali):
+
+1. Settings → Secrets and variables → Actions → **Variables**: `AUTO_DEPLOY_ENABLED = true`.
+2. Secrets: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` (kunci deploy khusus, key-only — §8.3).
+3. (Disarankan) Environment `production` → tambahkan **required reviewers** agar deploy menunggu
+   persetujuan; dan pasang **branch protection** di `main` (required checks `checks`, `test-api`,
+   `test-web`) sebelum menyalakannya.
+
+Alur: push/merge ke `main` → CI hijau → build image `:sha-<commit>` (api+web) → SSH: pin tag →
+`pull` → `up -d --no-build` → health `GET /api/health` → **rollback otomatis** ke tag sebelumnya bila
+health gagal.
+
+Rollback manual: jalankan ulang run `Deploy (jurnal)` yang sukses sebelumnya, atau di host set tag
+lama di `docker-compose.ghcr.yml` lalu `$COMPOSE pull && $COMPOSE up -d --no-build` (§7.10).
+
+Biaya: karena membangun image tiap push kode ke `main`, ini memakai kuota Actions (alasan
+`Images (edge)` dibuat manual). Bila ingin lebih hemat, ubah blok `on:` menjadi rilis-only:
+`push: { tags: ['v*'] }` — deploy hanya saat potong tag.
+
+**Catatan ZITN (repo `trutova`, Cloudflare Pages):** publish situs **belum** ikut otomatis di sini
+karena build butuh `outputs/daily/` (gitignored, hasil pipeline data) dan repo ZITN belum punya
+GitHub Actions. Rekomendasi: tempelkan `build_site.py` + `publish_site.py` di pipeline harian yang
+sudah menghasilkan `outputs/daily/`, dan tambah workflow `workflow_dispatch` untuk perubahan kode
+situs.
+
 ## 8. Operasional (A11)
 
 Referensi keputusan pemilik yang menunggu: jam backup, retensi, dan region hosting (residensi data)
