@@ -60,6 +60,7 @@ import type { OnboardingPatch, OnboardingState, OnboardingStatus } from '@jurnal
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { usePositions } from '@/features/positions/hooks/usePositions';
 import { api } from '@/lib/api';
+import { t } from '@/lib/i18n';
 
 import {
   armChecklistCompletion,
@@ -137,7 +138,7 @@ export function useOnboardingPatch(options?: { silent?: boolean }) {
       if (silent) return;
       // No success toast: the visible change — the checklist closing, the coach
       // mark going away — is the confirmation. A failure has no such tell.
-      toast.error(getErrorMessage(err, 'Failed to save your onboarding preference'));
+      toast.error(getErrorMessage(err, t('onboard.pref.saveFailed')));
     },
   });
 }

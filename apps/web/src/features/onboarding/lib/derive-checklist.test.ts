@@ -33,10 +33,10 @@ describe('deriveChecklist — shape', () => {
     expect(items).toHaveLength(4);
     expect(items.map((item) => item.id)).toEqual(['account', 'calculator', 'position', 'close']);
     expect(items.map((item) => item.label)).toEqual([
-      'Create a brokerage account',
-      'Size a trade in the calculator',
-      'Log a position',
-      'Close it and see the stats',
+      'onboard.item.account',
+      'onboard.item.calculator',
+      'onboard.item.position',
+      'onboard.item.close',
     ]);
   });
 

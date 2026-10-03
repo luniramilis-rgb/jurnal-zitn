@@ -45,23 +45,24 @@
 
 import { Play } from 'lucide-react';
 
+import type { MessageKey } from '@jurnal-zitn/shared';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { useT } from '@/hooks/useLocale';
 
 import { useWalkthroughLauncher } from '../hooks/useWalkthrough';
 import { CHECKLIST_ITEMS } from '../lib/derive-checklist';
 
 export function WalkthroughLauncher() {
+  const t = useT();
   const { start, isUnavailable } = useWalkthroughLauncher();
 
   return (
     <Card data-testid="walkthrough-launcher" className="gap-4 py-4">
       <CardHeader className="px-4">
-        <CardTitle className="text-base">Guided walkthrough</CardTitle>
-        <CardDescription>
-          Take any part of the tour, as many times as you like. It only points at the screen it is
-          talking about — nothing is changed and nothing is recorded.
-        </CardDescription>
+        <CardTitle className="text-base">{t('onboard.launcher.title')}</CardTitle>
+        <CardDescription>{t('onboard.launcher.desc')}</CardDescription>
       </CardHeader>
       <CardContent className="px-4">
         {/* Ordered, because these are the four setup steps in the order the
@@ -73,7 +74,7 @@ export function WalkthroughLauncher() {
               data-walkthrough-set={item.id}
               className="flex min-h-9 items-center gap-3 py-1"
             >
-              <span className="min-w-0 flex-1 text-sm">{item.label}</span>
+              <span className="min-w-0 flex-1 text-sm">{t(item.label as MessageKey)}</span>
               {/* A named button rather than the checklist's bare play triangle:
                   this card is a list of four things to start and nothing else,
                   so the action is the point of the row rather than an extra on
@@ -85,12 +86,14 @@ export function WalkthroughLauncher() {
                 size="sm"
                 className="shrink-0 cursor-pointer"
                 data-walkthrough-action={item.id}
-                aria-label={`Start walkthrough: ${item.label}`}
+                aria-label={t('onboard.launcher.startAria', {
+                  label: t(item.label as MessageKey),
+                })}
                 disabled={isUnavailable}
                 onClick={() => start(item.id)}
               >
                 <Play aria-hidden="true" />
-                Start
+                {t('onboard.launcher.start')}
               </Button>
             </li>
           ))}
@@ -103,8 +106,7 @@ export function WalkthroughLauncher() {
             data-testid="walkthrough-launcher-unavailable"
             className="pt-3 text-sm text-muted-foreground"
           >
-            The guided walkthrough could not be loaded. Nothing is lost — the getting-started guide
-            covers the same four steps in full.
+            {t('onboard.launcher.unavailable')}
           </p>
         )}
       </CardContent>

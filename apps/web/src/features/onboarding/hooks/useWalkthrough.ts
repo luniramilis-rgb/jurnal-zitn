@@ -57,6 +57,8 @@ import { create } from 'zustand';
 
 import { accountsListQuery, useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { positionsListQuery, usePositions } from '@/features/positions/hooks/usePositions';
+import { t } from '@/lib/i18n';
+import { getAppLocale } from '@/lib/locale';
 import { eventBus } from '@/stores/event-bus.store';
 import type { EventName } from '@/stores/events.types';
 
@@ -684,17 +686,18 @@ function explainStop(blocked: TourBlock): string {
     case 'action-required':
       // The control was on screen and pressable and the user left anyway, which
       // is the one stop that is theirs to clear.
-      return `“${blocked.step.title}” only moves on once you have actually done it, so the walkthrough cannot take that step for you.`;
+      return t('onboard.stop.actionRequired', { title: blocked.step.title });
     case 'target-missing':
       // Present tense, because it is true of both ways a control comes to be
       // absent: one that never rendered, and one the user has since dismissed
       // along with the dialog it lived in.
-      return `“${blocked.step.title}” is not on screen, so the walkthrough could not carry on from there.`;
+      return t('onboard.stop.targetMissing', { title: blocked.step.title });
   }
 }
 
 /**
- * WHERE TO START IT AGAIN — one answer, true for every reader.
+ * WHERE TO START IT AGAIN (`onboard.stop.carryOn`) — one answer, true for every
+ * reader.
  *
  * It used to name the setup checklist, which is the one surface that can have
  * gone: the checklist RETIRES for good once all four items are complete, and a
@@ -703,19 +706,17 @@ function explainStop(blocked: TourBlock): string {
  * for every user, retired or not — so it is the direction that cannot come to be
  * false under the person reading it.
  */
-const START_AGAIN_HERE = 'start it again whenever you want from Settings → Help';
-
 function announceStop(blocked: TourBlock | undefined): void {
   if (blocked === undefined) return;
 
-  toast.info('The walkthrough stopped', {
+  toast.info(t('onboard.stop.title'), {
     id: STOP_NOTICE_ID,
     duration: STOP_NOTICE_MS,
     // Both ways out, named: nothing was riding on the tour, and the door it was
     // started from is still there. Exiting discards nothing — this module writes
     // no onboarding state at all — so "nothing was lost" is a structural fact
     // rather than a reassurance.
-    description: `${explainStop(blocked)} Nothing was lost — carry on without it, or ${START_AGAIN_HERE}.`,
+    description: t('onboard.stop.carryOn', { reason: explainStop(blocked) }),
   });
 }
 
@@ -742,35 +743,23 @@ function announceStop(blocked: TourBlock | undefined): void {
 function explainCannotStart(itemId: ChecklistItemId): string {
   switch (itemId) {
     case 'account':
-      return (
-        'Your own accounts and the sample account cannot both exist, so creating one starts by ' +
-        'removing the sample data — and that is a confirmation this walkthrough cannot take you ' +
-        'through. Remove the sample data first, from the banner on your dashboard, and this ' +
-        'walkthrough will run.'
-      );
+      return t('onboard.cannotStart.account');
     case 'position':
-      return (
-        'A position is booked against an account, and you have none of your own yet — the sample ' +
-        'data does not count, because a position logged against it would tick nothing. Create an ' +
-        'account under Accounts and this walkthrough will run.'
-      );
+      return t('onboard.cannotStart.position');
     case 'close':
-      return (
-        'This one runs on a position of yours that is still open, and you have none right now. ' +
-        'Log one and open it, then start this walkthrough again.'
-      );
+      return t('onboard.cannotStart.close');
     case 'calculator':
       // Unreachable: `canStartSet` answers yes for this set unconditionally,
       // because /calculator renders its fields for every user, and
       // `needsStartableRead` means the launcher does not even ask before
       // starting it. Kept so the switch stays exhaustive and a fifth set is a
       // type error here.
-      return 'This walkthrough cannot start from where you are right now.';
+      return t('onboard.cannotStart.calculator');
   }
 }
 
 function announceCannotStart(itemId: ChecklistItemId): void {
-  toast.info('That walkthrough cannot start yet', {
+  toast.info(t('onboard.cannotStart.title'), {
     // The walkthrough's one notice, reused: a user who presses two sets in a row
     // gets the second explanation in place of the first rather than a stack.
     id: STOP_NOTICE_ID,
@@ -778,7 +767,7 @@ function announceCannotStart(itemId: ChecklistItemId): void {
     // No "start it again from …" here, unlike `announceStop`: this notice can
     // only be raised by the launcher, so the reader is already looking at the
     // place they would be sent to. The set stays on the card either way.
-    description: `${explainCannotStart(itemId)} Nothing was changed.`,
+    description: t('onboard.cannotStart.unchanged', { reason: explainCannotStart(itemId) }),
   });
 }
 
@@ -792,7 +781,7 @@ async function run(
   if (!runtime) return;
   const [engine, steps] = runtime;
 
-  const set = steps.WALKTHROUGH_STEPS[itemId];
+  const set = steps.getWalkthroughSteps(getAppLocale())[itemId];
   if (!set || set.length === 0) return;
 
   const params = withOpeningParams(set[0], callerParams, fallbackParams);

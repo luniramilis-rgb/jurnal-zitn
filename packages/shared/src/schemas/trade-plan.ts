@@ -8,16 +8,26 @@ export type TradePlanStatus = z.infer<typeof TradePlanStatusSchema>;
 export const TRADE_PLAN_SIDES = ['long', 'short'] as const;
 export const TradePlanSideSchema = z.enum(TRADE_PLAN_SIDES);
 
+// Market asal draf (prefill dari Pemindai ZITN, ZITN-TECH-043): IDX atau S&P 500.
+export const TRADE_PLAN_MARKETS = ['id', 'us'] as const;
+export const TradePlanMarketSchema = z.enum(TRADE_PLAN_MARKETS);
+export type TradePlanMarket = z.infer<typeof TradePlanMarketSchema>;
+
 // Prices/zone bounds cross the wire as decimal strings, like positions.
 const priceString = z
   .string()
   .max(32)
   .regex(/^\d+(\.\d+)?$/, 'Must be a non-negative decimal string');
 
+// Tanggal asal sinyal/lembar (YYYY-MM-DD).
+const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD');
+
 export const TradePlanSchema = z.object({
   id: z.string().uuid(),
   symbol: z.string(),
   side: TradePlanSideSchema,
+  market: TradePlanMarketSchema,
+  signalDate: z.string().nullable(),
   thesis: z.string().nullable(),
   playbookId: z.string().uuid().nullable(),
   entryZoneLow: z.string().nullable(),
@@ -35,6 +45,8 @@ export const CreateTradePlanInputSchema = z
   .object({
     symbol: z.string().trim().min(1).max(32),
     side: TradePlanSideSchema,
+    market: TradePlanMarketSchema.optional(),
+    signalDate: dateString.optional(),
     thesis: z.string().max(4000).optional(),
     playbookId: z.string().uuid().optional(),
     entryZoneLow: priceString.optional(),

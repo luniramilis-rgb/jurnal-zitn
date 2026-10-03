@@ -76,6 +76,10 @@ export function TradePlansPage() {
   const positions = usePositions();
   const positionById = new Map((positions.data ?? []).map((p) => [p.id, p]));
   const [form, setForm] = useState(EMPTY);
+  // "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): SSO mengarahkan ke
+  // `/trade-plans?focus=<id>`; sorot draf yang baru dibuat/difokuskan.
+  const focusId =
+    typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('focus') : null;
 
   const submit = () => {
     if (form.symbol.trim() === '') return;
@@ -184,8 +188,20 @@ export function TradePlansPage() {
             </TableRow>
           )}
           {list.data?.items.map((plan) => (
-            <TableRow key={plan.id} data-testid="trade-plan-row">
-              <TableCell className="font-medium">{plan.symbol}</TableCell>
+            <TableRow
+              key={plan.id}
+              data-testid="trade-plan-row"
+              className={plan.id === focusId ? 'ring-2 ring-primary' : undefined}
+            >
+              <TableCell className="font-medium">
+                {plan.symbol}
+                {(plan.market !== 'id' || plan.signalDate) && (
+                  <span className="ml-2 text-xs font-normal text-muted-foreground">
+                    {plan.market === 'us' ? 'S&P 500' : 'IDX'}
+                    {plan.signalDate ? ` · ${plan.signalDate}` : ''}
+                  </span>
+                )}
+              </TableCell>
               <TableCell>{plan.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}</TableCell>
               <TableCell>
                 <Numeric value={plan.entryZoneLow} kind="decimal" direction="none" />

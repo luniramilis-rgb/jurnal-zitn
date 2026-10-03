@@ -244,6 +244,34 @@ export const GLOSSARY: readonly GlossaryEntry[] = [
     termKey: 'term.credits',
     note: 'Bentuk jamak `credit`; label salinan memakai "credits" di kedua bahasa.',
   },
+
+  // -------------------------------------------------------------------------
+  // Chrome onboarding Jurnal ZITN (ZITN-TECH-044 / F7).
+  // -------------------------------------------------------------------------
+  {
+    key: 'walkthrough',
+    en: 'Walkthrough',
+    id: 'Panduan bertahap',
+    policy: 'translate',
+    source: 'broker',
+    note: 'Chrome onboarding Jurnal ZITN. Aksi "Walk me through it" = "Tuntun saya". Bentuk "tur berpandu" ditolak (terkesan promosional). Tanpa termKey karena id ≠ en.',
+  },
+  {
+    key: 'brokerageAccount',
+    en: 'Brokerage account',
+    id: 'Akun broker',
+    policy: 'translate',
+    source: 'broker',
+    note: 'Selaras `nav.brokerages` = "Broker" di kamus id. Tanpa termKey karena id ≠ en.',
+  },
+  {
+    key: 'sampleData',
+    en: 'Sample data',
+    id: 'Data contoh',
+    policy: 'translate',
+    source: 'broker',
+    note: 'Data contoh akun Jurnal ZITN (bukan milik pengguna). Tanpa termKey karena id ≠ en.',
+  },
 ];
 
 /**

@@ -316,6 +316,13 @@
       "when": 1790743831723,
       "tag": "0044_user_entitled_until",
       "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1791011092194,
+      "tag": "0045_trade_plan_market_signal_date",
+      "breakpoints": true
     }
   ]
 }

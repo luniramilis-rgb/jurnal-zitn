@@ -61,12 +61,10 @@ export const positionSteps: readonly WalkthroughStepSource[] = [
     // clears the anchor with room to spare.
     side: 'left',
     align: 'start',
-    actionHint: 'Choose New Position',
+    actionHintKey: 'walk.position.1.actionHint',
     advanceOnAction: true,
-    title: 'Log the position',
-    body:
-      'A position in Jurnal ZITN is one trade and every fill that belongs to it. Choose New Position ' +
-      'to start the one you just sized.',
+    titleKey: 'walk.position.1.title',
+    bodyKey: 'walk.position.1.body',
   },
   {
     target: '#symbol',
@@ -91,11 +89,8 @@ export const positionSteps: readonly WalkthroughStepSource[] = [
     // control is left interactive in the first place.
     side: 'right',
     align: 'start',
-    title: 'Symbol, side and account',
-    body:
-      'The ticker, whether you are long or short, and the account it is booked against. Symbol ' +
-      'searches as you type, the same as the calculator does. Notes are worth filling in now — ' +
-      'why you took the trade is the part you will want back later.',
+    titleKey: 'walk.position.2.title',
+    bodyKey: 'walk.position.2.body',
   },
   {
     target: '[data-tour="position-submit"]',
@@ -110,12 +105,10 @@ export const positionSteps: readonly WalkthroughStepSource[] = [
     // the placement the field step above already proves clears this dialog.
     side: 'right',
     align: 'end',
-    actionHint: 'Choose Create',
+    actionHintKey: 'walk.position.3.actionHint',
     advanceOnAction: true,
-    title: 'Create the position',
-    body:
-      'Choose Create. Nothing is committed to your account yet — what you get is a draft, which ' +
-      'is the subject of the next step.',
+    titleKey: 'walk.position.3.title',
+    bodyKey: 'walk.position.3.body',
   },
   {
     target: '[data-tour="position-add-fill"]',
@@ -131,12 +124,10 @@ export const positionSteps: readonly WalkthroughStepSource[] = [
     // popover across Add and across the Notes field above it. Placed above, the
     // popover stays clear of the dialog it just told the user to open.
     side: 'top',
-    actionHint: 'Add the entry fill',
+    actionHintKey: 'walk.position.4.actionHint',
     advanceOnAction: true,
-    title: 'It starts as a draft',
-    body:
-      'A draft is a plan, not a trade: it posts nothing to your ledger and leaves the balance ' +
-      'where it was. Add Fill records what you actually got.',
+    titleKey: 'walk.position.4.title',
+    bodyKey: 'walk.position.4.body',
   },
   {
     target: '[data-tour="position-open"]',
@@ -150,14 +141,10 @@ export const positionSteps: readonly WalkthroughStepSource[] = [
     // y 60. The same shape, and the same fix, as the two sets' opening steps.
     side: 'left',
     align: 'start',
-    actionHint: 'Choose Open Position',
+    actionHintKey: 'walk.position.5.actionHint',
     advanceOnAction: true,
-    title: 'Open the position',
-    body:
-      'With an entry fill recorded, Open Position moves it from draft to open. Its cost is now ' +
-      'held against the account as position value; realised P&amp;L is a separate thing, and ' +
-      'nothing is realised until you start exiting. Each exit fill books its share of the ' +
-      'result to the account as you record it.',
+    titleKey: 'walk.position.5.title',
+    bodyKey: 'walk.position.5.body',
   },
   {
     // Centred, and deliberately last. `advanceOnAction` has no effect on a final
@@ -167,9 +154,7 @@ export const positionSteps: readonly WalkthroughStepSource[] = [
     route: '/positions/$positionId',
     routeParams: ['positionId'],
     docs: 'positions',
-    title: 'That is a position logged',
-    body:
-      'Draft, open, closed: three states, and you have used two of them. The Positions list ' +
-      'filters by each one, so a plan you have not taken never sits among the trades you have.',
+    titleKey: 'walk.position.6.title',
+    bodyKey: 'walk.position.6.body',
   },
 ];

@@ -3,6 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import type {
   CreateTradePlanInput,
   TradePlan,
+  TradePlanMarket,
   TradePlanStatus,
   UpdateTradePlanInput,
 } from '@jurnal-zitn/shared';
@@ -32,6 +33,8 @@ function toTradePlan(row: typeof tradePlans.$inferSelect): TradePlan {
     id: row.id,
     symbol: row.symbol,
     side: row.side as TradePlan['side'],
+    market: row.market as TradePlan['market'],
+    signalDate: row.signalDate ?? null,
     thesis: row.thesis,
     playbookId: row.playbookId,
     entryZoneLow: row.entryZoneLow,
@@ -82,6 +85,8 @@ export async function createTradePlan(
         userId,
         symbol: input.symbol,
         side: input.side,
+        market: input.market ?? 'id',
+        signalDate: input.signalDate ?? null,
         thesis: input.thesis ?? null,
         playbookId: input.playbookId ?? null,
         entryZoneLow: input.entryZoneLow ?? null,
@@ -91,6 +96,48 @@ export async function createTradePlan(
       })
       .returning();
     return toTradePlan(row!);
+  });
+}
+
+/**
+ * "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): buat draf pra-trade **idempoten**.
+ *
+ * Bila sudah ada draf **Pending** untuk (user, symbol, market) yang sama, kembalikan yang itu
+ * (fokuskan) alih-alih membuat duplikat. Draf terminal (executed/missed/cancelled) TIDAK
+ * difokuskan — dibuat draf baru. Prefill hanya identitas: symbol + market + signalDate; sisi
+ * default `long` (dapat diubah pengguna), **tanpa** zona/stop/target.
+ */
+export async function createOrFocusPendingPlan(
+  userId: string,
+  input: { symbol: string; market?: TradePlanMarket; signalDate?: string | null },
+): Promise<{ plan: TradePlan; focused: boolean }> {
+  const market: TradePlanMarket = input.market ?? 'id';
+  return withTransaction(db, async (tx) => {
+    const [existing] = await tx
+      .select()
+      .from(tradePlans)
+      .where(
+        and(
+          eq(tradePlans.userId, userId),
+          eq(tradePlans.symbol, input.symbol),
+          eq(tradePlans.market, market),
+          eq(tradePlans.status, 'pending'),
+        ),
+      )
+      .limit(1);
+    if (existing) return { plan: toTradePlan(existing), focused: true };
+
+    const [row] = await tx
+      .insert(tradePlans)
+      .values({
+        userId,
+        symbol: input.symbol,
+        side: 'long',
+        market,
+        signalDate: input.signalDate ?? null,
+      })
+      .returning();
+    return { plan: toTradePlan(row!), focused: false };
   });
 }
 
@@ -105,6 +152,8 @@ export async function updateTradePlan(
       .set({
         ...(input.symbol !== undefined ? { symbol: input.symbol } : {}),
         ...(input.side !== undefined ? { side: input.side } : {}),
+        ...(input.market !== undefined ? { market: input.market } : {}),
+        ...(input.signalDate !== undefined ? { signalDate: input.signalDate } : {}),
         ...(input.thesis !== undefined ? { thesis: input.thesis } : {}),
         ...(input.playbookId !== undefined ? { playbookId: input.playbookId } : {}),
         ...(input.entryZoneLow !== undefined ? { entryZoneLow: input.entryZoneLow } : {}),

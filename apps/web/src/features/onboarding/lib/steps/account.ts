@@ -97,14 +97,10 @@ export const accountSteps: readonly WalkthroughStepSource[] = [
     // clears the anchor with room to spare.
     side: 'left',
     align: 'start',
-    actionHint: 'Choose New Account',
+    actionHintKey: 'walk.account.1.actionHint',
     advanceOnAction: true,
-    title: 'Start with an account',
-    body:
-      'Every position, fill and ledger entry is booked against an account, so this is the one ' +
-      'thing to do first. A Jurnal ZITN account mirrors a real brokerage account — the same currency, ' +
-      'the same starting balance, the same trades — but it is not connected to your broker, and ' +
-      'Jurnal ZITN never places or executes trades. Choose New Account to open the form.',
+    titleKey: 'walk.account.1.title',
+    bodyKey: 'walk.account.1.body',
   },
   {
     target: '#name',
@@ -119,69 +115,48 @@ export const accountSteps: readonly WalkthroughStepSource[] = [
     // exist. It still ends cleanly for a dialog that is genuinely never opened.
     waitForMs: 15000,
     side: 'left',
-    title: 'Name',
-    body:
-      'Name the account after the brokerage account it mirrors. You pick it by this name every ' +
-      'time you log a position, so make it one you will recognise when you have more than one.',
+    titleKey: 'walk.account.2.title',
+    bodyKey: 'walk.account.2.body',
   },
   {
     target: '#currency',
     route: '/accounts',
     docs: 'gettingStarted',
     side: 'left',
-    title: 'Currency',
-    body:
-      'The currency this account trades in. Its balance, fees and P&amp;L are all recorded and ' +
-      'shown in this currency.',
+    titleKey: 'walk.account.3.title',
+    bodyKey: 'walk.account.3.body',
   },
   {
     target: '#timezone',
     route: '/accounts',
     docs: 'gettingStarted',
     side: 'left',
-    title: 'Trading-day timezone',
-    body:
-      'This defaults to America/New_York because NYSE, NASDAQ and NYSE Arca all operate on US ' +
-      'Eastern. It defines the trading day for this account, which is what decides whether a ' +
-      'position can be re-entered the same day. It is not your reporting timezone — that one ' +
-      'buckets your P&amp;L and is set separately, under Settings → Profile.',
+    titleKey: 'walk.account.4.title',
+    bodyKey: 'walk.account.4.body',
   },
   {
     target: '#startingBalance',
     route: '/accounts',
     docs: 'gettingStarted',
     side: 'left',
-    title: 'Starting balance',
-    body:
-      'The account&rsquo;s opening cash, and the baseline every later figure is measured against. ' +
-      'Set it once, here: the balance Jurnal ZITN shows you is this figure plus every ledger entry, so ' +
-      'editing it afterwards would move every historical balance with it. That is why it cannot ' +
-      'be changed once the account exists. Leave it empty and the account starts at zero.',
+    titleKey: 'walk.account.5.title',
+    bodyKey: 'walk.account.5.body',
   },
   {
     target: '#defaultRiskPercent',
     route: '/accounts',
     docs: 'gettingStarted',
     side: 'left',
-    title: 'Default risk %',
-    body:
-      'The share of this account&rsquo;s balance you risk on a single trade. It prefills the ' +
-      'position-size calculator, and you can override it on any one calculation without changing ' +
-      'the account. Choose 1%, 2% or 3% — each one shows what ten losing trades in a row would ' +
-      'cost you — or No rule, which sets none and leaves the calculator&rsquo;s risk percent for ' +
-      'you to fill in each time. 2% is chosen for you, and unlike the starting balance you can ' +
-      'change it whenever you want.',
+    titleKey: 'walk.account.6.title',
+    bodyKey: 'walk.account.6.body',
   },
   {
     target: '#brokerage',
     route: '/accounts',
     docs: 'gettingStarted',
     side: 'left',
-    title: 'Brokerage',
-    body:
-      'Choose a brokerage and Jurnal ZITN calculates and records this account&rsquo;s fees from that ' +
-      'brokerage&rsquo;s fee schedule. Leaving it on None is perfectly valid — you then enter ' +
-      'fees yourself on each fill — and you can attach a brokerage later.',
+    titleKey: 'walk.account.7.title',
+    bodyKey: 'walk.account.7.body',
   },
   {
     target: '[data-tour="account-submit"]',
@@ -193,12 +168,10 @@ export const accountSteps: readonly WalkthroughStepSource[] = [
     // Above and end-aligned, the popover clears the whole footer row.
     side: 'right',
     align: 'end',
-    actionHint: 'Choose Create',
+    actionHintKey: 'walk.account.8.actionHint',
     advanceOnAction: true,
-    title: 'Create the account',
-    body:
-      'Choose Create. The account appears in the list behind this form as soon as it exists, and ' +
-      'you can book positions against it straight away.',
+    titleKey: 'walk.account.8.title',
+    bodyKey: 'walk.account.8.body',
   },
   {
     // No target: nothing on the dashboard is being pointed at, and the two
@@ -210,13 +183,7 @@ export const accountSteps: readonly WalkthroughStepSource[] = [
     // accounts list wondering what to do next.
     route: '/dashboard',
     docs: 'gettingStarted',
-    title: 'Back on your dashboard',
-    body:
-      'Your account is created, and this is your dashboard again — the setup checklist here ' +
-      'names what to do next. One more zone before you go, and it is a different one: separately ' +
-      'from the trading-day timezone you just set, Jurnal ZITN stores a single reporting timezone for ' +
-      'you — the zone your P&amp;L is bucketed into by day, week and month, so those figures ' +
-      'stay the same wherever you open Jurnal ZITN. One was stored when you registered. Confirm or ' +
-      'correct it under Settings → Profile, where it is shown prefilled with the zone on record.',
+    titleKey: 'walk.account.9.title',
+    bodyKey: 'walk.account.9.body',
   },
 ];

@@ -1236,6 +1236,180 @@ const ID_MESSAGES = {
   'pos.occ.strikePlaceholder': '150,00',
   'pos.placeholder.amount': '0,00',
   'pos.fill.enterPriceQty': 'Masukkan harga dan kuantitas',
+  // --- F7: onboarding & panduan Jurnal ZITN (ZITN-TECH-044). ---
+  'onboard.zero.title.welcome': 'Selamat datang di Jurnal ZITN',
+  'onboard.zero.title.ready': 'Akun Anda siap',
+  'onboard.zero.desc.welcome':
+    'Mulai dengan akun broker. Setiap posisi, Fill, dan entri buku besar dicatat pada satu akun, jadi belum ada yang bisa ditampilkan di dasbor ini sampai akun itu dibuat.',
+  'onboard.zero.desc.ready':
+    'Berikutnya posisi: catat trade pada akun Anda, lalu tutup, dan dasbor ini terisi angka nyata. Ikuti panduan bertahap, atau lewati langsung ke dasbor biasa kapan pun Anda mau.',
+  'onboard.zero.notConnected':
+    'Akun Jurnal ZITN mencerminkan akun broker nyata: mata uang yang sama, saldo awal yang sama, trade yang sama. Akun ini tidak terhubung ke broker Anda. Jurnal ZITN tidak pernah menempatkan atau mengeksekusi trade — Anda mencatat trade yang sudah Anda lakukan.',
+  'onboard.zero.action.createAccount': 'Buat akun pertama saya',
+  'onboard.zero.action.walkthrough': 'Tuntun saya',
+  'onboard.zero.action.continue': 'Lanjutkan panduan',
+  'onboard.zero.action.skip': 'Lewati ke dasbor saya',
+  'onboard.zero.action.sampleData': 'Tambah data contoh',
+  'onboard.zero.guidance.unavailable':
+    'Panduan bertahap tidak dapat dimuat. Tidak ada yang hilang — daftar penyiapan di bawah memuat empat langkah yang sama, dan panduan memulai membahasnya lengkap.',
+  'onboard.zero.guidance.waiting':
+    'Panduan bertahap menunggu daftar penyiapan Anda dimuat. Sebentar lagi siap.',
+  'onboard.zero.guidance.noneOutstanding':
+    'Panduan bertahap mengikuti daftar penyiapan, dan tidak ada langkah tersisa. Buka lagi daftar penyiapan di bawah agar bisa dipandu.',
+  'onboard.zero.sample.pending':
+    'Menambahkan data contoh. Dasbor Anda terisi begitu data selesai masuk.',
+  'onboard.zero.docsLink': 'Baca panduan memulai',
+  'onboard.checklist.title': 'Persiapan',
+  'onboard.checklist.progress': '{done} dari {total} selesai',
+  'onboard.checklist.dismissAria': 'Tutup daftar penyiapan',
+  'onboard.checklist.loadingAria': 'Memuat daftar penyiapan Anda',
+  'onboard.checklist.reopen': 'Buka lagi daftar penyiapan',
+  'onboard.checklist.startAria': 'Mulai: {label}',
+  'onboard.checklist.doneSuffix': '— selesai',
+  'onboard.checklist.notDoneSuffix': '— belum selesai',
+  'onboard.item.account': 'Buat akun broker',
+  'onboard.item.calculator': 'Hitung ukuran posisi di kalkulator',
+  'onboard.item.position': 'Catat posisi',
+  'onboard.item.close': 'Tutup dan lihat statistiknya',
+  'onboard.launcher.title': 'Panduan bertahap',
+  'onboard.launcher.desc':
+    'Ikuti bagian mana pun dari tur ini, sebanyak yang Anda suka. Tur hanya menunjuk ke layar yang dibicarakannya — tidak ada yang diubah dan tidak ada yang dicatat.',
+  'onboard.launcher.start': 'Mulai',
+  'onboard.launcher.startAria': 'Mulai panduan: {label}',
+  'onboard.launcher.unavailable':
+    'Panduan bertahap tidak dapat dimuat. Tidak ada yang hilang — panduan memulai membahas empat langkah yang sama secara lengkap.',
+  'onboard.help.title': 'Bantuan',
+  'onboard.help.subtitle': 'Jalankan lagi panduan bertahap, kapan pun Anda mau.',
+  'onboard.stop.title': 'Panduan terhenti',
+  'onboard.stop.actionRequired':
+    '“{title}” baru berlanjut setelah Anda benar-benar melakukannya, jadi panduan tidak bisa mengambil langkah itu untuk Anda.',
+  'onboard.stop.targetMissing':
+    '“{title}” tidak ada di layar, jadi panduan tidak bisa lanjut dari sana.',
+  'onboard.stop.carryOn':
+    '{reason} Tidak ada yang hilang — lanjutkan tanpa panduan, atau mulai lagi kapan saja dari Pengaturan → Bantuan.',
+  'onboard.cannotStart.title': 'Panduan itu belum bisa dimulai',
+  'onboard.cannotStart.account':
+    'Akun milik Anda dan akun contoh tidak dapat ada bersamaan, jadi membuat akun dimulai dengan menghapus data contoh — dan itu konfirmasi yang tidak bisa dituntun panduan ini. Hapus data contoh dulu, dari banner di dasbor Anda, lalu panduan ini akan berjalan.',
+  'onboard.cannotStart.position':
+    'Posisi dicatat pada sebuah akun, dan Anda belum punya akun sendiri — data contoh tidak dihitung, karena posisi yang dicatat terhadapnya tidak akan menandai apa pun. Buat akun di menu Akun dan panduan ini akan berjalan.',
+  'onboard.cannotStart.close':
+    'Yang ini berjalan pada posisi Anda yang masih terbuka, dan Anda belum punya. Catat satu dan buka, lalu mulai lagi panduan ini.',
+  'onboard.cannotStart.calculator': 'Panduan ini tidak bisa dimulai dari posisi Anda saat ini.',
+  'onboard.cannotStart.unchanged': '{reason} Tidak ada yang diubah.',
+  'tour.next': 'Berikutnya',
+  'tour.previous': 'Sebelumnya',
+  'tour.done': 'Selesai',
+  'tour.progress': '{{current}} dari {{total}}',
+  'tour.actionHintFrame': 'Untuk melanjutkan: {hint}',
+  'tour.readMore': 'Baca selengkapnya',
+  'coach.readMore': 'Baca selengkapnya',
+  'coach.gotIt': 'Mengerti',
+  'coach.positionPartials.title': 'Tambah dan kurangi posisi dengan Fill',
+  'coach.positionPartials.body':
+    'Tambah Fill mencatat entri untuk menambah posisi, atau keluar untuk mengambil sebagian posisi. Tutup posisi tetap nonaktif sampai seluruh jumlahnya sudah keluar.',
+  'coach.csvImport.title': 'Masukkan riwayat Anda dari CSV',
+  'coach.csvImport.body':
+    'Pilih preset atau petakan sendiri kolom broker Anda, baca pratinjaunya, lalu konfirmasi. Impor bersifat menambah — posisi dan Fill ditambahkan ke akun yang Anda pilih.',
+  'coach.optionsTools.title': 'Hitung harga kontrak, baca simbol',
+  'coach.optionsTools.body':
+    'Penghitung Black-Scholes menilai call atau put dari spot, strike, waktu hingga kedaluwarsa, volatilitas, dan suku bunga bebas risiko. Kartu OCC membaca simbol opsi atau menyusunnya dari bagian-bagiannya.',
+  'coach.dashboardWidgets.title': 'Atur dasbor sesuai keinginan Anda',
+  'coach.dashboardWidgets.body':
+    'Tambah Widget menaruh kartu lain di kisi dan menu tiap kartu menghapusnya. Di perangkat penunjuk Anda dapat menyeret kartu lewat kepalanya dan mengubah ukurannya dari tepi; Atur ulang tata letak mengembalikan semuanya.',
+  'demo.title': 'Anda sedang melihat data contoh',
+  'demo.body':
+    'Setiap angka di layar berasal dari akun contoh, bukan dari trade yang Anda catat. Hapus saat Anda siap memasukkan data Anda sendiri.',
+  'demo.pending': 'Menghapus data contoh. Angka di layar hilang begitu data terhapus.',
+  'demo.remove': 'Hapus data contoh',
+  'demo.added': 'Data contoh ditambahkan',
+  'demo.addFailed': 'Gagal menambahkan data contoh',
+  'demo.removed': 'Data contoh dihapus',
+  'demo.removeFailed': 'Gagal menghapus data contoh',
+  'onboard.pref.saveFailed': 'Gagal menyimpan preferensi penyiapan Anda',
+  'walk.account.1.title': 'Mulai dengan akun',
+  'walk.account.1.actionHint': 'Pilih Akun baru',
+  'walk.account.1.body':
+    'Setiap posisi, Fill, dan entri buku besar dicatat pada sebuah akun, jadi inilah satu hal yang harus dilakukan lebih dulu. Akun Jurnal ZITN mencerminkan akun broker nyata — mata uang yang sama, saldo awal yang sama, trade yang sama — tetapi tidak terhubung ke broker Anda, dan Jurnal ZITN tidak pernah menempatkan atau mengeksekusi trade. Pilih Akun baru untuk membuka formulir.',
+  'walk.account.2.title': 'Nama',
+  'walk.account.2.body':
+    'Beri nama akun sesuai akun broker yang dicerminkannya. Anda memilihnya lewat nama ini setiap kali mencatat posisi, jadi pilih nama yang mudah dikenali saat akun Anda lebih dari satu.',
+  'walk.account.3.title': 'Mata uang',
+  'walk.account.3.body':
+    'Mata uang yang dipakai akun ini untuk bertransaksi. Saldo, biaya, dan P&amp;L-nya semua dicatat dan ditampilkan dalam mata uang ini.',
+  'walk.account.4.title': 'Zona waktu hari perdagangan',
+  'walk.account.4.body':
+    'Ini default ke America/New_York karena NYSE, NASDAQ, dan NYSE Arca semuanya beroperasi di waktu Eastern AS. Nilai ini menentukan hari perdagangan akun ini, yang menentukan apakah sebuah posisi bisa dimasuki kembali di hari yang sama. Ini bukan zona waktu pelaporan Anda — zona itu mengelompokkan P&amp;L Anda dan diatur terpisah, di Pengaturan → Profil.',
+  'walk.account.5.title': 'Saldo awal',
+  'walk.account.5.body':
+    'Kas pembuka akun, dan garis dasar tempat semua angka berikutnya diukur. Tetapkan sekali, di sini: saldo yang ditampilkan Jurnal ZITN adalah angka ini ditambah setiap entri buku besar, jadi mengubahnya nanti akan menggeser semua saldo historisnya. Karena itu nilainya tidak bisa diubah setelah akun ada. Biarkan kosong dan akun mulai dari nol.',
+  'walk.account.6.title': 'Risiko bawaan %',
+  'walk.account.6.body':
+    'Porsi saldo akun ini yang Anda risikokan pada satu trade. Nilai ini mengisi awal kalkulator ukuran posisi, dan Anda bisa menimpanya pada satu perhitungan tanpa mengubah akun. Pilih 1%, 2%, atau 3% — masing-masing menunjukkan biaya sepuluh trade rugi berturut-turut — atau Tanpa aturan, yang tidak menetapkan apa pun dan membiarkan persen risiko kalkulator Anda isi sendiri tiap kali. 2% dipilih untuk Anda, dan tidak seperti saldo awal, Anda bisa mengubahnya kapan saja.',
+  'walk.account.7.title': 'Broker',
+  'walk.account.7.body':
+    'Pilih broker dan Jurnal ZITN menghitung serta mencatat biaya akun ini dari jadwal biaya broker tersebut. Membiarkannya di Tidak ada sah saja — Anda lalu memasukkan biaya sendiri pada setiap Fill — dan Anda bisa menautkan broker nanti.',
+  'walk.account.8.title': 'Buat akun',
+  'walk.account.8.actionHint': 'Pilih Buat',
+  'walk.account.8.body':
+    'Pilih Buat. Akun muncul di daftar di belakang formulir ini begitu dibuat, dan Anda bisa langsung mencatat posisi terhadapnya.',
+  'walk.account.9.title': 'Kembali di dasbor Anda',
+  'walk.account.9.body':
+    'Akun Anda sudah dibuat, dan ini dasbor Anda lagi — daftar penyiapan di sini menyebut langkah berikutnya. Satu zona lagi sebelum pergi, dan ini berbeda: terpisah dari zona waktu hari perdagangan yang baru Anda tetapkan, Jurnal ZITN menyimpan satu zona waktu pelaporan untuk Anda — zona tempat P&amp;L Anda dikelompokkan per hari, minggu, dan bulan, agar angka itu tetap sama di mana pun Anda membuka Jurnal ZITN. Satu zona disimpan saat Anda mendaftar. Konfirmasi atau perbaiki di Pengaturan → Profil, yang menampilkannya terisi awal dengan zona yang tercatat.',
+  'walk.calculator.1.title': 'Harga masuk',
+  'walk.calculator.1.body':
+    'Mulai dari harga yang Anda rencanakan untuk masuk. Tidak ada yang dikirim atau disimpan di sini — kalkulator menghitung ulang saat Anda mengetik, jadi Anda bisa mencoba satu skenario lalu berubah pikiran.',
+  'walk.calculator.2.title': 'Stop loss',
+  'walk.calculator.2.body':
+    'Harga di mana Anda menerima bahwa trade ini salah. Jarak dari masuk ke stop adalah yang disebut hasil sebagai Risiko per unit, dan ukuran posisi diturunkan darinya — stop yang lebih lebar membeli lebih sedikit unit untuk uang yang sama yang dirisikokan.',
+  'walk.calculator.3.title': 'Harga target (opsional)',
+  'walk.calculator.3.body':
+    'Opsional, seperti kata labelnya. Tambahkan dan Anda juga mendapat Imbalan per unit serta rasio Risiko/Imbalan; biarkan kosong dan Anda tetap mendapat ukuran posisi.',
+  'walk.calculator.4.title': 'Risiko',
+  'walk.calculator.4.actionHint': 'Pilih dasar Persen',
+  'walk.calculator.4.body':
+    'Sekarang tentukan berapa yang bersedia Anda rugikan. Nilai risiko adalah angka yang Anda ketik; Persen menghitungnya dari saldo akun dan persentase risiko. Pilih Persen untuk memakai aturan yang Anda tetapkan di akun.',
+  'walk.calculator.5.title': 'Akun',
+  'walk.calculator.5.actionHint': 'Pilih akun',
+  'walk.calculator.5.body':
+    'Pilih akun yang Anda tradingkan. Di bawah Persen, akun menyediakan saldo sebagai dasar ukuran; di kedua dasar, akun menyediakan mata uang dan membatasi posisi sebesar daya beli yang benar-benar dimiliki akun. Akun yang punya broker juga membawa jadwal biaya broker itu ke dalam estimasi untuk Anda — di bagian Biaya Anda masih bisa mengubah atau menghapusnya.',
+  'walk.calculator.6.title': 'Nilai yang dirisikokan',
+  'walk.calculator.6.body':
+    'Di bawah Persen, Persen risiko diisi awal dari Risiko bawaan % akun itu bila ada; di bawah Nilai risiko, Nilai risiko adalah angka yang Anda ketik. Apa pun pilihannya, perubahan hanya berlaku untuk perhitungan ini — akun tetap memegang aturannya, jadi angka yang Anda andalkan besok tetap yang Anda pilih.',
+  'walk.calculator.7.title': 'Ukuran, risiko, dan R:R',
+  'walk.calculator.7.body':
+    'Ukuran Posisi memberi Anda ukuran posisi dalam unit bulat, Risiko per unit, dan Nilai risiko sesungguhnya setelah ukuran dibulatkan ke bawah. Dengan target, Risiko / Imbalan menambahkan Imbalan per unit dan rasio Risiko/Imbalan — apa yang dibayar rencana ini jika berhasil, per unit biayanya jika tidak.',
+  'walk.position.1.title': 'Catat posisi',
+  'walk.position.1.actionHint': 'Pilih Posisi Baru',
+  'walk.position.1.body':
+    'Satu posisi di Jurnal ZITN adalah satu trade beserta setiap Fill-nya. Pilih Posisi Baru untuk memulai posisi yang baru saja Anda ukur.',
+  'walk.position.2.title': 'Simbol, sisi, dan akun',
+  'walk.position.2.body':
+    'Ticker, apakah Anda long atau short, dan akun tempat posisi dicatat. Simbol mencari saat Anda mengetik, sama seperti di kalkulator. Catatan layak diisi sekarang — alasan Anda mengambil trade adalah bagian yang nanti ingin Anda lihat kembali.',
+  'walk.position.3.title': 'Buat posisi',
+  'walk.position.3.actionHint': 'Pilih Buat',
+  'walk.position.3.body':
+    'Pilih Buat. Belum ada yang dicatat ke akun Anda — yang Anda dapat adalah draf, pokok langkah berikutnya.',
+  'walk.position.4.title': 'Dimulai sebagai draf',
+  'walk.position.4.actionHint': 'Tambahkan fill masuk',
+  'walk.position.4.body':
+    'Draf adalah rencana, bukan trade: tidak mencatat apa pun ke buku besar Anda dan meninggalkan saldo di tempatnya. Tambah Fill mencatat apa yang benar-benar Anda dapatkan.',
+  'walk.position.5.title': 'Buka posisi',
+  'walk.position.5.actionHint': 'Pilih Buka posisi',
+  'walk.position.5.body':
+    'Dengan fill masuk tercatat, Buka posisi memindahkannya dari draf ke terbuka. Biayanya kini ditahan terhadap akun sebagai nilai posisi; P&amp;L realisasi hal yang terpisah, dan tidak ada yang direalisasikan sampai Anda mulai keluar. Setiap fill keluar mencatat bagiannya dari hasil ke akun saat Anda mencatatnya.',
+  'walk.position.6.title': 'Posisi tercatat',
+  'walk.position.6.body':
+    'Draf, terbuka, tertutup: tiga status, dan Anda sudah memakai dua. Daftar Posisi memfilter berdasarkan masing-masingnya, jadi rencana yang belum Anda ambil tidak pernah bercampur dengan trade yang sudah Anda lakukan.',
+  'walk.close.1.title': 'Catat keluarnya',
+  'walk.close.1.actionHint': 'Tambahkan fill keluar',
+  'walk.close.1.body': 'Setel jenis ke Keluar, pada harga dan jumlah saat Anda menutup.',
+  'walk.close.2.title': 'Menutup sendiri',
+  'walk.close.2.actionHint': 'Pilih Tutup posisi',
+  'walk.close.2.body':
+    'Keluarkan seluruh jumlah yang Anda masukkan dan Jurnal ZITN menutup posisinya untuk Anda, berpatokan pada fill terakhir itu — Tutup posisi ada untuk kasus yang tidak bisa ditangani otomatis, misalnya trade yang Anda selesaikan dengan mengoreksi fill sebelumnya. P&amp;L realisasi Anda sudah masuk ke akun pada setiap fill keluar saat Anda mencatatnya, bukan di akhir, jadi saldo sudah bergerak. Hanya keluar sebagian? Itu langkah yang selesai, bukan trade yang selesai: lanjutkan dengan Berikutnya dan tambahkan sisanya lewat Tambah Fill kapan pun Anda menutupnya.',
+  'walk.close.3.title': 'Dan begitulah',
+  'walk.close.3.body':
+    'Kembali di dasbor, yang terbentuk sendiri dari trade yang Anda catat: setiap keluar yang Anda catat mencatat bagiannya dari hasil saat Anda mencatatnya, jadi saldo akun Anda sudah bergerak. Dengan posisi tertutup penuh, statistik dan kurva ekuitas di sini bersumber dari angka Anda sendiri — dan jika Anda hanya keluar sebagian, keduanya terisi begitu Anda menutup sisanya. Catat yang berikutnya dan angkanya bergerak lagi.',
 } as const;
 
 export type MessageKey = keyof typeof ID_MESSAGES;
@@ -2449,6 +2623,179 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'pos.occ.strikePlaceholder': '150.00',
   'pos.placeholder.amount': '0.00',
   'pos.fill.enterPriceQty': 'Enter price and quantity',
+  // --- F7: onboarding & panduan Jurnal ZITN (ZITN-TECH-044). ---
+  'onboard.zero.title.welcome': 'Welcome to Jurnal ZITN',
+  'onboard.zero.title.ready': 'Your account is ready',
+  'onboard.zero.desc.welcome':
+    'Start with a brokerage account. Every position, fill and ledger entry is booked against one, so there is nothing to show on this dashboard until you create it.',
+  'onboard.zero.desc.ready':
+    'Positions come next: log a trade against your account, then close it, and this dashboard fills in with real numbers. Follow the guided walkthrough, or skip ahead to the ordinary dashboard whenever you like.',
+  'onboard.zero.notConnected':
+    'A Jurnal ZITN account mirrors a real brokerage account: the same currency, the same starting balance, the same trades. It is not connected to your broker. Jurnal ZITN never places or executes trades — you record trades you have already made.',
+  'onboard.zero.action.createAccount': 'Create my first account',
+  'onboard.zero.action.walkthrough': 'Walk me through it',
+  'onboard.zero.action.continue': 'Continue the walkthrough',
+  'onboard.zero.action.skip': 'Skip to my dashboard',
+  'onboard.zero.action.sampleData': 'Add sample data',
+  'onboard.zero.guidance.unavailable':
+    'The guided walkthrough could not be loaded. Nothing is lost — the setup checklist below lists the same four steps, and the getting-started guide covers them in full.',
+  'onboard.zero.guidance.waiting':
+    'The guided walkthrough is waiting for your setup checklist to load. It will be ready in a moment.',
+  'onboard.zero.guidance.noneOutstanding':
+    'The guided walkthrough follows the setup checklist, and no step is outstanding. Reopen the checklist below to be guided.',
+  'onboard.zero.sample.pending': 'Adding sample data. Your dashboard fills in as soon as it lands.',
+  'onboard.zero.docsLink': 'Read the getting-started guide',
+  'onboard.checklist.title': 'Get set up',
+  'onboard.checklist.progress': '{done} of {total} complete',
+  'onboard.checklist.dismissAria': 'Dismiss checklist',
+  'onboard.checklist.loadingAria': 'Loading your setup checklist',
+  'onboard.checklist.reopen': 'Reopen setup checklist',
+  'onboard.checklist.startAria': 'Start: {label}',
+  'onboard.checklist.doneSuffix': '— completed',
+  'onboard.checklist.notDoneSuffix': '— not completed',
+  'onboard.item.account': 'Create a brokerage account',
+  'onboard.item.calculator': 'Size a trade in the calculator',
+  'onboard.item.position': 'Log a position',
+  'onboard.item.close': 'Close it and see the stats',
+  'onboard.launcher.title': 'Guided walkthrough',
+  'onboard.launcher.desc':
+    'Take any part of the tour, as many times as you like. It only points at the screen it is talking about — nothing is changed and nothing is recorded.',
+  'onboard.launcher.start': 'Start',
+  'onboard.launcher.startAria': 'Start walkthrough: {label}',
+  'onboard.launcher.unavailable':
+    'The guided walkthrough could not be loaded. Nothing is lost — the getting-started guide covers the same four steps in full.',
+  'onboard.help.title': 'Help',
+  'onboard.help.subtitle': 'Start the guided walkthrough again, whenever you want it.',
+  'onboard.stop.title': 'The walkthrough stopped',
+  'onboard.stop.actionRequired':
+    '“{title}” only moves on once you have actually done it, so the walkthrough cannot take that step for you.',
+  'onboard.stop.targetMissing':
+    '“{title}” is not on screen, so the walkthrough could not carry on from there.',
+  'onboard.stop.carryOn':
+    '{reason} Nothing was lost — carry on without it, or start it again whenever you want from Settings → Help.',
+  'onboard.cannotStart.title': 'That walkthrough cannot start yet',
+  'onboard.cannotStart.account':
+    'Your own accounts and the sample account cannot both exist, so creating one starts by removing the sample data — and that is a confirmation this walkthrough cannot take you through. Remove the sample data first, from the banner on your dashboard, and this walkthrough will run.',
+  'onboard.cannotStart.position':
+    'A position is booked against an account, and you have none of your own yet — the sample data does not count, because a position logged against it would tick nothing. Create an account under Accounts and this walkthrough will run.',
+  'onboard.cannotStart.close':
+    'This one runs on a position of yours that is still open, and you have none right now. Log one and open it, then start this walkthrough again.',
+  'onboard.cannotStart.calculator': 'This walkthrough cannot start from where you are right now.',
+  'onboard.cannotStart.unchanged': '{reason} Nothing was changed.',
+  'tour.next': 'Next',
+  'tour.previous': 'Previous',
+  'tour.done': 'Done',
+  'tour.progress': '{{current}} of {{total}}',
+  'tour.actionHintFrame': 'To continue: {hint}',
+  'tour.readMore': 'Read more',
+  'coach.readMore': 'Read more',
+  'coach.gotIt': 'Got it',
+  'coach.positionPartials.title': 'Scale in and out with fills',
+  'coach.positionPartials.body':
+    'Add Fill records an entry to scale in, or an exit to take part of the position off. Close Position stays disabled until the whole quantity has been exited.',
+  'coach.csvImport.title': 'Bring your history in from a CSV',
+  'coach.csvImport.body':
+    "Pick a preset or map your broker's columns by hand, read the preview, then confirm. Imports are additive — they add positions and fills to the account you choose.",
+  'coach.optionsTools.title': 'Price a contract, decode a symbol',
+  'coach.optionsTools.body':
+    'The Black-Scholes pricer values a call or put from spot, strike, time to expiry, volatility and the risk-free rate. The OCC card decodes an option symbol or builds one from its parts.',
+  'coach.dashboardWidgets.title': 'Arrange the dashboard your way',
+  'coach.dashboardWidgets.body':
+    "Add Widget puts another card on the grid and each card's menu removes it. On a pointer device you can drag a card by its header and resize it from an edge; Reset layout puts everything back.",
+  'demo.title': 'You are looking at sample data',
+  'demo.body':
+    'Every figure on screen comes from a sample account, not from trades you have recorded. Remove it when you are ready to enter your own.',
+  'demo.pending': 'Removing sample data. The figures on screen clear as soon as it lands.',
+  'demo.remove': 'Remove sample data',
+  'demo.added': 'Sample data added',
+  'demo.addFailed': 'Failed to add sample data',
+  'demo.removed': 'Sample data removed',
+  'demo.removeFailed': 'Failed to remove sample data',
+  'onboard.pref.saveFailed': 'Failed to save your onboarding preference',
+  'walk.account.1.title': 'Start with an account',
+  'walk.account.1.actionHint': 'Choose New Account',
+  'walk.account.1.body':
+    'Every position, fill and ledger entry is booked against an account, so this is the one thing to do first. A Jurnal ZITN account mirrors a real brokerage account — the same currency, the same starting balance, the same trades — but it is not connected to your broker, and Jurnal ZITN never places or executes trades. Choose New Account to open the form.',
+  'walk.account.2.title': 'Name',
+  'walk.account.2.body':
+    'Name the account after the brokerage account it mirrors. You pick it by this name every time you log a position, so make it one you will recognise when you have more than one.',
+  'walk.account.3.title': 'Currency',
+  'walk.account.3.body':
+    'The currency this account trades in. Its balance, fees and P&amp;L are all recorded and shown in this currency.',
+  'walk.account.4.title': 'Trading-day timezone',
+  'walk.account.4.body':
+    'This defaults to America/New_York because NYSE, NASDAQ and NYSE Arca all operate on US Eastern. It defines the trading day for this account, which is what decides whether a position can be re-entered the same day. It is not your reporting timezone — that one buckets your P&amp;L and is set separately, under Settings → Profile.',
+  'walk.account.5.title': 'Starting balance',
+  'walk.account.5.body':
+    'The account&rsquo;s opening cash, and the baseline every later figure is measured against. Set it once, here: the balance Jurnal ZITN shows you is this figure plus every ledger entry, so editing it afterwards would move every historical balance with it. That is why it cannot be changed once the account exists. Leave it empty and the account starts at zero.',
+  'walk.account.6.title': 'Default risk %',
+  'walk.account.6.body':
+    'The share of this account&rsquo;s balance you risk on a single trade. It prefills the position-size calculator, and you can override it on any one calculation without changing the account. Choose 1%, 2% or 3% — each one shows what ten losing trades in a row would cost you — or No rule, which sets none and leaves the calculator&rsquo;s risk percent for you to fill in each time. 2% is chosen for you, and unlike the starting balance you can change it whenever you want.',
+  'walk.account.7.title': 'Brokerage',
+  'walk.account.7.body':
+    'Choose a brokerage and Jurnal ZITN calculates and records this account&rsquo;s fees from that brokerage&rsquo;s fee schedule. Leaving it on None is perfectly valid — you then enter fees yourself on each fill — and you can attach a brokerage later.',
+  'walk.account.8.title': 'Create the account',
+  'walk.account.8.actionHint': 'Choose Create',
+  'walk.account.8.body':
+    'Choose Create. The account appears in the list behind this form as soon as it exists, and you can book positions against it straight away.',
+  'walk.account.9.title': 'Back on your dashboard',
+  'walk.account.9.body':
+    'Your account is created, and this is your dashboard again — the setup checklist here names what to do next. One more zone before you go, and it is a different one: separately from the trading-day timezone you just set, Jurnal ZITN stores a single reporting timezone for you — the zone your P&amp;L is bucketed into by day, week and month, so those figures stay the same wherever you open Jurnal ZITN. One was stored when you registered. Confirm or correct it under Settings → Profile, where it is shown prefilled with the zone on record.',
+  'walk.calculator.1.title': 'Entry price',
+  'walk.calculator.1.body':
+    'Start with the price you plan to get in at. Nothing here is submitted or saved — the calculator recomputes as you type, so you can try a setup and change your mind.',
+  'walk.calculator.2.title': 'Stop loss',
+  'walk.calculator.2.body':
+    'The price at which you would accept the trade is wrong. The distance from entry to stop is what the results call Per-unit risk, and the position size is derived from it — a wider stop buys fewer units for the same money at risk.',
+  'walk.calculator.3.title': 'Target price (optional)',
+  'walk.calculator.3.body':
+    'Optional, as the label says. Add it and you also get the Per-unit reward and the Risk/Reward ratio; leave it out and you still get a size.',
+  'walk.calculator.4.title': 'Risk',
+  'walk.calculator.4.actionHint': 'Choose the Percent basis',
+  'walk.calculator.4.body':
+    'Now say how much you are willing to lose. Dollar is a figure you type; Percent sizes it from an account balance and a risk percentage. Choose Percent to use the rule you set on the account.',
+  'walk.calculator.5.title': 'Account',
+  'walk.calculator.5.actionHint': 'Pick an account',
+  'walk.calculator.5.body':
+    'Pick the account you are trading. Under Percent it supplies the balance to size against, and in either basis it supplies the currency and caps the position at the buying power the account actually has. An account with a brokerage attached also brings that brokerage&rsquo;s fee schedule into the estimate for you — under Fees you can still change or clear it.',
+  'walk.calculator.6.title': 'The amount at risk',
+  'walk.calculator.6.body':
+    'Under Percent, Risk percent is prefilled from that account&rsquo;s Default risk % when it has one; under Dollar, Dollar risk is the figure you type. Either way the change applies to this calculation only — the account keeps its rule, so the number you rely on tomorrow is still the one you chose.',
+  'walk.calculator.7.title': 'Size, risk and R:R',
+  'walk.calculator.7.body':
+    'Position Sizing gives you the Position size in whole units, the Per-unit risk, and the Actual dollar risk once that size is rounded down. With a target, Risk / Reward adds the Per-unit reward and the Risk/Reward ratio — what the plan pays if it works, per unit of what it costs if it does not.',
+  'walk.position.1.title': 'Log the position',
+  'walk.position.1.actionHint': 'Choose New Position',
+  'walk.position.1.body':
+    'A position in Jurnal ZITN is one trade and every fill that belongs to it. Choose New Position to start the one you just sized.',
+  'walk.position.2.title': 'Symbol, side and account',
+  'walk.position.2.body':
+    'The ticker, whether you are long or short, and the account it is booked against. Symbol searches as you type, the same as the calculator does. Notes are worth filling in now — why you took the trade is the part you will want back later.',
+  'walk.position.3.title': 'Create the position',
+  'walk.position.3.actionHint': 'Choose Create',
+  'walk.position.3.body':
+    'Choose Create. Nothing is committed to your account yet — what you get is a draft, which is the subject of the next step.',
+  'walk.position.4.title': 'It starts as a draft',
+  'walk.position.4.actionHint': 'Add the entry fill',
+  'walk.position.4.body':
+    'A draft is a plan, not a trade: it posts nothing to your ledger and leaves the balance where it was. Add Fill records what you actually got.',
+  'walk.position.5.title': 'Open the position',
+  'walk.position.5.actionHint': 'Choose Open Position',
+  'walk.position.5.body':
+    'With an entry fill recorded, Open Position moves it from draft to open. Its cost is now held against the account as position value; realised P&amp;L is a separate thing, and nothing is realised until you start exiting. Each exit fill books its share of the result to the account as you record it.',
+  'walk.position.6.title': 'That is a position logged',
+  'walk.position.6.body':
+    'Draft, open, closed: three states, and you have used two of them. The Positions list filters by each one, so a plan you have not taken never sits among the trades you have.',
+  'walk.close.1.title': 'Record the exit',
+  'walk.close.1.actionHint': 'Add the exit fill',
+  'walk.close.1.body': 'Set the type to Exit, at the price and quantity you closed at.',
+  'walk.close.2.title': 'It closes itself',
+  'walk.close.2.actionHint': 'Choose Close Position',
+  'walk.close.2.body':
+    'Exit the whole quantity you entered and Jurnal ZITN closes the position for you, timed to that last fill — Close Position is here for the ones it cannot, such as a trade you finish by correcting an earlier fill. Your realised P&amp;L reached the account with each exit fill as you recorded it, not at the end, so the balance has already moved. Exited only part of it? That is a finished step, not a finished trade: carry on with Next and add the rest from Add Fill whenever you close it out.',
+  'walk.close.3.title': 'And there it is',
+  'walk.close.3.body':
+    'Back on the dashboard, which builds itself from the trades you log: each exit you recorded booked its share of the result as you recorded it, so your account balance has already moved. With the position fully closed, the stats and the equity curve here draw from your own figures — and if you exited only part of it, they fill in the moment you close out the rest. Log the next one and they move again.',
 };
 
 export const MESSAGES: Record<AppLocale, Record<MessageKey, string>> = {
