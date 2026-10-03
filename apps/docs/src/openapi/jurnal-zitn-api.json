@@ -1263,11 +1263,33 @@
               "format": "date",
               "type": "string"
             }
+          },
+          {
+            "description": "Optional ticker from Pemindai ZITN's \"Tambah ke Jurnal\" (ZITN-TECH-043). On success the journal creates (or focuses) an idempotent Pending F4 draft for this symbol+market and redirects to `/trade-plans?focus=<id>`. Identity only — no levels.\n",
+            "in": "query",
+            "name": "add",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Market of the added ticker (`id` default, `us` for S&P 500).",
+            "in": "query",
+            "name": "pasar",
+            "required": false,
+            "schema": {
+              "enum": [
+                "id",
+                "us"
+              ],
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "302": {
-            "description": "Session started; redirect to `/` (or `/lembar?tanggal=…`)."
+            "description": "Session started; redirect to `/` (or `/lembar?tanggal=…`, or the draft)."
           },
           "401": {
             "description": "Invalid",

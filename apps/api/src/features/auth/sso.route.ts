@@ -63,7 +63,7 @@ const TICKER_RE = /^[A-Z0-9.\-]{1,12}$/;
  *         schema: { type: string, enum: [id, us] }
  *         description: Market of the added ticker (`id` default, `us` for S&P 500).
  *     responses:
- *       302: { description: Session started; redirect to `/` (or `/lembar?tanggal=…`, or the draft). }
+ *       302: { description: "Session started; redirect to `/` (or `/lembar?tanggal=…`, or the draft)." }
  *       401: { description: Invalid, expired, or replayed token. }
  *       503: { description: ZITN SSO is not configured on this instance. }
  */
