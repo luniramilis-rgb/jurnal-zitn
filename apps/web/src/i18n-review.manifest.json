@@ -911,10 +911,10 @@
         "features/onboarding/components/ActivationChecklist.tsx",
         "features/onboarding/lib/derive-checklist.ts"
       ],
-      "status": "belum",
-      "reviewer": null,
-      "date": null,
-      "commit": null,
+      "status": "sah",
+      "reviewer": "pemilik (F7 OK) + chat diskusi (ses_effa4cd04ffe6VXJG7V4ceP5xz)",
+      "date": "2026-10-03",
+      "commit": "bf8d735",
       "keys": [
         "onboard.checklist.dismissAria",
         "onboard.checklist.doneSuffix",
@@ -954,10 +954,10 @@
         "routes/_auth.settings.help.tsx",
         "features/onboarding/components/WalkthroughLauncher.tsx"
       ],
-      "status": "belum",
-      "reviewer": null,
-      "date": null,
-      "commit": null,
+      "status": "sah",
+      "reviewer": "pemilik (F7 OK) + chat diskusi (ses_effa4cd04ffe6VXJG7V4ceP5xz)",
+      "date": "2026-10-03",
+      "commit": "bf8d735",
       "keys": [
         "onboard.help.subtitle",
         "onboard.help.title",
@@ -986,10 +986,10 @@
         "features/onboarding/components/CoachMark.tsx",
         "features/onboarding/components/DemoBanner.tsx"
       ],
-      "status": "belum",
-      "reviewer": null,
-      "date": null,
-      "commit": null,
+      "status": "sah",
+      "reviewer": "pemilik (F7 OK) + chat diskusi (ses_effa4cd04ffe6VXJG7V4ceP5xz)",
+      "date": "2026-10-03",
+      "commit": "bf8d735",
       "keys": [
         "coach.csvImport.body",
         "coach.csvImport.title",
