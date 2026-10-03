@@ -193,7 +193,15 @@ export function TradePlansPage() {
               data-testid="trade-plan-row"
               className={plan.id === focusId ? 'ring-2 ring-primary' : undefined}
             >
-              <TableCell className="font-medium">{plan.symbol}</TableCell>
+              <TableCell className="font-medium">
+                {plan.symbol}
+                {(plan.market !== 'id' || plan.signalDate) && (
+                  <span className="ml-2 text-xs font-normal text-muted-foreground">
+                    {plan.market === 'us' ? 'S&P 500' : 'IDX'}
+                    {plan.signalDate ? ` · ${plan.signalDate}` : ''}
+                  </span>
+                )}
+              </TableCell>
               <TableCell>{plan.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}</TableCell>
               <TableCell>
                 <Numeric value={plan.entryZoneLow} kind="decimal" direction="none" />
