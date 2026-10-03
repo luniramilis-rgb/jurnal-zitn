@@ -30,6 +30,13 @@ export const ledgerEntries = pgTable(
     direction: varchar('direction', { length: 6 }).notNull(),
     amount: numeric('amount', { precision: 18, scale: 4 }).notNull(),
     currency: varchar('currency', { length: 3 }).notNull(),
+    // Implicit FX fact (ZITN-TECH-022 §5.1.4): when the transaction/broker already
+    // states an IDR↔USD rate, it is stored here as a RAW fact — never a
+    // conversion. Null when unknown; read-time conversion then falls back to the
+    // user's rate, then the canonical JISDOR reference rate.
+    fxRate: numeric('fx_rate', { precision: 24, scale: 12 }),
+    fxSource: varchar('fx_source', { length: 32 }),
+    fxAt: timestamp('fx_at', { withTimezone: true }),
     symbol: varchar('symbol', { length: 20 }),
     occurredAt: timestamp('occurred_at', { withTimezone: true }).notNull(),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
@@ -113,5 +120,37 @@ export const exchangeRates = pgTable(
       sql`${table.baseCurrency} <> ${table.quoteCurrency}`,
     ),
     check('exchange_rates_rate_positive_chk', sql`${table.rate} > 0`),
+  ],
+);
+
+/**
+ * Canonical reference rates (ZITN-TECH-022 §5.2) — the JISDOR BI rate fetched
+ * from ZITN's gated `/api/kurs/usd-idr`. NOT user-scoped; separate from
+ * `exchangeRates` (the user's own rates). Read-time conversion priority:
+ * implicit ledger fact > user rate > this canonical rate. A missing rate is a
+ * HARD failure, never a guess.
+ */
+export const referenceRates = pgTable(
+  'reference_rates',
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    baseCurrency: varchar('base_currency', { length: 3 }).notNull(),
+    quoteCurrency: varchar('quote_currency', { length: 3 }).notNull(),
+    rate: numeric('rate', { precision: 24, scale: 12 }).notNull(),
+    effectiveDate: date('effective_date').notNull(),
+    source: varchar('source', { length: 32 }).notNull(),
+    fetchedAt: timestamp('fetched_at', { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex('reference_rates_pair_date_unique').on(
+      table.baseCurrency,
+      table.quoteCurrency,
+      table.effectiveDate,
+    ),
+    check(
+      'reference_rates_distinct_currencies_chk',
+      sql`${table.baseCurrency} <> ${table.quoteCurrency}`,
+    ),
+    check('reference_rates_rate_positive_chk', sql`${table.rate} > 0`),
   ],
 );
