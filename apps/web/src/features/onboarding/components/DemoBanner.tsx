@@ -22,6 +22,7 @@
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
+import { useT } from '@/hooks/useLocale';
 
 import { useDemoAccount } from '../hooks/useDemoAccount';
 
@@ -29,6 +30,7 @@ import { useDemoAccount } from '../hooks/useDemoAccount';
 const REMOVAL_NOTE_ID = 'demo-banner-removal-note';
 
 export function DemoBanner() {
+  const t = useT();
   const { isDemoPresent, teardown, isPending } = useDemoAccount();
 
   // Nothing at all for the overwhelming majority of users, including while the
@@ -48,11 +50,8 @@ export function DemoBanner() {
       className="mb-4 flex flex-col items-start gap-3 border-info/20 bg-info/10 sm:flex-row sm:items-center sm:justify-between"
     >
       <div>
-        <AlertTitle>You are looking at sample data</AlertTitle>
-        <AlertDescription>
-          Every figure on screen comes from a sample account, not from trades you have recorded.
-          Remove it when you are ready to enter your own.
-        </AlertDescription>
+        <AlertTitle>{t('demo.title')}</AlertTitle>
+        <AlertDescription>{t('demo.body')}</AlertDescription>
         {/* Teardown drops a whole account's worth of positions, fills and ledger
             rows, so it is long enough to need saying. `role="status"` because it
             appears and disappears under the user while the rest of the screen
@@ -64,7 +63,7 @@ export function DemoBanner() {
             data-testid="demo-banner-removal-note"
             className="mt-1 text-sm text-muted-foreground"
           >
-            Removing sample data. The figures on screen clear as soon as it lands.
+            {t('demo.pending')}
           </p>
         )}
       </div>
@@ -90,7 +89,7 @@ export function DemoBanner() {
           teardown();
         }}
       >
-        Remove sample data
+        {t('demo.remove')}
       </Button>
     </Alert>
   );

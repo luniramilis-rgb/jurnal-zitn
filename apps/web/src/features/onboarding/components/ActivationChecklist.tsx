@@ -95,8 +95,11 @@
 import { Circle, CircleCheck, Play, RotateCcw, X } from 'lucide-react';
 import { useEffect, useRef, type ComponentProps, type ReactNode } from 'react';
 
+import type { MessageKey } from '@jurnal-zitn/shared';
+
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useT } from '@/hooks/useLocale';
 import { cn } from '@/lib/utils';
 
 import { useOnboarding, type UseOnboardingResult } from '../hooks/useOnboarding';
@@ -165,6 +168,7 @@ function Shell({
   children,
   ...rest
 }: { trailing?: ReactNode; children: ReactNode } & ComponentProps<'section'>) {
+  const t = useT();
   return (
     <section
       {...rest}
@@ -172,7 +176,7 @@ function Shell({
     >
       <header className="flex min-h-10 items-center justify-between gap-2 border-b border-hairline px-3 py-1.5">
         <h3 className="font-mono text-xs font-medium uppercase tracking-[0.1em] text-muted-foreground">
-          Get set up
+          {t('onboard.checklist.title')}
         </h3>
         <div className="flex items-center gap-2">{trailing}</div>
       </header>
@@ -182,6 +186,7 @@ function Shell({
 }
 
 export function ActivationChecklist({ onStartStep, canStartStep }: ActivationChecklistProps) {
+  const t = useT();
   const { checklist, preference, isError, isSaving, setStatus, dismiss } = useOnboarding();
 
   const allComplete = checklist?.allComplete === true;
@@ -213,7 +218,7 @@ export function ActivationChecklist({ onStartStep, canStartStep }: ActivationChe
           onClick={() => setStatus('active')}
         >
           <RotateCcw aria-hidden="true" />
-          Reopen setup checklist
+          {t('onboard.checklist.reopen')}
         </Button>
       </div>
     );
@@ -226,7 +231,7 @@ export function ActivationChecklist({ onStartStep, canStartStep }: ActivationChe
       <Shell
         data-testid="activation-checklist-loading"
         role="status"
-        aria-label="Loading your setup checklist"
+        aria-label={t('onboard.checklist.loadingAria')}
         trailing={<Skeleton className="h-4 w-24 motion-reduce:animate-none" />}
       >
         <ol className="flex flex-col">
@@ -256,13 +261,13 @@ export function ActivationChecklist({ onStartStep, canStartStep }: ActivationChe
             data-testid="activation-checklist-progress"
             className="font-mono text-xs text-muted-foreground"
           >
-            {doneCount} of {checklist.items.length} complete
+            {t('onboard.checklist.progress', { done: doneCount, total: checklist.items.length })}
           </span>
           <Button
             variant="ghost"
             size="icon-xs"
             className="cursor-pointer text-muted-foreground"
-            aria-label="Dismiss checklist"
+            aria-label={t('onboard.checklist.dismissAria')}
             disabled={isSaving}
             onClick={dismiss}
           >
@@ -293,8 +298,11 @@ export function ActivationChecklist({ onStartStep, canStartStep }: ActivationChe
                 item.done && 'text-muted-foreground line-through',
               )}
             >
-              {item.label}
-              <span className="sr-only">{item.done ? ' — completed' : ' — not completed'}</span>
+              {t(item.label as MessageKey)}
+              <span className="sr-only">
+                {' '}
+                {t(item.done ? 'onboard.checklist.doneSuffix' : 'onboard.checklist.notDoneSuffix')}
+              </span>
             </span>
             {/* No primary (amber) action anywhere on this card. The checklist
                 is embedded in the zero-state, which carries the one primary
@@ -312,7 +320,9 @@ export function ActivationChecklist({ onStartStep, canStartStep }: ActivationChe
                 size="icon-sm"
                 className="shrink-0 cursor-pointer"
                 data-checklist-action={item.id}
-                aria-label={`Start: ${item.label}`}
+                aria-label={t('onboard.checklist.startAria', {
+                  label: t(item.label as MessageKey),
+                })}
                 onClick={() => onStartStep(item.id)}
               >
                 <Play aria-hidden="true" />

@@ -96,9 +96,12 @@
 
 import { useState } from 'react';
 
+import type { MessageKey } from '@jurnal-zitn/shared';
+
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { AccountDialog } from '@/features/accounts/components/AccountDialog';
+import { useT } from '@/hooks/useLocale';
 import { docsUrl } from '@/lib/docs';
 
 import { useDemoAccount } from '../hooks/useDemoAccount';
@@ -126,20 +129,21 @@ const SAMPLE_DATA_NOTE_ID = 'zero-state-sample-data-note';
 function guidanceGap(
   isUnavailable: boolean,
   checklist: Checklist | null | undefined,
-): string | null {
+): MessageKey | null {
   if (isUnavailable) {
-    return 'The guided walkthrough could not be loaded. Nothing is lost — the setup checklist below lists the same four steps, and the getting-started guide covers them in full.';
+    return 'onboard.zero.guidance.unavailable';
   }
   if (checklist === undefined) {
-    return 'The guided walkthrough is waiting for your setup checklist to load. It will be ready in a moment.';
+    return 'onboard.zero.guidance.waiting';
   }
   if (checklist === null || checklist.allComplete) {
-    return 'The guided walkthrough follows the setup checklist, and no step is outstanding. Reopen the checklist below to be guided.';
+    return 'onboard.zero.guidance.noneOutstanding';
   }
   return null;
 }
 
 export function ZeroState() {
+  const t = useT();
   const { setStatus, dismiss, isSaving, checklist } = useOnboarding();
   const { start, canStart, isUnavailable } = useWalkthrough();
   const { seed, isPending: isSeeding } = useDemoAccount();
@@ -213,15 +217,10 @@ export function ZeroState() {
       <Card>
         <CardHeader className="px-4 sm:px-6">
           <h2 className="text-xl leading-none font-semibold">
-            {hasOwnAccount ? 'Your account is ready' : 'Welcome to Jurnal ZITN'}
+            {hasOwnAccount ? t('onboard.zero.title.ready') : t('onboard.zero.title.welcome')}
           </h2>
           <CardDescription>
-            {hasOwnAccount
-              ? 'Positions come next: log a trade against your account, then close it, and this ' +
-                'dashboard fills in with real numbers. Follow the guided walkthrough, or skip ' +
-                'ahead to the ordinary dashboard whenever you like.'
-              : 'Start with a brokerage account. Every position, fill and ledger entry is booked ' +
-                'against one, so there is nothing to show on this dashboard until you create it.'}
+            {hasOwnAccount ? t('onboard.zero.desc.ready') : t('onboard.zero.desc.welcome')}
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4 px-4 sm:px-6">
@@ -230,9 +229,7 @@ export function ZeroState() {
               the second the user has met that form and typed the balance. */}
           {!hasOwnAccount && (
             <p data-testid="zero-state-not-connected" className="text-sm text-muted-foreground">
-              A Jurnal ZITN account mirrors a real brokerage account: the same currency, the same
-              starting balance, the same trades. It is not connected to your broker. Jurnal ZITN
-              never places or executes trades — you record trades you have already made.
+              {t('onboard.zero.notConnected')}
             </p>
           )}
 
@@ -245,7 +242,7 @@ export function ZeroState() {
                 className="w-full cursor-pointer motion-reduce:transition-none sm:w-auto"
                 onClick={() => setAccountDialogOpen(true)}
               >
-                Create my first account
+                {t('onboard.zero.action.createAccount')}
               </Button>
             )}
             {/* `aria-disabled`, NEVER the `disabled` attribute, whenever the
@@ -272,7 +269,9 @@ export function ZeroState() {
               // optional item id and a click handler is called with an event.
               onClick={() => beginGuided()}
             >
-              {hasOwnAccount ? 'Continue the walkthrough' : 'Walk me through it'}
+              {hasOwnAccount
+                ? t('onboard.zero.action.continue')
+                : t('onboard.zero.action.walkthrough')}
             </Button>
             {hasOwnAccount ? (
               /* The explicit way out this view owes the user: the ordinary
@@ -288,7 +287,7 @@ export function ZeroState() {
                 disabled={isSaving}
                 onClick={() => dismiss()}
               >
-                Skip to my dashboard
+                {t('onboard.zero.action.skip')}
               </Button>
             ) : (
               /* Sample data is offered ALONGSIDE creating a real account, never
@@ -316,7 +315,7 @@ export function ZeroState() {
                   seed();
                 }}
               >
-                Add sample data
+                {t('onboard.zero.action.sampleData')}
               </Button>
             )}
           </div>
@@ -341,7 +340,7 @@ export function ZeroState() {
               data-testid="zero-state-guidance-note"
               className="text-sm text-muted-foreground"
             >
-              {guidanceNote}
+              {t(guidanceNote)}
             </p>
           )}
 
@@ -356,7 +355,7 @@ export function ZeroState() {
               data-testid="zero-state-sample-data-note"
               className="text-sm text-muted-foreground"
             >
-              Adding sample data. Your dashboard fills in as soon as it lands.
+              {t('onboard.zero.sample.pending')}
             </p>
           )}
         </CardContent>
@@ -393,7 +392,7 @@ export function ZeroState() {
           rel="noreferrer"
           className="cursor-pointer underline underline-offset-2 hover:text-foreground"
         >
-          Read the getting-started guide
+          {t('onboard.zero.docsLink')}
         </a>
       </p>
 

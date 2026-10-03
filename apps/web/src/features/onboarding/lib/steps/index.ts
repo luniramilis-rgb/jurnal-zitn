@@ -29,7 +29,10 @@
  * host and no step can forget the link.
  */
 
+import { translate, type AppLocale, type MessageKey } from '@jurnal-zitn/shared';
+
 import { docsUrl, type DocsPage } from '@/lib/docs';
+import { getAppLocale } from '@/lib/locale';
 
 import type { ChecklistItemId } from '../derive-checklist';
 import type { TourStep } from '../tour-engine';
@@ -41,14 +44,23 @@ import { positionSteps } from './position';
 
 /**
  * A step as AUTHORED. `description` is absent on purpose — it is composed from
- * `body` and `docs` by `compile()`.
+ * `body` and `docs` by `compile()`. The prose itself lives in the shared
+ * dictionary (`walk.<set>.<n>.*`) so the tour is translated like every other
+ * surface (ZITN-TECH-044 / F7).
  */
-export interface WalkthroughStepSource extends Omit<TourStep, 'description'> {
+export interface WalkthroughStepSource extends Omit<
+  TourStep,
+  'description' | 'title' | 'actionHint'
+> {
+  /** Dictionary key for the step title. */
+  titleKey: MessageKey;
   /**
-   * The prompt itself. Rendered as HTML by the engine, so `&` must be written
-   * `&amp;`. Author-written repo source only — NEVER interpolate user input.
+   * Dictionary key for the prompt itself. Rendered as HTML by the engine, so a
+   * literal `&` in the VALUE must be written `&amp;`.
    */
-  body: string;
+  bodyKey: MessageKey;
+  /** Dictionary key for the action gesture this step waits for, if gated. */
+  actionHintKey?: MessageKey;
   /** The documentation page this step's "read more" link opens. */
   docs: DocsPage;
   /**
@@ -83,27 +95,40 @@ export type WalkthroughStep = TourStep &
  * new tab for the same reason every other docs link in the app does — the
  * reader is mid-task and replacing the app loses their place.
  */
-export function readMore(page: DocsPage): string {
-  return `<a href="${docsUrl(page)}" target="_blank" rel="noreferrer">Read more</a>`;
+export function readMore(page: DocsPage, locale: AppLocale = getAppLocale()): string {
+  return `<a href="${docsUrl(page)}" target="_blank" rel="noreferrer">${translate(locale, 'tour.readMore')}</a>`;
 }
 
-function compile(sources: readonly WalkthroughStepSource[]): WalkthroughStep[] {
-  return sources.map(({ body, docs, route, ...step }) => ({
+function compile(sources: readonly WalkthroughStepSource[], locale: AppLocale): WalkthroughStep[] {
+  return sources.map(({ titleKey, bodyKey, actionHintKey, docs, route, ...step }) => ({
     ...step,
+    ...(actionHintKey === undefined ? {} : { actionHint: translate(locale, actionHintKey) }),
+    title: translate(locale, titleKey),
     docs,
     route,
-    description: `${body} ${readMore(docs)}`,
+    description: `${translate(locale, bodyKey)} ${readMore(docs, locale)}`,
   }));
 }
 
 /**
- * The four step sets, keyed by the checklist item each one completes. Assignable
- * to `TourStep[]` as-is, so `startTour(WALKTHROUGH_STEPS.account)` is the whole
- * integration.
+ * The four step sets, keyed by the checklist item each one completes, resolved
+ * for `locale`. Assignable to `TourStep[]` as-is, so
+ * `startTour(getWalkthroughSteps(locale).account)` is the whole integration.
  */
-export const WALKTHROUGH_STEPS: Record<ChecklistItemId, WalkthroughStep[]> = {
-  account: compile(accountSteps),
-  calculator: compile(calculatorSteps),
-  position: compile(positionSteps),
-  close: compile(closeSteps),
-};
+export function getWalkthroughSteps(locale: AppLocale): Record<ChecklistItemId, WalkthroughStep[]> {
+  return {
+    account: compile(accountSteps, locale),
+    calculator: compile(calculatorSteps, locale),
+    position: compile(positionSteps, locale),
+    close: compile(closeSteps, locale),
+  };
+}
+
+/**
+ * The default-locale sets, kept as a constant for tests and any consumer that
+ * wants the authored content without naming a locale. Runtime code always
+ * resolves fresh through `getWalkthroughSteps()` so a language change is
+ * reflected without reloading the module.
+ */
+export const WALKTHROUGH_STEPS: Record<ChecklistItemId, WalkthroughStep[]> =
+  getWalkthroughSteps(getAppLocale());

@@ -25,6 +25,7 @@ import type { Account } from '@jurnal-zitn/shared';
 
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { api } from '@/lib/api';
+import { t } from '@/lib/i18n';
 import { eventBus } from '@/stores/event-bus.store';
 
 function getErrorMessage(err: unknown, fallback: string): string {
@@ -69,10 +70,10 @@ export function useDemoAccount(): UseDemoAccountResult {
     mutationFn: () => api.post<Account>('/accounts/demo'),
     onSuccess: () => {
       eventBus.publish('accounts:cache-invalidate', { reason: 'demo-seeded' });
-      toast.success('Sample data added');
+      toast.success(t('demo.added'));
     },
     onError: (err: unknown) => {
-      toast.error(getErrorMessage(err, 'Failed to add sample data'));
+      toast.error(getErrorMessage(err, t('demo.addFailed')));
     },
   });
 
@@ -83,10 +84,10 @@ export function useDemoAccount(): UseDemoAccountResult {
     mutationFn: (accountId: string) => api.delete(`/accounts/${accountId}?cascade=demo`),
     onSuccess: () => {
       eventBus.publish('accounts:cache-invalidate', { reason: 'demo-removed' });
-      toast.success('Sample data removed');
+      toast.success(t('demo.removed'));
     },
     onError: (err: unknown) => {
-      toast.error(getErrorMessage(err, 'Failed to remove sample data'));
+      toast.error(getErrorMessage(err, t('demo.removeFailed')));
     },
   });
 

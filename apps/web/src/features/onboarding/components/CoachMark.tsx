@@ -82,9 +82,12 @@
 import { Lightbulb } from 'lucide-react';
 import { useState } from 'react';
 
+import type { MessageKey } from '@jurnal-zitn/shared';
+
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover';
 import { useAuth } from '@/hooks/useAuth';
+import { useT } from '@/hooks/useLocale';
 import { docsUrl, type DocsPage } from '@/lib/docs';
 
 import { useOnboardingQuery, useOnboardingPatch } from '../hooks/useOnboarding';
@@ -134,8 +137,8 @@ export type CoachMarkSurface =
   | 'dashboard-widgets';
 
 interface CoachMarkCopy {
-  title: string;
-  body: string;
+  titleKey: MessageKey;
+  bodyKey: MessageKey;
   /**
    * The "read more" target. OPTIONAL: a mark may point at no page, but a mark
    * that does must point at a written one. The rule the walkthrough's step data
@@ -147,7 +150,9 @@ interface CoachMarkCopy {
 }
 
 /**
- * The copy, kept as data next to the component that renders it.
+ * The copy, kept as data next to the component that renders it. The prose
+ * itself lives in the shared dictionary (`coach.*`) so it is translated like
+ * every other surface (ZITN-TECH-044 / F7).
  *
  * EVERY SENTENCE NAMES SOMETHING THAT IS ON THE SCREEN — the controls are
  * quoted by their real labels, and `CoachMark.test.tsx` re-reads the source of
@@ -158,33 +163,23 @@ interface CoachMarkCopy {
  */
 const COACH_MARKS: Record<CoachMarkSurface, CoachMarkCopy> = {
   'position-partials': {
-    title: 'Scale in and out with fills',
-    body:
-      'Add Fill records an entry to scale in, or an exit to take part of the position off. ' +
-      'Close Position stays disabled until the whole quantity has been exited.',
+    titleKey: 'coach.positionPartials.title',
+    bodyKey: 'coach.positionPartials.body',
     docs: 'positions',
   },
   'csv-import': {
-    title: 'Bring your history in from a CSV',
-    body:
-      "Pick a preset or map your broker's columns by hand, read the preview, then confirm. " +
-      'Imports are additive — they add positions and fills to the account you choose.',
+    titleKey: 'coach.csvImport.title',
+    bodyKey: 'coach.csvImport.body',
     docs: 'importHistory',
   },
   'options-tools': {
-    title: 'Price a contract, decode a symbol',
-    body:
-      'The Black-Scholes pricer values a call or put from spot, strike, time to expiry, ' +
-      'volatility and the risk-free rate. The OCC card decodes an option symbol or builds ' +
-      'one from its parts.',
+    titleKey: 'coach.optionsTools.title',
+    bodyKey: 'coach.optionsTools.body',
     docs: 'optionsTools',
   },
   'dashboard-widgets': {
-    title: 'Arrange the dashboard your way',
-    body:
-      "Add Widget puts another card on the grid and each card's menu removes it. On a pointer " +
-      'device you can drag a card by its header and resize it from an edge; Reset layout puts ' +
-      'everything back.',
+    titleKey: 'coach.dashboardWidgets.title',
+    bodyKey: 'coach.dashboardWidgets.body',
     docs: 'gettingStarted',
   },
 };
@@ -201,6 +196,7 @@ export interface CoachMarkProps {
 }
 
 export function CoachMark({ surface, available = true }: CoachMarkProps) {
+  const t = useT();
   const { data: preference } = useOnboardingQuery();
   const { user } = useAuth();
   const patch = useOnboardingPatch();
@@ -259,7 +255,7 @@ export function CoachMark({ surface, available = true }: CoachMarkProps) {
         // content sits in — see the note at the top of the file.
         data-coach-mark=""
         role="note"
-        aria-label={mark.title}
+        aria-label={t(mark.titleKey)}
         side="bottom"
         align="start"
         collisionPadding={8}
@@ -271,8 +267,8 @@ export function CoachMark({ surface, available = true }: CoachMarkProps) {
         className="pointer-events-none max-w-[calc(100vw-2rem)] space-y-3"
       >
         <div className="space-y-1">
-          <p className="text-sm font-medium">{mark.title}</p>
-          <p className="text-sm text-muted-foreground">{mark.body}</p>
+          <p className="text-sm font-medium">{t(mark.titleKey)}</p>
+          <p className="text-sm text-muted-foreground">{t(mark.bodyKey)}</p>
         </div>
         <div className="flex items-center justify-end gap-3">
           {mark.docs !== undefined && (
@@ -284,7 +280,7 @@ export function CoachMark({ surface, available = true }: CoachMarkProps) {
               rel="noreferrer"
               className="pointer-events-auto cursor-pointer text-sm font-medium text-primary underline underline-offset-2"
             >
-              Read more
+              {t('coach.readMore')}
             </a>
           )}
           {/* Outline, not primary: these surfaces already spend their one amber
@@ -297,7 +293,7 @@ export function CoachMark({ surface, available = true }: CoachMarkProps) {
             className="pointer-events-auto cursor-pointer"
             onClick={dismiss}
           >
-            Got it
+            {t('coach.gotIt')}
           </Button>
         </div>
       </PopoverContent>

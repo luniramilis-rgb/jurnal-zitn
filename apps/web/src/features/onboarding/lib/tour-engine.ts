@@ -20,6 +20,10 @@
 
 import { driver, type Driver, type DriveStep, type DriverHook } from 'driver.js';
 
+import { translate, type AppLocale } from '@jurnal-zitn/shared';
+
+import { getAppLocale } from '@/lib/locale';
+
 import '../tour.css';
 
 /** Consumed by `tour.css`; also the hook a future restyle can hang off. */
@@ -292,7 +296,7 @@ function prefersReducedMotion(): boolean {
  * shorter than the box driver.js placed, and a shorter popover cannot overlap
  * something the taller one cleared.
  */
-function toDriveStep(step: TourStep): DriveStep {
+function toDriveStep(step: TourStep, locale: AppLocale): DriveStep {
   return {
     element: step.target,
     waitForElement: step.waitForMs,
@@ -301,7 +305,7 @@ function toDriveStep(step: TourStep): DriveStep {
       description:
         step.actionHint === undefined
           ? step.description
-          : `${step.description}<p class="${HINT_CLASS}" role="status">To continue: ${escapeHtml(step.actionHint)}</p>`,
+          : `${step.description}<p class="${HINT_CLASS}" role="status">${translate(locale, 'tour.actionHintFrame', { hint: escapeHtml(step.actionHint) })}</p>`,
       side: step.side,
       align: step.align,
       // driver.js REPLACES the global `popoverClass` with a step's own, so the
@@ -858,8 +862,10 @@ export function startTour(steps: TourStep[], handlers: TourHandlers = {}): void 
   exitReason = 'dismissed';
   blocked = undefined;
 
+  const locale = getAppLocale();
+
   instance = driver({
-    steps: steps.map(toDriveStep),
+    steps: steps.map((step) => toDriveStep(step, locale)),
     // The design system's reduced-motion gate. `tour.css` also disables the
     // transitions this option does not reach.
     animate: !prefersReducedMotion(),
@@ -869,8 +875,13 @@ export function startTour(steps: TourStep[], handlers: TourHandlers = {}): void 
     // keyboard. Leaving it on would double-handle every arrow press that landed
     // outside driver.js's own transition guard, which is most of them.
     allowKeyboardControl: false,
-    // The non-motion carrier of step state.
+    // The non-motion carrier of step state. driver.js substitutes `{{current}}`
+    // and `{{total}}` in `progressText` itself (ZITN-TECH-044 / F7).
     showProgress: true,
+    nextBtnText: translate(locale, 'tour.next'),
+    prevBtnText: translate(locale, 'tour.previous'),
+    doneBtnText: translate(locale, 'tour.done'),
+    progressText: translate(locale, 'tour.progress'),
     // The highlighted control stays usable.
     disableActiveInteraction: false,
     popoverClass: POPOVER_CLASS,

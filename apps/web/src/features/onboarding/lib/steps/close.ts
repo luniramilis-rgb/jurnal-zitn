@@ -80,10 +80,10 @@ export const closeSteps: readonly WalkthroughStepSource[] = [
     side: 'left',
     align: 'end',
     narrow: true,
-    actionHint: 'Add the exit fill',
+    actionHintKey: 'walk.close.1.actionHint',
     advanceOnAction: true,
-    title: 'Record the exit',
-    body: 'Set the type to Exit, at the price and quantity you closed at.',
+    titleKey: 'walk.close.1.title',
+    bodyKey: 'walk.close.1.body',
   },
   {
     target: '[data-tour="position-close"]',
@@ -91,28 +91,17 @@ export const closeSteps: readonly WalkthroughStepSource[] = [
     routeParams: ['positionId'],
     docs: 'positions',
     waitForMs: 3000,
-    actionHint: 'Choose Close Position',
+    actionHintKey: 'walk.close.2.actionHint',
     advanceOnAction: true,
-    title: 'It closes itself',
-    body:
-      'Exit the whole quantity you entered and Jurnal ZITN closes the position for you, timed to that ' +
-      'last fill — Close Position is here for the ones it cannot, such as a trade you finish by ' +
-      'correcting an earlier fill. Your realised P&amp;L reached the account with each exit fill ' +
-      'as you recorded it, not at the end, so the balance has already moved. Exited only part of ' +
-      'it? That is a finished step, not a finished trade: carry on with Next and add the rest ' +
-      'from Add Fill whenever you close it out.',
+    titleKey: 'walk.close.2.title',
+    bodyKey: 'walk.close.2.body',
   },
   {
     // No target — see the header: a partial exit leaves the dashboard on its
     // welcome view, where the grid this step used to anchor to does not exist.
     route: '/dashboard',
     docs: 'gettingStarted',
-    title: 'And there it is',
-    body:
-      'Back on the dashboard, which builds itself from the trades you log: each exit you ' +
-      'recorded booked its share of the result as you recorded it, so your account balance has ' +
-      'already moved. With the position fully closed, the stats and the equity curve here draw ' +
-      'from your own figures — and if you exited only part of it, they fill in the moment you ' +
-      'close out the rest. Log the next one and they move again.',
+    titleKey: 'walk.close.3.title',
+    bodyKey: 'walk.close.3.body',
   },
 ];

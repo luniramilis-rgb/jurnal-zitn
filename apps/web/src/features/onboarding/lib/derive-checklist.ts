@@ -26,7 +26,7 @@ export type ChecklistItemId = 'account' | 'calculator' | 'position' | 'close';
 
 export interface ChecklistItem {
   id: ChecklistItemId;
-  /** Sentence-case label, in the words the UI itself uses. */
+  /** Dictionary key for the sentence-case label (ZITN-TECH-044 / F7). */
   label: string;
   done: boolean;
 }
@@ -109,8 +109,10 @@ export interface Checklist {
  * un-ticked item, never to an error the user cannot get past.
  */
 /**
- * The four items as AUTHORED — their ids, their labels and the order they are
- * shown in. No user data is involved, so this says nothing about completion.
+ * The four items as AUTHORED — their ids, their dictionary keys and the order
+ * they are shown in. No user data is involved, so this says nothing about
+ * completion. `label` holds a `MessageKey` (ZITN-TECH-044 / F7); render it with
+ * `t(item.label as MessageKey)`.
  *
  * Split out of `deriveChecklist` because a second caller needs the NAMES
  * without needing the answers. The walkthrough's permanent entry point in
@@ -121,10 +123,10 @@ export interface Checklist {
  * there are or what order they come in.
  */
 export const CHECKLIST_ITEMS: readonly Omit<ChecklistItem, 'done'>[] = [
-  { id: 'account', label: 'Create a brokerage account' },
-  { id: 'calculator', label: 'Size a trade in the calculator' },
-  { id: 'position', label: 'Log a position' },
-  { id: 'close', label: 'Close it and see the stats' },
+  { id: 'account', label: 'onboard.item.account' },
+  { id: 'calculator', label: 'onboard.item.calculator' },
+  { id: 'position', label: 'onboard.item.position' },
+  { id: 'close', label: 'onboard.item.close' },
 ];
 
 export function deriveChecklist(input: ChecklistInput): Checklist {

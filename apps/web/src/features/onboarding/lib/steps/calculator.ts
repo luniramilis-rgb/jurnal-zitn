@@ -78,44 +78,34 @@ export const calculatorSteps: readonly WalkthroughStepSource[] = [
     // navigation has already landed.
     waitForMs: 5000,
     side: 'right',
-    title: 'Entry price',
-    body:
-      'Start with the price you plan to get in at. Nothing here is submitted or saved — the ' +
-      'calculator recomputes as you type, so you can try a setup and change your mind.',
+    titleKey: 'walk.calculator.1.title',
+    bodyKey: 'walk.calculator.1.body',
   },
   {
     target: '#stopLoss',
     route: '/calculator',
     docs: 'gettingStarted',
     side: 'right',
-    title: 'Stop loss',
-    body:
-      'The price at which you would accept the trade is wrong. The distance from entry to stop ' +
-      'is what the results call Per-unit risk, and the position size is derived from it — a ' +
-      'wider stop buys fewer units for the same money at risk.',
+    titleKey: 'walk.calculator.2.title',
+    bodyKey: 'walk.calculator.2.body',
   },
   {
     target: '#targetPrice',
     route: '/calculator',
     docs: 'gettingStarted',
     side: 'right',
-    title: 'Target price (optional)',
-    body:
-      'Optional, as the label says. Add it and you also get the Per-unit reward and the ' +
-      'Risk/Reward ratio; leave it out and you still get a size.',
+    titleKey: 'walk.calculator.3.title',
+    bodyKey: 'walk.calculator.3.body',
   },
   {
     target: '[data-tour="calculator-risk"]',
     route: '/calculator',
     docs: 'gettingStarted',
     side: 'right',
-    actionHint: 'Choose the Percent basis',
+    actionHintKey: 'walk.calculator.4.actionHint',
     advanceOnAction: true,
-    title: 'Risk',
-    body:
-      'Now say how much you are willing to lose. Dollar is a figure you type; Percent sizes it ' +
-      'from an account balance and a risk percentage. Choose Percent to use the rule you set on ' +
-      'the account.',
+    titleKey: 'walk.calculator.4.title',
+    bodyKey: 'walk.calculator.4.body',
   },
   {
     target: '[data-tour="calculator-account"]',
@@ -123,15 +113,10 @@ export const calculatorSteps: readonly WalkthroughStepSource[] = [
     docs: 'gettingStarted',
     waitForMs: 3000,
     side: 'right',
-    actionHint: 'Pick an account',
+    actionHintKey: 'walk.calculator.5.actionHint',
     advanceOnAction: true,
-    title: 'Account',
-    body:
-      'Pick the account you are trading. Under Percent it supplies the balance to size against, ' +
-      'and in either basis it supplies the currency and caps the position at the buying power ' +
-      'the account actually has. An account with a brokerage attached also brings that ' +
-      'brokerage&rsquo;s fee schedule into the estimate for you — under Fees you can still ' +
-      'change or clear it.',
+    titleKey: 'walk.calculator.5.title',
+    bodyKey: 'walk.calculator.5.body',
   },
   {
     // Whichever field the basis chosen two steps ago renders; exactly one of the
@@ -141,23 +126,15 @@ export const calculatorSteps: readonly WalkthroughStepSource[] = [
     docs: 'gettingStarted',
     waitForMs: 3000,
     side: 'right',
-    title: 'The amount at risk',
-    body:
-      'Under Percent, Risk percent is prefilled from that account&rsquo;s Default risk % when it ' +
-      'has one; under Dollar, Dollar risk is the figure you type. Either way the change applies ' +
-      'to this calculation only — the account keeps its rule, so the number you rely on tomorrow ' +
-      'is still the one you chose.',
+    titleKey: 'walk.calculator.6.title',
+    bodyKey: 'walk.calculator.6.body',
   },
   {
     target: '[data-tour="calculator-results"]',
     route: '/calculator',
     docs: 'metricsGlossary',
     side: 'left',
-    title: 'Size, risk and R:R',
-    body:
-      'Position Sizing gives you the Position size in whole units, the Per-unit risk, and the ' +
-      'Actual dollar risk once that size is rounded down. With a target, Risk / Reward adds the ' +
-      'Per-unit reward and the Risk/Reward ratio — what the plan pays if it works, per unit of ' +
-      'what it costs if it does not.',
+    titleKey: 'walk.calculator.7.title',
+    bodyKey: 'walk.calculator.7.body',
   },
 ];
