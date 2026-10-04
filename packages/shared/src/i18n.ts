@@ -8,17 +8,17 @@ import { TERM_MESSAGES } from './glossary';
  * Kamus ringan berbasis kunci stabil, dipakai bersama web (UI) dan API (email/pesan galat)
  * agar satu sumber. Pasar utama IDX, bahasa utama ID, EN = fallback teknis.
  *
- * **Gate bahasa (ZITN-TECH-021 §6, keputusan pemilik B1 2026-09-28).** `DEFAULT_LOCALE` adalah
+ * **Gate bahasa (ZITN-TECH-021 Â§6, keputusan pemilik B1 2026-09-28).** `DEFAULT_LOCALE` adalah
  * **pasar utama**: `id`. Pengguna ber-bahasa Inggris mendapat `en` lewat penyemian sekali dari
- * `detectBrowserLocale()` (`apps/web/src/hooks/useLocale.tsx`) — bukan lewat default yang dipaksa
+ * `detectBrowserLocale()` (`apps/web/src/hooks/useLocale.tsx`) â€” bukan lewat default yang dipaksa
  * EN. Menahan default di `en` pernah dipertimbangkan, tetapi ditolak karena `users.locale` kosong
  * untuk semua pengguna sehingga permukaan sebelum-masuk (login/register/reset), email sebelum
  * login, dan shell web akan tampil EN bagi pengguna ID.
  *
- * Selama jendela tinjau manual per halaman (TECH-021 §5), `DEFAULT_LOCALE` **tetap** `id`; yang
+ * Selama jendela tinjau manual per halaman (TECH-021 Â§5), `DEFAULT_LOCALE` **tetap** `id`; yang
  * bergerak adalah status `sah` per rute di `LOCALIZATION.md`, bukan default bahasa.
  *
- * Namespace `term.*` berasal dari `glossary.ts` (nilai identik `id`/`en`) — satu-satunya
+ * Namespace `term.*` berasal dari `glossary.ts` (nilai identik `id`/`en`) â€” satu-satunya
  * tempat keputusan istilah pasar.
  */
 
@@ -51,12 +51,12 @@ const ID_MESSAGES = {
   'auth.field.newPassword': 'Kata sandi baru',
   'auth.field.confirmPassword': 'Konfirmasi kata sandi',
   'auth.error.unexpected': 'Terjadi kesalahan tak terduga',
-  'auth.error.rateLimited': 'Terlalu banyak permintaan — coba lagi nanti.',
+  'auth.error.rateLimited': 'Terlalu banyak permintaan â€” coba lagi nanti.',
   'auth.error.generic': 'Terjadi kesalahan. Silakan coba lagi.',
   'auth.error.passwordMismatch': 'Kata sandi tidak cocok',
   'auth.login.title': 'Masuk',
   'auth.login.submit': 'Masuk',
-  'auth.login.submitting': 'Sedang masuk…',
+  'auth.login.submitting': 'Sedang masukâ€¦',
   'auth.login.expired': 'Sesi berakhir. Silakan masuk lagi.',
   'auth.login.deleted': 'Akun Anda telah dihapus.',
   'auth.login.forgot': 'Lupa kata sandi?',
@@ -72,11 +72,11 @@ const ID_MESSAGES = {
   'ctx.chart': 'Buka chart',
   'auth.forgot.title': 'Atur ulang kata sandi',
   'auth.forgot.sent':
-    'Jika akun untuk alamat itu ada, tautan atur ulang sedang dikirim — periksa kotak masuk Anda.',
+    'Jika akun untuk alamat itu ada, tautan atur ulang sedang dikirim â€” periksa kotak masuk Anda.',
   'auth.forgot.unavailable':
-    'Instance ini tidak mengonfigurasi email. Atur ulang mandiri tidak tersedia — minta operator mengatur ulang kata sandi Anda.',
+    'Instance ini tidak mengonfigurasi email. Atur ulang mandiri tidak tersedia â€” minta operator mengatur ulang kata sandi Anda.',
   'auth.forgot.submit': 'Kirim tautan atur ulang',
-  'auth.forgot.submitting': 'Mengirim…',
+  'auth.forgot.submitting': 'Mengirimâ€¦',
   'auth.forgot.back': 'Kembali ke masuk',
   'auth.reset.title': 'Buat kata sandi baru',
   'auth.reset.missingToken': 'Tautan ini tidak menyertakan token atur ulang.',
@@ -85,7 +85,7 @@ const ID_MESSAGES = {
   'auth.reset.loginLink': 'Masuk',
   'auth.reset.requestNew': 'Minta tautan atur ulang baru',
   'auth.reset.submit': 'Atur ulang kata sandi',
-  'auth.reset.submitting': 'Mengatur ulang…',
+  'auth.reset.submitting': 'Mengatur ulangâ€¦',
   'auth.link.expired': 'Tautan ini tidak valid atau sudah kedaluwarsa.',
   'auth.verify.title': 'Verifikasi email Anda',
   'auth.verify.missingToken': 'Tautan ini tidak menyertakan token verifikasi.',
@@ -93,12 +93,12 @@ const ID_MESSAGES = {
   'auth.verify.success': 'Email terverifikasi.',
   'auth.verify.goDashboard': 'Ke dasbor',
   'auth.verify.submit': 'Verifikasi email saya',
-  'auth.verify.submitting': 'Memverifikasi…',
+  'auth.verify.submitting': 'Memverifikasiâ€¦',
   'auth.verify.accountSettings': 'pengaturan akun',
   'auth.register.title': 'Buat akun',
   'auth.register.submit': 'Daftar',
-  'auth.register.submitting': 'Membuat akun…',
-  'auth.register.loading': 'Memuat…',
+  'auth.register.submitting': 'Membuat akunâ€¦',
+  'auth.register.loading': 'Memuatâ€¦',
   'auth.register.haveAccount': 'Sudah punya akun?',
   'auth.register.closedTitle': 'Pendaftaran ditutup',
   'auth.register.closedLaunchTitle': 'Pendaftaran dibuka saat peluncuran',
@@ -111,19 +111,19 @@ const ID_MESSAGES = {
   'auth.register.checkEmailPrefix': 'Kami mengirim tautan verifikasi ke',
   'auth.register.checkEmailSuffix': 'Ikuti tautan itu untuk memverifikasi alamat email Anda.',
   'auth.register.resend': 'Kirim ulang email verifikasi',
-  'auth.register.resending': 'Mengirim…',
+  'auth.register.resending': 'Mengirimâ€¦',
   'auth.register.continue': 'Lanjut ke dasbor',
   'settings.account.title': 'Akun',
   'settings.account.subtitle': 'Kelola akun dan sesi Anda.',
   'settings.account.verified': 'Terverifikasi',
   'settings.account.notVerified': 'Belum terverifikasi',
   'settings.account.resend': 'Kirim ulang email verifikasi',
-  'settings.account.resending': 'Mengirim…',
+  'settings.account.resending': 'Mengirimâ€¦',
   'settings.export.title': 'Ekspor data',
   'settings.export.subtitle':
     'Unduh semua data yang kami simpan untuk akun Anda sebagai satu berkas JSON.',
   'settings.export.download': 'Unduh data saya',
-  'settings.export.downloading': 'Menyiapkan…',
+  'settings.export.downloading': 'Menyiapkanâ€¦',
   'settings.export.error': 'Gagal menyiapkan ekspor. Coba lagi.',
   'settings.logout': 'Keluar',
   'settings.delete.title': 'Hapus akun',
@@ -133,7 +133,7 @@ const ID_MESSAGES = {
   'settings.delete.scheduledFallback': 'akhir masa berbayar Anda',
   'settings.delete.cancelError': 'Gagal membatalkan penghapusan. Coba lagi.',
   'settings.delete.cancel': 'Batalkan penghapusan',
-  'settings.delete.cancelling': 'Membatalkan…',
+  'settings.delete.cancelling': 'Membatalkanâ€¦',
   'settings.delete.inProgress': 'Penghapusan sedang berjalan.',
   'settings.delete.warning': 'Hapus akun dan datanya secara permanen. Ini tidak dapat dibatalkan.',
   'settings.delete.cta': 'Hapus akun',
@@ -143,19 +143,19 @@ const ID_MESSAGES = {
     'Akun Anda akan dihapus pada {date}, saat masa berbayar berakhir. Tetap bisa dipakai sampai saat itu, dan Anda dapat membatalkan sebelum dijalankan.',
   'settings.delete.confirmPassword': 'Konfirmasi kata sandi Anda',
   'settings.delete.submit': 'Hapus akun saya',
-  'settings.delete.submitting': 'Menghapus…',
+  'settings.delete.submitting': 'Menghapusâ€¦',
   'settings.delete.cancelButton': 'Batal',
   'settings.delete.error.validation': 'Kata sandi itu tidak valid. Periksa dan coba lagi.',
   'settings.delete.error.invalidPassword': 'Kata sandi itu salah.',
   'settings.delete.error.lastAdmin':
     'Anda admin terakhir. Jadikan pengguna lain admin sebelum menghapus akun Anda.',
   'settings.delete.error.subscription':
-    'Langganan Anda tidak dapat diselesaikan saat ini — penagihan tidak tersedia. Coba lagi nanti.',
+    'Langganan Anda tidak dapat diselesaikan saat ini â€” penagihan tidak tersedia. Coba lagi nanti.',
   'settings.delete.error.rateLimited': 'Terlalu banyak percobaan. Coba lagi beberapa menit lagi.',
   'settings.delete.error.stripe':
-    'Langganan Anda tidak dapat diperbarui. Tidak ada yang dihapus — coba lagi.',
+    'Langganan Anda tidak dapat diperbarui. Tidak ada yang dihapus â€” coba lagi.',
   'settings.delete.error.inProgress': 'Penghapusan sudah berjalan.',
-  'settings.delete.error.fallback': 'Terjadi kesalahan. Tidak ada yang dihapus — coba lagi.',
+  'settings.delete.error.fallback': 'Terjadi kesalahan. Tidak ada yang dihapus â€” coba lagi.',
   'retention.title': 'Yang disimpan saat penghapusan',
   'retention.item.stripe': 'Stripe menyimpan catatan pelanggan dan fakturnya.',
   'retention.item.audit':
@@ -191,7 +191,7 @@ const ID_MESSAGES = {
   'nav.expand': 'Bentangkan bilah samping',
   'journal.context.title': 'Pemindai',
   'journal.context.subtitle':
-    'Kutipan konteks dari lembar ZITN — bukan seluruh lembar dan bukan salinan data.',
+    'Kutipan konteks dari lembar ZITN â€” bukan seluruh lembar dan bukan salinan data.',
   'journal.context.date': 'Tanggal lembar',
   'journal.context.view': 'Lihat lembar hari itu',
   'journal.context.refresh': 'Muat ulang',
@@ -215,7 +215,7 @@ const ID_MESSAGES = {
   'journal.context.notLinked':
     'Akun ini belum tertaut ke ZITN. Masuk lewat ZITN agar konteks lembar bisa dibaca.',
   'journal.context.off': 'Konteks lembar sedang tidak tersedia.',
-  'journal.context.loading': 'Memuat…',
+  'journal.context.loading': 'Memuatâ€¦',
   'nav.newUpdates': 'Pembaruan baru tersedia',
   'nav.group.trade': 'Transaksi',
   'nav.group.review': 'Tinjauan',
@@ -300,7 +300,7 @@ const ID_MESSAGES = {
   'w.record.viewPositions': 'Buka posisi',
   'w.record.import': 'Impor CSV',
   'w.record.importHint': 'Periksa impor yang belum direkonsiliasi.',
-  'w.record.note': 'Metrik proses — bukan angka hasil.',
+  'w.record.note': 'Metrik proses â€” bukan angka hasil.',
   'feedback.tab': 'Kirim umpan balik',
   'feedback.form.typeLabel': 'Jenis',
   'feedback.form.types.bug': 'Bug',
@@ -308,7 +308,7 @@ const ID_MESSAGES = {
   'feedback.form.types.general': 'Umum',
   'feedback.form.types.question': 'Pertanyaan',
   'feedback.form.messageLabel': 'Pesan',
-  'feedback.form.messagePlaceholder': 'Tulis pesan Anda (10–500 karakter)',
+  'feedback.form.messagePlaceholder': 'Tulis pesan Anda (10â€“500 karakter)',
   'feedback.form.counter': '{n} karakter tersisa',
   'feedback.form.send': 'Kirim',
   'feedback.form.sent': 'Terkirim. Terima kasih.',
@@ -375,12 +375,12 @@ const ID_MESSAGES = {
   'pos.field.fees': 'Biaya',
   'pos.field.dateTime': 'Tanggal & Waktu',
   'pos.field.notes': 'Catatan',
-  'pos.notes.placeholder': 'Opsional…',
+  'pos.notes.placeholder': 'Opsionalâ€¦',
   'pos.fill.override': 'Timpa',
   'pos.fill.calcFromSchedule': 'Dihitung dari jadwal biaya broker akun.',
   'pos.fill.addedOnTop': 'Ditambahkan di atas jadwal broker, yang tetap berlaku untuk posisi ini.',
   'pos.fill.priceTick': 'Harga dibulatkan ke tick IDX.',
-  'pos.fill.saving': 'Menyimpan…',
+  'pos.fill.saving': 'Menyimpanâ€¦',
   'pos.action.save': 'Simpan',
   'pos.action.add': 'Tambah',
   'pos.fill.dateInvalid': 'Masukkan tanggal dan waktu yang valid',
@@ -390,13 +390,13 @@ const ID_MESSAGES = {
   'pos.action.reduceNone': 'Kurangi posisi (tidak ada terbuka)',
   'pos.action.open': 'Buka posisi',
   'pos.action.reopen': 'Buka kembali',
-  'pos.action.reopening': 'Membuka kembali…',
+  'pos.action.reopening': 'Membuka kembaliâ€¦',
   'pos.action.close': 'Tutup posisi',
-  'pos.action.closing': 'Menutup…',
+  'pos.action.closing': 'Menutupâ€¦',
   'pos.action.delete': 'Hapus',
   'pos.delete.title': 'Hapus posisi',
   'pos.delete.closedBody':
-    'Menghapus posisi tertutup "{symbol}" mengeluarkan P&L realisasinya dari saldo akun serta ringkasan pajak dan kinerja — termasuk tahun pajak sebelumnya — dan dapat mengubah klasifikasi wash-sale posisi lain. Tidak dapat dibatalkan.',
+    'Menghapus posisi tertutup "{symbol}" mengeluarkan P&L realisasinya dari saldo akun serta ringkasan pajak dan kinerja â€” termasuk tahun pajak sebelumnya â€” dan dapat mengubah klasifikasi wash-sale posisi lain. Tidak dapat dibatalkan.',
   'pos.delete.body': 'Yakin ingin menghapus "{symbol}"? Tidak dapat dibatalkan.',
   'pos.detail.notFound': 'Posisi tidak ditemukan',
   'pos.detail.addEntryFirst': 'Tambahkan fill masuk dulu',
@@ -423,7 +423,7 @@ const ID_MESSAGES = {
   'pos.shots.openAria': 'Buka tangkapan layar {n}',
   'pos.shots.deleteAria': 'Hapus tangkapan layar {n}',
   'pos.field.assetType': 'Jenis Aset',
-  'pos.field.notesPlaceholder': 'Catatan opsional…',
+  'pos.field.notesPlaceholder': 'Catatan opsionalâ€¦',
   'pos.field.selectAccount': 'Pilih akun',
   'pos.field.entryPlaceholder': 'mis. AAPL',
   'pos.field.stopLoss': 'Stop Loss',
@@ -432,7 +432,7 @@ const ID_MESSAGES = {
   'pos.asset.stock': 'Saham',
   'pos.asset.option': 'Opsi',
   'pos.dialog.editPosition': 'Ubah Posisi',
-  'pos.dialog.creating': 'Membuat…',
+  'pos.dialog.creating': 'Membuatâ€¦',
   'pos.action.create': 'Buat',
   'pos.filter.result': 'Hasil',
   'pos.filter.all': 'Semua',
@@ -452,7 +452,7 @@ const ID_MESSAGES = {
   'pos.lightbox.unavailable': 'Gambar tidak lagi tersedia',
   'calc.page.title': 'Kalkulator Transaksi',
   'calc.field.account': 'Akun',
-  'calc.accounts.loading': 'Memuat akun…',
+  'calc.accounts.loading': 'Memuat akunâ€¦',
   'calc.accounts.failed': 'Gagal memuat akun',
   'calc.field.selectAccount': 'Pilih akun',
   'calc.field.direction': 'Arah',
@@ -469,12 +469,12 @@ const ID_MESSAGES = {
   'calc.field.balance': 'Saldo',
   'calc.field.riskPercent': 'Persen risiko',
   'calc.field.fees': 'Biaya',
-  'calc.brokerages.loading': 'Memuat broker…',
+  'calc.brokerages.loading': 'Memuat brokerâ€¦',
   'calc.brokerages.failed': 'Gagal memuat broker',
   'calc.field.selectBrokerage': 'Pilih broker',
   'calc.field.manualFees': 'Biaya manual',
   'calc.quote.pull': 'Ambil harga terakhir',
-  'calc.quote.pulling': 'Mengambil…',
+  'calc.quote.pulling': 'Mengambilâ€¦',
   'calc.error.notFound': 'Simbol tidak ditemukan.',
   'calc.error.providerUnavailable': 'Layanan kutipan sedang tidak tersedia. Coba lagi sebentar.',
   'calc.error.providerMisconfigured': 'Layanan kutipan salah konfigurasi.',
@@ -526,14 +526,14 @@ const ID_MESSAGES = {
   'perf.behavior.overtrading': 'Overtrading',
   'perf.behavior.activeDays': 'Hari aktif',
   'perf.behavior.overDays': 'Hari overtrading',
-  'perf.behavior.threshold': 'Ambang (mean + 1,5σ)',
+  'perf.behavior.threshold': 'Ambang (mean + 1,5Ïƒ)',
   'perf.behavior.revenge': 'Revenge',
   'perf.behavior.revengeWindow': 'Jendela',
   'perf.behavior.revengeCount': 'Jumlah',
   'perf.behavior.revengeRate': 'Rasio',
   'perf.behavior.minutes': '{n} menit',
   'perf.behavior.empty': 'Belum ada trade tertutup untuk dianalisis.',
-  'perf.behavior.note': 'Metrik proses — bukan angka hasil.',
+  'perf.behavior.note': 'Metrik proses â€” bukan angka hasil.',
   'perf.behavior.calc.title': 'Risk of ruin & Kelly',
   'perf.behavior.calc.winRate': 'Win rate (%)',
   'perf.behavior.calc.payoff': 'Rasio imbal/risiko',
@@ -561,7 +561,7 @@ const ID_MESSAGES = {
   'nav.chart': 'Chart',
   'chart.title': 'Chart',
   'chart.noSymbol': 'Pilih emiten dari lembar atau tautan chart.',
-  'chart.loading': 'Memuat chart…',
+  'chart.loading': 'Memuat chartâ€¦',
   'chart.failed': 'Gagal memuat Lightweight Charts.',
   'chart.unavailable': 'Data chart tidak tersedia untuk emiten ini.',
   'chart.notLinked': 'Akun belum tertaut ke ZITN.',
@@ -614,7 +614,7 @@ const ID_MESSAGES = {
   'tp.miss': 'Tandai terlewat',
   'tp.cancel': 'Batalkan',
   'tp.link': 'Tautkan ke posisi',
-  'tp.linkNone': '— Tidak ditautkan —',
+  'tp.linkNone': 'â€” Tidak ditautkan â€”',
   'tp.linkOpenOnly': 'Hanya posisi terbuka',
   'tp.confirm.title': 'Konfirmasi status rencana',
   'tp.confirm.body': 'Tandai {symbol} sebagai {status}? Tindakan ini tidak bisa dibatalkan.',
@@ -634,15 +634,15 @@ const ID_MESSAGES = {
   'calc.basis.title': 'Ukuran posisi',
   'calc.basis.capBy': 'Batasi ukuran berdasarkan',
   'calc.basis.select': 'Pilih dasar',
-  'calc.basis.cash': 'Kas — yang bisa dipakai',
-  'calc.basis.balance': 'Saldo — total ekuitas',
-  'calc.sizing.nothing': 'Saldo akun nol atau negatif — tidak ada dasar untuk menghitung ukuran.',
+  'calc.basis.cash': 'Kas â€” yang bisa dipakai',
+  'calc.basis.balance': 'Saldo â€” total ekuitas',
+  'calc.sizing.nothing': 'Saldo akun nol atau negatif â€” tidak ada dasar untuk menghitung ukuran.',
   'calc.sizing.exceedsMax': 'Nilai risiko terhitung melampaui batas maksimum kalkulator.',
   'calc.sizing.buyingPowerZero':
     'Daya beli tersedia tidak cukup untuk satu saham/kontrak pada harga masuk ini.',
   'calc.sizing.roundsToZero':
     'Nilai berisiko tidak menutup satu saham/kontrak pada jarak stop ini, sehingga ukuran dibulatkan ke nol. Ukuran hanya bergerak mengikuti jarak stop dan nilai berisiko.',
-  // Cek Risiko (ZITN-TECH-017 §12 / Fase H) — permukaan kalkulator di dalam app.
+  // Cek Risiko (ZITN-TECH-017 Â§12 / Fase H) â€” permukaan kalkulator di dalam app.
   'nav.cekRisiko': 'Cek Risiko',
   'cek.page.title': 'Cek Risiko',
   'cek.page.subtitle': 'Hitung lot, biaya, dan batas rugi',
@@ -682,32 +682,32 @@ const ID_MESSAGES = {
   'cek.result.hargaRataRata': 'Harga rata-rata baru',
   'cek.result.lotsTotal': 'Total lot',
   'cek.verdict.title': 'Status risiko',
-  'cek.verdict.aman': 'Risiko aman — di bawah 1% modal',
-  'cek.verdict.kuning': 'Risiko sedang — antara 1% dan 2% modal',
-  'cek.verdict.tinggi': 'Risiko tinggi — di atas 2% modal',
+  'cek.verdict.aman': 'Risiko aman â€” di bawah 1% modal',
+  'cek.verdict.kuning': 'Risiko sedang â€” antara 1% dan 2% modal',
+  'cek.verdict.tinggi': 'Risiko tinggi â€” di atas 2% modal',
   'cek.empty': 'Isi angka di atas untuk melihat hasil.',
   'cek.formula.toggle': 'Lihat rumus',
   'cek.formula.hide': 'Sembunyikan rumus',
   'cek.formula.lot':
-    'Anggaran risiko = modal × risiko%. Risiko per saham = harga beli − harga stop. Jumlah saham = anggaran risiko ÷ risiko per saham, lalu dibulatkan ke bawah ke lot utuh (1 lot = 100 saham). Rugi maksimal = jumlah saham × risiko per saham.',
+    'Anggaran risiko = modal Ã— risiko%. Risiko per saham = harga beli âˆ’ harga stop. Jumlah saham = anggaran risiko Ã· risiko per saham, lalu dibulatkan ke bawah ke lot utuh (1 lot = 100 saham). Rugi maksimal = jumlah saham Ã— risiko per saham.',
   'cek.formula.biaya':
-    'Biaya beli = nilai beli × fee beli platform. Biaya jual = nilai jual × fee jual platform. PPh final = 0,1% × nilai jual. Nilai bersih = nilai jual − biaya jual − PPh. Untung/rugi bersih = nilai bersih − nilai beli − biaya beli.',
+    'Biaya beli = nilai beli Ã— fee beli platform. Biaya jual = nilai jual Ã— fee jual platform. PPh final = 0,1% Ã— nilai jual. Nilai bersih = nilai jual âˆ’ biaya jual âˆ’ PPh. Untung/rugi bersih = nilai bersih âˆ’ nilai beli âˆ’ biaya beli.',
   'cek.formula.ara':
-    'ARA/ARB dihitung dari harga acuan: ARA 35% (sampai Rp200), 25% (Rp200–Rp5.000), 20% (di atas Rp5.000); ARB 15% untuk semua rentang. Angka perkiraan, bukan acuan resmi bursa.',
+    'ARA/ARB dihitung dari harga acuan: ARA 35% (sampai Rp200), 25% (Rp200â€“Rp5.000), 20% (di atas Rp5.000); ARB 15% untuk semua rentang. Angka perkiraan, bukan acuan resmi bursa.',
   'cek.action.simpan': 'Simpan ke Catatan',
-  'cek.action.saving': 'Menyimpan…',
+  'cek.action.saving': 'Menyimpanâ€¦',
   'cek.action.saved': 'Tersimpan ke Catatan',
   'cek.action.modeLengkap': 'Mode lengkap',
   'cek.action.modeLengkap.hint': 'Playbook, analitik, impor, dan akuntansi ada di Mode lengkap.',
   'cek.posisi.title': 'Posisi Saya',
   'cek.posisi.empty': 'Belum ada posisi tersimpan.',
-  'cek.posisi.loading': 'Memuat posisi…',
+  'cek.posisi.loading': 'Memuat posisiâ€¦',
   'cek.posisi.lots': 'Lot',
   'cek.posisi.viewAll': 'Lihat semua posisi',
   'cek.fee.disclaimer':
     'Fee platform adalah perkiraan umum; tiap sekuritas punya tier dan promo sendiri. Periksa dan sesuaikan.',
   'cek.disclaimer':
-    'Alat hitung dari angka yang Anda masukkan — bukan saran, rekomendasi, atau prediksi.',
+    'Alat hitung dari angka yang Anda masukkan â€” bukan saran, rekomendasi, atau prediksi.',
   'cek.error.modal': 'Masukkan modal yang lebih besar dari nol.',
   'cek.error.risiko': 'Masukkan risiko antara 0 dan 100 persen.',
   'cek.error.harga': 'Masukkan harga yang lebih besar dari nol.',
@@ -716,13 +716,54 @@ const ID_MESSAGES = {
   'cek.error.lots': 'Masukkan jumlah lot yang lebih besar dari nol.',
   'cek.error.tierPositions': 'Anda telah mencapai batas posisi paket Anda.',
   'cek.error.tierAccount': 'Akun ini hanya-baca pada paket Anda.',
+  'cek.profile.title': 'Profil risiko',
+  'cek.profile.rule': 'Aturan',
+  'cek.profile.period': 'Periode',
+  'cek.profile.period.penuh': 'Penuh',
+  'cek.profile.period.modern': '5 tahun terakhir',
+  'cek.profile.period.2025': '2025',
+  'cek.profile.tp': 'TP %',
+  'cek.profile.sl': 'SL %',
+  'cek.profile.noSl': 'Tanpa SL',
+  'cek.profile.h': 'Horizon (sesi)',
+  'cek.profile.preset': 'Preset',
+  'cek.profile.preset.konservatif': 'Konservatif',
+  'cek.profile.preset.seimbang': 'Seimbang',
+  'cek.profile.preset.agresif': 'Agresif',
+  'cek.profile.approx': 'Pendekatan ke sel terdekat: TP {tp}% Â· SL {sl} Â· H {h}.',
+  'cek.profile.current': 'Risiko saat ini',
+  'cek.profile.saveHint':
+    'Pilihan ini tersimpan sebagai setelan dan dipakai "Risiko saat ini" serta draf pra-trade.',
+  'cek.profile.stats': 'Statistik historis (in-sample)',
+  'cek.profile.rr': 'R:R',
+  'cek.profile.breakeven': 'Impas P(TP)',
+  'cek.profile.pTp': 'P(TP)',
+  'cek.profile.delta': 'Delta vs impas',
+  'cek.profile.pSl': 'P(SL)',
+  'cek.profile.eNet': 'E net',
+  'cek.profile.median': 'Median',
+  'cek.profile.p5': 'p5',
+  'cek.profile.p1min': 'p1/min',
+  'cek.profile.loss10': 'Rugi > 10%',
+  'cek.profile.loss20': 'Rugi > 20%',
+  'cek.profile.loss40': 'Rugi > 40%',
+  'cek.profile.freq': 'Frekuensi (n)',
+  'cek.profile.bar.tp': 'TP',
+  'cek.profile.bar.timeout': 'Timeout',
+  'cek.profile.bar.sl': 'SL',
+  'cek.profile.gauge.win': 'P(TP) vs impas',
+  'cek.profile.warn.fragile': 'Rapuh: P(TP) di bawah impas â€” hasil bergantung pada timeout.',
+  'cek.profile.warn.tail': 'Ekor dalam: ada peluang rugi besar (>40%).',
+  'cek.profile.insample':
+    'In-sample Â· bukan nasihat/janji Â· tanpa proyeksi P/L. Basis: {basis}. Dibuat {date}.',
+  'cek.profile.nodata': 'Sel tidak tersedia untuk kombinasi ini.',
   'tax.page.title': 'Ringkasan Pajak',
   'tax.subtitle': 'P&L realisasi dan pengeluaran tercatat untuk tahun terpilih.',
   'tax.subtitleFlags':
     'P&L realisasi, pengeluaran tercatat, dan posisi bertanda untuk tahun terpilih.',
   'tax.field.year': 'Tahun',
   'tax.field.jurisdiction': 'Yurisdiksi',
-  'tax.disclaimer.trigger': 'Disclaimer — baca sebelum memakai angka ini',
+  'tax.disclaimer.trigger': 'Disclaimer â€” baca sebelum memakai angka ini',
   'tax.missingRates': 'Kurs tidak tersedia:',
   'tax.enterRate': 'Masukkan kurs',
   'tax.loadFailed': 'Gagal memuat ringkasan pajak. Silakan coba lagi.',
@@ -786,7 +827,7 @@ const ID_MESSAGES = {
   'exp.field.amountPlaceholder': 'mis. 29.99',
   'exp.field.currency': 'Mata uang',
   'exp.field.notesOptional': 'Catatan (opsional)',
-  'exp.field.notesPlaceholder': 'Konteks tambahan…',
+  'exp.field.notesPlaceholder': 'Konteks tambahanâ€¦',
   'exp.form.save': 'Simpan perubahan',
   'wash.col.underlying': 'Aset Dasar',
   'wash.col.opened': 'Dibuka',
@@ -798,13 +839,14 @@ const ID_MESSAGES = {
   'wash.reason.heldOpen': 'Tetap terbuka dalam jendela 30 hari',
   'wash.more': '+{n} lagi',
   'email.reset.subject': 'Atur ulang kata sandi Jurnal ZITN',
-  'email.reset.preheader': 'Atur ulang kata sandi Jurnal ZITN — tautan kedaluwarsa dalam 60 menit.',
+  'email.reset.preheader':
+    'Atur ulang kata sandi Jurnal ZITN â€” tautan kedaluwarsa dalam 60 menit.',
   'email.reset.heading': 'Atur ulang kata sandi',
   'email.reset.intro': 'Kami menerima permintaan mengatur ulang kata sandi akun Jurnal ZITN Anda.',
   'email.reset.cta': 'Atur ulang kata sandi',
   'email.reset.expiry': 'Tautan ini kedaluwarsa dalam 60 menit.',
   'email.reset.notice':
-    'Jika Anda tidak meminta ini, abaikan email ini — kata sandi Anda tidak berubah.',
+    'Jika Anda tidak meminta ini, abaikan email ini â€” kata sandi Anda tidak berubah.',
   'email.verify.subject': 'Verifikasi alamat email Anda',
   'email.verify.preheader':
     'Verifikasi alamat email Anda untuk menyelesaikan penyiapan Jurnal ZITN.',
@@ -815,13 +857,13 @@ const ID_MESSAGES = {
   'email.verify.expiry': 'Tautan ini kedaluwarsa dalam 24 jam.',
   'email.verify.notice': 'Jika Anda tidak meminta ini, abaikan email ini.',
   'email.pasteLink': 'Atau tempel tautan ini ke peramban Anda:',
-  'email.footer.tagline': 'Jurnal ZITN — jurnal trading sumber terbuka',
+  'email.footer.tagline': 'Jurnal ZITN â€” jurnal trading sumber terbuka',
   'email.footer.auto': 'Ini pesan transaksional otomatis tentang akun Jurnal ZITN Anda.',
   'web.error.title': 'Terjadi kesalahan',
   'web.notFound.title': 'Halaman tidak ditemukan',
   'web.notFound.desc':
     'Kami tidak menemukan halaman itu. Periksa alamatnya, atau masuk untuk melanjutkan.',
-  'web.loading': 'Memuat…',
+  'web.loading': 'Memuatâ€¦',
   'web.notFound.signIn': 'Masuk',
   'changelog.error': 'Gagal memuat catatan rilis. Silakan cek lagi nanti.',
   'changelog.empty': 'Belum ada rilis',
@@ -834,28 +876,28 @@ const ID_MESSAGES = {
   'adm.error.notFound': 'Pengguna ini tidak ada lagi. Tidak ada yang dihapus.',
   'adm.error.lastAdmin': 'Tidak bisa menghapus admin terakhir.',
   'adm.error.subscription':
-    'Langganannya tidak dapat diselesaikan saat ini — penagihan tidak tersedia. Tidak ada yang dihapus; coba lagi nanti.',
-  'adm.error.stripe': 'Langganannya tidak dapat dibatalkan. Tidak ada yang dihapus — coba lagi.',
-  'adm.error.fallback': 'Terjadi kesalahan. Tidak ada yang dihapus — coba lagi.',
+    'Langganannya tidak dapat diselesaikan saat ini â€” penagihan tidak tersedia. Tidak ada yang dihapus; coba lagi nanti.',
+  'adm.error.stripe': 'Langganannya tidak dapat dibatalkan. Tidak ada yang dihapus â€” coba lagi.',
+  'adm.error.fallback': 'Terjadi kesalahan. Tidak ada yang dihapus â€” coba lagi.',
   'tax.disc.preamble':
     'Jurnal ZITN bukan penasihat pajak. Angka yang ditampilkan adalah agregat komputasional dari data trading Anda, bukan nasihat pajak.',
   'tax.disc.recUS':
     'Biaya broker atas posisi tertutup sudah dikurangkan dari angka P&L realisasi di sini. Biaya fill yang tercatat untuk visibilitas ada di halaman Rekap Biaya terpisah (dikelompokkan per filledAt). Tanda wash-sale di bawah bersifat heuristik; tidak menyesuaikan angka P&L.',
   'tax.disc.recCA':
-    'Biaya komisi yang dibayar lewat fill sudah termasuk dalam laba/rugi realisasi di atas (sesuai perlakuan adjusted cost base CRA). Tarif inklusi capital gains 50% TIDAK diterapkan oleh Jurnal ZITN — P&L realisasi yang ditampilkan adalah angka sebelum tarif inklusi.',
+    'Biaya komisi yang dibayar lewat fill sudah termasuk dalam laba/rugi realisasi di atas (sesuai perlakuan adjusted cost base CRA). Tarif inklusi capital gains 50% TIDAK diterapkan oleh Jurnal ZITN â€” P&L realisasi yang ditampilkan adalah angka sebelum tarif inklusi.',
   'tax.disc.recID':
     'Pajak: Jurnal ZITN menampilkan **PPh final {rate}% dari nilai penjualan** (bukan perhitungan pajak resmi). Angka di bawah hanya agregat komputasional dari data transaksi Anda; konsultasikan dengan konsultan pajak.',
   'tax.disc.recOther':
     'Jurnal ZITN tidak mendukung aturan pajak khusus untuk yurisdiksi Anda. Angka di bawah hanya agregat komputasional; konsultasikan dengan konsultan pajak setempat.',
   'tax.disc.reconcile':
-    'Biaya fill yang tercatat dan pengeluaran tercatat ditampilkan di tempat terpisah — biaya tercatat di halaman [Rekap Biaya](/accounting/fee-rollup) (dikelompokkan per filledAt), pengeluaran tercatat di bagian bawah. Jurnal ZITN tidak menghitung penghasilan kena pajak bersih — pengurangan itu bergantung pada status wajib pajak dan aturan pengurangan khusus yurisdiksi.',
+    'Biaya fill yang tercatat dan pengeluaran tercatat ditampilkan di tempat terpisah â€” biaya tercatat di halaman [Rekap Biaya](/accounting/fee-rollup) (dikelompokkan per filledAt), pengeluaran tercatat di bagian bawah. Jurnal ZITN tidak menghitung penghasilan kena pajak bersih â€” pengurangan itu bergantung pada status wajib pajak dan aturan pengurangan khusus yurisdiksi.',
   'tax.disc.heuristic':
-    'Tanda wash-sale (US) dan superficial-loss (CA) memakai heuristik simbol-dan-tanggal, bukan pencocokan per lot. Untuk opsi, pencocokan memakai aset dasar — strike dan kedaluwarsa berbeda dari aset dasar yang sama ditandai bersama. Tanda wash-sale dan superficial-loss diagregasi lintas semua akun Anda.',
+    'Tanda wash-sale (US) dan superficial-loss (CA) memakai heuristik simbol-dan-tanggal, bukan pencocokan per lot. Untuk opsi, pencocokan memakai aset dasar â€” strike dan kedaluwarsa berbeda dari aset dasar yang sama ditandai bersama. Tanda wash-sale dan superficial-loss diagregasi lintas semua akun Anda.',
   'tax.disc.yearBucket':
     'Semua pengelompokan tahun memakai batas kalender UTC. Posisi yang ditutup setelah 19:00 ET pada 31 Desember akan muncul di ringkasan pajak tahun berikutnya.',
   'tax.disc.filing': 'Konsultasikan dengan tenaga ahli pajak untuk pelaporan.',
   'tax.disc.stabilityNone':
-    'Konversi mata uang memakai kurs (tidak tersedia — tetapkan mata uang tampilan untuk mengonversi).',
+    'Konversi mata uang memakai kurs (tidak tersedia â€” tetapkan mata uang tampilan untuk mengonversi).',
   'tax.disc.stabilityPast':
     'Konversi mata uang memakai kurs per {date} (akhir tahun). Memuat ulang tidak mengubah angka kecuali Anda memasukkan kurs baru bertanggal pada atau sebelum tanggal itu.',
   'tax.disc.stabilityCurrent':
@@ -869,7 +911,7 @@ const ID_MESSAGES = {
   'err.emailNotConfigured': 'Instance ini tidak mengonfigurasi email.',
   'err.registrationDisabled': 'Pendaftaran akun baru ditutup.',
   'err.invalidTimezone': 'Zona waktu tidak valid.',
-  // Chrome umum (bukan istilah pasar) — nilai ID penuh (ZITN-TECH-021 §2).
+  // Chrome umum (bukan istilah pasar) â€” nilai ID penuh (ZITN-TECH-021 Â§2).
   'common.name': 'Nama',
   'common.notes': 'Catatan',
   'common.currency': 'Mata uang',
@@ -878,22 +920,22 @@ const ID_MESSAGES = {
   'common.edit': 'Ubah',
   'common.delete': 'Hapus',
   'common.save': 'Simpan',
-  'common.saving': 'Menyimpan…',
+  'common.saving': 'Menyimpanâ€¦',
   'common.create': 'Buat',
   'common.confirm': 'Konfirmasi',
   'common.continue': 'Lanjutkan',
   'common.none': 'Tidak ada',
   'page.accounts': 'Akun',
   'page.brokerages': 'Broker',
-  // Brokerages (F2, ZITN-TECH-021 §5.7).
+  // Brokerages (F2, ZITN-TECH-021 Â§5.7).
   'broker.title.view': 'Lihat broker sistem',
   'broker.title.edit': 'Ubah broker',
   'broker.title.new': 'Broker baru',
   'broker.field.namePlaceholder': 'mis. Interactive Brokers',
   'broker.field.notesPlaceholder': 'Catatan opsional',
   'broker.field.preset': 'Preset broker IDX',
-  'broker.field.presetPlaceholder': 'Pilih preset…',
-  'broker.action.duplicating': 'Menyalin…',
+  'broker.field.presetPlaceholder': 'Pilih presetâ€¦',
+  'broker.action.duplicating': 'Menyalinâ€¦',
   'broker.action.duplicate': 'Buat salinan yang dapat diubah',
   'broker.confirmFee.title': 'Konfirmasi perubahan jadwal biaya',
   'broker.confirmFee.bodyOne':
@@ -907,7 +949,7 @@ const ID_MESSAGES = {
   'broker.list.empty': 'Belum ada broker. Buat satu untuk mulai melacak biaya.',
   'broker.col.type': 'Jenis',
   'broker.col.feeSummary': 'Ringkasan biaya',
-  'broker.row.approx': 'Tarif perkiraan — periksa dengan broker Anda',
+  'broker.row.approx': 'Tarif perkiraan â€” periksa dengan broker Anda',
   'broker.type.system': 'Sistem',
   'broker.type.custom': 'Kustom',
   'broker.delete.title': 'Hapus broker',
@@ -923,10 +965,10 @@ const ID_MESSAGES = {
   'broker.fee.percentSell': 'Komisi % (jual)',
   'broker.fee.perContractCommission': 'Komisi per kontrak',
   'broker.fee.perContractExchangeFee': 'Biaya bursa per kontrak',
-  // Catatan preset IDX: keraguan ("perkiraan… periksa dan sesuaikan") WAJIB tetap (rubrik R8).
+  // Catatan preset IDX: keraguan ("perkiraanâ€¦ periksa dan sesuaikan") WAJIB tetap (rubrik R8).
   'broker.preset.idxNotes':
-    'Perkiraan komisi {buy}% beli / {sell}% jual (termasuk levy). Angka dapat berbeda per sekuritas/promo — periksa dan sesuaikan dengan tarif broker Anda.',
-  // Accounts (F2, ZITN-TECH-021 §5.7).
+    'Perkiraan komisi {buy}% beli / {sell}% jual (termasuk levy). Angka dapat berbeda per sekuritas/promo â€” periksa dan sesuaikan dengan tarif broker Anda.',
+  // Accounts (F2, ZITN-TECH-021 Â§5.7).
   'acct.title.edit': 'Ubah akun',
   'acct.title.new': 'Akun baru',
   'acct.list.new': 'Akun baru',
@@ -947,7 +989,7 @@ const ID_MESSAGES = {
   'acct.demo.body':
     'Akun Anda dan akun contoh tidak dapat ada bersamaan, jadi membuat akun akan menghapus akun contoh beserta seluruh transaksinya. Anda dapat menambahkan data contoh lagi setelah tidak punya akun sendiri.',
   'acct.demo.error': 'Data contoh tidak dapat dihapus, jadi akun Anda belum dibuat. Coba lagi.',
-  'acct.demo.removing': 'Menghapus…',
+  'acct.demo.removing': 'Menghapusâ€¦',
   'acct.demo.confirm': 'Hapus dan lanjutkan',
   'acct.delete.title': 'Hapus akun',
   'acct.delete.body': 'Yakin ingin menghapus "{name}"? Tindakan ini tidak dapat dibatalkan.',
@@ -955,12 +997,12 @@ const ID_MESSAGES = {
   'acct.field.namePlaceholder': 'mis. IBKR Utama',
   'acct.field.timezone': 'Zona waktu hari perdagangan',
   'acct.field.timezoneHelp':
-    'Menentukan hari perdagangan untuk akun ini — dipakai untuk memutuskan apakah posisi dapat dimasukkan kembali pada hari yang sama. Ini bukan zona waktu pelaporan Anda, yang mengelompokkan P&L dan diatur di pengaturan.',
+    'Menentukan hari perdagangan untuk akun ini â€” dipakai untuk memutuskan apakah posisi dapat dimasukkan kembali pada hari yang sama. Ini bukan zona waktu pelaporan Anda, yang mengelompokkan P&L dan diatur di pengaturan.',
   'acct.field.startingBalance': 'Saldo awal',
   'acct.field.startingBalancePlaceholder': '0,00',
   'acct.field.defaultRisk': 'Risiko bawaan %',
   'acct.field.defaultRiskHelp':
-    'Porsi saldo akun ini yang Anda risikokan pada satu transaksi — ini mengisi awal kalkulator ukuran posisi, dan Anda dapat menimpanya pada perhitungan mana pun. Angka kedua adalah biaya yang timbul jika sepuluh transaksi berturut-turut merugi.',
+    'Porsi saldo akun ini yang Anda risikokan pada satu transaksi â€” ini mengisi awal kalkulator ukuran posisi, dan Anda dapat menimpanya pada perhitungan mana pun. Angka kedua adalah biaya yang timbul jika sepuluh transaksi berturut-turut merugi.',
   'acct.risk.preset1Label': '1%',
   'acct.risk.preset1Note': '10 kerugian: -10%',
   'acct.risk.preset2Label': '2%',
@@ -974,7 +1016,7 @@ const ID_MESSAGES = {
   'acct.brokerage.systemPresets': 'Preset sistem',
   'acct.brokerage.yours': 'Broker Anda',
   'acct.warn.usdFees':
-    'Preset ini mengasumsikan biaya USD — jumlahnya mungkin tidak mencerminkan biaya setelah penyesuaian mata uang yang akurat.',
+    'Preset ini mengasumsikan biaya USD â€” jumlahnya mungkin tidak mencerminkan biaya setelah penyesuaian mata uang yang akurat.',
   'acct.confirmBrokerage.title': 'Ganti broker?',
   'acct.confirmBrokerage.bodyOne':
     'Akun ini memiliki {count} posisi. Mengubah broker akan memengaruhi perhitungan biaya untuk posisi yang ada.',
@@ -984,8 +1026,8 @@ const ID_MESSAGES = {
   'acct.detail.backToAccounts': 'Kembali ke akun',
   'acct.detail.back': 'Kembali',
   'acct.detail.ledger': 'Buku besar',
-  // Accounting/ledger & FX (F3, ZITN-TECH-021 §5.7/§5.14). Chrome ID, kalimat penjelas ID.
-  // Entity `&apos;`/`&amp;` sudah jadi karakter asli (rubrik §5.13-1).
+  // Accounting/ledger & FX (F3, ZITN-TECH-021 Â§5.7/Â§5.14). Chrome ID, kalimat penjelas ID.
+  // Entity `&apos;`/`&amp;` sudah jadi karakter asli (rubrik Â§5.13-1).
   'page.exchangeRates': 'Kurs',
   'placeholder.amount': '0,00',
   'action.reset': 'Reset',
@@ -994,7 +1036,7 @@ const ID_MESSAGES = {
   'acct.balance.reconcile': 'Rekonsiliasi',
   'acct.balance.cash': 'Kas',
   'acct.balance.positions': 'Posisi',
-  'acct.balance.costBasisNote': 'Posisi terbuka pada harga perolehan — bukan nilai pasar.',
+  'acct.balance.costBasisNote': 'Posisi terbuka pada harga perolehan â€” bukan nilai pasar.',
   'displayCur.title': 'Mata uang tampilan',
   'displayCur.desc':
     'Mata uang yang dipakai untuk total lintas mata uang di dasbor. Saldo per akun tetap dalam mata uang aslinya.',
@@ -1004,7 +1046,7 @@ const ID_MESSAGES = {
   'fx.subtitle': 'Kelola kurs yang dipakai untuk mengubah saldo akun ke mata uang tampilan Anda.',
   'fx.field.base': 'Mata uang dasar',
   'fx.field.quote': 'Mata uang kutipan',
-  'fx.field.rate': 'Kurs ({base} → {quote})',
+  'fx.field.rate': 'Kurs ({base} â†’ {quote})',
   'fx.field.ratePlaceholder': 'mis. 0,92',
   'fx.field.effectiveDate': 'Tanggal berlaku',
   'fx.utcNote':
@@ -1017,20 +1059,20 @@ const ID_MESSAGES = {
   'fx.col.effectiveDate': 'Tanggal berlaku',
   'fx.delete.title': 'Hapus kurs',
   'fx.delete.body':
-    'Hapus kurs {base} → {quote} yang berlaku {date}? Tindakan ini tidak dapat dibatalkan.',
+    'Hapus kurs {base} â†’ {quote} yang berlaku {date}? Tindakan ini tidak dapat dibatalkan.',
   'fx.confirm.title': 'Konfirmasi perubahan kurs',
   'fx.confirm.body':
     'Perubahan kurs ini memperbarui total yang ditampilkan dari {before} menjadi sekitar {after}. Total tepat saat disimpan bisa berbeda bila tab lain atau perubahan berurutan mengubah kurs terkait. Lanjutkan?',
   'acct.reconcile.title': 'Rekonsiliasi saldo kas',
   'acct.reconcile.desc':
-    'Jurnal ZITN melacak saldo kas akun ini: saldo awal Anda ditambah P&L realisasi dari posisi yang sudah ditutup. Nilai pasar posisi terbuka tidak termasuk. Masukkan saldo kas yang seharusnya ditampilkan akun ini — Jurnal ZITN membuat satu entri penyesuaian untuk selisihnya.',
+    'Jurnal ZITN melacak saldo kas akun ini: saldo awal Anda ditambah P&L realisasi dari posisi yang sudah ditutup. Nilai pasar posisi terbuka tidak termasuk. Masukkan saldo kas yang seharusnya ditampilkan akun ini â€” Jurnal ZITN membuat satu entri penyesuaian untuk selisihnya.',
   'acct.reconcile.current': 'Saldo saat ini',
   'acct.reconcile.target': 'Saldo kas aktual',
   'acct.reconcile.adjustment': 'Penyesuaian',
-  'acct.reconcile.noChange': 'Tidak ada perubahan — saldo sudah cocok',
+  'acct.reconcile.noChange': 'Tidak ada perubahan â€” saldo sudah cocok',
   'acct.reconcile.credit': 'kredit',
   'acct.reconcile.debit': 'debit',
-  'acct.reconcile.posting': 'Memposting…',
+  'acct.reconcile.posting': 'Mempostingâ€¦',
   'acct.reconcile.submit': 'Posting penyesuaian',
   'cash.title.record': 'Catat deposit atau penarikan',
   'cash.desc.record':
@@ -1043,12 +1085,12 @@ const ID_MESSAGES = {
   'cash.field.resulting': 'Saldo setelahnya',
   'cash.warn.negative':
     'Saldo akan di bawah nol. Saldo Jurnal ZITN hanya kas dan tidak termasuk nilai pasar posisi terbuka.',
-  'cash.action.recording': 'Mencatat…',
+  'cash.action.recording': 'Mencatatâ€¦',
   'cash.action.recordDeposit': 'Catat deposit',
   'cash.action.recordWithdrawal': 'Catat penarikan',
   'ledger.empty.title': 'Belum ada aktivitas',
   'ledger.empty.desc':
-    'Belum ada aktivitas — catat deposit atau tutup posisi untuk melihat entri buku besar di sini',
+    'Belum ada aktivitas â€” catat deposit atau tutup posisi untuk melihat entri buku besar di sini',
   'ledger.col.occurredAt': 'Waktu',
   'ledger.col.position': 'Posisi',
   'ledger.col.debit': 'Debit',
@@ -1062,17 +1104,17 @@ const ID_MESSAGES = {
   'ledger.action.deleteWithdrawalAria': 'Hapus penarikan',
   'ledger.pag.previous': 'Sebelumnya',
   'ledger.pag.next': 'Berikutnya',
-  'ledger.pag.status': 'Halaman {page} · {size} per halaman',
+  'ledger.pag.status': 'Halaman {page} Â· {size} per halaman',
   'ledger.delete.title': 'Hapus {type}?',
   'ledger.delete.body':
     'Jurnal ZITN menambahkan entri pembalikan untuk {amount} dan menyimpan entri aslinya. Saldo kembali seperti sebelum {entryType} ini.',
-  // Istilah pasar (glossary.ts) — nilai identik `id`/`en`.
+  // Istilah pasar (glossary.ts) â€” nilai identik `id`/`en`.
   ...TERM_MESSAGES,
   // --- F4: csv-import (rute /import). Error/peringatan mapper dijelaskan per kode. ---
   'page.import': 'Impor dari CSV',
-  'import.loading': 'Memuat impor…',
+  'import.loading': 'Memuat imporâ€¦',
   'import.intro':
-    'Impor bersifat menambah — posisi dan fill ditambahkan ke akun tujuan. Biaya diambil dari CSV kecuali kolom biaya tidak dipetakan.',
+    'Impor bersifat menambah â€” posisi dan fill ditambahkan ke akun tujuan. Biaya diambil dari CSV kecuali kolom biaya tidak dipetakan.',
   'import.guideLink': 'Baca panduan impor',
   'import.remainingOne': '{remaining} dari {cap} impor CSV tersisa pada paket Anda.',
   'import.remainingMany': '{remaining} dari {cap} impor CSV tersisa pada paket Anda.',
@@ -1082,19 +1124,19 @@ const ID_MESSAGES = {
   'import.step2.desc': 'Server mengurai dan memvalidasi berkas.',
   'import.step3.title': '3. Petakan kolom',
   'import.step3.desc':
-    'Pilih preset untuk mengisi otomatis, lalu sesuaikan — atau petakan setiap field secara manual. Atur bentuk baris terpisah dari preset mana pun.',
+    'Pilih preset untuk mengisi otomatis, lalu sesuaikan â€” atau petakan setiap field secara manual. Atur bentuk baris terpisah dari preset mana pun.',
   'import.missingRequired': 'Petakan semua field wajib untuk melanjutkan: {fields}.',
   'import.preview.submit': 'Pratinjau impor',
-  'import.preview.pending': 'Membuat pratinjau…',
+  'import.preview.pending': 'Membuat pratinjauâ€¦',
   'import.preview.failedTitle': 'Pratinjau gagal',
   'import.preview.failed': 'Pratinjau gagal. Silakan coba lagi.',
   'import.account.label': 'Akun tujuan',
-  'import.account.loading': 'Memuat akun…',
+  'import.account.loading': 'Memuat akunâ€¦',
   'import.account.error': 'Tidak dapat memuat akun. Coba lagi.',
-  'import.account.empty': 'Buat akun dulu — perdagangan yang diimpor memerlukan akun tujuan.',
+  'import.account.empty': 'Buat akun dulu â€” perdagangan yang diimpor memerlukan akun tujuan.',
   'import.account.placeholder': 'Pilih akun',
   'import.account.option': '{name} ({currency})',
-  'import.account.optionReadOnly': '{name} ({currency}) — hanya-baca pada paket Anda',
+  'import.account.optionReadOnly': '{name} ({currency}) â€” hanya-baca pada paket Anda',
   'import.file.label': 'Berkas CSV',
   'import.file.choose': 'Pilih berkas',
   'import.file.none': 'Tidak ada berkas dipilih',
@@ -1111,7 +1153,7 @@ const ID_MESSAGES = {
   'import.mapper.numberFormat': 'Format angka',
   'import.mapper.quantityUnit': 'Satuan kuantitas',
   'import.mapper.shares': 'Saham',
-  'import.mapper.lots': 'Lot (IDX — 1 lot = 100 saham)',
+  'import.mapper.lots': 'Lot (IDX â€” 1 lot = 100 saham)',
   'import.mapper.contractForm': 'Bentuk kontrak',
   'import.mapper.contractOcc': 'Simbol OCC di kolom Symbol',
   'import.mapper.contractComposed': 'Kolom kedaluwarsa / strike / call-put terpisah',
@@ -1130,21 +1172,21 @@ const ID_MESSAGES = {
   'import.commit.duplicates':
     'Perdagangan ini tampak duplikat dari yang sudah ada di akun ini. Tetap impor?',
   'import.commit.tierLimit':
-    'Batas impor CSV paket Anda telah tercapai — pratinjau ini tetap tersimpan, jadi Anda dapat mengimpornya setelah upgrade tanpa mengunggah ulang.',
-  'import.commit.rePreviewing': 'Membuat pratinjau ulang…',
+    'Batas impor CSV paket Anda telah tercapai â€” pratinjau ini tetap tersimpan, jadi Anda dapat mengimpornya setelah upgrade tanpa mengunggah ulang.',
+  'import.commit.rePreviewing': 'Membuat pratinjau ulangâ€¦',
   'import.commit.rePreview': 'Pratinjau ulang',
   'import.commit.submit': 'Konfirmasi impor',
-  'import.commit.importing': 'Mengimpor…',
+  'import.commit.importing': 'Mengimporâ€¦',
   'import.commit.superseded':
-    'Pratinjau ini digantikan oleh yang lebih baru — buat pratinjau ulang untuk mengimpornya.',
+    'Pratinjau ini digantikan oleh yang lebih baru â€” buat pratinjau ulang untuk mengimpornya.',
   'import.commit.err.expired':
-    'Pratinjau ini telah kedaluwarsa — buat pratinjau ulang untuk mengimpor.',
+    'Pratinjau ini telah kedaluwarsa â€” buat pratinjau ulang untuk mengimpor.',
   'import.commit.err.inProgress': 'Impor untuk pratinjau ini sedang berjalan.',
   'import.commit.err.blocked':
     'Pratinjau ini memiliki galat yang menghalangi dan tidak dapat diimpor.',
-  'import.commit.err.duplicates': 'Tampak seperti duplikat — konfirmasi untuk tetap mengimpor.',
+  'import.commit.err.duplicates': 'Tampak seperti duplikat â€” konfirmasi untuk tetap mengimpor.',
   'import.commit.err.tierAccount':
-    'Akun ini tidak dapat ditulis pada paket Anda saat ini. Impor CSV hanya dapat menargetkan akun yang ditetapkan — ubah penetapan atau upgrade.',
+    'Akun ini tidak dapat ditulis pada paket Anda saat ini. Impor CSV hanya dapat menargetkan akun yang ditetapkan â€” ubah penetapan atau upgrade.',
   'import.commit.err.tierPositions':
     'Impor ini akan melampaui batas posisi paket Anda. Upgrade untuk menambah batas.',
   'import.commit.err.tierImports':
@@ -1166,7 +1208,7 @@ const ID_MESSAGES = {
   'import.summary.positions': 'Posisi',
   'import.summary.fills': 'Fill',
   'import.summary.segmentation':
-    'Fill dikelompokkan menjadi posisi berdasarkan simbol dan arah. Setiap posisi berjalan dari entri pertamanya sampai kembali flat; posisi baru dimulai setelahnya. Impor ini bersifat menambah — posisi dan fill ini ditambahkan ke akun tujuan.',
+    'Fill dikelompokkan menjadi posisi berdasarkan simbol dan arah. Setiap posisi berjalan dari entri pertamanya sampai kembali flat; posisi baru dimulai setelahnya. Impor ini bersifat menambah â€” posisi dan fill ini ditambahkan ke akun tujuan.',
   'import.issue.errorsTitle': 'Galat yang menghalangi ({n})',
   'import.issue.warningsTitle': 'Peringatan ({n})',
   'import.issue.row': 'Baris {row}',
@@ -1189,7 +1231,7 @@ const ID_MESSAGES = {
   'import.err.mappingTypeOrActionRequired':
     'Pemetaan execution harus memetakan tepat satu dari "type" atau "action".',
   'import.err.mappingTypeOrActionExclusive':
-    'Pemetaan execution harus memetakan tepat satu dari "type" atau "action" — jangan keduanya.',
+    'Pemetaan execution harus memetakan tepat satu dari "type" atau "action" â€” jangan keduanya.',
   'import.err.mappingExpiryFormatMissing': 'Bentuk kontrak composed memerlukan format kedaluwarsa.',
   'import.err.mappingColumnAbsent': 'Field dipetakan ke kolom "{column}" yang tidak ada di berkas.',
   'import.err.transformNoMatch': 'Nilai di kolom ini tidak dikenali untuk field tersebut.',
@@ -1241,7 +1283,7 @@ const ID_MESSAGES = {
   'import.err.exitBeforeEntry': 'Tidak bisa keluar sebelum ada baris masuk.',
   'import.err.exitExceedsEntry': 'Kuantitas keluar melebihi kuantitas masuk yang tersedia.',
   'import.err.segmentNotReconciled':
-    'Posisi harus keluar penuh untuk ditutup (kuantitas keluar ≠ kuantitas masuk).',
+    'Posisi harus keluar penuh untuk ditutup (kuantitas keluar â‰  kuantitas masuk).',
   'import.err.closeBeforeOpen': 'Tanggal tutup tidak boleh mendahului tanggal buka.',
   'import.err.unknown': 'Baris ini memiliki galat yang belum dapat dijelaskan.',
   'import.warn.rounded': 'Nilai angka dibulatkan ke 8 angka desimal.',
@@ -1255,15 +1297,15 @@ const ID_MESSAGES = {
   'import.warn.derivedExpiry':
     'Tanggal kedaluwarsa diturunkan dari bentuk bulanan (Jumat ketiga); dapat berbeda dari tanggal OCC broker.',
   'import.warn.unknown': 'Peringatan ini belum dapat dijelaskan.',
-  // --- F5: billing (rute /settings/billing). Permukaan uang/penawaran → cakupan 100% (R12). ---
+  // --- F5: billing (rute /settings/billing). Permukaan uang/penawaran â†’ cakupan 100% (R12). ---
   'settings.billing.title': 'Tagihan',
   'settings.billing.subtitleCredits': 'Lihat saldo kredit Anda, beli kredit, dan tinjau pemakaian.',
   'settings.billing.subtitleManage': 'Kelola langganan Anda.',
   'settings.billing.disabled': 'Penagihan tidak aktif di instance ini.',
-  'billing.loading': 'Memuat…',
+  'billing.loading': 'Memuatâ€¦',
   'billing.balance.title': 'Saldo',
   'billing.balance.error': 'Tidak dapat memuat saldo.',
-  'billing.balance.approxUsd': '≈ {amount} (perkiraan)',
+  'billing.balance.approxUsd': 'â‰ˆ {amount} (perkiraan)',
   'billing.buyCredits': 'Beli kredit',
   'billing.checkout.error': 'Tidak dapat memulai checkout. Coba lagi.',
   'billing.portal.error': 'Tidak dapat membuka portal penagihan. Coba lagi.',
@@ -1274,11 +1316,11 @@ const ID_MESSAGES = {
   'billing.plan.proUntil': 'Pro sampai {date}',
   'billing.plan.renews': 'Diperbarui {date}',
   'billing.plan.pastDue':
-    'Pembayaran terlambat — perbarui metode pembayaran untuk mempertahankan Pro.',
+    'Pembayaran terlambat â€” perbarui metode pembayaran untuk mempertahankan Pro.',
   'billing.upgrade': 'Upgrade ke Pro',
   'billing.manage': 'Kelola langganan',
   'billing.unavailable':
-    'Penagihan sementara tidak tersedia — pengelolaan langganan akan kembali segera.',
+    'Penagihan sementara tidak tersedia â€” pengelolaan langganan akan kembali segera.',
   'billing.unlimited': 'Tanpa batas',
   'billing.lever.accounts': 'Akun terhubung',
   'billing.lever.positions': 'Posisi',
@@ -1290,10 +1332,10 @@ const ID_MESSAGES = {
   'billing.usage.platformTurns': 'Giliran Advisor bulan ini',
   'billing.usage.images': 'Unggahan gambar bulan ini',
   'billing.usage.csvImports': 'Impor CSV',
-  'billing.confirming.title': 'Mengonfirmasi langganan Anda…',
+  'billing.confirming.title': 'Mengonfirmasi langganan Andaâ€¦',
   'billing.confirming.desc': 'Biasanya hanya butuh beberapa detik.',
   'billing.confirming.capped':
-    'Masih mengonfirmasi — bisa sampai satu menit; cek lagi atau hubungi dukungan bila terus berlanjut.',
+    'Masih mengonfirmasi â€” bisa sampai satu menit; cek lagi atau hubungi dukungan bila terus berlanjut.',
   'billing.history.title': 'Riwayat pemakaian',
   'billing.history.error': 'Tidak dapat memuat riwayat.',
   'billing.history.empty': 'Belum ada aktivitas.',
@@ -1301,7 +1343,7 @@ const ID_MESSAGES = {
   'billing.kind.purchase': 'Pembelian',
   'billing.kind.usage': 'Pemakaian',
   'billing.kind.reversal': 'Pembalikan',
-  'billing.usage.detail': '{provider} · {model} · {input} masuk / {output} keluar token',
+  'billing.usage.detail': '{provider} Â· {model} Â· {input} masuk / {output} keluar token',
   // --- Pengerasan F5: calculator, positions, fee-rollup (residu tak-terpeta). ---
   'calc.placeholder.amount': '0,00',
   'calc.options.selectFromChain': 'Pilih dari rantai opsi',
@@ -1323,14 +1365,14 @@ const ID_MESSAGES = {
   'onboard.zero.desc.ready':
     'Berikutnya posisi: catat trade pada akun Anda, lalu tutup, dan dasbor ini terisi angka nyata. Ikuti panduan bertahap, atau lewati langsung ke dasbor biasa kapan pun Anda mau.',
   'onboard.zero.notConnected':
-    'Akun Jurnal ZITN mencerminkan akun broker nyata: mata uang yang sama, saldo awal yang sama, trade yang sama. Akun ini tidak terhubung ke broker Anda. Jurnal ZITN tidak pernah menempatkan atau mengeksekusi trade — Anda mencatat trade yang sudah Anda lakukan.',
+    'Akun Jurnal ZITN mencerminkan akun broker nyata: mata uang yang sama, saldo awal yang sama, trade yang sama. Akun ini tidak terhubung ke broker Anda. Jurnal ZITN tidak pernah menempatkan atau mengeksekusi trade â€” Anda mencatat trade yang sudah Anda lakukan.',
   'onboard.zero.action.createAccount': 'Buat akun pertama saya',
   'onboard.zero.action.walkthrough': 'Tuntun saya',
   'onboard.zero.action.continue': 'Lanjutkan panduan',
   'onboard.zero.action.skip': 'Lewati ke dasbor saya',
   'onboard.zero.action.sampleData': 'Tambah data contoh',
   'onboard.zero.guidance.unavailable':
-    'Panduan bertahap tidak dapat dimuat. Tidak ada yang hilang — daftar penyiapan di bawah memuat empat langkah yang sama, dan panduan memulai membahasnya lengkap.',
+    'Panduan bertahap tidak dapat dimuat. Tidak ada yang hilang â€” daftar penyiapan di bawah memuat empat langkah yang sama, dan panduan memulai membahasnya lengkap.',
   'onboard.zero.guidance.waiting':
     'Panduan bertahap menunggu daftar penyiapan Anda dimuat. Sebentar lagi siap.',
   'onboard.zero.guidance.noneOutstanding':
@@ -1344,33 +1386,33 @@ const ID_MESSAGES = {
   'onboard.checklist.loadingAria': 'Memuat daftar penyiapan Anda',
   'onboard.checklist.reopen': 'Buka lagi daftar penyiapan',
   'onboard.checklist.startAria': 'Mulai: {label}',
-  'onboard.checklist.doneSuffix': '— selesai',
-  'onboard.checklist.notDoneSuffix': '— belum selesai',
+  'onboard.checklist.doneSuffix': 'â€” selesai',
+  'onboard.checklist.notDoneSuffix': 'â€” belum selesai',
   'onboard.item.account': 'Buat akun broker',
   'onboard.item.calculator': 'Hitung ukuran posisi di kalkulator',
   'onboard.item.position': 'Catat posisi',
   'onboard.item.close': 'Tutup dan lihat statistiknya',
   'onboard.launcher.title': 'Panduan bertahap',
   'onboard.launcher.desc':
-    'Ikuti bagian mana pun dari tur ini, sebanyak yang Anda suka. Tur hanya menunjuk ke layar yang dibicarakannya — tidak ada yang diubah dan tidak ada yang dicatat.',
+    'Ikuti bagian mana pun dari tur ini, sebanyak yang Anda suka. Tur hanya menunjuk ke layar yang dibicarakannya â€” tidak ada yang diubah dan tidak ada yang dicatat.',
   'onboard.launcher.start': 'Mulai',
   'onboard.launcher.startAria': 'Mulai panduan: {label}',
   'onboard.launcher.unavailable':
-    'Panduan bertahap tidak dapat dimuat. Tidak ada yang hilang — panduan memulai membahas empat langkah yang sama secara lengkap.',
+    'Panduan bertahap tidak dapat dimuat. Tidak ada yang hilang â€” panduan memulai membahas empat langkah yang sama secara lengkap.',
   'onboard.help.title': 'Bantuan',
   'onboard.help.subtitle': 'Jalankan lagi panduan bertahap, kapan pun Anda mau.',
   'onboard.stop.title': 'Panduan terhenti',
   'onboard.stop.actionRequired':
-    '“{title}” baru berlanjut setelah Anda benar-benar melakukannya, jadi panduan tidak bisa mengambil langkah itu untuk Anda.',
+    'â€œ{title}â€ baru berlanjut setelah Anda benar-benar melakukannya, jadi panduan tidak bisa mengambil langkah itu untuk Anda.',
   'onboard.stop.targetMissing':
-    '“{title}” tidak ada di layar, jadi panduan tidak bisa lanjut dari sana.',
+    'â€œ{title}â€ tidak ada di layar, jadi panduan tidak bisa lanjut dari sana.',
   'onboard.stop.carryOn':
-    '{reason} Tidak ada yang hilang — lanjutkan tanpa panduan, atau mulai lagi kapan saja dari Pengaturan → Bantuan.',
+    '{reason} Tidak ada yang hilang â€” lanjutkan tanpa panduan, atau mulai lagi kapan saja dari Pengaturan â†’ Bantuan.',
   'onboard.cannotStart.title': 'Panduan itu belum bisa dimulai',
   'onboard.cannotStart.account':
-    'Akun milik Anda dan akun contoh tidak dapat ada bersamaan, jadi membuat akun dimulai dengan menghapus data contoh — dan itu konfirmasi yang tidak bisa dituntun panduan ini. Hapus data contoh dulu, dari banner di dasbor Anda, lalu panduan ini akan berjalan.',
+    'Akun milik Anda dan akun contoh tidak dapat ada bersamaan, jadi membuat akun dimulai dengan menghapus data contoh â€” dan itu konfirmasi yang tidak bisa dituntun panduan ini. Hapus data contoh dulu, dari banner di dasbor Anda, lalu panduan ini akan berjalan.',
   'onboard.cannotStart.position':
-    'Posisi dicatat pada sebuah akun, dan Anda belum punya akun sendiri — data contoh tidak dihitung, karena posisi yang dicatat terhadapnya tidak akan menandai apa pun. Buat akun di menu Akun dan panduan ini akan berjalan.',
+    'Posisi dicatat pada sebuah akun, dan Anda belum punya akun sendiri â€” data contoh tidak dihitung, karena posisi yang dicatat terhadapnya tidak akan menandai apa pun. Buat akun di menu Akun dan panduan ini akan berjalan.',
   'onboard.cannotStart.close':
     'Yang ini berjalan pada posisi Anda yang masih terbuka, dan Anda belum punya. Catat satu dan buka, lalu mulai lagi panduan ini.',
   'onboard.cannotStart.calculator': 'Panduan ini tidak bisa dimulai dari posisi Anda saat ini.',
@@ -1388,7 +1430,7 @@ const ID_MESSAGES = {
     'Tambah Fill mencatat entri untuk menambah posisi, atau keluar untuk mengambil sebagian posisi. Tutup posisi tetap nonaktif sampai seluruh jumlahnya sudah keluar.',
   'coach.csvImport.title': 'Masukkan riwayat Anda dari CSV',
   'coach.csvImport.body':
-    'Pilih preset atau petakan sendiri kolom broker Anda, baca pratinjaunya, lalu konfirmasi. Impor bersifat menambah — posisi dan Fill ditambahkan ke akun yang Anda pilih.',
+    'Pilih preset atau petakan sendiri kolom broker Anda, baca pratinjaunya, lalu konfirmasi. Impor bersifat menambah â€” posisi dan Fill ditambahkan ke akun yang Anda pilih.',
   'coach.optionsTools.title': 'Hitung harga kontrak, baca simbol',
   'coach.optionsTools.body':
     'Penghitung Black-Scholes menilai call atau put dari spot, strike, waktu hingga kedaluwarsa, volatilitas, dan suku bunga bebas risiko. Kartu OCC membaca simbol opsi atau menyusunnya dari bagian-bagiannya.',
@@ -1408,7 +1450,7 @@ const ID_MESSAGES = {
   'walk.account.1.title': 'Mulai dengan akun',
   'walk.account.1.actionHint': 'Pilih Akun baru',
   'walk.account.1.body':
-    'Setiap posisi, Fill, dan entri buku besar dicatat pada sebuah akun, jadi inilah satu hal yang harus dilakukan lebih dulu. Akun Jurnal ZITN mencerminkan akun broker nyata — mata uang yang sama, saldo awal yang sama, trade yang sama — tetapi tidak terhubung ke broker Anda, dan Jurnal ZITN tidak pernah menempatkan atau mengeksekusi trade. Pilih Akun baru untuk membuka formulir.',
+    'Setiap posisi, Fill, dan entri buku besar dicatat pada sebuah akun, jadi inilah satu hal yang harus dilakukan lebih dulu. Akun Jurnal ZITN mencerminkan akun broker nyata â€” mata uang yang sama, saldo awal yang sama, trade yang sama â€” tetapi tidak terhubung ke broker Anda, dan Jurnal ZITN tidak pernah menempatkan atau mengeksekusi trade. Pilih Akun baru untuk membuka formulir.',
   'walk.account.2.title': 'Nama',
   'walk.account.2.body':
     'Beri nama akun sesuai akun broker yang dicerminkannya. Anda memilihnya lewat nama ini setiap kali mencatat posisi, jadi pilih nama yang mudah dikenali saat akun Anda lebih dari satu.',
@@ -1417,29 +1459,29 @@ const ID_MESSAGES = {
     'Mata uang yang dipakai akun ini untuk bertransaksi. Saldo, biaya, dan P&amp;L-nya semua dicatat dan ditampilkan dalam mata uang ini.',
   'walk.account.4.title': 'Zona waktu hari perdagangan',
   'walk.account.4.body':
-    'Ini default ke America/New_York karena NYSE, NASDAQ, dan NYSE Arca semuanya beroperasi di waktu Eastern AS. Nilai ini menentukan hari perdagangan akun ini, yang menentukan apakah sebuah posisi bisa dimasuki kembali di hari yang sama. Ini bukan zona waktu pelaporan Anda — zona itu mengelompokkan P&amp;L Anda dan diatur terpisah, di Pengaturan → Profil.',
+    'Ini default ke America/New_York karena NYSE, NASDAQ, dan NYSE Arca semuanya beroperasi di waktu Eastern AS. Nilai ini menentukan hari perdagangan akun ini, yang menentukan apakah sebuah posisi bisa dimasuki kembali di hari yang sama. Ini bukan zona waktu pelaporan Anda â€” zona itu mengelompokkan P&amp;L Anda dan diatur terpisah, di Pengaturan â†’ Profil.',
   'walk.account.5.title': 'Saldo awal',
   'walk.account.5.body':
     'Kas pembuka akun, dan garis dasar tempat semua angka berikutnya diukur. Tetapkan sekali, di sini: saldo yang ditampilkan Jurnal ZITN adalah angka ini ditambah setiap entri buku besar, jadi mengubahnya nanti akan menggeser semua saldo historisnya. Karena itu nilainya tidak bisa diubah setelah akun ada. Biarkan kosong dan akun mulai dari nol.',
   'walk.account.6.title': 'Risiko bawaan %',
   'walk.account.6.body':
-    'Porsi saldo akun ini yang Anda risikokan pada satu trade. Nilai ini mengisi awal kalkulator ukuran posisi, dan Anda bisa menimpanya pada satu perhitungan tanpa mengubah akun. Pilih 1%, 2%, atau 3% — masing-masing menunjukkan biaya sepuluh trade rugi berturut-turut — atau Tanpa aturan, yang tidak menetapkan apa pun dan membiarkan persen risiko kalkulator Anda isi sendiri tiap kali. 2% dipilih untuk Anda, dan tidak seperti saldo awal, Anda bisa mengubahnya kapan saja.',
+    'Porsi saldo akun ini yang Anda risikokan pada satu trade. Nilai ini mengisi awal kalkulator ukuran posisi, dan Anda bisa menimpanya pada satu perhitungan tanpa mengubah akun. Pilih 1%, 2%, atau 3% â€” masing-masing menunjukkan biaya sepuluh trade rugi berturut-turut â€” atau Tanpa aturan, yang tidak menetapkan apa pun dan membiarkan persen risiko kalkulator Anda isi sendiri tiap kali. 2% dipilih untuk Anda, dan tidak seperti saldo awal, Anda bisa mengubahnya kapan saja.',
   'walk.account.7.title': 'Broker',
   'walk.account.7.body':
-    'Pilih broker dan Jurnal ZITN menghitung serta mencatat biaya akun ini dari jadwal biaya broker tersebut. Membiarkannya di Tidak ada sah saja — Anda lalu memasukkan biaya sendiri pada setiap Fill — dan Anda bisa menautkan broker nanti.',
+    'Pilih broker dan Jurnal ZITN menghitung serta mencatat biaya akun ini dari jadwal biaya broker tersebut. Membiarkannya di Tidak ada sah saja â€” Anda lalu memasukkan biaya sendiri pada setiap Fill â€” dan Anda bisa menautkan broker nanti.',
   'walk.account.8.title': 'Buat akun',
   'walk.account.8.actionHint': 'Pilih Buat',
   'walk.account.8.body':
     'Pilih Buat. Akun muncul di daftar di belakang formulir ini begitu dibuat, dan Anda bisa langsung mencatat posisi terhadapnya.',
   'walk.account.9.title': 'Kembali di dasbor Anda',
   'walk.account.9.body':
-    'Akun Anda sudah dibuat, dan ini dasbor Anda lagi — daftar penyiapan di sini menyebut langkah berikutnya. Satu zona lagi sebelum pergi, dan ini berbeda: terpisah dari zona waktu hari perdagangan yang baru Anda tetapkan, Jurnal ZITN menyimpan satu zona waktu pelaporan untuk Anda — zona tempat P&amp;L Anda dikelompokkan per hari, minggu, dan bulan, agar angka itu tetap sama di mana pun Anda membuka Jurnal ZITN. Satu zona disimpan saat Anda mendaftar. Konfirmasi atau perbaiki di Pengaturan → Profil, yang menampilkannya terisi awal dengan zona yang tercatat.',
+    'Akun Anda sudah dibuat, dan ini dasbor Anda lagi â€” daftar penyiapan di sini menyebut langkah berikutnya. Satu zona lagi sebelum pergi, dan ini berbeda: terpisah dari zona waktu hari perdagangan yang baru Anda tetapkan, Jurnal ZITN menyimpan satu zona waktu pelaporan untuk Anda â€” zona tempat P&amp;L Anda dikelompokkan per hari, minggu, dan bulan, agar angka itu tetap sama di mana pun Anda membuka Jurnal ZITN. Satu zona disimpan saat Anda mendaftar. Konfirmasi atau perbaiki di Pengaturan â†’ Profil, yang menampilkannya terisi awal dengan zona yang tercatat.',
   'walk.calculator.1.title': 'Harga masuk',
   'walk.calculator.1.body':
-    'Mulai dari harga yang Anda rencanakan untuk masuk. Tidak ada yang dikirim atau disimpan di sini — kalkulator menghitung ulang saat Anda mengetik, jadi Anda bisa mencoba satu skenario lalu berubah pikiran.',
+    'Mulai dari harga yang Anda rencanakan untuk masuk. Tidak ada yang dikirim atau disimpan di sini â€” kalkulator menghitung ulang saat Anda mengetik, jadi Anda bisa mencoba satu skenario lalu berubah pikiran.',
   'walk.calculator.2.title': 'Stop loss',
   'walk.calculator.2.body':
-    'Harga di mana Anda menerima bahwa trade ini salah. Jarak dari masuk ke stop adalah yang disebut hasil sebagai Risiko per unit, dan ukuran posisi diturunkan darinya — stop yang lebih lebar membeli lebih sedikit unit untuk uang yang sama yang dirisikokan.',
+    'Harga di mana Anda menerima bahwa trade ini salah. Jarak dari masuk ke stop adalah yang disebut hasil sebagai Risiko per unit, dan ukuran posisi diturunkan darinya â€” stop yang lebih lebar membeli lebih sedikit unit untuk uang yang sama yang dirisikokan.',
   'walk.calculator.3.title': 'Harga target (opsional)',
   'walk.calculator.3.body':
     'Opsional, seperti kata labelnya. Tambahkan dan Anda juga mendapat Imbalan per unit serta rasio Risiko/Imbalan; biarkan kosong dan Anda tetap mendapat ukuran posisi.',
@@ -1450,24 +1492,24 @@ const ID_MESSAGES = {
   'walk.calculator.5.title': 'Akun',
   'walk.calculator.5.actionHint': 'Pilih akun',
   'walk.calculator.5.body':
-    'Pilih akun yang Anda tradingkan. Di bawah Persen, akun menyediakan saldo sebagai dasar ukuran; di kedua dasar, akun menyediakan mata uang dan membatasi posisi sebesar daya beli yang benar-benar dimiliki akun. Akun yang punya broker juga membawa jadwal biaya broker itu ke dalam estimasi untuk Anda — di bagian Biaya Anda masih bisa mengubah atau menghapusnya.',
+    'Pilih akun yang Anda tradingkan. Di bawah Persen, akun menyediakan saldo sebagai dasar ukuran; di kedua dasar, akun menyediakan mata uang dan membatasi posisi sebesar daya beli yang benar-benar dimiliki akun. Akun yang punya broker juga membawa jadwal biaya broker itu ke dalam estimasi untuk Anda â€” di bagian Biaya Anda masih bisa mengubah atau menghapusnya.',
   'walk.calculator.6.title': 'Nilai yang dirisikokan',
   'walk.calculator.6.body':
-    'Di bawah Persen, Persen risiko diisi awal dari Risiko bawaan % akun itu bila ada; di bawah Nilai risiko, Nilai risiko adalah angka yang Anda ketik. Apa pun pilihannya, perubahan hanya berlaku untuk perhitungan ini — akun tetap memegang aturannya, jadi angka yang Anda andalkan besok tetap yang Anda pilih.',
+    'Di bawah Persen, Persen risiko diisi awal dari Risiko bawaan % akun itu bila ada; di bawah Nilai risiko, Nilai risiko adalah angka yang Anda ketik. Apa pun pilihannya, perubahan hanya berlaku untuk perhitungan ini â€” akun tetap memegang aturannya, jadi angka yang Anda andalkan besok tetap yang Anda pilih.',
   'walk.calculator.7.title': 'Ukuran, risiko, dan R:R',
   'walk.calculator.7.body':
-    'Ukuran Posisi memberi Anda ukuran posisi dalam unit bulat, Risiko per unit, dan Nilai risiko sesungguhnya setelah ukuran dibulatkan ke bawah. Dengan target, Risiko / Imbalan menambahkan Imbalan per unit dan rasio Risiko/Imbalan — apa yang dibayar rencana ini jika berhasil, per unit biayanya jika tidak.',
+    'Ukuran Posisi memberi Anda ukuran posisi dalam unit bulat, Risiko per unit, dan Nilai risiko sesungguhnya setelah ukuran dibulatkan ke bawah. Dengan target, Risiko / Imbalan menambahkan Imbalan per unit dan rasio Risiko/Imbalan â€” apa yang dibayar rencana ini jika berhasil, per unit biayanya jika tidak.',
   'walk.position.1.title': 'Catat posisi',
   'walk.position.1.actionHint': 'Pilih Posisi Baru',
   'walk.position.1.body':
     'Satu posisi di Jurnal ZITN adalah satu trade beserta setiap Fill-nya. Pilih Posisi Baru untuk memulai posisi yang baru saja Anda ukur.',
   'walk.position.2.title': 'Simbol, sisi, dan akun',
   'walk.position.2.body':
-    'Ticker, apakah Anda long atau short, dan akun tempat posisi dicatat. Simbol mencari saat Anda mengetik, sama seperti di kalkulator. Catatan layak diisi sekarang — alasan Anda mengambil trade adalah bagian yang nanti ingin Anda lihat kembali.',
+    'Ticker, apakah Anda long atau short, dan akun tempat posisi dicatat. Simbol mencari saat Anda mengetik, sama seperti di kalkulator. Catatan layak diisi sekarang â€” alasan Anda mengambil trade adalah bagian yang nanti ingin Anda lihat kembali.',
   'walk.position.3.title': 'Buat posisi',
   'walk.position.3.actionHint': 'Pilih Buat',
   'walk.position.3.body':
-    'Pilih Buat. Belum ada yang dicatat ke akun Anda — yang Anda dapat adalah draf, pokok langkah berikutnya.',
+    'Pilih Buat. Belum ada yang dicatat ke akun Anda â€” yang Anda dapat adalah draf, pokok langkah berikutnya.',
   'walk.position.4.title': 'Dimulai sebagai draf',
   'walk.position.4.actionHint': 'Tambahkan fill masuk',
   'walk.position.4.body':
@@ -1485,10 +1527,10 @@ const ID_MESSAGES = {
   'walk.close.2.title': 'Menutup sendiri',
   'walk.close.2.actionHint': 'Pilih Tutup posisi',
   'walk.close.2.body':
-    'Keluarkan seluruh jumlah yang Anda masukkan dan Jurnal ZITN menutup posisinya untuk Anda, berpatokan pada fill terakhir itu — Tutup posisi ada untuk kasus yang tidak bisa ditangani otomatis, misalnya trade yang Anda selesaikan dengan mengoreksi fill sebelumnya. P&amp;L realisasi Anda sudah masuk ke akun pada setiap fill keluar saat Anda mencatatnya, bukan di akhir, jadi saldo sudah bergerak. Hanya keluar sebagian? Itu langkah yang selesai, bukan trade yang selesai: lanjutkan dengan Berikutnya dan tambahkan sisanya lewat Tambah Fill kapan pun Anda menutupnya.',
+    'Keluarkan seluruh jumlah yang Anda masukkan dan Jurnal ZITN menutup posisinya untuk Anda, berpatokan pada fill terakhir itu â€” Tutup posisi ada untuk kasus yang tidak bisa ditangani otomatis, misalnya trade yang Anda selesaikan dengan mengoreksi fill sebelumnya. P&amp;L realisasi Anda sudah masuk ke akun pada setiap fill keluar saat Anda mencatatnya, bukan di akhir, jadi saldo sudah bergerak. Hanya keluar sebagian? Itu langkah yang selesai, bukan trade yang selesai: lanjutkan dengan Berikutnya dan tambahkan sisanya lewat Tambah Fill kapan pun Anda menutupnya.',
   'walk.close.3.title': 'Dan begitulah',
   'walk.close.3.body':
-    'Kembali di dasbor, yang terbentuk sendiri dari trade yang Anda catat: setiap keluar yang Anda catat mencatat bagiannya dari hasil saat Anda mencatatnya, jadi saldo akun Anda sudah bergerak. Dengan posisi tertutup penuh, statistik dan kurva ekuitas di sini bersumber dari angka Anda sendiri — dan jika Anda hanya keluar sebagian, keduanya terisi begitu Anda menutup sisanya. Catat yang berikutnya dan angkanya bergerak lagi.',
+    'Kembali di dasbor, yang terbentuk sendiri dari trade yang Anda catat: setiap keluar yang Anda catat mencatat bagiannya dari hasil saat Anda mencatatnya, jadi saldo akun Anda sudah bergerak. Dengan posisi tertutup penuh, statistik dan kurva ekuitas di sini bersumber dari angka Anda sendiri â€” dan jika Anda hanya keluar sebagian, keduanya terisi begitu Anda menutup sisanya. Catat yang berikutnya dan angkanya bergerak lagi.',
 } as const;
 
 export type MessageKey = keyof typeof ID_MESSAGES;
@@ -1515,7 +1557,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'auth.field.newPassword': 'New password',
   'auth.field.confirmPassword': 'Confirm password',
   'auth.error.unexpected': 'An unexpected error occurred',
-  'auth.error.rateLimited': 'Too many requests — try again later.',
+  'auth.error.rateLimited': 'Too many requests â€” try again later.',
   'auth.error.generic': 'Something went wrong. Please try again.',
   'auth.error.passwordMismatch': 'Passwords do not match',
   'auth.login.title': 'Log in',
@@ -1536,9 +1578,9 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'ctx.chart': 'Open chart',
   'auth.forgot.title': 'Reset your password',
   'auth.forgot.sent':
-    'If an account exists for that address, a reset link is on its way — check your inbox.',
+    'If an account exists for that address, a reset link is on its way â€” check your inbox.',
   'auth.forgot.unavailable':
-    'This instance has no email configured. Self-service reset is unavailable — ask your operator to reset your password.',
+    'This instance has no email configured. Self-service reset is unavailable â€” ask your operator to reset your password.',
   'auth.forgot.submit': 'Send reset link',
   'auth.forgot.submitting': 'Sending...',
   'auth.forgot.back': 'Back to log in',
@@ -1596,7 +1638,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'settings.delete.scheduledFallback': 'the end of your paid period',
   'settings.delete.cancelError': 'Could not cancel the deletion. Try again.',
   'settings.delete.cancel': 'Cancel deletion',
-  'settings.delete.cancelling': 'Cancelling…',
+  'settings.delete.cancelling': 'Cancellingâ€¦',
   'settings.delete.inProgress': 'Deletion in progress.',
   'settings.delete.warning': 'Permanently delete your account and its data. This cannot be undone.',
   'settings.delete.cta': 'Delete account',
@@ -1607,19 +1649,19 @@ const EN_MESSAGES: Record<MessageKey, string> = {
     'Your account will be deleted on {date}, when your paid period ends. It stays usable until then, and you can cancel before it fires.',
   'settings.delete.confirmPassword': 'Confirm your password',
   'settings.delete.submit': 'Delete my account',
-  'settings.delete.submitting': 'Deleting…',
+  'settings.delete.submitting': 'Deletingâ€¦',
   'settings.delete.cancelButton': 'Cancel',
   'settings.delete.error.validation': 'That password is not valid. Check it and try again.',
   'settings.delete.error.invalidPassword': 'That password is incorrect.',
   'settings.delete.error.lastAdmin':
     'You are the last admin. Make another user an admin before deleting your account.',
   'settings.delete.error.subscription':
-    'Your subscription cannot be resolved right now — billing is unavailable. Try again later.',
+    'Your subscription cannot be resolved right now â€” billing is unavailable. Try again later.',
   'settings.delete.error.rateLimited': 'Too many attempts. Try again in a few minutes.',
   'settings.delete.error.stripe':
-    'Your subscription could not be updated. Nothing was deleted — try again.',
+    'Your subscription could not be updated. Nothing was deleted â€” try again.',
   'settings.delete.error.inProgress': 'A deletion is already in progress.',
-  'settings.delete.error.fallback': 'Something went wrong. Nothing was deleted — try again.',
+  'settings.delete.error.fallback': 'Something went wrong. Nothing was deleted â€” try again.',
   'retention.title': 'What deletion keeps',
   'retention.item.stripe': 'Stripe keeps its customer and invoice records.',
   'retention.item.audit':
@@ -1655,9 +1697,9 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'nav.expand': 'Expand sidebar',
   'journal.context.title': 'Scanner',
   'journal.context.subtitle':
-    'A context snippet from the ZITN daily sheet — not the whole sheet, not a data copy.',
+    'A context snippet from the ZITN daily sheet â€” not the whole sheet, not a data copy.',
   'journal.context.date': 'Sheet date',
-  'journal.context.view': 'View that day’s sheet',
+  'journal.context.view': 'View that dayâ€™s sheet',
   'journal.context.refresh': 'Reload',
   'journal.context.asof': 'As of',
   'journal.context.symbols': 'Symbols',
@@ -1695,7 +1737,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'widget.pnlCalendar': 'P&L Calendar',
   'widget.dimensionBreakdown': 'Dimension Breakdown',
   'widget.idxTaxFees': 'IDX Tax & Fees',
-  'widget.dailySheet': 'Today’s Scanner',
+  'widget.dailySheet': 'Todayâ€™s Scanner',
   'widget.recordCompleteness': 'Record Completeness',
   'action.cancel': 'Cancel',
   'dashboard.resetLayout': 'Reset layout',
@@ -1765,7 +1807,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'w.record.viewPositions': 'Open positions',
   'w.record.import': 'CSV import',
   'w.record.importHint': 'Review imports that are not reconciled yet.',
-  'w.record.note': 'Process metrics — not outcome figures.',
+  'w.record.note': 'Process metrics â€” not outcome figures.',
   'feedback.tab': 'Send feedback',
   'feedback.form.typeLabel': 'Type',
   'feedback.form.types.bug': 'Bug',
@@ -1773,7 +1815,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'feedback.form.types.general': 'General',
   'feedback.form.types.question': 'Question',
   'feedback.form.messageLabel': 'Message',
-  'feedback.form.messagePlaceholder': 'Write your message (10–500 characters)',
+  'feedback.form.messagePlaceholder': 'Write your message (10â€“500 characters)',
   'feedback.form.counter': '{n} characters remaining',
   'feedback.form.send': 'Send',
   'feedback.form.sent': 'Sent. Thank you.',
@@ -1862,7 +1904,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'pos.action.delete': 'Delete',
   'pos.delete.title': 'Delete position',
   'pos.delete.closedBody':
-    'Deleting the closed position "{symbol}" removes its realized P&L from the account balance and from tax and performance summaries — including prior tax years — and may change other positions\' wash-sale classification. This cannot be undone.',
+    'Deleting the closed position "{symbol}" removes its realized P&L from the account balance and from tax and performance summaries â€” including prior tax years â€” and may change other positions\' wash-sale classification. This cannot be undone.',
   'pos.delete.body': 'Are you sure you want to delete "{symbol}"? This cannot be undone.',
   'pos.detail.notFound': 'Position not found',
   'pos.detail.addEntryFirst': 'Add an entry fill first',
@@ -1918,7 +1960,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'pos.lightbox.unavailable': 'Image no longer available',
   'calc.page.title': 'Trade Calculator',
   'calc.field.account': 'Account',
-  'calc.accounts.loading': 'Loading accounts…',
+  'calc.accounts.loading': 'Loading accountsâ€¦',
   'calc.accounts.failed': 'Failed to load accounts',
   'calc.field.selectAccount': 'Select an account',
   'calc.field.direction': 'Direction',
@@ -1935,12 +1977,12 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'calc.field.balance': 'Balance',
   'calc.field.riskPercent': 'Risk percent',
   'calc.field.fees': 'Fees',
-  'calc.brokerages.loading': 'Loading brokerages…',
+  'calc.brokerages.loading': 'Loading brokeragesâ€¦',
   'calc.brokerages.failed': 'Failed to load brokerages',
   'calc.field.selectBrokerage': 'Select a brokerage',
   'calc.field.manualFees': 'Manual fees',
   'calc.quote.pull': 'Pull last price',
-  'calc.quote.pulling': 'Pulling…',
+  'calc.quote.pulling': 'Pullingâ€¦',
   'calc.error.notFound': 'Symbol not found.',
   'calc.error.providerUnavailable': 'Quote service is temporarily unavailable. Try again shortly.',
   'calc.error.providerMisconfigured': 'Quote service is misconfigured.',
@@ -1992,14 +2034,14 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'perf.behavior.overtrading': 'Overtrading',
   'perf.behavior.activeDays': 'Active days',
   'perf.behavior.overDays': 'Overtrading days',
-  'perf.behavior.threshold': 'Threshold (mean + 1.5σ)',
+  'perf.behavior.threshold': 'Threshold (mean + 1.5Ïƒ)',
   'perf.behavior.revenge': 'Revenge',
   'perf.behavior.revengeWindow': 'Window',
   'perf.behavior.revengeCount': 'Count',
   'perf.behavior.revengeRate': 'Rate',
   'perf.behavior.minutes': '{n} minutes',
   'perf.behavior.empty': 'No closed trades to analyse yet.',
-  'perf.behavior.note': 'Process metrics — not outcome figures.',
+  'perf.behavior.note': 'Process metrics â€” not outcome figures.',
   'perf.behavior.calc.title': 'Risk of ruin & Kelly',
   'perf.behavior.calc.winRate': 'Win rate (%)',
   'perf.behavior.calc.payoff': 'Reward/risk ratio',
@@ -2027,7 +2069,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'nav.chart': 'Chart',
   'chart.title': 'Chart',
   'chart.noSymbol': 'Pick a symbol from the sheet or a chart link.',
-  'chart.loading': 'Loading chart…',
+  'chart.loading': 'Loading chartâ€¦',
   'chart.failed': 'Failed to load Lightweight Charts.',
   'chart.unavailable': 'No chart data for this symbol.',
   'chart.notLinked': 'The account is not linked to ZITN.',
@@ -2080,7 +2122,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'tp.miss': 'Mark missed',
   'tp.cancel': 'Cancel',
   'tp.link': 'Link to position',
-  'tp.linkNone': '— Not linked —',
+  'tp.linkNone': 'â€” Not linked â€”',
   'tp.linkOpenOnly': 'Open positions only',
   'tp.confirm.title': 'Confirm plan status',
   'tp.confirm.body': 'Mark {symbol} as {status}? This cannot be undone.',
@@ -2100,16 +2142,16 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'calc.basis.title': 'Position sizing',
   'calc.basis.capBy': 'Cap sizing by',
   'calc.basis.select': 'Select a basis',
-  'calc.basis.cash': 'Cash — what you can deploy',
-  'calc.basis.balance': 'Balance — total equity',
+  'calc.basis.cash': 'Cash â€” what you can deploy',
+  'calc.basis.balance': 'Balance â€” total equity',
   'calc.sizing.nothing':
-    'The account balance is zero or negative — there is nothing to size against.',
+    'The account balance is zero or negative â€” there is nothing to size against.',
   'calc.sizing.exceedsMax': "The derived dollar risk exceeds the calculator's maximum.",
   'calc.sizing.buyingPowerZero':
     'Available buying power cannot fund one share/contract at this entry price.',
   'calc.sizing.roundsToZero':
     'The amount at risk does not cover one share/contract at this stop distance, so the size rounds down to zero. Size moves only with the stop distance and the amount at risk.',
-  // Cek Risiko (ZITN-TECH-017 §12 / Fase H).
+  // Cek Risiko (ZITN-TECH-017 Â§12 / Fase H).
   'nav.cekRisiko': 'Risk Check',
   'cek.page.title': 'Risk Check',
   'cek.page.subtitle': 'Work out lots, costs, and your loss limit',
@@ -2149,32 +2191,32 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.result.hargaRataRata': 'New average price',
   'cek.result.lotsTotal': 'Total lots',
   'cek.verdict.title': 'Risk status',
-  'cek.verdict.aman': 'Safe risk — under 1% of capital',
-  'cek.verdict.kuning': 'Moderate risk — 1% to 2% of capital',
-  'cek.verdict.tinggi': 'High risk — over 2% of capital',
+  'cek.verdict.aman': 'Safe risk â€” under 1% of capital',
+  'cek.verdict.kuning': 'Moderate risk â€” 1% to 2% of capital',
+  'cek.verdict.tinggi': 'High risk â€” over 2% of capital',
   'cek.empty': 'Enter the numbers above to see the result.',
   'cek.formula.toggle': 'Show the formula',
   'cek.formula.hide': 'Hide the formula',
   'cek.formula.lot':
-    'Risk budget = capital × risk%. Risk per share = buy price − stop price. Shares = risk budget ÷ risk per share, then rounded down to whole lots (1 lot = 100 shares). Maximum loss = shares × risk per share.',
+    'Risk budget = capital Ã— risk%. Risk per share = buy price âˆ’ stop price. Shares = risk budget Ã· risk per share, then rounded down to whole lots (1 lot = 100 shares). Maximum loss = shares Ã— risk per share.',
   'cek.formula.biaya':
-    'Buy fee = buy value × platform buy fee. Sell fee = sell value × platform sell fee. Final tax = 0.1% × sell value. Net proceeds = sell value − sell fee − tax. Net profit/loss = net proceeds − buy value − buy fee.',
+    'Buy fee = buy value Ã— platform buy fee. Sell fee = sell value Ã— platform sell fee. Final tax = 0.1% Ã— sell value. Net proceeds = sell value âˆ’ sell fee âˆ’ tax. Net profit/loss = net proceeds âˆ’ buy value âˆ’ buy fee.',
   'cek.formula.ara':
-    'ARA/ARB are computed from the reference price: ARA 35% (up to Rp200), 25% (Rp200–Rp5,000), 20% (above Rp5,000); ARB 15% for every range. Estimates, not the exchange’s official figures.',
+    'ARA/ARB are computed from the reference price: ARA 35% (up to Rp200), 25% (Rp200â€“Rp5,000), 20% (above Rp5,000); ARB 15% for every range. Estimates, not the exchangeâ€™s official figures.',
   'cek.action.simpan': 'Save to Notes',
-  'cek.action.saving': 'Saving…',
+  'cek.action.saving': 'Savingâ€¦',
   'cek.action.saved': 'Saved to Notes',
   'cek.action.modeLengkap': 'Full mode',
   'cek.action.modeLengkap.hint': 'Playbooks, analytics, import, and accounting live in Full mode.',
   'cek.posisi.title': 'My Positions',
   'cek.posisi.empty': 'No saved positions yet.',
-  'cek.posisi.loading': 'Loading positions…',
+  'cek.posisi.loading': 'Loading positionsâ€¦',
   'cek.posisi.lots': 'Lots',
   'cek.posisi.viewAll': 'View all positions',
   'cek.fee.disclaimer':
     'Platform fees are general estimates; every broker has its own tiers and promos. Check and adjust them.',
   'cek.disclaimer':
-    'A calculator from the numbers you enter — not advice, a recommendation, or a prediction.',
+    'A calculator from the numbers you enter â€” not advice, a recommendation, or a prediction.',
   'cek.error.modal': 'Enter a capital greater than zero.',
   'cek.error.risiko': 'Enter a risk between 0 and 100 percent.',
   'cek.error.harga': 'Enter a price greater than zero.',
@@ -2183,13 +2225,54 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.error.lots': 'Enter a lot count greater than zero.',
   'cek.error.tierPositions': "You've reached your plan's position limit.",
   'cek.error.tierAccount': 'This account is read-only on your plan.',
+  'cek.profile.title': 'Risk profile',
+  'cek.profile.rule': 'Rule',
+  'cek.profile.period': 'Period',
+  'cek.profile.period.penuh': 'Full',
+  'cek.profile.period.modern': 'Last 5 years',
+  'cek.profile.period.2025': '2025',
+  'cek.profile.tp': 'TP %',
+  'cek.profile.sl': 'SL %',
+  'cek.profile.noSl': 'No SL',
+  'cek.profile.h': 'Horizon (sessions)',
+  'cek.profile.preset': 'Preset',
+  'cek.profile.preset.konservatif': 'Conservative',
+  'cek.profile.preset.seimbang': 'Balanced',
+  'cek.profile.preset.agresif': 'Aggressive',
+  'cek.profile.approx': 'Approximated to the nearest cell: TP {tp}% Â· SL {sl} Â· H {h}.',
+  'cek.profile.current': 'Current risk',
+  'cek.profile.saveHint':
+    'This choice is saved as a setting and used by "Current risk" and the pre-trade draft.',
+  'cek.profile.stats': 'Historical statistics (in-sample)',
+  'cek.profile.rr': 'R:R',
+  'cek.profile.breakeven': 'Breakeven P(TP)',
+  'cek.profile.pTp': 'P(TP)',
+  'cek.profile.delta': 'Delta vs breakeven',
+  'cek.profile.pSl': 'P(SL)',
+  'cek.profile.eNet': 'E net',
+  'cek.profile.median': 'Median',
+  'cek.profile.p5': 'p5',
+  'cek.profile.p1min': 'p1/min',
+  'cek.profile.loss10': 'Loss > 10%',
+  'cek.profile.loss20': 'Loss > 20%',
+  'cek.profile.loss40': 'Loss > 40%',
+  'cek.profile.freq': 'Frequency (n)',
+  'cek.profile.bar.tp': 'TP',
+  'cek.profile.bar.timeout': 'Timeout',
+  'cek.profile.bar.sl': 'SL',
+  'cek.profile.gauge.win': 'P(TP) vs breakeven',
+  'cek.profile.warn.fragile': 'Fragile: P(TP) below breakeven â€” outcome leans on the timeout.',
+  'cek.profile.warn.tail': 'Deep tail: a large loss (>40%) is possible.',
+  'cek.profile.insample':
+    'In-sample Â· not advice/promise Â· no P/L projection. Basis: {basis}. Generated {date}.',
+  'cek.profile.nodata': 'No cell for this combination.',
   'tax.page.title': 'Tax Summary',
   'tax.subtitle': 'Realised P&L and tracked expenses for the selected year.',
   'tax.subtitleFlags':
     'Realised P&L, tracked expenses, and flagged positions for the selected year.',
   'tax.field.year': 'Year',
   'tax.field.jurisdiction': 'Jurisdiction',
-  'tax.disclaimer.trigger': 'Disclaimer — please read before using these figures',
+  'tax.disclaimer.trigger': 'Disclaimer â€” please read before using these figures',
   'tax.missingRates': 'Missing exchange rate(s):',
   'tax.enterRate': 'Enter rate',
   'tax.loadFailed': 'Failed to load tax summary. Please try again.',
@@ -2266,13 +2349,13 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'wash.reason.heldOpen': 'Held open in 30-day window',
   'wash.more': '+{n} more',
   'email.reset.subject': 'Reset your Jurnal ZITN password',
-  'email.reset.preheader': 'Reset your Jurnal ZITN password — this link expires in 60 minutes.',
+  'email.reset.preheader': 'Reset your Jurnal ZITN password â€” this link expires in 60 minutes.',
   'email.reset.heading': 'Reset your password',
   'email.reset.intro': 'We received a request to reset the password for your Jurnal ZITN account.',
   'email.reset.cta': 'Reset password',
   'email.reset.expiry': 'This link expires in 60 minutes.',
   'email.reset.notice':
-    "If you didn't request this, you can ignore this email — your password is unchanged.",
+    "If you didn't request this, you can ignore this email â€” your password is unchanged.",
   'email.verify.subject': 'Verify your email address',
   'email.verify.preheader': 'Verify your email address to finish setting up Jurnal ZITN.',
   'email.verify.heading': 'Confirm your email address',
@@ -2282,7 +2365,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'email.verify.expiry': 'This link expires in 24 hours.',
   'email.verify.notice': "If you didn't request this, you can ignore this email.",
   'email.pasteLink': 'Or paste this link into your browser:',
-  'email.footer.tagline': 'Jurnal ZITN — the open-source trading journal',
+  'email.footer.tagline': 'Jurnal ZITN â€” the open-source trading journal',
   'email.footer.auto':
     'This is an automated, transactional message about your Jurnal ZITN account.',
   'web.error.title': 'Something went wrong',
@@ -2302,28 +2385,29 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'adm.error.notFound': 'This user no longer exists. Nothing was deleted.',
   'adm.error.lastAdmin': 'Cannot delete the last admin.',
   'adm.error.subscription':
-    'Their subscription cannot be resolved right now — billing is unavailable. Nothing was deleted; try again later.',
-  'adm.error.stripe': 'Their subscription could not be cancelled. Nothing was deleted — try again.',
-  'adm.error.fallback': 'Something went wrong. Nothing was deleted — try again.',
+    'Their subscription cannot be resolved right now â€” billing is unavailable. Nothing was deleted; try again later.',
+  'adm.error.stripe':
+    'Their subscription could not be cancelled. Nothing was deleted â€” try again.',
+  'adm.error.fallback': 'Something went wrong. Nothing was deleted â€” try again.',
   'tax.disc.preamble':
     'Jurnal ZITN is not a tax advisor. The figures shown are computational aggregates of your trading data, not tax advice.',
   'tax.disc.recUS':
     'Brokerage fees on closed positions are already deducted from the realised P&L figures here. Recorded fill fees for visibility live on the separate Fee Rollup page (filledAt-bucketed). Wash-sale flags below are heuristic; they do not adjust the P&L figures.',
   'tax.disc.recCA':
-    "Commission fees paid through fills are already incorporated into the realised gain/loss above (consistent with the CRA's adjusted cost base treatment). The 50% capital-gains inclusion rate is NOT applied by Jurnal ZITN — the realised P&L shown is the pre-inclusion-rate figure.",
+    "Commission fees paid through fills are already incorporated into the realised gain/loss above (consistent with the CRA's adjusted cost base treatment). The 50% capital-gains inclusion rate is NOT applied by Jurnal ZITN â€” the realised P&L shown is the pre-inclusion-rate figure.",
   'tax.disc.recID':
     'Tax: Jurnal ZITN shows the **{rate}% final income tax on sale proceeds** (not an official tax computation). The figures below are computational aggregates of your transaction data; consult a tax professional.',
   'tax.disc.recOther':
     'Jurnal ZITN does not support jurisdiction-specific tax rules for your jurisdiction. The figures below are computational aggregates only; consult a local tax professional.',
   'tax.disc.reconcile':
-    'Recorded fill fees and tracked expenses are surfaced in separate places — recorded fees on the [Fee Rollup page](/accounting/fee-rollup) (bucketed by `filledAt`), tracked expenses in the section below. Jurnal ZITN does not compute a net taxable income — that subtraction depends on filer status and jurisdiction-specific deduction rules.',
+    'Recorded fill fees and tracked expenses are surfaced in separate places â€” recorded fees on the [Fee Rollup page](/accounting/fee-rollup) (bucketed by `filledAt`), tracked expenses in the section below. Jurnal ZITN does not compute a net taxable income â€” that subtraction depends on filer status and jurisdiction-specific deduction rules.',
   'tax.disc.heuristic':
-    'Wash-sale (US) and superficial-loss (CA) flags use a symbol-and-date heuristic, not lot-level matching. For options, matching uses the underlying — different strikes and expirations of the same underlying are flagged together. Wash-sale and superficial-loss flags aggregate across all of your accounts.',
+    'Wash-sale (US) and superficial-loss (CA) flags use a symbol-and-date heuristic, not lot-level matching. For options, matching uses the underlying â€” different strikes and expirations of the same underlying are flagged together. Wash-sale and superficial-loss flags aggregate across all of your accounts.',
   'tax.disc.yearBucket':
     "All year-bucketing uses UTC calendar boundaries. A position closed after 19:00 ET on December 31 will appear in the following year's tax summary.",
   'tax.disc.filing': 'Consult a qualified tax professional for filing.',
   'tax.disc.stabilityNone':
-    'Currency conversion uses rates as of (none available — set a display currency to convert).',
+    'Currency conversion uses rates as of (none available â€” set a display currency to convert).',
   'tax.disc.stabilityPast':
     'Currency conversion uses rates as of {date} (year-end). Reloading does not change the numbers unless you enter new rates dated on or before that date.',
   'tax.disc.stabilityCurrent':
@@ -2337,7 +2421,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'err.emailNotConfigured': 'This instance has no email configured.',
   'err.registrationDisabled': 'New account signups are closed.',
   'err.invalidTimezone': 'Invalid timezone.',
-  // Chrome umum (bukan istilah pasar) — nilai ID penuh (ZITN-TECH-021 §2).
+  // Chrome umum (bukan istilah pasar) â€” nilai ID penuh (ZITN-TECH-021 Â§2).
   'common.name': 'Name',
   'common.notes': 'Notes',
   'common.currency': 'Currency',
@@ -2353,14 +2437,14 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'common.none': 'None',
   'page.accounts': 'Accounts',
   'page.brokerages': 'Brokerages',
-  // Brokerages (F2, ZITN-TECH-021 §5.7).
+  // Brokerages (F2, ZITN-TECH-021 Â§5.7).
   'broker.title.view': 'View System Brokerage',
   'broker.title.edit': 'Edit Brokerage',
   'broker.title.new': 'New Brokerage',
   'broker.field.namePlaceholder': 'e.g., Interactive Brokers',
   'broker.field.notesPlaceholder': 'Optional notes',
   'broker.field.preset': 'Broker preset',
-  'broker.field.presetPlaceholder': 'Choose a preset…',
+  'broker.field.presetPlaceholder': 'Choose a presetâ€¦',
   'broker.action.duplicating': 'Copying...',
   'broker.action.duplicate': 'Create Editable Copy',
   'broker.confirmFee.title': 'Confirm Fee Schedule Change',
@@ -2375,7 +2459,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'broker.list.empty': 'No brokerages yet. Create one to start tracking fees.',
   'broker.col.type': 'Type',
   'broker.col.feeSummary': 'Fee Summary',
-  'broker.row.approx': 'Approximate rates — verify with your broker',
+  'broker.row.approx': 'Approximate rates â€” verify with your broker',
   'broker.type.system': 'System',
   'broker.type.custom': 'Custom',
   'broker.delete.title': 'Delete Brokerage',
@@ -2392,8 +2476,8 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'broker.fee.perContractCommission': 'Per Contract Commission',
   'broker.fee.perContractExchangeFee': 'Per Contract Exchange Fee',
   'broker.preset.idxNotes':
-    "Estimated commission {buy}% buy / {sell}% sell (including levy). Figures may differ per security/promo — check and adjust to your broker's rates.",
-  // Accounts (F2, ZITN-TECH-021 §5.7).
+    "Estimated commission {buy}% buy / {sell}% sell (including levy). Figures may differ per security/promo â€” check and adjust to your broker's rates.",
+  // Accounts (F2, ZITN-TECH-021 Â§5.7).
   'acct.title.edit': 'Edit Account',
   'acct.title.new': 'New Account',
   'acct.list.new': 'New Account',
@@ -2415,7 +2499,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
     'Your own accounts and the sample account cannot both exist, so creating an account removes the sample account and every trade in it. You can add sample data again once you have no accounts of your own.',
   'acct.demo.error':
     'The sample data could not be removed, so your account has not been created. Try again.',
-  'acct.demo.removing': 'Removing…',
+  'acct.demo.removing': 'Removingâ€¦',
   'acct.demo.confirm': 'Remove and continue',
   'acct.delete.title': 'Delete account',
   'acct.delete.body': 'Are you sure you want to delete "{name}"? This action cannot be undone.',
@@ -2423,12 +2507,12 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'acct.field.namePlaceholder': 'e.g., IBKR Main',
   'acct.field.timezone': 'Trading-day timezone',
   'acct.field.timezoneHelp':
-    'Defines the trading day for this account — used to decide whether a position can be re-entered the same day. It is not your reporting timezone, which buckets your P&L and is set in settings.',
+    'Defines the trading day for this account â€” used to decide whether a position can be re-entered the same day. It is not your reporting timezone, which buckets your P&L and is set in settings.',
   'acct.field.startingBalance': 'Starting balance',
   'acct.field.startingBalancePlaceholder': '0.00',
   'acct.field.defaultRisk': 'Default risk %',
   'acct.field.defaultRiskHelp':
-    "The share of this account's balance you risk on a single trade — it prefills the position-size calculator, and you can override it on any one calculation. The second figure is what ten losing trades in a row would cost.",
+    "The share of this account's balance you risk on a single trade â€” it prefills the position-size calculator, and you can override it on any one calculation. The second figure is what ten losing trades in a row would cost.",
   'acct.risk.preset1Label': '1%',
   'acct.risk.preset1Note': '10 losses: -10%',
   'acct.risk.preset2Label': '2%',
@@ -2442,7 +2526,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'acct.brokerage.systemPresets': 'System Presets',
   'acct.brokerage.yours': 'Your Brokerages',
   'acct.warn.usdFees':
-    'This preset assumes USD fees — amounts may not reflect accurate currency-adjusted costs.',
+    'This preset assumes USD fees â€” amounts may not reflect accurate currency-adjusted costs.',
   'acct.confirmBrokerage.title': 'Change brokerage?',
   'acct.confirmBrokerage.bodyOne':
     'This account has {count} position. Changing the brokerage will affect fee calculations for existing positions.',
@@ -2452,7 +2536,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'acct.detail.backToAccounts': 'Back to accounts',
   'acct.detail.back': 'Back',
   'acct.detail.ledger': 'Ledger',
-  // Accounting/ledger & FX (F3, ZITN-TECH-021 §5.7/§5.14).
+  // Accounting/ledger & FX (F3, ZITN-TECH-021 Â§5.7/Â§5.14).
   'page.exchangeRates': 'Exchange Rates',
   'placeholder.amount': '0.00',
   'action.reset': 'Reset',
@@ -2461,7 +2545,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'acct.balance.reconcile': 'Reconcile',
   'acct.balance.cash': 'Cash',
   'acct.balance.positions': 'Positions',
-  'acct.balance.costBasisNote': 'Open positions at cost basis — not market value.',
+  'acct.balance.costBasisNote': 'Open positions at cost basis â€” not market value.',
   'displayCur.title': 'Display currency',
   'displayCur.desc':
     'The currency used for the dashboard cross-currency total. Per-account balances stay in their native currency.',
@@ -2471,7 +2555,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'fx.subtitle': 'Manage the rates used to convert account balances into your display currency.',
   'fx.field.base': 'Base currency',
   'fx.field.quote': 'Quote currency',
-  'fx.field.rate': 'Rate ({base} → {quote})',
+  'fx.field.rate': 'Rate ({base} â†’ {quote})',
   'fx.field.ratePlaceholder': 'e.g., 0.92',
   'fx.field.effectiveDate': 'Effective date',
   'fx.utcNote':
@@ -2483,20 +2567,20 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'fx.col.rate': 'Rate',
   'fx.col.effectiveDate': 'Effective date',
   'fx.delete.title': 'Delete exchange rate',
-  'fx.delete.body': 'Delete the {base} → {quote} rate effective {date}? This cannot be undone.',
+  'fx.delete.body': 'Delete the {base} â†’ {quote} rate effective {date}? This cannot be undone.',
   'fx.confirm.title': 'Confirm rate change',
   'fx.confirm.body':
     'This rate change updates your displayed total from {before} to approximately {after}. The exact total at commit time may differ if other tabs or sequential edits change related rates. Continue?',
   'acct.reconcile.title': 'Reconcile cash balance',
   'acct.reconcile.desc':
-    "Jurnal ZITN tracks this account's cash balance: your starting balance plus realized P&L from closed trades. It does not include the market value of open positions. Enter the cash balance this account should show — Jurnal ZITN posts a single adjusting entry for the difference.",
+    "Jurnal ZITN tracks this account's cash balance: your starting balance plus realized P&L from closed trades. It does not include the market value of open positions. Enter the cash balance this account should show â€” Jurnal ZITN posts a single adjusting entry for the difference.",
   'acct.reconcile.current': 'Current balance',
   'acct.reconcile.target': 'Actual cash balance',
   'acct.reconcile.adjustment': 'Adjustment',
-  'acct.reconcile.noChange': 'No change — the balance already matches',
+  'acct.reconcile.noChange': 'No change â€” the balance already matches',
   'acct.reconcile.credit': 'credit',
   'acct.reconcile.debit': 'debit',
-  'acct.reconcile.posting': 'Posting…',
+  'acct.reconcile.posting': 'Postingâ€¦',
   'acct.reconcile.submit': 'Post adjustment',
   'cash.title.record': 'Record a deposit or withdrawal',
   'cash.desc.record':
@@ -2509,12 +2593,12 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cash.field.resulting': 'Resulting balance',
   'cash.warn.negative':
     "The balance will go below zero. Jurnal ZITN's balance is cash only and does not include the market value of open positions.",
-  'cash.action.recording': 'Recording…',
+  'cash.action.recording': 'Recordingâ€¦',
   'cash.action.recordDeposit': 'Record deposit',
   'cash.action.recordWithdrawal': 'Record withdrawal',
   'ledger.empty.title': 'No activity yet',
   'ledger.empty.desc':
-    'No activity yet — record a deposit or close a position to see ledger entries here',
+    'No activity yet â€” record a deposit or close a position to see ledger entries here',
   'ledger.col.occurredAt': 'Occurred at',
   'ledger.col.position': 'Position',
   'ledger.col.debit': 'Debit',
@@ -2528,17 +2612,17 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'ledger.action.deleteWithdrawalAria': 'Delete withdrawal',
   'ledger.pag.previous': 'Previous',
   'ledger.pag.next': 'Next',
-  'ledger.pag.status': 'Page {page} · {size} per page',
+  'ledger.pag.status': 'Page {page} Â· {size} per page',
   'ledger.delete.title': 'Delete {type}?',
   'ledger.delete.body':
     'Jurnal ZITN adds a reversal entry for {amount} and keeps the original. The balance returns to what it was before this {entryType}.',
-  // Istilah pasar (glossary.ts) — nilai identik `id`/`en`.
+  // Istilah pasar (glossary.ts) â€” nilai identik `id`/`en`.
   ...TERM_MESSAGES,
   // --- F4: csv-import (/import route). Mapper errors/warnings explained per code. ---
   'page.import': 'Import trades from CSV',
-  'import.loading': 'Loading import…',
+  'import.loading': 'Loading importâ€¦',
   'import.intro':
-    'Imports are additive — they add positions and fills to the target account. Fees come from the CSV unless no fees column is mapped.',
+    'Imports are additive â€” they add positions and fills to the target account. Fees come from the CSV unless no fees column is mapped.',
   'import.guideLink': 'Read the import guide',
   'import.remainingOne': '{remaining} of {cap} CSV import remaining on your plan.',
   'import.remainingMany': '{remaining} of {cap} CSV imports remaining on your plan.',
@@ -2548,19 +2632,19 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'import.step2.desc': 'The server parses and validates the file.',
   'import.step3.title': '3. Map columns',
   'import.step3.desc':
-    'Pick a preset to auto-fill, then adjust — or map every field by hand. Set the row shape independently of any preset.',
+    'Pick a preset to auto-fill, then adjust â€” or map every field by hand. Set the row shape independently of any preset.',
   'import.missingRequired': 'Map all required fields to continue: {fields}.',
   'import.preview.submit': 'Preview import',
-  'import.preview.pending': 'Previewing…',
+  'import.preview.pending': 'Previewingâ€¦',
   'import.preview.failedTitle': 'Preview failed',
   'import.preview.failed': 'Preview failed. Please try again.',
   'import.account.label': 'Target account',
-  'import.account.loading': 'Loading accounts…',
+  'import.account.loading': 'Loading accountsâ€¦',
   'import.account.error': 'Could not load accounts. Try again.',
-  'import.account.empty': 'Create an account first — imported trades need a target account.',
+  'import.account.empty': 'Create an account first â€” imported trades need a target account.',
   'import.account.placeholder': 'Select an account',
   'import.account.option': '{name} ({currency})',
-  'import.account.optionReadOnly': '{name} ({currency}) — read-only on your plan',
+  'import.account.optionReadOnly': '{name} ({currency}) â€” read-only on your plan',
   'import.file.label': 'CSV file',
   'import.file.choose': 'Choose file',
   'import.file.none': 'No file selected',
@@ -2577,7 +2661,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'import.mapper.numberFormat': 'Number format',
   'import.mapper.quantityUnit': 'Quantity unit',
   'import.mapper.shares': 'Shares',
-  'import.mapper.lots': 'Lots (IDX — 1 lot = 100 shares)',
+  'import.mapper.lots': 'Lots (IDX â€” 1 lot = 100 shares)',
   'import.mapper.contractForm': 'Contract form',
   'import.mapper.contractOcc': 'OCC symbol in the Symbol column',
   'import.mapper.contractComposed': 'Separate expiry / strike / call-put columns',
@@ -2596,18 +2680,19 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'import.commit.duplicates':
     'These trades look like duplicates of trades already in this account. Import them anyway?',
   'import.commit.tierLimit':
-    "You've reached your plan's CSV import limit — this preview stays saved, so you can import it after upgrading without re-uploading.",
-  'import.commit.rePreviewing': 'Re-previewing…',
+    "You've reached your plan's CSV import limit â€” this preview stays saved, so you can import it after upgrading without re-uploading.",
+  'import.commit.rePreviewing': 'Re-previewingâ€¦',
   'import.commit.rePreview': 'Re-preview',
   'import.commit.submit': 'Confirm import',
-  'import.commit.importing': 'Importing…',
-  'import.commit.superseded': 'This preview was replaced by a newer one — re-preview to import it.',
-  'import.commit.err.expired': 'This preview has expired — re-preview to import.',
+  'import.commit.importing': 'Importingâ€¦',
+  'import.commit.superseded':
+    'This preview was replaced by a newer one â€” re-preview to import it.',
+  'import.commit.err.expired': 'This preview has expired â€” re-preview to import.',
   'import.commit.err.inProgress': 'An import for this preview is already running.',
   'import.commit.err.blocked': 'This preview has blocking errors and cannot be imported.',
-  'import.commit.err.duplicates': 'These look like duplicates — confirm to import anyway.',
+  'import.commit.err.duplicates': 'These look like duplicates â€” confirm to import anyway.',
   'import.commit.err.tierAccount':
-    'This account is not writable on your current plan. CSV imports can only target your designated writable account — change the designation or upgrade.',
+    'This account is not writable on your current plan. CSV imports can only target your designated writable account â€” change the designation or upgrade.',
   'import.commit.err.tierPositions':
     'This import would exceed your plan\u2019s position limit. Upgrade to raise the cap.',
   'import.commit.err.tierImports':
@@ -2629,7 +2714,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'import.summary.positions': 'Positions',
   'import.summary.fills': 'Fills',
   'import.summary.segmentation':
-    'Fills are grouped into positions by symbol and direction. Each position runs from its first entry until it returns to flat; a new position starts after that. This import is additive — it adds these positions and fills to the target account.',
+    'Fills are grouped into positions by symbol and direction. Each position runs from its first entry until it returns to flat; a new position starts after that. This import is additive â€” it adds these positions and fills to the target account.',
   'import.issue.errorsTitle': 'Blocking errors ({n})',
   'import.issue.warningsTitle': 'Warnings ({n})',
   'import.issue.row': 'Row {row}',
@@ -2708,7 +2793,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'import.err.exitBeforeEntry': 'Cannot exit before an entry fill.',
   'import.err.exitExceedsEntry': 'The exit quantity would exceed the available entry quantity.',
   'import.err.segmentNotReconciled':
-    'A position must be fully exited to close (exit quantity ≠ entry quantity).',
+    'A position must be fully exited to close (exit quantity â‰  entry quantity).',
   'import.err.closeBeforeOpen': 'The close date cannot precede the open date.',
   'import.err.unknown': 'This row has an error that cannot be explained yet.',
   'import.warn.rounded': 'A number was rounded to 8 decimal places.',
@@ -2722,15 +2807,15 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'import.warn.derivedExpiry':
     'The expiry was derived from the monthly form (third Friday); it may differ from the broker\u2019s OCC expiration date.',
   'import.warn.unknown': 'This warning cannot be explained yet.',
-  // --- F5: billing (/settings/billing route). Money/offer surface → 100% coverage (R12). ---
+  // --- F5: billing (/settings/billing route). Money/offer surface â†’ 100% coverage (R12). ---
   'settings.billing.title': 'Billing',
   'settings.billing.subtitleCredits': 'View your credit balance, buy credits, and review usage.',
   'settings.billing.subtitleManage': 'Manage your subscription.',
   'settings.billing.disabled': 'Billing is not enabled on this instance.',
-  'billing.loading': 'Loading…',
+  'billing.loading': 'Loadingâ€¦',
   'billing.balance.title': 'Balance',
   'billing.balance.error': "Couldn't load balance.",
-  'billing.balance.approxUsd': '≈ {amount} (approx.)',
+  'billing.balance.approxUsd': 'â‰ˆ {amount} (approx.)',
   'billing.buyCredits': 'Buy credits',
   'billing.checkout.error': "Couldn't start checkout. Try again.",
   'billing.portal.error': "Couldn't open the billing portal. Try again.",
@@ -2740,11 +2825,11 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'billing.plan.perMonth': '{price} / month',
   'billing.plan.proUntil': 'Pro until {date}',
   'billing.plan.renews': 'Renews {date}',
-  'billing.plan.pastDue': 'Payment past due — update your payment method to keep Pro.',
+  'billing.plan.pastDue': 'Payment past due â€” update your payment method to keep Pro.',
   'billing.upgrade': 'Upgrade to Pro',
   'billing.manage': 'Manage subscription',
   'billing.unavailable':
-    'Billing is temporarily unavailable — subscription management will return shortly.',
+    'Billing is temporarily unavailable â€” subscription management will return shortly.',
   'billing.unlimited': 'Unlimited',
   'billing.lever.accounts': 'Connected accounts',
   'billing.lever.positions': 'Positions',
@@ -2756,10 +2841,10 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'billing.usage.platformTurns': 'Advisor turns this month',
   'billing.usage.images': 'Image uploads this month',
   'billing.usage.csvImports': 'CSV imports',
-  'billing.confirming.title': 'Confirming your subscription…',
+  'billing.confirming.title': 'Confirming your subscriptionâ€¦',
   'billing.confirming.desc': 'This usually takes a few seconds.',
   'billing.confirming.capped':
-    'Still confirming — this can take a minute; check back or contact support if it persists.',
+    'Still confirming â€” this can take a minute; check back or contact support if it persists.',
   'billing.history.title': 'Usage history',
   'billing.history.error': "Couldn't load history.",
   'billing.history.empty': 'No activity yet.',
@@ -2767,7 +2852,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'billing.kind.purchase': 'Purchase',
   'billing.kind.usage': 'Usage',
   'billing.kind.reversal': 'Reversal',
-  'billing.usage.detail': '{provider} · {model} · {input} in / {output} out tokens',
+  'billing.usage.detail': '{provider} Â· {model} Â· {input} in / {output} out tokens',
   // --- Hardening F5: calculator, positions, fee-rollup (unmapped residue). ---
   'calc.placeholder.amount': '0.00',
   'calc.options.selectFromChain': 'Select from options chain',
@@ -2789,14 +2874,14 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'onboard.zero.desc.ready':
     'Positions come next: log a trade against your account, then close it, and this dashboard fills in with real numbers. Follow the guided walkthrough, or skip ahead to the ordinary dashboard whenever you like.',
   'onboard.zero.notConnected':
-    'A Jurnal ZITN account mirrors a real brokerage account: the same currency, the same starting balance, the same trades. It is not connected to your broker. Jurnal ZITN never places or executes trades — you record trades you have already made.',
+    'A Jurnal ZITN account mirrors a real brokerage account: the same currency, the same starting balance, the same trades. It is not connected to your broker. Jurnal ZITN never places or executes trades â€” you record trades you have already made.',
   'onboard.zero.action.createAccount': 'Create my first account',
   'onboard.zero.action.walkthrough': 'Walk me through it',
   'onboard.zero.action.continue': 'Continue the walkthrough',
   'onboard.zero.action.skip': 'Skip to my dashboard',
   'onboard.zero.action.sampleData': 'Add sample data',
   'onboard.zero.guidance.unavailable':
-    'The guided walkthrough could not be loaded. Nothing is lost — the setup checklist below lists the same four steps, and the getting-started guide covers them in full.',
+    'The guided walkthrough could not be loaded. Nothing is lost â€” the setup checklist below lists the same four steps, and the getting-started guide covers them in full.',
   'onboard.zero.guidance.waiting':
     'The guided walkthrough is waiting for your setup checklist to load. It will be ready in a moment.',
   'onboard.zero.guidance.noneOutstanding':
@@ -2809,33 +2894,33 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'onboard.checklist.loadingAria': 'Loading your setup checklist',
   'onboard.checklist.reopen': 'Reopen setup checklist',
   'onboard.checklist.startAria': 'Start: {label}',
-  'onboard.checklist.doneSuffix': '— completed',
-  'onboard.checklist.notDoneSuffix': '— not completed',
+  'onboard.checklist.doneSuffix': 'â€” completed',
+  'onboard.checklist.notDoneSuffix': 'â€” not completed',
   'onboard.item.account': 'Create a brokerage account',
   'onboard.item.calculator': 'Size a trade in the calculator',
   'onboard.item.position': 'Log a position',
   'onboard.item.close': 'Close it and see the stats',
   'onboard.launcher.title': 'Guided walkthrough',
   'onboard.launcher.desc':
-    'Take any part of the tour, as many times as you like. It only points at the screen it is talking about — nothing is changed and nothing is recorded.',
+    'Take any part of the tour, as many times as you like. It only points at the screen it is talking about â€” nothing is changed and nothing is recorded.',
   'onboard.launcher.start': 'Start',
   'onboard.launcher.startAria': 'Start walkthrough: {label}',
   'onboard.launcher.unavailable':
-    'The guided walkthrough could not be loaded. Nothing is lost — the getting-started guide covers the same four steps in full.',
+    'The guided walkthrough could not be loaded. Nothing is lost â€” the getting-started guide covers the same four steps in full.',
   'onboard.help.title': 'Help',
   'onboard.help.subtitle': 'Start the guided walkthrough again, whenever you want it.',
   'onboard.stop.title': 'The walkthrough stopped',
   'onboard.stop.actionRequired':
-    '“{title}” only moves on once you have actually done it, so the walkthrough cannot take that step for you.',
+    'â€œ{title}â€ only moves on once you have actually done it, so the walkthrough cannot take that step for you.',
   'onboard.stop.targetMissing':
-    '“{title}” is not on screen, so the walkthrough could not carry on from there.',
+    'â€œ{title}â€ is not on screen, so the walkthrough could not carry on from there.',
   'onboard.stop.carryOn':
-    '{reason} Nothing was lost — carry on without it, or start it again whenever you want from Settings → Help.',
+    '{reason} Nothing was lost â€” carry on without it, or start it again whenever you want from Settings â†’ Help.',
   'onboard.cannotStart.title': 'That walkthrough cannot start yet',
   'onboard.cannotStart.account':
-    'Your own accounts and the sample account cannot both exist, so creating one starts by removing the sample data — and that is a confirmation this walkthrough cannot take you through. Remove the sample data first, from the banner on your dashboard, and this walkthrough will run.',
+    'Your own accounts and the sample account cannot both exist, so creating one starts by removing the sample data â€” and that is a confirmation this walkthrough cannot take you through. Remove the sample data first, from the banner on your dashboard, and this walkthrough will run.',
   'onboard.cannotStart.position':
-    'A position is booked against an account, and you have none of your own yet — the sample data does not count, because a position logged against it would tick nothing. Create an account under Accounts and this walkthrough will run.',
+    'A position is booked against an account, and you have none of your own yet â€” the sample data does not count, because a position logged against it would tick nothing. Create an account under Accounts and this walkthrough will run.',
   'onboard.cannotStart.close':
     'This one runs on a position of yours that is still open, and you have none right now. Log one and open it, then start this walkthrough again.',
   'onboard.cannotStart.calculator': 'This walkthrough cannot start from where you are right now.',
@@ -2853,7 +2938,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
     'Add Fill records an entry to scale in, or an exit to take part of the position off. Close Position stays disabled until the whole quantity has been exited.',
   'coach.csvImport.title': 'Bring your history in from a CSV',
   'coach.csvImport.body':
-    "Pick a preset or map your broker's columns by hand, read the preview, then confirm. Imports are additive — they add positions and fills to the account you choose.",
+    "Pick a preset or map your broker's columns by hand, read the preview, then confirm. Imports are additive â€” they add positions and fills to the account you choose.",
   'coach.optionsTools.title': 'Price a contract, decode a symbol',
   'coach.optionsTools.body':
     'The Black-Scholes pricer values a call or put from spot, strike, time to expiry, volatility and the risk-free rate. The OCC card decodes an option symbol or builds one from its parts.',
@@ -2873,7 +2958,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'walk.account.1.title': 'Start with an account',
   'walk.account.1.actionHint': 'Choose New Account',
   'walk.account.1.body':
-    'Every position, fill and ledger entry is booked against an account, so this is the one thing to do first. A Jurnal ZITN account mirrors a real brokerage account — the same currency, the same starting balance, the same trades — but it is not connected to your broker, and Jurnal ZITN never places or executes trades. Choose New Account to open the form.',
+    'Every position, fill and ledger entry is booked against an account, so this is the one thing to do first. A Jurnal ZITN account mirrors a real brokerage account â€” the same currency, the same starting balance, the same trades â€” but it is not connected to your broker, and Jurnal ZITN never places or executes trades. Choose New Account to open the form.',
   'walk.account.2.title': 'Name',
   'walk.account.2.body':
     'Name the account after the brokerage account it mirrors. You pick it by this name every time you log a position, so make it one you will recognise when you have more than one.',
@@ -2882,29 +2967,29 @@ const EN_MESSAGES: Record<MessageKey, string> = {
     'The currency this account trades in. Its balance, fees and P&amp;L are all recorded and shown in this currency.',
   'walk.account.4.title': 'Trading-day timezone',
   'walk.account.4.body':
-    'This defaults to America/New_York because NYSE, NASDAQ and NYSE Arca all operate on US Eastern. It defines the trading day for this account, which is what decides whether a position can be re-entered the same day. It is not your reporting timezone — that one buckets your P&amp;L and is set separately, under Settings → Profile.',
+    'This defaults to America/New_York because NYSE, NASDAQ and NYSE Arca all operate on US Eastern. It defines the trading day for this account, which is what decides whether a position can be re-entered the same day. It is not your reporting timezone â€” that one buckets your P&amp;L and is set separately, under Settings â†’ Profile.',
   'walk.account.5.title': 'Starting balance',
   'walk.account.5.body':
     'The account&rsquo;s opening cash, and the baseline every later figure is measured against. Set it once, here: the balance Jurnal ZITN shows you is this figure plus every ledger entry, so editing it afterwards would move every historical balance with it. That is why it cannot be changed once the account exists. Leave it empty and the account starts at zero.',
   'walk.account.6.title': 'Default risk %',
   'walk.account.6.body':
-    'The share of this account&rsquo;s balance you risk on a single trade. It prefills the position-size calculator, and you can override it on any one calculation without changing the account. Choose 1%, 2% or 3% — each one shows what ten losing trades in a row would cost you — or No rule, which sets none and leaves the calculator&rsquo;s risk percent for you to fill in each time. 2% is chosen for you, and unlike the starting balance you can change it whenever you want.',
+    'The share of this account&rsquo;s balance you risk on a single trade. It prefills the position-size calculator, and you can override it on any one calculation without changing the account. Choose 1%, 2% or 3% â€” each one shows what ten losing trades in a row would cost you â€” or No rule, which sets none and leaves the calculator&rsquo;s risk percent for you to fill in each time. 2% is chosen for you, and unlike the starting balance you can change it whenever you want.',
   'walk.account.7.title': 'Brokerage',
   'walk.account.7.body':
-    'Choose a brokerage and Jurnal ZITN calculates and records this account&rsquo;s fees from that brokerage&rsquo;s fee schedule. Leaving it on None is perfectly valid — you then enter fees yourself on each fill — and you can attach a brokerage later.',
+    'Choose a brokerage and Jurnal ZITN calculates and records this account&rsquo;s fees from that brokerage&rsquo;s fee schedule. Leaving it on None is perfectly valid â€” you then enter fees yourself on each fill â€” and you can attach a brokerage later.',
   'walk.account.8.title': 'Create the account',
   'walk.account.8.actionHint': 'Choose Create',
   'walk.account.8.body':
     'Choose Create. The account appears in the list behind this form as soon as it exists, and you can book positions against it straight away.',
   'walk.account.9.title': 'Back on your dashboard',
   'walk.account.9.body':
-    'Your account is created, and this is your dashboard again — the setup checklist here names what to do next. One more zone before you go, and it is a different one: separately from the trading-day timezone you just set, Jurnal ZITN stores a single reporting timezone for you — the zone your P&amp;L is bucketed into by day, week and month, so those figures stay the same wherever you open Jurnal ZITN. One was stored when you registered. Confirm or correct it under Settings → Profile, where it is shown prefilled with the zone on record.',
+    'Your account is created, and this is your dashboard again â€” the setup checklist here names what to do next. One more zone before you go, and it is a different one: separately from the trading-day timezone you just set, Jurnal ZITN stores a single reporting timezone for you â€” the zone your P&amp;L is bucketed into by day, week and month, so those figures stay the same wherever you open Jurnal ZITN. One was stored when you registered. Confirm or correct it under Settings â†’ Profile, where it is shown prefilled with the zone on record.',
   'walk.calculator.1.title': 'Entry price',
   'walk.calculator.1.body':
-    'Start with the price you plan to get in at. Nothing here is submitted or saved — the calculator recomputes as you type, so you can try a setup and change your mind.',
+    'Start with the price you plan to get in at. Nothing here is submitted or saved â€” the calculator recomputes as you type, so you can try a setup and change your mind.',
   'walk.calculator.2.title': 'Stop loss',
   'walk.calculator.2.body':
-    'The price at which you would accept the trade is wrong. The distance from entry to stop is what the results call Per-unit risk, and the position size is derived from it — a wider stop buys fewer units for the same money at risk.',
+    'The price at which you would accept the trade is wrong. The distance from entry to stop is what the results call Per-unit risk, and the position size is derived from it â€” a wider stop buys fewer units for the same money at risk.',
   'walk.calculator.3.title': 'Target price (optional)',
   'walk.calculator.3.body':
     'Optional, as the label says. Add it and you also get the Per-unit reward and the Risk/Reward ratio; leave it out and you still get a size.',
@@ -2915,24 +3000,24 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'walk.calculator.5.title': 'Account',
   'walk.calculator.5.actionHint': 'Pick an account',
   'walk.calculator.5.body':
-    'Pick the account you are trading. Under Percent it supplies the balance to size against, and in either basis it supplies the currency and caps the position at the buying power the account actually has. An account with a brokerage attached also brings that brokerage&rsquo;s fee schedule into the estimate for you — under Fees you can still change or clear it.',
+    'Pick the account you are trading. Under Percent it supplies the balance to size against, and in either basis it supplies the currency and caps the position at the buying power the account actually has. An account with a brokerage attached also brings that brokerage&rsquo;s fee schedule into the estimate for you â€” under Fees you can still change or clear it.',
   'walk.calculator.6.title': 'The amount at risk',
   'walk.calculator.6.body':
-    'Under Percent, Risk percent is prefilled from that account&rsquo;s Default risk % when it has one; under Dollar, Dollar risk is the figure you type. Either way the change applies to this calculation only — the account keeps its rule, so the number you rely on tomorrow is still the one you chose.',
+    'Under Percent, Risk percent is prefilled from that account&rsquo;s Default risk % when it has one; under Dollar, Dollar risk is the figure you type. Either way the change applies to this calculation only â€” the account keeps its rule, so the number you rely on tomorrow is still the one you chose.',
   'walk.calculator.7.title': 'Size, risk and R:R',
   'walk.calculator.7.body':
-    'Position Sizing gives you the Position size in whole units, the Per-unit risk, and the Actual dollar risk once that size is rounded down. With a target, Risk / Reward adds the Per-unit reward and the Risk/Reward ratio — what the plan pays if it works, per unit of what it costs if it does not.',
+    'Position Sizing gives you the Position size in whole units, the Per-unit risk, and the Actual dollar risk once that size is rounded down. With a target, Risk / Reward adds the Per-unit reward and the Risk/Reward ratio â€” what the plan pays if it works, per unit of what it costs if it does not.',
   'walk.position.1.title': 'Log the position',
   'walk.position.1.actionHint': 'Choose New Position',
   'walk.position.1.body':
     'A position in Jurnal ZITN is one trade and every fill that belongs to it. Choose New Position to start the one you just sized.',
   'walk.position.2.title': 'Symbol, side and account',
   'walk.position.2.body':
-    'The ticker, whether you are long or short, and the account it is booked against. Symbol searches as you type, the same as the calculator does. Notes are worth filling in now — why you took the trade is the part you will want back later.',
+    'The ticker, whether you are long or short, and the account it is booked against. Symbol searches as you type, the same as the calculator does. Notes are worth filling in now â€” why you took the trade is the part you will want back later.',
   'walk.position.3.title': 'Create the position',
   'walk.position.3.actionHint': 'Choose Create',
   'walk.position.3.body':
-    'Choose Create. Nothing is committed to your account yet — what you get is a draft, which is the subject of the next step.',
+    'Choose Create. Nothing is committed to your account yet â€” what you get is a draft, which is the subject of the next step.',
   'walk.position.4.title': 'It starts as a draft',
   'walk.position.4.actionHint': 'Add the entry fill',
   'walk.position.4.body':
@@ -2950,10 +3035,10 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'walk.close.2.title': 'It closes itself',
   'walk.close.2.actionHint': 'Choose Close Position',
   'walk.close.2.body':
-    'Exit the whole quantity you entered and Jurnal ZITN closes the position for you, timed to that last fill — Close Position is here for the ones it cannot, such as a trade you finish by correcting an earlier fill. Your realised P&amp;L reached the account with each exit fill as you recorded it, not at the end, so the balance has already moved. Exited only part of it? That is a finished step, not a finished trade: carry on with Next and add the rest from Add Fill whenever you close it out.',
+    'Exit the whole quantity you entered and Jurnal ZITN closes the position for you, timed to that last fill â€” Close Position is here for the ones it cannot, such as a trade you finish by correcting an earlier fill. Your realised P&amp;L reached the account with each exit fill as you recorded it, not at the end, so the balance has already moved. Exited only part of it? That is a finished step, not a finished trade: carry on with Next and add the rest from Add Fill whenever you close it out.',
   'walk.close.3.title': 'And there it is',
   'walk.close.3.body':
-    'Back on the dashboard, which builds itself from the trades you log: each exit you recorded booked its share of the result as you recorded it, so your account balance has already moved. With the position fully closed, the stats and the equity curve here draw from your own figures — and if you exited only part of it, they fill in the moment you close out the rest. Log the next one and they move again.',
+    'Back on the dashboard, which builds itself from the trades you log: each exit you recorded booked its share of the result as you recorded it, so your account balance has already moved. With the position fully closed, the stats and the equity curve here draw from your own figures â€” and if you exited only part of it, they fill in the moment you close out the rest. Log the next one and they move again.',
 };
 
 export const MESSAGES: Record<AppLocale, Record<MessageKey, string>> = {
@@ -2991,7 +3076,7 @@ const DATE_FORMAT_CACHE = new Map<string, Intl.DateTimeFormat>();
 
 /**
  * Reuse one `Intl` formatter per `locale + options` instead of constructing a new one per
- * call — tables can format thousands of cells in a single render (ZITN-TECH-025 review,
+ * call â€” tables can format thousands of cells in a single render (ZITN-TECH-025 review,
  * performance track).
  */
 function getNumberFormat(locale: string, options: Intl.NumberFormatOptions): Intl.NumberFormat {
@@ -3036,9 +3121,9 @@ export function formatNumber(
 }
 
 /**
- * Format harga/kuantitas dalam **gaya titik** (D5, ZITN-TECH-021 §5.14): trader IDX
+ * Format harga/kuantitas dalam **gaya titik** (D5, ZITN-TECH-021 Â§5.14): trader IDX
  * membaca `.` sebagai pemisah desimal, dan field kelas ini **tidak** boleh memakai
- * grouping ribuan. Satu mekanisme untuk kelas "harga" — menggantikan `toFixed()`
+ * grouping ribuan. Satu mekanisme untuk kelas "harga" â€” menggantikan `toFixed()`
  * ad-hoc di komponen (mis. `PositionDetail`), tanpa mengubah nilai tersimpan.
  * Dibatasi 8 desimal (presisi kuantisasi engine) dan sengaja memakai locale `en`.
  */

@@ -23,6 +23,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { useRiskProfile } from '@/features/cek-risiko/hooks/useRiskProfile';
+import { RISK_PROFILE } from '@/features/cek-risiko/lib/risk-profile';
 import { usePositions } from '@/features/positions/hooks/usePositions';
 import { useT } from '@/hooks/useLocale';
 
@@ -96,6 +98,9 @@ export function TradePlansPage() {
   // The lifecycle is forward-only (F4): a confirmation step guards a mis-click
   // without relaxing the rule.
   const [confirm, setConfirm] = useState<{ plan: TradePlan; status: TradePlanStatus } | null>(null);
+  // Saved risk profile (Cek Risiko → Profil risiko): surfaced here so the
+  // pre-trade draft is written against the same setting (ZITN-TECH-043 §3.3).
+  const { choice: riskProfile } = useRiskProfile();
   const positionById = new Map((positions.data ?? []).map((p) => [p.id, p]));
   const [form, setForm] = useState(EMPTY);
   // "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): SSO mengarahkan ke
@@ -146,6 +151,17 @@ export function TradePlansPage() {
   return (
     <div className="space-y-6">
       <h1 className="text-xl font-semibold">{t('tp.title')}</h1>
+
+      <p className="text-sm text-muted-foreground" data-testid="tp-risk-profile">
+        {t('cek.profile.current')}:{' '}
+        {RISK_PROFILE.rules[riskProfile.rule]?.label ?? riskProfile.rule} ·{' '}
+        {t(`cek.profile.period.${riskProfile.period}`)} · TP {riskProfile.tp}% ·{' '}
+        {riskProfile.sl === 'none' ? t('cek.profile.noSl') : `SL ${riskProfile.sl}%`} · H{' '}
+        {riskProfile.h}{' '}
+        <a href="/cek-risiko" className="underline">
+          {t('cek.profile.title')}
+        </a>
+      </p>
 
       <Card>
         <CardHeader>

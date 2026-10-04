@@ -8,8 +8,9 @@ import { useT } from '@/hooks/useLocale';
 import { BiayaPajakPanel } from './BiayaPajakPanel';
 import { HitungLotPanel } from './HitungLotPanel';
 import { PosisiSaya } from './PosisiSaya';
+import { ProfilRisikoPanel } from './ProfilRisikoPanel';
 
-type Mode = 'lot' | 'biaya';
+type Mode = 'lot' | 'biaya' | 'profil';
 
 /**
  * Permukaan **Cek Risiko** (ZITN-TECH-017 §12 / Fase H) — wajah baru jurnal.
@@ -57,9 +58,26 @@ export function CekRisikoPage() {
         >
           {t('cek.mode.biaya')}
         </Button>
+        <Button
+          type="button"
+          role="tab"
+          aria-selected={mode === 'profil'}
+          variant={mode === 'profil' ? 'default' : 'outline'}
+          className="flex-1 cursor-pointer"
+          onClick={() => setMode('profil')}
+          data-testid="cek-mode-profil"
+        >
+          {t('cek.profile.title')}
+        </Button>
       </div>
 
-      {mode === 'lot' ? <HitungLotPanel /> : <BiayaPajakPanel />}
+      {mode === 'lot' ? (
+        <HitungLotPanel />
+      ) : mode === 'biaya' ? (
+        <BiayaPajakPanel />
+      ) : (
+        <ProfilRisikoPanel />
+      )}
 
       <PosisiSaya />
 

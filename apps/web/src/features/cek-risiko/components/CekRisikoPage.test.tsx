@@ -134,6 +134,14 @@ describe('CekRisikoPage — mode ringkas (H1)', () => {
     expect(document.querySelector('select')).toBeTruthy();
   });
 
+  it('menampilkan segmen "Profil risiko" di dalam tab Cek Risiko (bukan tab baru)', () => {
+    renderPage();
+    expect(screen.getByTestId('cek-mode-profil')).toBeTruthy();
+    fireEvent.click(screen.getByTestId('cek-mode-profil'));
+    expect(screen.getByTestId('cek-profile')).toBeTruthy();
+    expect(screen.queryByTestId('cek-modal')).toBeNull();
+  });
+
   it('verdict 3 tingkat pada risiko 1% / 2% / 3% (D-H2)', () => {
     renderPage();
     expect(screen.getByTestId('cek-verdict').getAttribute('data-level')).toBe('aman');
