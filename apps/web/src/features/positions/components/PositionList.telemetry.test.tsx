@@ -34,6 +34,10 @@ vi.mock('../hooks/usePositions', () => ({
   usePositions: () => ({ data: [], isLoading: false }),
 }));
 
+vi.mock('@/features/trade-plans/hooks/useTradePlans', () => ({
+  useTradePlans: () => ({ data: { items: [] } }),
+}));
+
 // Stub the (controlled) dialog so we don't pull in useCreatePosition / Radix
 // portals. It exposes a close affordance so we can drive the open→close→open cycle.
 vi.mock('./CreatePositionDialog', () => ({

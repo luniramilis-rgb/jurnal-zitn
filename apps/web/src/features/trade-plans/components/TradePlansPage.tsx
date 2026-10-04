@@ -40,6 +40,12 @@ const STATUS_LABEL: Record<TradePlanStatus, MessageKey> = {
   cancelled: 'tp.stCancelled',
 };
 
+const POSITION_STATUS_LABEL: Record<'draft' | 'open' | 'closed', MessageKey> = {
+  draft: 'pos.status.draft',
+  open: 'pos.status.open',
+  closed: 'pos.status.closed',
+};
+
 /** Live reward:risk from the plan's own levels; null when it cannot be computed. */
 export function liveRR(plan: {
   side: 'long' | 'short';
@@ -73,7 +79,10 @@ export function TradePlansPage() {
   const setStatus = useSetTradePlanStatus();
   const remove = useDeleteTradePlan();
   const linkPlan = useLinkTradePlan();
-  const positions = usePositions();
+  // A plan attaches to a live trade, so the picker defaults to open positions;
+  // "show all" re-includes draft/closed when the user needs them.
+  const [showAllPositions, setShowAllPositions] = useState(false);
+  const positions = usePositions(showAllPositions ? undefined : { status: 'open' });
   const positionById = new Map((positions.data ?? []).map((p) => [p.id, p]));
   const [form, setForm] = useState(EMPTY);
   // "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): SSO mengarahkan ke
@@ -175,7 +184,20 @@ export function TradePlansPage() {
             <TableHead>{t('tp.target')}</TableHead>
             <TableHead>{t('tp.rr')}</TableHead>
             <TableHead>{t('tp.status')}</TableHead>
-            <TableHead>{t('tp.link')}</TableHead>
+            <TableHead>
+              <div className="flex items-center gap-2">
+                <span>{t('tp.link')}</span>
+                <label className="flex cursor-pointer items-center gap-1 text-xs font-normal text-muted-foreground">
+                  <input
+                    type="checkbox"
+                    className="cursor-pointer"
+                    checked={showAllPositions}
+                    onChange={(event) => setShowAllPositions(event.target.checked)}
+                  />
+                  {t('tp.linkShowAll')}
+                </label>
+              </div>
+            </TableHead>
             <TableHead />
           </TableRow>
         </TableHeader>
@@ -219,9 +241,9 @@ export function TradePlansPage() {
               <TableCell>
                 {plan.positionId ? (
                   <span className="flex items-center gap-2">
-                    <span>
+                    <a href={`/positions/${plan.positionId}`} className="hover:underline">
                       {positionById.get(plan.positionId)?.symbol ?? plan.positionId.slice(0, 8)}
-                    </span>
+                    </a>
                     <Button
                       type="button"
                       variant="outline"
@@ -248,7 +270,9 @@ export function TradePlansPage() {
                     <option value="">{t('tp.linkNone')}</option>
                     {(positions.data ?? []).map((p) => (
                       <option key={p.id} value={p.id}>
-                        {p.symbol}
+                        {p.symbol} · {p.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}
+                        {p.openedAt ? ` · ${p.openedAt.slice(0, 10)}` : ''} ·{' '}
+                        {t(POSITION_STATUS_LABEL[p.status])}
                       </option>
                     ))}
                   </select>

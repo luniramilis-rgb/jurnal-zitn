@@ -20,6 +20,7 @@ import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { TagChipList } from '@/features/tags/components/TagChip';
 import { TagFilterControl } from '@/features/tags/components/TagFilterControl';
 import { useTags } from '@/features/tags/hooks/useTags';
+import { useTradePlans } from '@/features/trade-plans/hooks/useTradePlans';
 import { useT } from '@/hooks/useLocale';
 import { captureClientEvent } from '@/lib/telemetry/posthog';
 import { cn } from '@/lib/utils';
@@ -56,6 +57,14 @@ export function PositionList() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const { data: accounts } = useAccounts();
   const { data: positions, isLoading } = usePositions(filters);
+  // Reverse link (F4): a pre-trade plan may be attached 1:1 to a position. Map
+  // position→plan so a row can jump straight to its plan.
+  const tradePlans = useTradePlans();
+  const planByPosition = new Map(
+    (tradePlans.data?.items ?? [])
+      .filter((plan) => plan.positionId !== null)
+      .map((plan) => [plan.positionId as string, plan.id]),
+  );
   const tagsQuery = useTags();
   const selectedTagIds = filters?.tag ?? [];
   const inspectPosition = useDrawerStore((s) => s.inspectPosition);
@@ -234,6 +243,14 @@ export function PositionList() {
                       <span className="block text-xs leading-none text-muted-foreground">
                         {optionContract.compactLabel}
                       </span>
+                    )}
+                    {planByPosition.has(pos.id) && (
+                      <a
+                        href={`/trade-plans?focus=${planByPosition.get(pos.id)}`}
+                        className="block text-xs leading-none text-muted-foreground hover:underline"
+                      >
+                        {t('pos.planLink')}
+                      </a>
                     )}
                   </TableCell>
                   <TableCell className="py-0">

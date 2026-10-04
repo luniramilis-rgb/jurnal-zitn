@@ -36,6 +36,10 @@ vi.mock('@/features/positions/hooks/usePositions', () => ({
   usePositions: vi.fn(),
 }));
 
+vi.mock('@/features/trade-plans/hooks/useTradePlans', () => ({
+  useTradePlans: () => ({ data: { items: [] } }),
+}));
+
 vi.mock('@/lib/telemetry/posthog', () => ({
   captureClientEvent: vi.fn(),
 }));
