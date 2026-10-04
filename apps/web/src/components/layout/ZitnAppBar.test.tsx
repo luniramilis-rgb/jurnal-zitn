@@ -43,7 +43,7 @@ describe('ZitnAppBar — shared ZITN chrome (G2, A1)', () => {
       'Beranda',
       'Pemindai',
       'Chart',
-      'Jurnal ZITN',
+      'Jurnal',
       'Akun',
     ]);
     expect(links.map((a) => a.getAttribute('href'))).toEqual([
@@ -53,8 +53,8 @@ describe('ZitnAppBar — shared ZITN chrome (G2, A1)', () => {
       '/dashboard',
       'https://zeninthenoise.com/akun/',
     ]);
-    // Jurnal ZITN is this app — it reads as the current surface.
-    expect(screen.getByText('Jurnal ZITN').getAttribute('aria-current')).toBe('page');
+    // Jurnal is this app — it reads as the current surface.
+    expect(screen.getByText('Jurnal').getAttribute('aria-current')).toBe('page');
     // The strip carries the shared ZITN accent.
     expect(bar.getAttribute('style')).toContain('#f59e0b');
   });
