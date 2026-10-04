@@ -36,6 +36,9 @@ services:
       - ${DOCKER_CONFIG_DIR:-/home/ubuntu/.docker}:/config:ro
     environment:
       DOCKER_CONFIG: /config
+      # Newer Docker daemons require API >= 1.40; Watchtower 1.7.1 defaults to
+      # 1.25 and crash-loops otherwise ("client version 1.25 is too old").
+      DOCKER_API_VERSION: "1.40"
       TZ: Asia/Jakarta
       WATCHTOWER_CLEANUP: "true"
     # 6-field cron (sec min hour dom mon dow); with TZ=Asia/Jakarta → 01:00 WIB.
