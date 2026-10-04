@@ -3,6 +3,16 @@ import { useState } from 'react';
 import type { MessageKey, TradePlan, TradePlanStatus } from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
@@ -83,6 +93,9 @@ export function TradePlansPage() {
   // too, and the linked one must resolve to its symbol). "Open only" narrows it.
   const [openOnly, setOpenOnly] = useState(false);
   const positions = usePositions(openOnly ? { status: 'open' } : undefined);
+  // The lifecycle is forward-only (F4): a confirmation step guards a mis-click
+  // without relaxing the rule.
+  const [confirm, setConfirm] = useState<{ plan: TradePlan; status: TradePlanStatus } | null>(null);
   const positionById = new Map((positions.data ?? []).map((p) => [p.id, p]));
   const [form, setForm] = useState(EMPTY);
   // "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): SSO mengarahkan ke
@@ -124,7 +137,7 @@ export function TradePlansPage() {
       size="sm"
       className="cursor-pointer"
       disabled={setStatus.isPending}
-      onClick={() => setStatus.mutate({ id: plan.id, status })}
+      onClick={() => setConfirm({ plan, status })}
     >
       {label}
     </Button>
@@ -300,6 +313,36 @@ export function TradePlansPage() {
           ))}
         </TableBody>
       </Table>
+
+      <AlertDialog open={confirm !== null} onOpenChange={(open) => !open && setConfirm(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('tp.confirm.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {confirm
+                ? t('tp.confirm.body', {
+                    symbol: confirm.plan.symbol,
+                    status: t(STATUS_LABEL[confirm.status]),
+                  })
+                : ''}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="cursor-pointer" onClick={() => setConfirm(null)}>
+              {t('action.cancel')}
+            </AlertDialogCancel>
+            <AlertDialogAction
+              className="cursor-pointer"
+              onClick={() => {
+                if (confirm) setStatus.mutate({ id: confirm.plan.id, status: confirm.status });
+                setConfirm(null);
+              }}
+            >
+              {t('tp.confirm.action')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
