@@ -24,6 +24,20 @@ server {
         add_header Cache-Control "no-store" always;
     }
 
+    # PWA manifest (Fase H). nginx's stock mime.types has no `webmanifest`
+    # mapping, so without this exact-match it ships as application/octet-stream
+    # and browsers may refuse the manifest (breaking installability).
+    location = /manifest.webmanifest {
+        default_type application/manifest+json;
+        add_header Cache-Control "no-cache" always;
+    }
+
+    # Service worker (Fase H) must not be cached, so a new deploy's worker is
+    # picked up on the next visit.
+    location = /sw.js {
+        add_header Cache-Control "no-cache" always;
+    }
+
     # SPA build identity for Prometheus (observability REQ-7.5). Unlike
     # /config.js, the file is EXTENSIONLESS, so it needs both halves of this
     # block: without the exact-match location `try_files $uri $uri/ /index.html`
