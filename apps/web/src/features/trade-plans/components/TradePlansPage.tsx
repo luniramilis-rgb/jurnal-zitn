@@ -79,10 +79,10 @@ export function TradePlansPage() {
   const setStatus = useSetTradePlanStatus();
   const remove = useDeleteTradePlan();
   const linkPlan = useLinkTradePlan();
-  // A plan attaches to a live trade, so the picker defaults to open positions;
-  // "show all" re-includes draft/closed when the user needs them.
-  const [showAllPositions, setShowAllPositions] = useState(false);
-  const positions = usePositions(showAllPositions ? undefined : { status: 'open' });
+  // Show every position by default (a plan may attach to a closed/draft trade
+  // too, and the linked one must resolve to its symbol). "Open only" narrows it.
+  const [openOnly, setOpenOnly] = useState(false);
+  const positions = usePositions(openOnly ? { status: 'open' } : undefined);
   const positionById = new Map((positions.data ?? []).map((p) => [p.id, p]));
   const [form, setForm] = useState(EMPTY);
   // "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): SSO mengarahkan ke
@@ -191,10 +191,10 @@ export function TradePlansPage() {
                   <input
                     type="checkbox"
                     className="cursor-pointer"
-                    checked={showAllPositions}
-                    onChange={(event) => setShowAllPositions(event.target.checked)}
+                    checked={openOnly}
+                    onChange={(event) => setOpenOnly(event.target.checked)}
                   />
-                  {t('tp.linkShowAll')}
+                  {t('tp.linkOpenOnly')}
                 </label>
               </div>
             </TableHead>
