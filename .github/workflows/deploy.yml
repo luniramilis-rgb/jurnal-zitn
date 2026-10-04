@@ -1,27 +1,20 @@
 name: Deploy (jurnal)
 
-# Auto-deploy the journal to its VPS after CI succeeds on `main`.
+# Build + publish the journal images after CI succeeds on `main`. The VPS then
+# pulls them itself via Watchtower (`docker-compose.auto.yml`) — no inbound SSH is
+# needed, which fits the host's restricted firewall.
 #
-# INERT BY DEFAULT. The job-level guard `vars.AUTO_DEPLOY_ENABLED == 'true'`
-# means nothing builds or deploys until the owner opts in:
-#
-#   Settings → Secrets and variables → Actions → Variables
+# INERT BY DEFAULT. The job guard `vars.AUTO_DEPLOY_ENABLED == 'true'` means
+# nothing builds until the owner opts in:
+#   Settings → Secrets and variables → Actions → Variables:
 #     AUTO_DEPLOY_ENABLED = true
-#   Settings → Secrets and variables → Actions → Secrets
-#     VPS_HOST      hostname/IP of the journal VPS
-#     VPS_USER      deploy user (key-only; see DEPLOY.md §8.3)
-#     VPS_SSH_KEY   private key for that user (dedicated deploy key)
 #
-# Optional: add protection rules to the `production` environment (required
-# reviewers) so a deploy waits for approval. Manual run: Actions → Deploy (jurnal)
-# → Run workflow.
+# Flow: push to main → CI (checks/test-api/test-web) → on success → build+push
+# `:edge` (moving) and `:sha-<commit>` (immutable) → Watchtower on the VPS pulls
+# `:edge` on its schedule and recreates `api`/`web`.
 #
-# Flow: push to main → CI (checks/test-api/test-web) → on success → build
-# immutable `:sha-<commit>` images → SSH deploy (pin tag → pull → up → health) →
-# auto-rollback to the previous tag if health fails.
-#
-# Rollback: Actions → this workflow → re-run a previous successful run, or set the
-# tag back in docker-compose.ghcr.yml on the host and `pull && up -d --no-build`.
+# Rollback: pin `:sha-<commit>` (known good) in docker-compose.ghcr.yml and
+# `pull && up -d --no-build`, or disable Watchtower temporarily.
 
 on:
   workflow_run:
@@ -31,8 +24,8 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: deploy-production
-  cancel-in-progress: false
+  group: build-images
+  cancel-in-progress: true
 
 permissions:
   contents: read
@@ -83,59 +76,8 @@ jobs:
           context: .
           file: ${{ matrix.dockerfile }}
           push: true
-          tags: ${{ env.REGISTRY }}/${{ steps.ns.outputs.owner }}/${{ matrix.image }}:sha-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
+          tags: |
+            ${{ env.REGISTRY }}/${{ steps.ns.outputs.owner }}/${{ matrix.image }}:edge
+            ${{ env.REGISTRY }}/${{ steps.ns.outputs.owner }}/${{ matrix.image }}:sha-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-
-  deploy:
-    needs: build
-    if: vars.AUTO_DEPLOY_ENABLED == 'true'
-    runs-on: ubuntu-latest
-    timeout-minutes: 20
-    environment: production
-    steps:
-      - name: SSH deploy to VPS
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
-          IMAGE_TAG: sha-${{ github.event_name == 'workflow_run' && github.event.workflow_run.head_sha || github.sha }}
-        run: |
-          set -euo pipefail
-          install -m 700 -d ~/.ssh
-          printf '%s\n' "$VPS_SSH_KEY" > ~/.ssh/id_deploy
-          chmod 600 ~/.ssh/id_deploy
-          ssh-keyscan -H "$VPS_HOST" >> ~/.ssh/known_hosts 2>/dev/null || true
-          ssh -i ~/.ssh/id_deploy -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile="$HOME/.ssh/known_hosts" \
-            "$VPS_USER@$VPS_HOST" "IMAGE_TAG=$IMAGE_TAG bash -s" <<'REMOTE'
-          set -euo pipefail
-          cd /opt/jurnal-zitn
-
-          # Bring compose files up to date when the host is a git checkout; the
-          # tag pin is rewritten below, so discard any local edit to it first.
-          if [ -d .git ]; then
-            git fetch --quiet origin main || true
-            git checkout -- docker-compose.ghcr.yml 2>/dev/null || true
-            git pull --ff-only || true
-          fi
-
-          COMPOSE="docker compose -f docker-compose.yml -f docker-compose.ghcr.yml -f docker-compose.cloudflare.yml"
-          PREV_TAG="$(grep -oE 'jurnal-zitn-web:sha-[0-9a-f]+' docker-compose.ghcr.yml | head -1 | sed 's/.*:sha-/sha-/')"
-          sed -i -E "s#(jurnal-zitn-(api|web):)sha-[0-9a-f]+#\1${IMAGE_TAG}#g" docker-compose.ghcr.yml
-
-          $COMPOSE pull
-          $COMPOSE up -d --no-build
-
-          ok=0
-          for _ in $(seq 1 30); do
-            if curl -fsS http://localhost:8080/api/health >/dev/null 2>&1; then ok=1; break; fi
-            sleep 5
-          done
-          if [ "$ok" != "1" ]; then
-            echo "Health check failed — rolling back to ${PREV_TAG}"
-            sed -i -E "s#(jurnal-zitn-(api|web):)sha-[0-9a-f]+#\1${PREV_TAG}#g" docker-compose.ghcr.yml
-            $COMPOSE pull && $COMPOSE up -d --no-build
-            exit 1
-          fi
-          echo "Deployed ${IMAGE_TAG} and healthy."
-          REMOTE

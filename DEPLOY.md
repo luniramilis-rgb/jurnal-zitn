@@ -371,24 +371,31 @@ manual **Images (edge)** (hemat kuota — lihat catatan di header workflow itu).
 
 ### 7.11 Deploy otomatis (opsional)
 
-`.github/workflows/deploy.yml` mengalirkan **push → CI → deploy** tanpa langkah manual. Defaultnya
-**mati (inert)**: kedua job dijaga `vars.AUTO_DEPLOY_ENABLED == 'true'`, jadi tak ada yang berjalan
-sampai pemilik mengaktifkannya.
+Firewall host membatasi port masuk, jadi deploy **tidak** lewat SSH dari runner. Alih-alih,
+`.github/workflows/deploy.yml` membangun + mendorong image setelah CI hijau, dan VPS **menariknya
+sendiri** via **Watchtower** (`docker-compose.auto.yml`). Default **mati (inert)**: job dijaga
+`vars.AUTO_DEPLOY_ENABLED == 'true'`.
+
+Alur: push/merge ke `main` → CI hijau → build+push `:edge` (bergerak) & `:sha-<commit>` (imutabel) →
+Watchtower di VPS menarik `:edge` sesuai jadwal (01:00 WIB) dan membuat ulang `api`/`web`.
 
 Aktifkan (sekali):
 
-1. Settings → Secrets and variables → Actions → **Variables**: `AUTO_DEPLOY_ENABLED = true`.
-2. Secrets: `VPS_HOST`, `VPS_USER`, `VPS_SSH_KEY` (kunci deploy khusus, key-only — §8.3).
-3. (Disarankan) Environment `production` → tambahkan **required reviewers** agar deploy menunggu
-   persetujuan; dan pasang **branch protection** di `main` (required checks `checks`, `test-api`,
-   `test-web`) sebelum menyalakannya.
+1. GitHub → Settings → Secrets and variables → Actions → **Variables**: `AUTO_DEPLOY_ENABLED = true`.
+2. Di host: pastikan `docker login ghcr.io` sudah ada (§7.4). Bila login sebagai root, set
+   `DOCKER_CONFIG_DIR=/root/.docker` di `.env`.
+3. Di host, pakai overlay auto (menggantikan jalur `docker-compose.ghcr.yml` untuk otomatis):
+   ```bash
+   COMPOSE="docker compose -f docker-compose.yml -f docker-compose.auto.yml -f docker-compose.cloudflare.yml"
+   $COMPOSE pull && $COMPOSE up -d --no-build
+   ```
+   `docker-compose.auto.yml` memakai tag `:edge` untuk `api`/`web` dan menjalankan Watchtower
+   (`--label-enable` hanya `api`/`web`, `--cleanup`, jadwal 01:00 WIB).
+4. (Disarankan) Pasang **branch protection** `main` (required checks `checks`, `test-api`, `test-web`).
 
-Alur: push/merge ke `main` → CI hijau → build image `:sha-<commit>` (api+web) → SSH: pin tag →
-`pull` → `up -d --no-build` → health `GET /api/health` → **rollback otomatis** ke tag sebelumnya bila
-health gagal.
-
-Rollback manual: jalankan ulang run `Deploy (jurnal)` yang sukses sebelumnya, atau di host set tag
-lama di `docker-compose.ghcr.yml` lalu `$COMPOSE pull && $COMPOSE up -d --no-build` (§7.10).
+Rollback/manual: kembali ke jalur pin `docker-compose.ghcr.yml` dengan `:sha-<commit>` yang dikenal
+baik, lalu `$COMPOSE pull && $COMPOSE up -d --no-build` (§7.10); atau hentikan container Watchtower
+sementara.
 
 Biaya: karena membangun image tiap push kode ke `main`, ini memakai kuota Actions (alasan
 `Images (edge)` dibuat manual). Bila ingin lebih hemat, ubah blok `on:` menjadi rilis-only:

@@ -1,0 +1,46 @@
+# Overlay pull-based auto-deploy (ZITN-TECH-017 ops).
+#
+# Watchtower on the VPS polls GHCR and recreates `api`/`web` when the `:edge`
+# image changes — no inbound SSH needed, so the host firewall can stay closed.
+#
+# Usage (on the host):
+#   COMPOSE="docker compose -f docker-compose.yml -f docker-compose.auto.yml -f docker-compose.cloudflare.yml"
+#   $COMPOSE pull && $COMPOSE up -d --no-build
+#
+# Requires a prior `docker login ghcr.io` (private packages). Watchtower reads
+# that credential from DOCKER_CONFIG_DIR — set it in `.env` if the login lives
+# outside the deploy user's home (e.g. /root/.docker when composed via sudo):
+#   DOCKER_CONFIG_DIR=/root/.docker
+#
+# Security note: mounting the Docker socket grants Watchtower control of the
+# daemon; it is scoped with `--label-enable` so only the two labelled services
+# (api, web) are ever updated. The schedule is 01:00 WIB (market closed).
+
+services:
+  api:
+    image: ghcr.io/luniramilis-rgb/jurnal-zitn-api:edge
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+
+  web:
+    image: ghcr.io/luniramilis-rgb/jurnal-zitn-web:edge
+    labels:
+      com.centurylinklabs.watchtower.enable: "true"
+
+  watchtower:
+    # Pinned; see the maintained fork `nickfedor/watchtower` as an alternative.
+    image: containrrr/watchtower:1.7.1
+    restart: unless-stopped
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${DOCKER_CONFIG_DIR:-/home/ubuntu/.docker}:/config:ro
+    environment:
+      DOCKER_CONFIG: /config
+      TZ: Asia/Jakarta
+      WATCHTOWER_CLEANUP: "true"
+    # 6-field cron (sec min hour dom mon dow); with TZ=Asia/Jakarta → 01:00 WIB.
+    command: --label-enable --schedule "0 0 1 * * *"
+    depends_on:
+      - web
+    networks:
+      - jurnal-zitn
