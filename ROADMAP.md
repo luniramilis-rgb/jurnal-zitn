@@ -112,10 +112,11 @@ memuat uji default yang sudah dipin, jadi ditunda sebagai commit tersendiri bila
 
 ## Fase H — Cek Risiko (wajah baru jurnal) — ✅ SELESAI 2026-10-03
 
-**Status: terimplementasi 2026-10-03** — mesin `packages/shared/src/cek-risiko.ts`, permukaan
-`apps/web/src/features/cek-risiko/` di rute `/cek-risiko`, "Simpan ke Catatan" lewat mesin jurnal
-(`POST /positions` + `/fills`), nav `ZitnAppBar` + ZITN `theme.py` (`Cek Risiko`), PWA
-(`manifest.webmanifest` + `sw.js`). **Tayang menunggu deploy + verifikasi pemilik.**
+**Status: terimplementasi 2026-10-03; koreksi arah nav 2026-10-04** — mesin
+`packages/shared/src/cek-risiko.ts`, permukaan `apps/web/src/features/cek-risiko/` di rute `/cek-risiko`,
+"Simpan ke Catatan" lewat mesin jurnal (`POST /positions` + `/fills`), PWA (`manifest.webmanifest` + `sw.js`).
+**Nav (koreksi 2026-10-04):** app bar tetap **Jurnal ZITN → dasbor**; **Cek Risiko dipindah ke sidebar kiri**
+(Dasbor · Playbook · Rencana · Cek Risiko). **Ter-deploy 2026-10-04** ke host (`:edge` + Watchtower).
 
 **Keputusan pemilik (2026-10-03):** "Cek Risiko" = **wajah baru jurnal** (**mesin yang sama**, bukan
 aplikasi baru); judul halaman _"Cek Risiko — Hitung lot, biaya, dan batas rugi"_; **rute `/cek-risiko/`**.

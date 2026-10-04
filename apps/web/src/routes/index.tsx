@@ -46,10 +46,10 @@ function IndexRoute() {
   }
 
   if (isAuthenticated) {
-    // Fase H: the journal's new face is Cek Risiko. Post-SSO landings resolve to
-    // `/` (sso-redirect.ts), so signing in now arrives at the calculator rather
-    // than the full journal. Full mode remains one tap away (and at `/dashboard`).
-    return <Navigate to="/cek-risiko" replace />;
+    // Post-SSO landings resolve to `/` (sso-redirect.ts), so a signed-in visitor
+    // — including the ZITN "Jurnal ZITN" nav — lands on the dashboard. Cek Risiko
+    // is a sidebar feature, not the front door.
+    return <Navigate to="/dashboard" replace />;
   }
 
   return null;

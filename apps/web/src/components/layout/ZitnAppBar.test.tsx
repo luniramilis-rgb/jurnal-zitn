@@ -20,12 +20,12 @@ function renderBar() {
   const root = createRootRoute();
   const route = createRoute({
     getParentRoute: () => root as any,
-    path: '/cek-risiko',
+    path: '/dashboard',
     component: ZitnAppBar,
   });
   const router = createRouter({
     routeTree: root.addChildren([route]) as any,
-    history: createMemoryHistory({ initialEntries: ['/cek-risiko'] }),
+    history: createMemoryHistory({ initialEntries: ['/dashboard'] }),
   });
   render(<RouterProvider router={router as any} />);
 }
@@ -33,7 +33,7 @@ function renderBar() {
 
 afterEach(cleanup);
 
-describe('ZitnAppBar — shared ZITN chrome (G2, A1 · Fase H)', () => {
+describe('ZitnAppBar — shared ZITN chrome (G2, A1)', () => {
   it('renders the five ZITN surfaces with absolute/internal targets', async () => {
     renderBar();
 
@@ -43,18 +43,18 @@ describe('ZitnAppBar — shared ZITN chrome (G2, A1 · Fase H)', () => {
       'Beranda',
       'Pemindai',
       'Chart',
-      'Cek Risiko',
+      'Jurnal ZITN',
       'Akun',
     ]);
     expect(links.map((a) => a.getAttribute('href'))).toEqual([
       'https://zeninthenoise.com/',
       'https://zeninthenoise.com/daily/',
       'https://zeninthenoise.com/daily/chart/',
-      '/cek-risiko',
+      '/dashboard',
       'https://zeninthenoise.com/akun/',
     ]);
-    // Cek Risiko is this app's face — it reads as the current surface.
-    expect(screen.getByText('Cek Risiko').getAttribute('aria-current')).toBe('page');
+    // Jurnal ZITN is this app — it reads as the current surface.
+    expect(screen.getByText('Jurnal ZITN').getAttribute('aria-current')).toBe('page');
     // The strip carries the shared ZITN accent.
     expect(bar.getAttribute('style')).toContain('#f59e0b');
   });

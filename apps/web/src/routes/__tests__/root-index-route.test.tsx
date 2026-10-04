@@ -187,11 +187,11 @@ describe('the bare origin while signed in', () => {
     );
   });
 
-  it('sends the user to Cek Risiko (the journal’s new face)', async () => {
+  it('sends the user to the dashboard', async () => {
     const { router } = renderAt('/');
     await settle();
 
-    expect(router.state.location.pathname).toBe('/cek-risiko');
+    expect(router.state.location.pathname).toBe('/dashboard');
     expect(screen.queryByText('Page not found')).toBeNull();
   });
 });

@@ -16,6 +16,7 @@ import {
   Receipt,
   Settings,
   Shield,
+  ShieldCheck,
   Sparkles,
   TrendingUp,
   type LucideIcon,
@@ -202,6 +203,14 @@ export function Sidebar() {
           className={itemClass(expanded)}
         >
           <ItemContent expanded={expanded} label={t('nav.tradePlans')} Icon={ListChecks} />
+        </Link>
+        <Link
+          to="/cek-risiko"
+          aria-label={t('nav.cekRisiko')}
+          title={expanded ? undefined : t('nav.cekRisiko')}
+          className={itemClass(expanded)}
+        >
+          <ItemContent expanded={expanded} label={t('nav.cekRisiko')} Icon={ShieldCheck} />
         </Link>
         {advisorEnabled && (
           <Link

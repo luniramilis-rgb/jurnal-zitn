@@ -6,10 +6,11 @@ import tokens from '@/styles/zitn-tokens.json';
 
 /**
  * ZitnAppBar — Fase G / G2 (A1). The shared ZITN chrome as a compact top strip:
- * the five ZITN surfaces — Beranda · Pemindai · Chart · Cek Risiko · Akun. Four
- * are absolute ZITN links; "Cek Risiko" is this app's new face (Fase H), so it
- * renders as the current surface. This is the journal → ZITN half of the
- * two-way navigation (G3).
+ * the five ZITN surfaces — Beranda · Pemindai · Chart · Jurnal ZITN · Akun. Four
+ * are absolute ZITN links; "Jurnal ZITN" is this app, so it renders as the
+ * current surface (the dashboard). This is the journal → ZITN half of the
+ * two-way navigation (G3). Cek Risiko is a journal sidebar feature, not the
+ * top-level nav (owner correction 2026-10-04).
  *
  * Styled with the shared ZITN tokens (`zitn-tokens.json`, generated from
  * `src/trutova/core/theme.py` by `scripts/export_theme_tokens.py`) — never
@@ -31,7 +32,7 @@ const ITEMS: NavItem[] = [
   { key: 'beranda', label: 'Beranda', href: `${ZITN_SITE_URL}/`, external: true },
   { key: 'pemindai', label: 'Pemindai', href: `${ZITN_SITE_URL}/daily/`, external: true },
   { key: 'chart', label: 'Chart', href: `${ZITN_SITE_URL}/daily/chart/`, external: true },
-  { key: 'cek-risiko', label: 'Cek Risiko', href: '/cek-risiko', external: false },
+  { key: 'jurnal', label: 'Jurnal ZITN', href: '/dashboard', external: false },
   { key: 'akun', label: 'Akun', href: `${ZITN_SITE_URL}/akun/`, external: true },
 ];
 
@@ -59,7 +60,7 @@ export function ZitnAppBar() {
             {item.label}
           </a>
         ) : (
-          <Link key={item.key} to="/cek-risiko" aria-current="page">
+          <Link key={item.key} to="/dashboard" aria-current="page">
             {item.label}
           </Link>
         ),
