@@ -4,8 +4,9 @@ import { lazy, Suspense } from 'react';
 import { ChunkErrorBoundary } from '@/components/ChunkErrorBoundary';
 import { ChunkLoadFallback } from '@/components/ChunkLoadFallback';
 
-// Lazy so the trade-plans feature (and the ~146 KB risk_profile.json it imports
-// for the active-profile line) stays out of the initial bundle.
+// Lazy so the trade-plans feature stays out of the initial bundle. The active
+// risk-profile line reads the private grid at runtime (a fetched query), not a
+// bundled artifact.
 const TradePlansPage = lazy(() =>
   import('@/features/trade-plans/components/TradePlansPage').then((m) => ({
     default: m.TradePlansPage,

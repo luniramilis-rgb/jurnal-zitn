@@ -24,7 +24,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { useRiskProfile } from '@/features/cek-risiko/hooks/useRiskProfile';
-import { RISK_PROFILE } from '@/features/cek-risiko/lib/risk-profile';
+import { useRiskProfileData } from '@/features/cek-risiko/hooks/useRiskProfileData';
 import { usePositions } from '@/features/positions/hooks/usePositions';
 import { useT } from '@/hooks/useLocale';
 
@@ -101,6 +101,7 @@ export function TradePlansPage() {
   // Saved risk profile (Cek Risiko → Profil risiko): surfaced here so the
   // pre-trade draft is written against the same setting (ZITN-TECH-043 §3.3).
   const { choice: riskProfile } = useRiskProfile();
+  const { data: riskProfileData } = useRiskProfileData();
   const positionById = new Map((positions.data ?? []).map((p) => [p.id, p]));
   const [form, setForm] = useState(EMPTY);
   // "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): SSO mengarahkan ke
@@ -154,7 +155,7 @@ export function TradePlansPage() {
 
       <p className="text-sm text-muted-foreground" data-testid="tp-risk-profile">
         {t('cek.profile.current')}:{' '}
-        {RISK_PROFILE.rules[riskProfile.rule]?.label ?? riskProfile.rule} ·{' '}
+        {riskProfileData?.rules[riskProfile.rule]?.label ?? riskProfile.rule} ·{' '}
         {t(`cek.profile.period.${riskProfile.period}`)} · TP {riskProfile.tp}% ·{' '}
         {riskProfile.sl === 'none' ? t('cek.profile.noSl') : `SL ${riskProfile.sl}%`} · H{' '}
         {riskProfile.h}{' '}

@@ -1,46 +1,17 @@
-import raw from '../data/risk_profile.json';
+import type { RiskProfileCell, RiskProfileFile } from './risk-profile.types';
+
+export type { RiskProfileCell, RiskProfileFile, RiskProfileRule } from './risk-profile.types';
 
 /**
- * Konsumsi artefak `risk_profile.json` dari ZITN (ZITN-TECH-043 §2).
+ * Cek Risiko — grid "Profil risiko" (ZITN-TECH-043).
  *
- * **Jangan menghitung ulang** di sini — data & logika sinyal ada di ZITN; ini hanya
- * lookup grid (satu sumber angka). Off-grid dibulatkan ke sel terdekat dan ditandai
- * "pendekatan". Label **in-sample**, **tanpa proyeksi P/L uang**.
+ * Grid (rule × TP×SL×H dengan statistik backtest per sel) adalah **IP strategi**
+ * dan **tidak** disimpan di repo ini. Ia diambil **saat runtime** dari
+ * `GET /api/cek-risiko/risk-profile` (berkas privat di host). Di sini hanya ada
+ * tipe + lookup murni; **jangan** menyalin angka grid ke sini.
  */
 
-export interface RiskProfileCell {
-  n: number;
-  r_r: number | null;
-  breakeven: number | null;
-  p_tp: number;
-  p_sl: number | null;
-  e_net: number;
-  median: number;
-  p5: number;
-  p1: number;
-  min: number;
-  p_loss10: number;
-  p_loss20: number;
-  p_loss40: number;
-}
-
-export interface RiskProfileRule {
-  label: string;
-  grid: Record<string, RiskProfileCell>;
-}
-
-export interface RiskProfileFile {
-  generated: string;
-  cost: number;
-  cooldown: number;
-  label_basis: string;
-  rules: Record<string, RiskProfileRule>;
-}
-
-export const RISK_PROFILE = raw as RiskProfileFile;
-
-export const RISK_RULES = ['V4_MOMENTUM_BULL', 'V5_ABSORPSI_BEAR'] as const;
-export type RiskRule = (typeof RISK_RULES)[number];
+export type RiskRule = string;
 
 export const RISK_PERIODS = ['penuh', 'modern', '2025'] as const;
 export type RiskPeriod = (typeof RISK_PERIODS)[number];
@@ -49,11 +20,6 @@ export const RISK_TP_OPTIONS = [5, 10, 15, 20, 25, 30] as const;
 export const RISK_SL_OPTIONS = [5, 10, 15, 20, 25, 30, 50] as const;
 export const RISK_H_OPTIONS = [60, 252, 504] as const;
 
-/**
- * Dropdown choices shown in the UI. Kept as named constants (rather than reused
- * inline) so a future grid that lacks a UI value can still snap + label
- * "pendekatan"; today they are identical to the grid.
- */
 export const RISK_TP_CHOICES = RISK_TP_OPTIONS;
 export const RISK_SL_CHOICES = RISK_SL_OPTIONS;
 
@@ -72,14 +38,17 @@ export interface RiskProfileChoice {
   h: number;
 }
 
-/** Defaults per rule (handoff §3.1): V4 tp10/noSL/h504, V5 tp5/noSL/h504. */
-export const RISK_PROFILE_DEFAULTS: Record<RiskRule, RiskProfileChoice> = {
-  V4_MOMENTUM_BULL: { rule: 'V4_MOMENTUM_BULL', period: 'penuh', tp: 10, sl: 'none', h: 504 },
-  V5_ABSORPSI_BEAR: { rule: 'V5_ABSORPSI_BEAR', period: 'penuh', tp: 5, sl: 'none', h: 504 },
+/**
+ * Neutral default: no rule id (the real ids come from the private grid). The
+ * panel adopts the grid's first rule once it loads.
+ */
+export const DEFAULT_RISK_PROFILE_CHOICE: RiskProfileChoice = {
+  rule: '',
+  period: 'penuh',
+  tp: 10,
+  sl: 'none',
+  h: 504,
 };
-
-export const DEFAULT_RISK_PROFILE_CHOICE: RiskProfileChoice =
-  RISK_PROFILE_DEFAULTS.V4_MOMENTUM_BULL;
 
 export const RISK_PRESETS = [
   { id: 'konservatif', tp: 5, sl: 10 },
@@ -134,9 +103,14 @@ export interface RiskLookup {
   used: RiskProfileChoice;
 }
 
-export function lookupRiskProfile(choice: RiskProfileChoice): RiskLookup {
+/** Resolve a choice against the fetched grid; `cell` is null when absent. */
+export function lookupRiskProfile(
+  profile: RiskProfileFile | null,
+  choice: RiskProfileChoice,
+): RiskLookup {
   const { choice: used, approx } = snapChoice(choice);
-  const rule = RISK_PROFILE.rules[used.rule];
+  if (!profile) return { cell: null, approx, used };
+  const rule = profile.rules[used.rule];
   const cell = rule ? (rule.grid[riskCellKey(used)] ?? null) : null;
   return { cell, approx, used };
 }
