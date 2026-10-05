@@ -411,18 +411,34 @@ situs.
 
 Grid Profil risiko adalah **IP strategi** dan **tidak** di-commit. Ada **satu berkas per pasar**
 (ZITN-TECH-047): `GET /api/cek-risiko/risk-profile?market=us|id` (default `us`) menyajikan
-artefak yang sesuai **hanya** bila env path-nya menunjuk berkas yang ada. Sediakan di host:
+artefak yang sesuai **hanya** bila env path-nya menunjuk berkas yang ada.
 
-1. Salin artefak dari ZITN ke direktori host:
-   - `db_us/study/risk_profile.json` (US) -> `/opt/jurnal-zitn/data/risk_profile_us.json`
-   - `db_idx/study/risk_profile_id.json` (IDX) -> `/opt/jurnal-zitn/data/risk_profile_id.json`
-2. Overlay `docker-compose.auto.yml` memount keduanya read-only:
-   `./data/risk_profile_us.json:/app/risk_profile_us.json:ro` dan
-   `./data/risk_profile_id.json:/app/risk_profile_id.json:ro`.
-3. Set di `.env`:
-   - `RISK_PROFILE_PATH_US=/app/risk_profile_us.json`
-   - `RISK_PROFILE_PATH_ID=/app/risk_profile_id.json`
-4. `$COMPOSE up -d --no-build api`.
+**Dari mesin ZITN** (tempat `db_us/`/`db_idx/` dihasilkan), unggah kedua artefak ke host:
+
+```bash
+ssh user@HOST 'mkdir -p /opt/jurnal-zitn/data'
+scp db_us/study/risk_profile.json     user@HOST:/opt/jurnal-zitn/data/risk_profile_us.json
+scp db_idx/study/risk_profile_id.json user@HOST:/opt/jurnal-zitn/data/risk_profile_id.json
+```
+
+**Di host** (`/opt/jurnal-zitn`):
+
+```bash
+git pull                         # ambil overlay docker-compose.auto.yml terbaru (dua bind-mount)
+ls -l data/risk_profile_*.json   # WAJIB keduanya ada SEBELUM `up` (Docker membuat direktori bila absen)
+grep -q RISK_PROFILE_PATH_US .env || cat >> .env <<'EOF'
+RISK_PROFILE_PATH_US=/app/risk_profile_us.json
+RISK_PROFILE_PATH_ID=/app/risk_profile_id.json
+EOF
+$COMPOSE pull && $COMPOSE up -d --no-build api
+```
+
+**Verifikasi** (butuh sesi login; 503 = artefak/env belum benar):
+
+```bash
+curl -s -o /dev/null -w '%{http_code}\n' 'https://<host>/api/cek-risiko/risk-profile?market=us'  # 200
+curl -s -o /dev/null -w '%{http_code}\n' 'https://<host>/api/cek-risiko/risk-profile?market=id'  # 200
+```
 
 Tanpa berkas ini endpoint menjawab 503 untuk pasar itu dan segmen Profil risiko menampilkan
 keadaan "tanpa data". `RISK_PROFILE_PATH` lama (satu berkas US) masih dihormati sebagai fallback US.
