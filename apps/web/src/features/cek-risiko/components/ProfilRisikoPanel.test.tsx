@@ -33,13 +33,13 @@ describe('ProfilRisikoPanel — segmen "Profil risiko" (ZITN-TECH-043)', () => {
     expect(screen.getByTestId('cek-profile-warn-tail')).toBeTruthy();
   });
 
-  it('TP%/SL% berupa dropdown dengan opsi yang diminta', () => {
+  it('TP%/SL% berupa dropdown dengan opsi yang diminta + "Tanpa SL" checkbox', () => {
     render(<ProfilRisikoPanel />);
     const tp = screen.getByTestId('cek-profile-tp') as HTMLSelectElement;
     expect(Array.from(tp.options).map((o) => o.value)).toEqual(['5', '10', '15', '20', '25', '30']);
     const sl = screen.getByTestId('cek-profile-sl') as HTMLSelectElement;
     expect(Array.from(sl.options).map((o) => o.value)).toEqual([
-      'none',
+      '',
       '5',
       '10',
       '15',
@@ -48,6 +48,8 @@ describe('ProfilRisikoPanel — segmen "Profil risiko" (ZITN-TECH-043)', () => {
       '30',
       '50',
     ]);
+    // "Tanpa SL" is its own control, not a dropdown option.
+    expect(screen.getByTestId('cek-profile-nosl')).toBeTruthy();
   });
 
   it('config rapuh (P(TP) < impas) → peringatan rapuh + gauge', () => {

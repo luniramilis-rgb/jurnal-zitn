@@ -270,13 +270,45 @@ export function ProfilRisikoPanel() {
                 </select>
               </div>
               <div className="space-y-2">
+                <Label htmlFor="cek-profile-sl">{t('cek.profile.sl')}</Label>
+                <select
+                  id="cek-profile-sl"
+                  data-testid="cek-profile-sl"
+                  value={choice.sl === 'none' ? '' : String(choice.sl)}
+                  disabled={choice.sl === 'none'}
+                  onChange={(e) => patch({ sl: Number(e.target.value) })}
+                  className="w-full cursor-pointer rounded-md border bg-background px-2 py-1 text-sm disabled:opacity-50"
+                >
+                  <option value="" disabled hidden>
+                    —
+                  </option>
+                  {RISK_SL_CHOICES.map((sl) => (
+                    <option key={sl} value={sl}>
+                      {sl}
+                    </option>
+                  ))}
+                </select>
+                <label className="flex cursor-pointer items-center gap-2 text-sm">
+                  <input
+                    type="checkbox"
+                    data-testid="cek-profile-nosl"
+                    checked={choice.sl === 'none'}
+                    onChange={(e) => patch({ sl: e.target.checked ? 'none' : 15 })}
+                  />
+                  {t('cek.profile.noSl')}
+                </label>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
                 <Label htmlFor="cek-profile-h">{t('cek.profile.h')}</Label>
                 <select
                   id="cek-profile-h"
                   data-testid="cek-profile-h"
                   value={choice.h}
                   onChange={(e) => patch({ h: Number(e.target.value) })}
-                  className="cursor-pointer rounded-md border bg-background px-2 py-1 text-sm"
+                  className="w-full cursor-pointer rounded-md border bg-background px-2 py-1 text-sm"
                 >
                   {RISK_H_OPTIONS.map((h) => (
                     <option key={h} value={h}>
@@ -285,26 +317,6 @@ export function ProfilRisikoPanel() {
                   ))}
                 </select>
               </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="cek-profile-sl">{t('cek.profile.sl')}</Label>
-              <select
-                id="cek-profile-sl"
-                data-testid="cek-profile-sl"
-                value={choice.sl === 'none' ? 'none' : String(choice.sl)}
-                onChange={(e) =>
-                  patch({ sl: e.target.value === 'none' ? 'none' : Number(e.target.value) })
-                }
-                className="w-full cursor-pointer rounded-md border bg-background px-2 py-1 text-sm"
-              >
-                <option value="none">{t('cek.profile.noSl')}</option>
-                {RISK_SL_CHOICES.map((sl) => (
-                  <option key={sl} value={sl}>
-                    {sl}
-                  </option>
-                ))}
-              </select>
             </div>
 
             {approx && (
