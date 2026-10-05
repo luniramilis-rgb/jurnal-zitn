@@ -488,10 +488,14 @@ export function ProfilRisikoPanel() {
                   <Input
                     id="cek-profile-capital"
                     data-testid="cek-profile-capital"
-                    type="number"
-                    min={0}
+                    type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
                     value={sizing.capital === 0 ? '' : String(sizing.capital)}
-                    onChange={(e) => setSizing({ ...sizing, capital: Number(e.target.value) })}
+                    onChange={(e) => {
+                      const digits = e.target.value.replace(/[^0-9]/g, '');
+                      setSizing({ ...sizing, capital: digits === '' ? 0 : Number(digits) });
+                    }}
                   />
                 </div>
                 <div className="space-y-2">
