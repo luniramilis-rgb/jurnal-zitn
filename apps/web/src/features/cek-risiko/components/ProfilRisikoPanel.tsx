@@ -189,28 +189,26 @@ export function ProfilRisikoPanel() {
   const { cell, approx, used } = lookupRiskProfile(profile, choice);
   const pc = cell ? portfolioComponents(cell, sizing.w, sizing.s) : null;
 
-  // Total modal defaults to the user's default account balance (its currency).
+  // Profil risiko is S&P 500 (US) only — money is USD, regardless of the account
+  // currency. IDX is deliberately out of scope for now (its rules come later).
+  const currency = 'USD';
   const accounts = useAccounts();
   const accountList = accounts.data ?? [];
-  const defaultAccount = accountList.find((a) => a.isDefault) ?? accountList[0];
-  const currency = defaultAccount?.currency ?? 'IDR';
-  const accountBalance = defaultAccount?.balance;
+  const usdAccount = accountList.find((a) => a.currency === 'USD');
 
-  // Prefill ONCE per currency (an account switch refills; a deliberate clear
-  // persists). No dependency on the `sizing` object, so no setState loop.
-  const prefilledCurrency = useRef<string | null>(null);
+  // Prefill total modal from a USD account balance, ONCE (a deliberate clear
+  // persists); never from an IDR account. No USD account ⇒ blank.
+  const prefilled = useRef(false);
   useEffect(() => {
-    if (prefilledCurrency.current === currency) return;
-    prefilledCurrency.current = currency;
-    const n = accountBalance === undefined ? NaN : Math.round(Number(accountBalance));
-    if (!Number.isFinite(n) || n <= 0) {
-      if (sizing.capital !== 0) setSizing({ ...sizing, capital: 0, currency });
-      return;
-    }
-    setSizing({ ...sizing, capital: n, currency });
-  }, [currency, accountBalance, sizing, setSizing]);
+    if (prefilled.current || accounts.isLoading) return;
+    prefilled.current = true;
+    const balance = usdAccount?.balance;
+    const n = balance === undefined ? NaN : Math.round(Number(balance));
+    if (!Number.isFinite(n) || n <= 0) return;
+    setSizing({ ...sizing, capital: n, currency: 'USD' });
+  }, [accounts.isLoading, usdAccount, sizing, setSizing]);
 
-  const hasCapital = sizing.capital > 0 && sizing.currency === currency;
+  const hasCapital = sizing.capital > 0;
   const money = (fraction: number) =>
     Math.min(Number.MAX_SAFE_INTEGER, Math.round(sizing.capital * fraction));
 
@@ -234,6 +232,9 @@ export function ProfilRisikoPanel() {
   return (
     <TooltipProvider>
       <div className="space-y-4" data-testid="cek-profile">
+        <p className="text-xs text-muted-foreground" data-testid="cek-profile-market">
+          {t('cek.profile.marketNote')}
+        </p>
         {/* "Risiko saat ini": setelan yang sedang aktif. */}
         <Card>
           <CardHeader className="pb-2">

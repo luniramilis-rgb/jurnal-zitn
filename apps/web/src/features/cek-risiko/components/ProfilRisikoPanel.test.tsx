@@ -54,7 +54,8 @@ vi.mock('../hooks/useRiskProfileData', () => ({
 
 vi.mock('@/features/accounts/hooks/useAccounts', () => ({
   useAccounts: () => ({
-    data: [{ id: 'a1', name: 'Utama', currency: 'IDR', isDefault: true, balance: '500000000' }],
+    data: [{ id: 'a1', name: 'US', currency: 'USD', isDefault: true, balance: '50000' }],
+    isLoading: false,
   }),
 }));
 
@@ -113,18 +114,24 @@ describe('ProfilRisikoPanel — segmen "Profil risiko" (ZITN-TECH-043)', () => {
     expect(screen.getByTestId('cek-profile-gauge')).toBeTruthy();
   });
 
-  it('blok "Komponen portofolio (w×S)" tampil dengan default w=2% / S=20 + modal dari akun', () => {
+  it('profil risiko menandai pasar S&P 500/USD dan IDX di luar cakupan', () => {
+    render(<ProfilRisikoPanel />);
+    expect(screen.getByTestId('cek-profile-market').textContent).toContain('S&P 500');
+    expect(screen.getByTestId('cek-profile-market').textContent).toContain('USD');
+  });
+
+  it('blok "Komponen portofolio (w×S)" tampil dengan default w=2% / S=20 + modal dari akun USD', () => {
     render(<ProfilRisikoPanel />);
     expect(screen.getByTestId('cek-profile-portfolio')).toBeTruthy();
     expect((screen.getByTestId('cek-profile-w') as HTMLInputElement).value).toBe('2');
     expect((screen.getByTestId('cek-profile-s') as HTMLInputElement).value).toBe('20');
-    expect((screen.getByTestId('cek-profile-capital') as HTMLInputElement).value).toBe('500000000');
+    expect((screen.getByTestId('cek-profile-capital') as HTMLInputElement).value).toBe('50000');
   });
 
   it('modal yang dikosongkan pengguna tidak diisi ulang otomatis (prefill sekali)', () => {
     render(<ProfilRisikoPanel />);
     const capital = screen.getByTestId('cek-profile-capital') as HTMLInputElement;
-    expect(capital.value).toBe('500000000');
+    expect(capital.value).toBe('50000');
     fireEvent.change(capital, { target: { value: '' } });
     expect(capital.value).toBe('');
   });
