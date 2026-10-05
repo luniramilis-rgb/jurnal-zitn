@@ -3,6 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ChangelogReleasesResponse, MarkChangelogViewedResponse } from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
+import { CHANGELOG_ENABLED } from '@/lib/frontendFlags';
 
 // Module-graph discipline (REQ-4.7): this file imports only @tanstack/react-query,
 // @/lib/api, and types from @jurnal-zitn/shared — no markdown dependencies — because the
@@ -12,6 +13,9 @@ export function useChangelogReleases() {
   return useQuery<ChangelogReleasesResponse>({
     queryKey: ['changelog', 'releases'],
     queryFn: () => api.get<ChangelogReleasesResponse>('/changelog/releases'),
+    // Hidden during the ZITN rebrand → do not fetch the Tradr release notes at
+    // all (frontendFlags.CHANGELOG_ENABLED). Restoring the surface re-enables it.
+    enabled: CHANGELOG_ENABLED,
     // 15 min matches the server TTL (REQ-4.6) — no polling that defeats the server cache.
     staleTime: 15 * 60 * 1000,
     refetchOnWindowFocus: false,

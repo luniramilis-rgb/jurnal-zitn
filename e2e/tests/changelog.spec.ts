@@ -104,7 +104,7 @@ async function gotoAndAwaitReleases(page: Page, path: string): Promise<void> {
   expect(res.status()).toBe(200);
 }
 
-test.describe('changelog', () => {
+test.describe.skip('changelog (hidden during the ZITN rebrand)', () => {
   test.skip(
     ({ browserName, isMobile }) => browserName !== 'chromium' || isMobile,
     'Desktop-only suite — runs under chromium (Desktop Chrome).',
@@ -220,5 +220,29 @@ test.describe('changelog', () => {
       // same API process) and for locally reused stub processes.
       await setStubMode(page.request, 'ok');
     }
+  });
+});
+
+/**
+ * The Tradr-era release-notes surface is hidden during the ZITN rebrand
+ * (apps/web/src/lib/frontendFlags.ts → CHANGELOG_ENABLED = false): the sidebar
+ * entry is gone, no releases are fetched, and a direct visit redirects. The
+ * suite above is kept (skipped) so it can be re-enabled by flipping the flag.
+ */
+test.describe('changelog surface hidden', () => {
+  test.skip(
+    ({ browserName, isMobile }) => browserName !== 'chromium' || isMobile,
+    'Desktop-only suite — runs under chromium (Desktop Chrome).',
+  );
+
+  test('no Changelog nav entry, and /changelog redirects to /dashboard', async ({ page }) => {
+    await ensureStackOrSkip(page.request);
+    await registerUser(page.request, 'hidden');
+
+    await page.goto('/dashboard');
+    await expect(page.getByRole('link', { name: 'Changelog' })).toHaveCount(0);
+
+    await page.goto('/changelog');
+    await expect(page).toHaveURL(/\/dashboard$/);
   });
 });

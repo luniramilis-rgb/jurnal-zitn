@@ -330,10 +330,8 @@ test.describe('app update prompt', () => {
       'Plain-reload recovery is flaky on webkit; covered on chromium.',
     );
 
-    // ChangelogPage fires this once its releases query resolves.
-    await page.route('**/api/changelog/viewed', (route) => route.fulfill(json({})));
-    // Only the changelog chunk 404s — never the app shell's own JS, never /api.
-    await route404Chunk(page, '**/assets/ChangelogPage-*.js');
+    // Only the Cek Risiko route chunk 404s — never the app shell's own JS, never /api.
+    await route404Chunk(page, '**/assets/CekRisikoPage-*.js');
 
     let loadCount = 0;
     page.on('load', () => {
@@ -344,17 +342,17 @@ test.describe('app update prompt', () => {
     await waitForAuthShell(page);
     const loadsAfterInitial = loadCount;
 
-    // Navigate to /changelog: the chunk 404s, the boundary spends its one
+    // Navigate to /cek-risiko: the chunk 404s, the boundary spends its one
     // automatic reload (one extra document load), the reload's chunk 404s again,
     // the guard is spent, and the fallback renders.
-    await page.getByRole('link', { name: 'Changelog' }).click();
+    await page.getByRole('link', { name: 'Risk Check' }).click();
     await expect(page.getByTestId('chunk-load-fallback')).toBeVisible();
     expect(loadCount).toBe(loadsAfterInitial + 1);
 
     // Recover: the chunk is available again, the manual Reload succeeds.
-    await page.unroute('**/assets/ChangelogPage-*.js');
+    await page.unroute('**/assets/CekRisikoPage-*.js');
     await page.getByTestId('chunk-load-fallback-reload').click();
-    await expect(page.getByRole('heading', { name: 'Changelog' })).toBeVisible();
+    await expect(page.getByTestId('cek-risiko-page')).toBeVisible();
   });
 
   test('7 — a vanished Shiki chunk degrades in place with no reload', async ({ page }) => {

@@ -31,6 +31,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useT } from '@/hooks/useLocale';
 import { useAdvisorEnabled } from '@/hooks/useRegistrationEnabled';
 import { docsUrl } from '@/lib/docs';
+import { CHANGELOG_ENABLED, DOCS_LINKS_ENABLED } from '@/lib/frontendFlags';
 import { cn } from '@/lib/utils';
 import { useDrawerStore } from '@/stores/drawer.store';
 
@@ -116,11 +117,12 @@ export function Sidebar() {
   // state comes back on its own when the drawer closes.
   const expanded = pinned && !drawerOpen;
 
-  const changelogBadge = hasNewReleases(changelogReleases.data) ? (
-    <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary">
-      <span className="sr-only">{t('nav.newUpdates')}</span>
-    </span>
-  ) : undefined;
+  const changelogBadge =
+    CHANGELOG_ENABLED && hasNewReleases(changelogReleases.data) ? (
+      <span className="absolute -right-1 -top-1 h-2 w-2 rounded-full bg-primary">
+        <span className="sr-only">{t('nav.newUpdates')}</span>
+      </span>
+    ) : undefined;
 
   return (
     // `sticky top-0 h-screen` decouples the rail from the page: as a plain flex
@@ -305,31 +307,36 @@ export function Sidebar() {
         >
           <ItemContent expanded={expanded} label={t('nav.settings')} Icon={Settings} />
         </Link>
-        <Link
-          to="/changelog"
-          aria-label={t('nav.changelog')}
-          title={expanded ? undefined : t('nav.changelog')}
-          className={itemClass(expanded)}
-        >
-          <ItemContent
-            expanded={expanded}
-            label={t('nav.changelog')}
-            Icon={Megaphone}
-            badge={changelogBadge}
-          />
-        </Link>
+        {CHANGELOG_ENABLED && (
+          <Link
+            to="/changelog"
+            aria-label={t('nav.changelog')}
+            title={expanded ? undefined : t('nav.changelog')}
+            className={itemClass(expanded)}
+          >
+            <ItemContent
+              expanded={expanded}
+              label={t('nav.changelog')}
+              Icon={Megaphone}
+              badge={changelogBadge}
+            />
+          </Link>
+        )}
         {/* The documentation lives on its own host, so this is an <a>, not a
             router <Link>. New tab: a reader following it is mid-task and should
-            not lose the page they were on. */}
-        <a
-          href={docsUrl('home')}
-          target="_blank"
-          rel="noreferrer"
-          aria-label={t('nav.docs')}
-          className={itemClass(expanded)}
-        >
-          <ItemContent expanded={expanded} label={t('nav.docs')} Icon={BookOpen} />
-        </a>
+            not lose the page they were on. Hidden during the ZITN rebrand while
+            the linked host is still the external Tradr docs (frontendFlags). */}
+        {DOCS_LINKS_ENABLED && (
+          <a
+            href={docsUrl('home')}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={t('nav.docs')}
+            className={itemClass(expanded)}
+          >
+            <ItemContent expanded={expanded} label={t('nav.docs')} Icon={BookOpen} />
+          </a>
+        )}
         {user?.isAdmin && (
           <Link
             to="/admin"
