@@ -284,59 +284,20 @@ describe('Sidebar — Performance link is plain', () => {
   });
 });
 
-describe('Sidebar — Changelog link + new-updates badge', () => {
-  it('renders the Changelog link in the System group after Settings, with cursor-pointer', () => {
-    const { container, root } = mountWith(<Sidebar />);
-
-    const hrefs = Array.from(container.querySelectorAll('nav a')).map((a) =>
-      a.getAttribute('href'),
-    );
-    expect(hrefs.indexOf('/changelog')).toBeGreaterThanOrEqual(0);
-    // Ordering, not adjacency. The desk nav's SYSTEM group runs Settings →
-    // Changelog → Docs, so Changelog sits after Settings now; pinning `+ 1`
-    // would make every future nav insertion look like a regression here.
-    expect(hrefs.indexOf('/changelog')).toBeGreaterThan(hrefs.indexOf('/settings'));
-
-    const link = Array.from(container.querySelectorAll('a')).find(
-      (a) => a.getAttribute('href') === '/changelog',
-    );
-    expect(link?.textContent).toContain('Changelog');
-    expect(link?.className).toContain('cursor-pointer');
-
-    unmount(container, root);
-  });
-
-  it('renders the badge (with sr-only name) for a newer-than-floor release', () => {
+describe('Sidebar — Changelog surface hidden (ZITN rebrand)', () => {
+  it('renders no Changelog nav entry and no new-updates badge', () => {
+    // Even with a newer-than-floor release available, the surface stays hidden
+    // while frontendFlags.CHANGELOG_ENABLED is false (the code is kept, not deleted).
     changelogState.result = {
       data: releasesData('2026-06-10T00:00:00.000Z', '2026-06-01T00:00:00.000Z'),
       isError: false,
     };
     const { container, root } = mountWith(<Sidebar />);
 
-    const srOnly = changelogBadge(container);
-    expect(srOnly).toBeDefined();
-    // Visual dot: the sr-only name lives inside the bg-primary indicator.
-    expect(srOnly?.parentElement?.className).toContain('bg-primary');
-
-    unmount(container, root);
-  });
-
-  it('hides the badge on query error (no data)', () => {
-    changelogState.result = { data: undefined, isError: true };
-    const { container, root } = mountWith(<Sidebar />);
-
-    expect(changelogBadge(container)).toBeUndefined();
-
-    unmount(container, root);
-  });
-
-  it('hides the badge when the newest release is older than the viewed floor', () => {
-    changelogState.result = {
-      data: releasesData('2026-05-01T00:00:00.000Z', '2026-06-01T00:00:00.000Z'),
-      isError: false,
-    };
-    const { container, root } = mountWith(<Sidebar />);
-
+    const hrefs = Array.from(container.querySelectorAll('nav a')).map((a) =>
+      a.getAttribute('href'),
+    );
+    expect(hrefs).not.toContain('/changelog');
     expect(changelogBadge(container)).toBeUndefined();
 
     unmount(container, root);

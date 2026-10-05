@@ -1,9 +1,9 @@
 // @vitest-environment jsdom
 //
-// There were previously ZERO links from this app to the documentation, so a user
-// who needed an explanation had to already know the site existed. These assert
-// the way in stays present, and stays an external link — the docs are on their
-// own host, so a router <Link> would 404 inside the SPA.
+// The app used to link out to the external Tradr documentation host from the
+// sidebar. During the ZITN rebrand that link is hidden (frontendFlags.
+// DOCS_LINKS_ENABLED = false) but the code is kept so it can be restored by
+// flipping the flag. These assert the sidebar exposes no docs link while hidden.
 import { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -48,7 +48,7 @@ vi.mock('@/hooks/useUserTimezone', () => ({
   useUserTimezone: () => 'America/New_York',
 }));
 
-import { DOCS_BASE_URL, docsUrl } from '@/lib/docs';
+import { DOCS_BASE_URL } from '@/lib/docs';
 import { setAppLocale } from '@/lib/locale';
 
 import { Sidebar } from './Sidebar';
@@ -74,43 +74,27 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-describe('Sidebar — documentation link', () => {
-  it('links out to the documentation host', () => {
+describe('Sidebar — documentation link hidden (ZITN rebrand)', () => {
+  it('renders no link to the external Tradr documentation host', () => {
     const { container, root } = mountWith(<Sidebar />);
 
     const link = Array.from(container.querySelectorAll('nav a')).find((a) =>
       a.getAttribute('href')?.startsWith(DOCS_BASE_URL),
     );
 
-    expect(link).toBeTruthy();
-    expect(link?.getAttribute('href')).toBe(docsUrl('home'));
-    expect(link?.textContent).toContain('Docs');
+    expect(link).toBeUndefined();
 
     unmount(container, root);
   });
 
-  it('opens in a new tab, with rel=noreferrer', () => {
+  it('renders no "Docs" nav entry at all', () => {
     const { container, root } = mountWith(<Sidebar />);
 
-    const link = Array.from(container.querySelectorAll('nav a')).find((a) =>
-      a.getAttribute('href')?.startsWith(DOCS_BASE_URL),
+    const docs = Array.from(container.querySelectorAll('nav a')).find(
+      (a) => a.getAttribute('aria-label') === 'Docs',
     );
 
-    // The reader is mid-task; replacing the app loses their place.
-    expect(link?.getAttribute('target')).toBe('_blank');
-    expect(link?.getAttribute('rel')).toContain('noreferrer');
-
-    unmount(container, root);
-  });
-
-  it('is styled as a pointer target, like every other button-like element', () => {
-    const { container, root } = mountWith(<Sidebar />);
-
-    const link = Array.from(container.querySelectorAll('nav a')).find((a) =>
-      a.getAttribute('href')?.startsWith(DOCS_BASE_URL),
-    );
-
-    expect(link?.className).toContain('cursor-pointer');
+    expect(docs).toBeUndefined();
 
     unmount(container, root);
   });
