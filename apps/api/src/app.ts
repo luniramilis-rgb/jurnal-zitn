@@ -24,6 +24,7 @@ import brokeragesRouter from '@/features/brokerages/brokerages.route';
 import calculatorRouter, {
   calculatorPreferencesRouter,
 } from '@/features/calculator/calculator.route';
+import cekRisikoRouter from '@/features/cek-risiko/risk-profile.route';
 import { changelogRouter } from '@/features/changelog/changelog.route';
 import { initChangelogCache } from '@/features/changelog/changelog.service';
 import { configRouter } from '@/features/config/config.route';
@@ -137,6 +138,7 @@ app.route('/api/billing', billingRouter);
 app.route('/api/brokerages', brokeragesRouter);
 app.route('/api/calculator', calculatorRouter);
 app.route('/api/changelog', changelogRouter);
+app.route('/api/cek-risiko', cekRisikoRouter);
 app.route('/api/csv-import', csvImport);
 app.route('/api/dashboard', dashboardRoute);
 app.route('/api/feedback', feedbackRouter);
