@@ -105,7 +105,7 @@ export default defineConfig({
     starlight({
       title: 'Jurnal ZITN docs',
       description:
-        'Documentation for Jurnal ZITN — the open-source trading journal. User guide for the hosted app plus self-hosting and development guides.',
+        'Documentation for Jurnal ZITN — the open-source journal. User guide for the hosted app plus self-hosting and development guides.',
       pagefind: true,
       // Says which version these pages describe, on every page. Starlight 0.41
       // has no site-wide banner option, so this overrides the per-page one —

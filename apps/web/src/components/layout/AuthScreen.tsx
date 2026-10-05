@@ -46,7 +46,7 @@ export function AuthScreen({ children }: { children: ReactNode }) {
             </span>
             Jurnal ZITN
           </p>
-          <p className="font-mono text-xs text-muted-foreground">the open-source trading journal</p>
+          <p className="font-mono text-xs text-muted-foreground">jurnal trading sumber terbuka</p>
         </div>
         {children}
       </div>

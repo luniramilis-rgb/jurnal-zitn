@@ -51,7 +51,7 @@ const spec = swaggerJSDoc({
       title: 'Jurnal ZITN API',
       version: apiPkg.version ?? '0.0.0',
       description:
-        'HTTP API for Jurnal ZITN — the open-source trading journal.\n\n' +
+        'HTTP API for Jurnal ZITN — the open-source journal.\n\n' +
         'This reference is generated from the `@swagger` JSDoc blocks that live next to ' +
         'each route in the API source, so it always matches the endpoints the app actually ' +
         'serves. All routes are mounted under `/api`. The same API backs both the hosted ' +

@@ -2460,7 +2460,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'email.verify.expiry': 'This link expires in 24 hours.',
   'email.verify.notice': "If you didn't request this, you can ignore this email.",
   'email.pasteLink': 'Or paste this link into your browser:',
-  'email.footer.tagline': 'Jurnal ZITN — the open-source trading journal',
+  'email.footer.tagline': 'Jurnal ZITN — the open-source journal',
   'email.footer.auto':
     'This is an automated, transactional message about your Jurnal ZITN account.',
   'web.error.title': 'Something went wrong',

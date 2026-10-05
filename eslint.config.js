@@ -69,6 +69,8 @@ export default tseslint.config(
       '**/coverage/**',
       '**/.astro/**',
       '**/public/vendor/**',
+      // Kilo Agent Manager worktrees are managed copies of the repo, not source.
+      '**/.kilo/**',
     ],
   },
   ...tseslint.configs.recommended,
