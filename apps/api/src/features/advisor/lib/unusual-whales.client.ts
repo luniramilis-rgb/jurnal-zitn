@@ -349,10 +349,9 @@ export function createUnusualWhalesClient(deps: UnusualWhalesClientDeps): Unusua
   return {
     // Pinned: GET /api/stock/{ticker}/stock-state.
     //
-    // NOT `/info`, which this was pointed at and which returns REFERENCE data
-    // only — announce_time, avg30_volume, next_earnings_date, issue_type. It
-    // carries no price, so every field the quote projection reads was absent
-    // and the tool returned an empty object while claiming to be a quote.
+    // NOT `/info`, which this was pointed at and which returns reference data
+    // only (no price fields) — so every field the quote projection reads was
+    // absent and the tool returned an empty object while claiming to be a quote.
     // `stock-state` is the last-trade endpoint: close/open/high/low/prev_close,
     // volume, plus `tape_time` and `market_time` for recency.
     getStockQuote(symbol, signal) {
