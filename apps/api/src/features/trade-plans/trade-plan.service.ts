@@ -211,10 +211,11 @@ export async function deleteTradePlan(userId: string, id: string): Promise<void>
 
 /**
  * F4 — link a plan to the trade it produced (1:1), or unlink with `null`. The
- * position must be the caller's, and no other plan may already link that trade.
- * Attaching a Pending plan marks it Executed; detaching an Executed plan returns
- * it to Pending. Soft link: the id is stored without an FK, so deleting the
- * trade never touches the plan.
+ * position must be the caller's AND the same symbol as the plan (a plan for one
+ * emitter never attaches to another's trade), and no other plan may already link
+ * that trade. Linking is a SOFT association only: the forward-only lifecycle is
+ * MANUAL, so attaching/detaching never changes `status` (Executed comes only from
+ * an explicit status write).
  */
 export async function linkTradePlan(
   userId: string,
@@ -231,11 +232,17 @@ export async function linkTradePlan(
 
     if (positionId !== null) {
       const [position] = await tx
-        .select({ id: positions.id })
+        .select({ id: positions.id, symbol: positions.symbol })
         .from(positions)
         .where(and(eq(positions.userId, userId), eq(positions.id, positionId)))
         .limit(1);
       if (!position) throw new NotFoundError('Position', positionId);
+
+      if (position.symbol.toUpperCase() !== existing.symbol.toUpperCase()) {
+        throw new ValidationError('Position symbol does not match the plan', {
+          reason: 'position_symbol_mismatch',
+        });
+      }
 
       const [clash] = await tx
         .select({ id: tradePlans.id })
@@ -243,23 +250,15 @@ export async function linkTradePlan(
         .where(and(eq(tradePlans.userId, userId), eq(tradePlans.positionId, positionId)))
         .limit(1);
       if (clash && clash.id !== id) {
-        throw new ValidationError('That trade is already linked to another plan');
+        throw new ValidationError('That position is already linked to another plan', {
+          reason: 'position_already_linked',
+        });
       }
     }
 
-    const from = existing.status as TradePlanStatus;
-    const status: TradePlanStatus =
-      positionId === null
-        ? from === 'executed'
-          ? 'pending'
-          : from
-        : from === 'pending'
-          ? 'executed'
-          : from;
-
     const [row] = await tx
       .update(tradePlans)
-      .set({ positionId, status, updatedAt: new Date() })
+      .set({ positionId, updatedAt: new Date() })
       .where(eq(tradePlans.id, id))
       .returning();
     return toTradePlan(row!);
