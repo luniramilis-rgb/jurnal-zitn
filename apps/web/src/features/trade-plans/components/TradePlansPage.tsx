@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 import type { MessageKey, TradePlan, TradePlanStatus } from '@jurnal-zitn/shared';
 
@@ -78,6 +79,21 @@ export function liveRR(plan: {
   const reward = plan.side === 'long' ? target - entry : entry - target;
   if (risk <= 0 || reward <= 0) return null;
   return Math.round((reward / risk) * 100) / 100;
+}
+
+/**
+ * Positions a plan may link to: the SAME symbol only, and never one another plan
+ * already owns (the link is 1:1). Pure, so the honesty of the dropdown is tested.
+ */
+export function linkablePositions<T extends { id: string; symbol: string }>(
+  plan: { symbol: string },
+  positions: readonly T[],
+  plans: readonly { positionId: string | null }[],
+): readonly T[] {
+  const linked = new Set(
+    plans.map((p) => p.positionId).filter((pid): pid is string => pid != null),
+  );
+  return positions.filter((p) => p.symbol === plan.symbol && !linked.has(p.id));
 }
 
 /**
@@ -291,19 +307,24 @@ export function TradePlansPage() {
                     disabled={linkPlan.isPending}
                     onChange={(event) => {
                       if (event.target.value) {
-                        linkPlan.mutate({ id: plan.id, positionId: event.target.value });
+                        linkPlan.mutate(
+                          { id: plan.id, positionId: event.target.value },
+                          { onError: () => toast.error(t('tp.linkErrGeneric')) },
+                        );
                       }
                     }}
                     className="cursor-pointer rounded-md border bg-background px-2 py-1 text-sm"
                   >
                     <option value="">{t('tp.linkNone')}</option>
-                    {(positions.data ?? []).map((p) => (
-                      <option key={p.id} value={p.id}>
-                        {p.symbol} · {p.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}
-                        {p.openedAt ? ` · ${p.openedAt.slice(0, 10)}` : ''} ·{' '}
-                        {t(POSITION_STATUS_LABEL[p.status])}
-                      </option>
-                    ))}
+                    {linkablePositions(plan, positions.data ?? [], list.data?.items ?? []).map(
+                      (p) => (
+                        <option key={p.id} value={p.id}>
+                          {p.symbol} · {p.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}
+                          {p.openedAt ? ` · ${p.openedAt.slice(0, 10)}` : ''} ·{' '}
+                          {t(POSITION_STATUS_LABEL[p.status])}
+                        </option>
+                      ),
+                    )}
                   </select>
                 )}
               </TableCell>
