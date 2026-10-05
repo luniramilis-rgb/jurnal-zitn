@@ -3,7 +3,6 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   DEFAULT_RISK_PROFILE_CHOICE,
   RISK_PERIODS,
-  RISK_RULES,
   type RiskPeriod,
   type RiskProfileChoice,
   type RiskRule,
@@ -18,7 +17,7 @@ import {
 const STORAGE_KEY = 'zitn.cek-risiko.risk-profile.v1';
 
 function isRule(value: unknown): value is RiskRule {
-  return (RISK_RULES as readonly string[]).includes(value as string);
+  return typeof value === 'string' && value.length > 0;
 }
 function isPeriod(value: unknown): value is RiskPeriod {
   return (RISK_PERIODS as readonly string[]).includes(value as string);

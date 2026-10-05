@@ -65,3 +65,6 @@ graphify-out/
 
 # TanStack Router generated caches
 .tanstack/
+
+# Private strategy artifact (ZITN-TECH-043) — provisioned on the host, never committed.
+**/cek-risiko/data/risk_profile.json

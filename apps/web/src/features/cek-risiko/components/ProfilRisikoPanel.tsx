@@ -1,5 +1,5 @@
 import { CircleQuestionMark } from 'lucide-react';
-import type { ReactNode } from 'react';
+import { useEffect, type ReactNode } from 'react';
 
 import type { MessageKey } from '@jurnal-zitn/shared';
 
@@ -12,12 +12,11 @@ import { useT } from '@/hooks/useLocale';
 import { cn } from '@/lib/utils';
 
 import { useRiskProfile } from '../hooks/useRiskProfile';
+import { useRiskProfileData } from '../hooks/useRiskProfileData';
 import {
   RISK_H_OPTIONS,
   RISK_PERIODS,
   RISK_PRESETS,
-  RISK_PROFILE,
-  RISK_RULES,
   RISK_SL_CHOICES,
   RISK_TP_CHOICES,
   lookupRiskProfile,
@@ -166,8 +165,19 @@ function BreakevenGauge({ cell }: { cell: RiskProfileCell }) {
 /** Segmen "Profil risiko" (ZITN-TECH-043) di dalam tab Cek Risiko. */
 export function ProfilRisikoPanel() {
   const t = useT();
+  const { data: profile = null } = useRiskProfileData();
   const { choice, setChoice } = useRiskProfile();
-  const { cell, approx, used } = lookupRiskProfile(choice);
+  const { cell, approx, used } = lookupRiskProfile(profile, choice);
+
+  // The grid carries the real rule ids; adopt its first rule when the stored or
+  // default rule isn't present.
+  useEffect(() => {
+    if (!profile) return;
+    const keys = Object.keys(profile.rules);
+    if (keys.length > 0 && !profile.rules[choice.rule]) setChoice({ ...choice, rule: keys[0] });
+  }, [profile, choice, setChoice]);
+
+  const rules = profile ? Object.keys(profile.rules) : [];
 
   const patch = (next: Partial<typeof choice>) => setChoice({ ...choice, ...next });
   const applyPreset = (preset: (typeof RISK_PRESETS)[number]) =>
@@ -186,7 +196,7 @@ export function ProfilRisikoPanel() {
           </CardHeader>
           <CardContent className="space-y-2 text-sm">
             <p data-testid="cek-profile-current">
-              {RISK_PROFILE.rules[choice.rule]?.label ?? choice.rule} ·{' '}
+              {profile?.rules[choice.rule]?.label ?? choice.rule} ·{' '}
               {t(`cek.profile.period.${choice.period}`)} · TP {choice.tp}% ·{' '}
               {choice.sl === 'none' ? t('cek.profile.noSl') : `SL ${choice.sl}%`} · H {choice.h}
             </p>
@@ -206,9 +216,9 @@ export function ProfilRisikoPanel() {
                   onChange={(e) => patch({ rule: e.target.value as typeof choice.rule })}
                   className="cursor-pointer rounded-md border bg-background px-2 py-1 text-sm"
                 >
-                  {RISK_RULES.map((rule) => (
+                  {rules.map((rule) => (
                     <option key={rule} value={rule}>
-                      {RISK_PROFILE.rules[rule]?.label ?? rule}
+                      {profile?.rules[rule]?.label ?? rule}
                     </option>
                   ))}
                 </select>
@@ -410,8 +420,8 @@ export function ProfilRisikoPanel() {
 
               <p className="text-xs text-muted-foreground" data-testid="cek-profile-insample">
                 {t('cek.profile.insample', {
-                  basis: RISK_PROFILE.label_basis,
-                  date: RISK_PROFILE.generated.slice(0, 10),
+                  basis: profile?.label_basis ?? '',
+                  date: (profile?.generated ?? '').slice(0, 10),
                 })}
               </p>
             </CardContent>
