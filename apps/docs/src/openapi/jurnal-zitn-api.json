@@ -1986,6 +1986,25 @@
         ]
       }
     },
+    "/api/cek-risiko/risk-profile": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "The risk_profile.json grid."
+          },
+          "401": {
+            "description": "No valid session."
+          },
+          "503": {
+            "description": "The grid is not provisioned on this instance."
+          }
+        },
+        "summary": "The risk-profile grid (private strategy artifact, runtime-served).",
+        "tags": [
+          "Cek Risiko"
+        ]
+      }
+    },
     "/api/changelog/releases": {
       "get": {
         "description": "User-scoped, side-effect-free. Returns the cached GitHub releases (newest first) plus `fetchedAt`, a `stale` flag (cache older than its TTL but still served), and the per-viewer `lastViewedAt` floor (`changelog_viewed_at ?? created_at`). Never mutates viewer state — marking viewed is the dedicated POST. When the cache is empty and the upstream fetch fails, returns a coded `503 CHANGELOG_UNAVAILABLE`.\n",

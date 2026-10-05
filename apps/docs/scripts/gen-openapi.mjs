@@ -65,7 +65,9 @@ const spec = swaggerJSDoc({
   },
   // Every route file's hand-authored `@swagger` block; test files (`*.test.ts`)
   // do not match `*.route.ts` and are excluded.
-  apis: [resolve(apiRoot, 'src/features/**/*.route.ts')],
+  // POSIX-normalized: swagger-jsdoc's glob does not match Windows backslash
+  // paths, so a Windows dev run would otherwise extract zero paths.
+  apis: [resolve(apiRoot, 'src/features/**/*.route.ts').replaceAll('\\', '/')],
 });
 
 // Sanitize `paths`: keep only real path items — a `/`-prefixed key carrying at
