@@ -45,17 +45,17 @@ export type RiskRule = (typeof RISK_RULES)[number];
 export const RISK_PERIODS = ['penuh', 'modern', '2025'] as const;
 export type RiskPeriod = (typeof RISK_PERIODS)[number];
 
-export const RISK_TP_OPTIONS = [5, 10, 15, 20, 30] as const;
-export const RISK_SL_OPTIONS = [10, 15, 20, 30] as const;
+export const RISK_TP_OPTIONS = [5, 10, 15, 20, 25, 30] as const;
+export const RISK_SL_OPTIONS = [5, 10, 15, 20, 25, 30, 50] as const;
 export const RISK_H_OPTIONS = [60, 252, 504] as const;
 
 /**
- * Dropdown choices shown in the UI. A superset of the grid — values the grid
- * lacks (TP 25; SL 5/25/50) snap to the nearest cell and are labelled
- * "pendekatan". Keep `RISK_TP_OPTIONS`/`RISK_SL_OPTIONS` (the grid) for snapping.
+ * Dropdown choices shown in the UI. Kept as named constants (rather than reused
+ * inline) so a future grid that lacks a UI value can still snap + label
+ * "pendekatan"; today they are identical to the grid.
  */
-export const RISK_TP_CHOICES = [5, 10, 15, 20, 25, 30] as const;
-export const RISK_SL_CHOICES = [5, 10, 15, 20, 25, 30, 50] as const;
+export const RISK_TP_CHOICES = RISK_TP_OPTIONS;
+export const RISK_SL_CHOICES = RISK_SL_OPTIONS;
 
 /** Off-grid bounds accepted by the UI (values are rounded to the nearest cell). */
 export const RISK_TP_RANGE = { min: 3, max: 50 } as const;

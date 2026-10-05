@@ -734,7 +734,7 @@ const ID_MESSAGES = {
   'cek.profile.current': 'Risiko saat ini',
   'cek.profile.saveHint':
     'Pilihan ini tersimpan sebagai setelan dan dipakai "Risiko saat ini" serta draf pra-trade.',
-  'cek.profile.stats': 'Statistik historis (in-sample)',
+  'cek.profile.stats': 'Statistik historis (backtest; in-sample)',
   'cek.profile.rr': 'R:R',
   'cek.profile.breakeven': 'Impas P(TP)',
   'cek.profile.pTp': 'P(TP)',
@@ -2266,7 +2266,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.profile.current': 'Current risk',
   'cek.profile.saveHint':
     'This choice is saved as a setting and used by "Current risk" and the pre-trade draft.',
-  'cek.profile.stats': 'Historical statistics (in-sample)',
+  'cek.profile.stats': 'Historical statistics (backtest; in-sample)',
   'cek.profile.rr': 'R:R',
   'cek.profile.breakeven': 'Breakeven P(TP)',
   'cek.profile.pTp': 'P(TP)',

@@ -11,13 +11,13 @@ import {
 } from './risk-profile';
 
 describe('risk_profile.json — kontrak & lookup (ZITN-TECH-043)', () => {
-  it('memuat kedua rule dengan 225 sel (3 periode × 5 TP × 5 SL × 3 H)', () => {
+  it('memuat kedua rule dengan 432 sel (3 periode × 6 TP × 8 SL × 3 H)', () => {
     expect(Object.keys(RISK_PROFILE.rules).sort()).toEqual([
       'V4_MOMENTUM_BULL',
       'V5_ABSORPSI_BEAR',
     ]);
     for (const rule of Object.values(RISK_PROFILE.rules)) {
-      expect(Object.keys(rule.grid)).toHaveLength(225);
+      expect(Object.keys(rule.grid)).toHaveLength(432);
     }
     expect(RISK_PERIODS).toEqual(['penuh', 'modern', '2025']);
   });
