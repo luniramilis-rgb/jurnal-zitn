@@ -159,7 +159,7 @@ export function HitungLotPanel() {
               value={symbol}
               onChange={setSymbol}
               onQueryChange={(raw) => setSymbol(raw.toUpperCase())}
-              placeholder={t('calc.field.symbolPlaceholder')}
+              placeholder={t('cek.field.symbolPlaceholder')}
             />
           </div>
 

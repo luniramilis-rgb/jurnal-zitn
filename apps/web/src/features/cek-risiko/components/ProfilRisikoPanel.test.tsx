@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 // The grid is private and fetched at runtime; tests feed a tiny FIXTURE.
@@ -119,5 +119,13 @@ describe('ProfilRisikoPanel — segmen "Profil risiko" (ZITN-TECH-043)', () => {
     expect((screen.getByTestId('cek-profile-w') as HTMLInputElement).value).toBe('2');
     expect((screen.getByTestId('cek-profile-s') as HTMLInputElement).value).toBe('20');
     expect((screen.getByTestId('cek-profile-capital') as HTMLInputElement).value).toBe('500000000');
+  });
+
+  it('modal yang dikosongkan pengguna tidak diisi ulang otomatis (prefill sekali)', () => {
+    render(<ProfilRisikoPanel />);
+    const capital = screen.getByTestId('cek-profile-capital') as HTMLInputElement;
+    expect(capital.value).toBe('500000000');
+    fireEvent.change(capital, { target: { value: '' } });
+    expect(capital.value).toBe('');
   });
 });

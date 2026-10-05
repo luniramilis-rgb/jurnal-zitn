@@ -17,12 +17,15 @@ export interface PortfolioSizing {
   s: number;
   /** Total modal (mata uang akun). 0 = belum diisi. */
   capital: number;
+  /** Mata uang modal — agar angka tak tertukar saat akun default berganti. */
+  currency: string;
 }
 
 export const PORTFOLIO_SIZING_DEFAULT: PortfolioSizing = {
   w: RISK_WEIGHT_DEFAULT,
   s: RISK_SLOTS_DEFAULT,
   capital: 0,
+  currency: '',
 };
 
 function clampInt(value: unknown, min: number, max: number, fallback: number): number {
@@ -37,6 +40,10 @@ function clampMoney(value: unknown, fallback: number): number {
   return Math.min(1e15, Math.round(n));
 }
 
+function asCurrency(value: unknown): string {
+  return typeof value === 'string' ? value : '';
+}
+
 export function parsePortfolioSizing(raw: string | null): PortfolioSizing {
   if (!raw) return PORTFOLIO_SIZING_DEFAULT;
   try {
@@ -45,6 +52,7 @@ export function parsePortfolioSizing(raw: string | null): PortfolioSizing {
       w: clampInt(data.w, 1, 100, PORTFOLIO_SIZING_DEFAULT.w),
       s: clampInt(data.s, 1, 100, PORTFOLIO_SIZING_DEFAULT.s),
       capital: clampMoney(data.capital, PORTFOLIO_SIZING_DEFAULT.capital),
+      currency: asCurrency(data.currency),
     };
   } catch {
     return PORTFOLIO_SIZING_DEFAULT;
@@ -80,6 +88,7 @@ export function usePortfolioSizing(): {
       w: clampInt(next.w, 1, 100, PORTFOLIO_SIZING_DEFAULT.w),
       s: clampInt(next.s, 1, 100, PORTFOLIO_SIZING_DEFAULT.s),
       capital: clampMoney(next.capital, PORTFOLIO_SIZING_DEFAULT.capital),
+      currency: asCurrency(next.currency),
     };
     setSizingState(clean);
     try {

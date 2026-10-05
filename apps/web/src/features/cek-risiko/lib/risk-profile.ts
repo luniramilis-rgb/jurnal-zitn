@@ -23,11 +23,6 @@ export const RISK_H_OPTIONS = [60, 252, 504] as const;
 export const RISK_TP_CHOICES = RISK_TP_OPTIONS;
 export const RISK_SL_CHOICES = RISK_SL_OPTIONS;
 
-/** Off-grid bounds accepted by the UI (values are rounded to the nearest cell). */
-export const RISK_TP_RANGE = { min: 3, max: 50 } as const;
-export const RISK_SL_RANGE = { min: 5, max: 50 } as const;
-export const RISK_H_RANGE = { min: 20, max: 504 } as const;
-
 export type RiskSl = number | 'none';
 
 export interface RiskProfileChoice {
@@ -59,7 +54,6 @@ export const RISK_PRESETS = [
   { id: 'seimbang', tp: 10, sl: 20 },
   { id: 'agresif', tp: 15, sl: 30 },
 ] as const;
-export type RiskPresetId = (typeof RISK_PRESETS)[number]['id'];
 
 function nearest<T extends number>(options: readonly T[], value: number): T {
   return options.reduce(

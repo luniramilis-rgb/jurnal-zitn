@@ -1,5 +1,5 @@
 import { CircleQuestionMark } from 'lucide-react';
-import { useEffect, type ReactNode } from 'react';
+import { useEffect, useRef, type ReactNode } from 'react';
 
 import type { MessageKey } from '@jurnal-zitn/shared';
 
@@ -195,14 +195,24 @@ export function ProfilRisikoPanel() {
   const defaultAccount = accountList.find((a) => a.isDefault) ?? accountList[0];
   const currency = defaultAccount?.currency ?? 'IDR';
   const accountBalance = defaultAccount?.balance;
-  useEffect(() => {
-    if (sizing.capital !== 0 || accountBalance === undefined) return;
-    const n = Number(accountBalance);
-    if (Number.isFinite(n) && n > 0) setSizing({ ...sizing, capital: Math.round(n) });
-  }, [sizing, accountBalance, setSizing]);
 
-  const hasCapital = sizing.capital > 0;
-  const money = (fraction: number) => sizing.capital * fraction;
+  // Prefill ONCE per currency (an account switch refills; a deliberate clear
+  // persists). No dependency on the `sizing` object, so no setState loop.
+  const prefilledCurrency = useRef<string | null>(null);
+  useEffect(() => {
+    if (prefilledCurrency.current === currency) return;
+    prefilledCurrency.current = currency;
+    const n = accountBalance === undefined ? NaN : Math.round(Number(accountBalance));
+    if (!Number.isFinite(n) || n <= 0) {
+      if (sizing.capital !== 0) setSizing({ ...sizing, capital: 0, currency });
+      return;
+    }
+    setSizing({ ...sizing, capital: n, currency });
+  }, [currency, accountBalance, sizing, setSizing]);
+
+  const hasCapital = sizing.capital > 0 && sizing.currency === currency;
+  const money = (fraction: number) =>
+    Math.min(Number.MAX_SAFE_INTEGER, Math.round(sizing.capital * fraction));
 
   // The grid carries the real rule ids; adopt its first rule when the stored or
   // default rule isn't present.
@@ -471,7 +481,9 @@ export function ProfilRisikoPanel() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="cek-profile-capital">{t('cek.profile.portfolio.capital')}</Label>
+                  <Label htmlFor="cek-profile-capital">
+                    {t('cek.profile.portfolio.capital')} ({currency})
+                  </Label>
                   <Input
                     id="cek-profile-capital"
                     data-testid="cek-profile-capital"
@@ -539,9 +551,21 @@ export function ProfilRisikoPanel() {
                 </Stat>
               </div>
 
-              <p className="text-xs text-muted-foreground" data-testid="cek-profile-portfolio-note">
-                {t('cek.profile.portfolio.note')}
-              </p>
+              {hasCapital ? (
+                <p
+                  className="text-xs text-muted-foreground"
+                  data-testid="cek-profile-portfolio-note"
+                >
+                  {t('cek.profile.portfolio.note')}
+                </p>
+              ) : (
+                <p
+                  className="text-xs text-muted-foreground"
+                  data-testid="cek-profile-portfolio-hint"
+                >
+                  {t('cek.profile.portfolio.fillCapital')}
+                </p>
+              )}
             </CardContent>
           </Card>
         )}

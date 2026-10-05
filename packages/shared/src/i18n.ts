@@ -772,6 +772,8 @@ const ID_MESSAGES = {
   'cek.profile.portfolio.simultaneous': 'Ilustrasi S slot serentak (p5)',
   'cek.profile.portfolio.note':
     'Skala in-sample dari modal, w, dan S yang Anda isi · bukan prakiraan/janji · tanpa proyeksi untung.',
+  'cek.profile.portfolio.fillCapital': 'Isi total modal untuk melihat komponen Rupiah.',
+  'cek.field.symbolPlaceholder': 'mis. BBRI',
   'cek.profile.hint.rr':
     'Rasio imbal terhadap risiko. R:R 1,00 = potensi imbal setara risiko; makin tinggi, ambang menang makin longgar.',
   'cek.profile.hint.breakeven':
@@ -2319,6 +2321,8 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.profile.portfolio.simultaneous': 'Illustration: S slots at once (p5)',
   'cek.profile.portfolio.note':
     'In-sample scaling from your capital, w, and S · not a forecast/promise · no profit projection.',
+  'cek.profile.portfolio.fillCapital': 'Enter total capital to see the money components.',
+  'cek.field.symbolPlaceholder': 'e.g. BBRI',
   'cek.profile.hint.rr':
     'Reward-to-risk ratio. R:R 1.00 = reward matches risk; higher loosens the win threshold.',
   'cek.profile.hint.breakeven':
