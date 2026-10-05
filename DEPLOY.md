@@ -407,6 +407,19 @@ GitHub Actions. Rekomendasi: tempelkan `build_site.py` + `publish_site.py` di pi
 sudah menghasilkan `outputs/daily/`, dan tambah workflow `workflow_dispatch` untuk perubahan kode
 situs.
 
+### 7.12 Artefak privat: grid "Profil risiko" (opsional)
+
+Grid Profil risiko adalah **IP strategi** dan **tidak** di-commit. Endpoint
+`GET /api/cek-risiko/risk-profile` menyajikannya **hanya** bila env `RISK_PROFILE_PATH`
+menunjuk berkas yang ada. Sediakan di host:
+
+1. Salin artefak dari ZITN: `db_us/study/risk_profile.json` -> `/opt/jurnal-zitn/risk_profile.json`.
+2. Overlay `docker-compose.auto.yml` memount-nya read-only: `./risk_profile.json:/app/risk_profile.json:ro`.
+3. Set `RISK_PROFILE_PATH=/app/risk_profile.json` di `.env`.
+4. `$COMPOSE up -d --no-build api`.
+
+Tanpa berkas ini endpoint menjawab 503 dan segmen Profil risiko menampilkan keadaan "tanpa data".
+
 ## 8. Operasional (A11)
 
 Referensi keputusan pemilik yang menunggu: jam backup, retensi, dan region hosting (residensi data)

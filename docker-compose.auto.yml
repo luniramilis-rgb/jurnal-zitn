@@ -21,6 +21,11 @@ services:
     image: ghcr.io/luniramilis-rgb/jurnal-zitn-api:edge
     labels:
       com.centurylinklabs.watchtower.enable: "true"
+    volumes:
+      # PRIVATE risk-profile grid (ZITN-TECH-043). Strategy IP: the file stays on
+      # the host (next to this compose file) and is mounted read-only into api at
+      # the path its `.env` already points to (RISK_PROFILE_PATH=/app/risk_profile.json).
+      - ./risk_profile.json:/app/risk_profile.json:ro
 
   web:
     image: ghcr.io/luniramilis-rgb/jurnal-zitn-web:edge
