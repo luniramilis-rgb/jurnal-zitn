@@ -1,7 +1,31 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
 
-import { liveRR } from './TradePlansPage';
+import { liveRR, linkablePositions } from './TradePlansPage';
+
+describe('linkablePositions (F4 link honesty)', () => {
+  const positions = [
+    { id: 'p1', symbol: 'CEG' },
+    { id: 'p2', symbol: 'AAPL' },
+    { id: 'p3', symbol: 'CEG' },
+  ];
+
+  it('offers only positions of the plan’s own symbol', () => {
+    expect(linkablePositions({ symbol: 'CEG' }, positions, []).map((p) => p.id)).toEqual([
+      'p1',
+      'p3',
+    ]);
+  });
+
+  it('excludes positions another plan already owns', () => {
+    expect(
+      linkablePositions({ symbol: 'CEG' }, positions, [
+        { positionId: 'p1' },
+        { positionId: null },
+      ]).map((p) => p.id),
+    ).toEqual(['p3']);
+  });
+});
 
 describe('liveRR (F4)', () => {
   it('computes reward:risk for a long from the entry zone high', () => {
