@@ -272,8 +272,8 @@ describe('fetchCandles — OHLCV melalui jembatan (Fase 3c)', () => {
           l: [0.5, 1.5],
           c: [2, 3],
           v: [10, 20],
-          vwap: { '10': [1, 2] },
-          ma20_vol: [1, 2],
+          extra_indicator_a: { '10': [1, 2] },
+          extra_indicator_b: [1, 2],
         }),
         { status: 200 },
       ),
@@ -292,9 +292,10 @@ describe('fetchCandles — OHLCV melalui jembatan (Fase 3c)', () => {
     expect(body.symbol).toBe('BBCA');
     expect(body.t).toEqual(['2026-09-28', '2026-09-29']);
     expect(body.c).toEqual([2, 3]);
-    // Indikator tidak diteruskan (pertahanan berlapis).
-    expect('vwap' in body).toBe(false);
-    expect('ma20_vol' in body).toBe(false);
+    // Indikator tidak diteruskan (pertahanan berlapis) — kolom apa pun di luar
+    // OHLCV dibuang; nama field indikator ZITN tidak disebut di repo publik.
+    expect('extra_indicator_a' in body).toBe(false);
+    expect('extra_indicator_b' in body).toBe(false);
 
     const [url] = fetchImpl.mock.calls[0] as [string];
     expect(url).toContain('/api/journal/candles?market=id&ticker=BBCA');
