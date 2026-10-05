@@ -757,6 +757,30 @@ const ID_MESSAGES = {
   'cek.profile.insample':
     'In-sample Â· bukan nasihat/janji Â· tanpa proyeksi P/L. Basis: {basis}. Dibuat {date}.',
   'cek.profile.nodata': 'Sel tidak tersedia untuk kombinasi ini.',
+  'cek.profile.hint.rr':
+    'Rasio imbal terhadap risiko. R:R 1,00 = potensi imbal setara risiko; makin tinggi, ambang menang makin longgar.',
+  'cek.profile.hint.breakeven':
+    'Tingkat menang minimum agar tidak rugi pada R:R ini. Di bawah angka ini, jangka panjang cenderung rugi.',
+  'cek.profile.hint.ptp':
+    'Seberapa sering target tercapai lebih dulu (historis). Bandingkan dengan garis impas.',
+  'cek.profile.hint.delta':
+    'Selisih P(TP) terhadap impas. Positif = ada bantalan; negatif = rapuh.',
+  'cek.profile.hint.psl': 'Seberapa sering stop tersentuh lebih dulu (historis).',
+  'cek.profile.hint.enet':
+    'Rerata hasil per transaksi setelah biaya (fraksi). Positif = harapan untung historis.',
+  'cek.profile.hint.median':
+    'Nilai tengah hasil: separuh lebih baik, separuh lebih buruk; tahan terhadap pencilan.',
+  'cek.profile.hint.p5': 'Persentil 5%: 5% transaksi terburuk lebih buruk dari ini (risiko ekor).',
+  'cek.profile.hint.p1min': 'Persentil 1% dan hasil terburuk — gambaran skenario terburuk.',
+  'cek.profile.hint.loss10': 'Peluang kerugian melebihi 10% (historis).',
+  'cek.profile.hint.loss20': 'Peluang kerugian melebihi 20% (historis).',
+  'cek.profile.hint.loss40': 'Peluang kerugian melebihi 40% (historis) — ekor dalam.',
+  'cek.profile.hint.freq':
+    'Jumlah transaksi historis pada sel ini. Makin besar, indikator makin stabil.',
+  'cek.profile.hint.barTp': 'Bagian transaksi yang berakhir di target.',
+  'cek.profile.hint.barTimeout': 'Bagian transaksi yang tak menyentuh target/stop hingga horizon.',
+  'cek.profile.hint.barSl': 'Bagian transaksi yang berakhir di stop.',
+  'cek.profile.hint.gauge': 'P(TP) dibanding ambang impas; di atas garis = ada bantalan.',
   'tax.page.title': 'Ringkasan Pajak',
   'tax.subtitle': 'P&L realisasi dan pengeluaran tercatat untuk tahun terpilih.',
   'tax.subtitleFlags':
@@ -2266,6 +2290,28 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.profile.insample':
     'In-sample Â· not advice/promise Â· no P/L projection. Basis: {basis}. Generated {date}.',
   'cek.profile.nodata': 'No cell for this combination.',
+  'cek.profile.hint.rr':
+    'Reward-to-risk ratio. R:R 1.00 = reward matches risk; higher loosens the win threshold.',
+  'cek.profile.hint.breakeven':
+    'Minimum win rate to avoid a loss at this R:R. Below it, long-run results tend to lose.',
+  'cek.profile.hint.ptp':
+    'How often the target is hit first (historical). Compare with the breakeven line.',
+  'cek.profile.hint.delta': 'P(TP) minus breakeven. Positive = a buffer; negative = fragile.',
+  'cek.profile.hint.psl': 'How often the stop is hit first (historical).',
+  'cek.profile.hint.enet':
+    'Average outcome per trade after costs (fraction). Positive = historical edge.',
+  'cek.profile.hint.median': 'Middle outcome: half better, half worse; robust to outliers.',
+  'cek.profile.hint.p5': '5th percentile: the worst 5% of trades are below this (tail risk).',
+  'cek.profile.hint.p1min': '1st percentile and the worst outcome — the worst-case sketch.',
+  'cek.profile.hint.loss10': 'Chance of a loss larger than 10% (historical).',
+  'cek.profile.hint.loss20': 'Chance of a loss larger than 20% (historical).',
+  'cek.profile.hint.loss40': 'Chance of a loss larger than 40% (historical) — deep tail.',
+  'cek.profile.hint.freq': 'Historical trades in this cell. Larger means a steadier read.',
+  'cek.profile.hint.barTp': 'Share of trades that ended at the target.',
+  'cek.profile.hint.barTimeout':
+    'Share of trades that hit neither target nor stop within the horizon.',
+  'cek.profile.hint.barSl': 'Share of trades that ended at the stop.',
+  'cek.profile.hint.gauge': 'P(TP) against the breakeven threshold; above the line = a buffer.',
   'tax.page.title': 'Tax Summary',
   'tax.subtitle': 'Realised P&L and tracked expenses for the selected year.',
   'tax.subtitleFlags':
