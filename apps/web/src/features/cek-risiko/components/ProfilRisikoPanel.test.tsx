@@ -52,6 +52,12 @@ vi.mock('../hooks/useRiskProfileData', () => ({
   }),
 }));
 
+vi.mock('@/features/accounts/hooks/useAccounts', () => ({
+  useAccounts: () => ({
+    data: [{ id: 'a1', name: 'Utama', currency: 'IDR', isDefault: true, balance: '500000000' }],
+  }),
+}));
+
 import { ProfilRisikoPanel } from './ProfilRisikoPanel';
 
 const STORAGE_KEY = 'zitn.cek-risiko.risk-profile.v1';
@@ -107,11 +113,11 @@ describe('ProfilRisikoPanel — segmen "Profil risiko" (ZITN-TECH-043)', () => {
     expect(screen.getByTestId('cek-profile-gauge')).toBeTruthy();
   });
 
-  it('blok "Komponen portofolio (w×S)" tampil dengan default w=2% / S=20', () => {
+  it('blok "Komponen portofolio (w×S)" tampil dengan default w=2% / S=20 + modal dari akun', () => {
     render(<ProfilRisikoPanel />);
     expect(screen.getByTestId('cek-profile-portfolio')).toBeTruthy();
     expect((screen.getByTestId('cek-profile-w') as HTMLInputElement).value).toBe('2');
     expect((screen.getByTestId('cek-profile-s') as HTMLInputElement).value).toBe('20');
-    expect(screen.getByTestId('cek-profile-portfolio-note').textContent).toContain('w 2%');
+    expect((screen.getByTestId('cek-profile-capital') as HTMLInputElement).value).toBe('500000000');
   });
 });

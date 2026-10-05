@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { useT } from '@/hooks/useLocale';
 import { cn } from '@/lib/utils';
 
@@ -60,6 +61,20 @@ function PctSigned({ value }: { value: number | null }) {
     <>
       <Numeric value={value * 100} kind="decimal" precision={2} direction="auto" />%
     </>
+  );
+}
+
+function Money({
+  value,
+  currency,
+  signed = false,
+}: {
+  value: number;
+  currency: string;
+  signed?: boolean;
+}) {
+  return (
+    <Numeric value={value} kind="money" currency={currency} direction={signed ? 'auto' : 'none'} />
   );
 }
 
@@ -173,6 +188,21 @@ export function ProfilRisikoPanel() {
   const { sizing, setSizing } = usePortfolioSizing();
   const { cell, approx, used } = lookupRiskProfile(profile, choice);
   const pc = cell ? portfolioComponents(cell, sizing.w, sizing.s) : null;
+
+  // Total modal defaults to the user's default account balance (its currency).
+  const accounts = useAccounts();
+  const accountList = accounts.data ?? [];
+  const defaultAccount = accountList.find((a) => a.isDefault) ?? accountList[0];
+  const currency = defaultAccount?.currency ?? 'IDR';
+  const accountBalance = defaultAccount?.balance;
+  useEffect(() => {
+    if (sizing.capital !== 0 || accountBalance === undefined) return;
+    const n = Number(accountBalance);
+    if (Number.isFinite(n) && n > 0) setSizing({ ...sizing, capital: Math.round(n) });
+  }, [sizing, accountBalance, setSizing]);
+
+  const hasCapital = sizing.capital > 0;
+  const money = (fraction: number) => sizing.capital * fraction;
 
   // The grid carries the real rule ids; adopt its first rule when the stored or
   // default rule isn't present.
@@ -439,7 +469,18 @@ export function ProfilRisikoPanel() {
               <CardTitle className="text-sm">{t('cek.profile.portfolio.title')}</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="space-y-2">
+                  <Label htmlFor="cek-profile-capital">{t('cek.profile.portfolio.capital')}</Label>
+                  <Input
+                    id="cek-profile-capital"
+                    data-testid="cek-profile-capital"
+                    type="number"
+                    min={0}
+                    value={sizing.capital === 0 ? '' : String(sizing.capital)}
+                    onChange={(e) => setSizing({ ...sizing, capital: Number(e.target.value) })}
+                  />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="cek-profile-w">{t('cek.profile.portfolio.weight')}</Label>
                   <Input
@@ -467,25 +508,39 @@ export function ProfilRisikoPanel() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
+                <Stat label={t('cek.profile.portfolio.perPosition')}>
+                  {hasCapital ? <Money value={money(sizing.w / 100)} currency={currency} /> : '—'}
+                </Stat>
                 <Stat label={t('cek.profile.portfolio.exposureMax')}>
-                  <PctMag value={pc.exposureMax} />
+                  {hasCapital ? <Money value={money(pc.exposureMax)} currency={currency} /> : '—'}{' '}
+                  <span className="text-muted-foreground">
+                    (<PctMag value={pc.exposureMax} />)
+                  </span>
                 </Stat>
                 <Stat label={t('cek.profile.portfolio.worstOne')}>
-                  <PctSigned value={pc.worstOne} />
+                  {hasCapital ? (
+                    <Money value={money(pc.worstOne)} currency={currency} signed />
+                  ) : (
+                    '—'
+                  )}
                 </Stat>
                 <Stat label={t('cek.profile.portfolio.p5One')}>
-                  <PctSigned value={pc.p5One} />
+                  {hasCapital ? <Money value={money(pc.p5One)} currency={currency} signed /> : '—'}
+                </Stat>
+                <Stat label={t('cek.profile.portfolio.simultaneous')}>
+                  {hasCapital ? (
+                    <Money value={money(pc.simultaneousP5)} currency={currency} signed />
+                  ) : (
+                    '—'
+                  )}
                 </Stat>
                 <Stat label={t('cek.profile.portfolio.perTrade')}>
                   <PctSigned value={pc.perTrade} />
                 </Stat>
-                <Stat label={t('cek.profile.portfolio.simultaneous')}>
-                  <PctSigned value={pc.simultaneousP5} />
-                </Stat>
               </div>
 
               <p className="text-xs text-muted-foreground" data-testid="cek-profile-portfolio-note">
-                {t('cek.profile.portfolio.note', { w: sizing.w, s: sizing.s })}
+                {t('cek.profile.portfolio.note')}
               </p>
             </CardContent>
           </Card>

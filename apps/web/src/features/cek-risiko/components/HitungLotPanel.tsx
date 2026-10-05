@@ -99,12 +99,31 @@ export function HitungLotPanel() {
     }
   })();
 
+  // Bridge to the portfolio layer: `risiko% = w × SL%` (alokasi × jarak stop).
+  // Read-only di sini; setelan w/S tinggal di blok Komponen Portofolio.
+  const bridge = useMemo(() => {
+    if (!result || !result.ok) return null;
+    const modalNum = Number(modal);
+    const beli = Number(hargaBeli);
+    const stop = Number(hargaStop);
+    if (
+      !Number.isFinite(modalNum) ||
+      modalNum <= 0 ||
+      !Number.isFinite(beli) ||
+      beli <= 0 ||
+      !Number.isFinite(stop)
+    ) {
+      return null;
+    }
+    return { wImplied: Number(result.nilaiPosisi) / modalNum, stopDist: (beli - stop) / beli };
+  }, [result, modal, hargaBeli, hargaStop]);
+
   return (
     <div className="space-y-4">
       <Card>
         <CardContent className="space-y-4 pt-6">
           <div className="space-y-2">
-            <Label htmlFor="cek-modal">{t('cek.field.modal')}</Label>
+            <Label htmlFor="cek-modal">{t('cek.field.modal')}</Label>{' '}
             <Input
               id="cek-modal"
               data-testid="cek-modal"
@@ -235,6 +254,39 @@ export function HitungLotPanel() {
                   />
                 }
               />
+              {bridge && (
+                <>
+                  <Row
+                    label={t('cek.lot.wImplied')}
+                    value={
+                      <>
+                        <Numeric
+                          value={bridge.wImplied * 100}
+                          kind="decimal"
+                          precision={2}
+                          direction="none"
+                        />
+                        %
+                      </>
+                    }
+                  />
+                  <Row
+                    label={t('cek.lot.stopDist')}
+                    value={
+                      <>
+                        <Numeric
+                          value={bridge.stopDist * 100}
+                          kind="decimal"
+                          precision={2}
+                          direction="none"
+                        />
+                        %
+                      </>
+                    }
+                  />
+                  <p className="text-xs text-muted-foreground">{t('cek.lot.identity')}</p>
+                </>
+              )}
             </div>
 
             <RumusDisclosure formulaKey="cek.formula.lot" />

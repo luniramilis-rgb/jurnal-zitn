@@ -716,6 +716,9 @@ const ID_MESSAGES = {
   'cek.error.lots': 'Masukkan jumlah lot yang lebih besar dari nol.',
   'cek.error.tierPositions': 'Anda telah mencapai batas posisi paket Anda.',
   'cek.error.tierAccount': 'Akun ini hanya-baca pada paket Anda.',
+  'cek.lot.wImplied': 'W tersirat (nilai posisi ÷ modal)',
+  'cek.lot.stopDist': 'Jarak stop (SL%)',
+  'cek.lot.identity': 'Risiko% = w × SL% — bobot mengatur modal; jarak stop mengatur rugi.',
   'cek.profile.title': 'Profil risiko',
   'cek.profile.rule': 'Aturan',
   'cek.profile.period': 'Periode',
@@ -760,13 +763,15 @@ const ID_MESSAGES = {
   'cek.profile.portfolio.title': 'Komponen portofolio (w×S)',
   'cek.profile.portfolio.weight': 'Bobot per posisi (w) %',
   'cek.profile.portfolio.slots': 'Slot (S)',
+  'cek.profile.portfolio.capital': 'Total modal',
+  'cek.profile.portfolio.perPosition': 'Modal per posisi',
   'cek.profile.portfolio.exposureMax': 'Eksposur maksimum',
   'cek.profile.portfolio.worstOne': 'Dampak 1 posisi — terburuk',
   'cek.profile.portfolio.p5One': 'Dampak 1 posisi — p5',
   'cek.profile.portfolio.perTrade': 'Ekspektasi per transaksi',
   'cek.profile.portfolio.simultaneous': 'Ilustrasi S slot serentak (p5)',
   'cek.profile.portfolio.note':
-    'Skala in-sample (w {w}% · S {s}) · bukan prakiraan/janji · tanpa P/L uang.',
+    'Skala in-sample dari modal, w, dan S yang Anda isi · bukan prakiraan/janji · tanpa proyeksi untung.',
   'cek.profile.hint.rr':
     'Rasio imbal terhadap risiko. R:R 1,00 = potensi imbal setara risiko; makin tinggi, ambang menang makin longgar.',
   'cek.profile.hint.breakeven':
@@ -2258,6 +2263,9 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.error.lots': 'Enter a lot count greater than zero.',
   'cek.error.tierPositions': "You've reached your plan's position limit.",
   'cek.error.tierAccount': 'This account is read-only on your plan.',
+  'cek.lot.wImplied': 'Implied w (position value ÷ capital)',
+  'cek.lot.stopDist': 'Stop distance (SL%)',
+  'cek.lot.identity': 'Risk% = w × SL% — weight sets capital; stop distance sets the loss.',
   'cek.profile.title': 'Risk profile',
   'cek.profile.rule': 'Rule',
   'cek.profile.period': 'Period',
@@ -2302,13 +2310,15 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.profile.portfolio.title': 'Portfolio components (w×S)',
   'cek.profile.portfolio.weight': 'Weight per position (w) %',
   'cek.profile.portfolio.slots': 'Slots (S)',
+  'cek.profile.portfolio.capital': 'Total capital',
+  'cek.profile.portfolio.perPosition': 'Capital per position',
   'cek.profile.portfolio.exposureMax': 'Maximum exposure',
   'cek.profile.portfolio.worstOne': '1-position impact — worst',
   'cek.profile.portfolio.p5One': '1-position impact — p5',
   'cek.profile.portfolio.perTrade': 'Expectation per trade',
   'cek.profile.portfolio.simultaneous': 'Illustration: S slots at once (p5)',
   'cek.profile.portfolio.note':
-    'In-sample scaling (w {w}% · S {s}) · not a forecast/promise · no money P/L.',
+    'In-sample scaling from your capital, w, and S · not a forecast/promise · no profit projection.',
   'cek.profile.hint.rr':
     'Reward-to-risk ratio. R:R 1.00 = reward matches risk; higher loosens the win threshold.',
   'cek.profile.hint.breakeven':

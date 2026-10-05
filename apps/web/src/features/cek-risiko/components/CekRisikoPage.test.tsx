@@ -159,6 +159,9 @@ describe('CekRisikoPage — mode ringkas (H1)', () => {
     setValue('cek-harga-stop', '4300');
 
     expect(screen.getByTestId('cek-lots').textContent).toContain('9');
+    // Bridge to the portfolio layer: implied w + the risk% = w × SL% identity.
+    expect(screen.getByText(/Implied w/)).toBeTruthy();
+    expect(screen.getByText(/Risk% = w × SL%/)).toBeTruthy();
   });
 
   it('prefill kode/harga dari konteks Pemindai/Chart (?symbol=&harga=)', () => {
