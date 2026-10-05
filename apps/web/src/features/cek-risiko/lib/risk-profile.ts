@@ -13,6 +13,19 @@ export type { RiskProfileCell, RiskProfileFile, RiskProfileRule } from './risk-p
 
 export type RiskRule = string;
 
+/**
+ * Pasar yang punya artefak grid sendiri (ZITN-TECH-047, keputusan pemilik D47-1):
+ * `us` (S&P 500, default) dan `id` (IDX). Rule id-nya **datang dari artefak**
+ * (grid privat) — tidak pernah ditulis di repo publik ini.
+ */
+export const RISK_MARKETS = ['us', 'id'] as const;
+export type RiskMarket = (typeof RISK_MARKETS)[number];
+export const DEFAULT_RISK_MARKET: RiskMarket = 'us';
+
+export function isRiskMarket(value: unknown): value is RiskMarket {
+  return (RISK_MARKETS as readonly string[]).includes(value as string);
+}
+
 export const RISK_PERIODS = ['penuh', 'modern', '2025'] as const;
 export type RiskPeriod = (typeof RISK_PERIODS)[number];
 
@@ -25,7 +38,27 @@ export const RISK_SL_CHOICES = RISK_SL_OPTIONS;
 
 export type RiskSl = number | 'none';
 
+/**
+ * Per-market presentation + exit defaults. The rule **id** still comes from the
+ * artifact; these are only the label currency and the exit parameters the panel
+ * starts from when the user switches markets (US exits are the frozen V4/V5
+ * defaults, IDX the frozen TP +5% / no SL / H=504 rule — not strategy IP).
+ */
+export interface RiskMarketMeta {
+  /** Currency the capital/exposure figures are denominated in. */
+  currency: string;
+  tp: number;
+  sl: RiskSl;
+  h: number;
+}
+
+export const RISK_MARKET_META: Record<RiskMarket, RiskMarketMeta> = {
+  us: { currency: 'USD', tp: 10, sl: 'none', h: 504 },
+  id: { currency: 'IDR', tp: 5, sl: 'none', h: 504 },
+};
+
 export interface RiskProfileChoice {
+  market: RiskMarket;
   rule: RiskRule;
   period: RiskPeriod;
   tp: number;
@@ -35,9 +68,10 @@ export interface RiskProfileChoice {
 
 /**
  * Neutral default: no rule id (the real ids come from the private grid). The
- * panel adopts the grid's first rule once it loads.
+ * panel adopts the grid's first rule once it loads, per selected market.
  */
 export const DEFAULT_RISK_PROFILE_CHOICE: RiskProfileChoice = {
+  market: DEFAULT_RISK_MARKET,
   rule: '',
   period: 'penuh',
   tp: 10,
@@ -84,8 +118,9 @@ export function snapChoice(choice: RiskProfileChoice): {
     ? choice.h
     : nearest(RISK_H_OPTIONS, choice.h);
   const period = snapPeriod(choice.period);
+  const market = isRiskMarket(choice.market) ? choice.market : DEFAULT_RISK_MARKET;
   const approx = tp !== choice.tp || sl !== choice.sl || h !== choice.h || period !== choice.period;
-  return { choice: { ...choice, tp, sl, h, period }, approx };
+  return { choice: { ...choice, market, tp, sl, h, period }, approx };
 }
 
 export function riskCellKey(choice: Pick<RiskProfileChoice, 'period' | 'tp' | 'sl' | 'h'>): string {

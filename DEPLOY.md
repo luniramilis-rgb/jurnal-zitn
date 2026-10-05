@@ -407,18 +407,25 @@ GitHub Actions. Rekomendasi: tempelkan `build_site.py` + `publish_site.py` di pi
 sudah menghasilkan `outputs/daily/`, dan tambah workflow `workflow_dispatch` untuk perubahan kode
 situs.
 
-### 7.12 Artefak privat: grid "Profil risiko" (opsional)
+### 7.12 Artefak privat: grid "Profil risiko" per pasar (opsional)
 
-Grid Profil risiko adalah **IP strategi** dan **tidak** di-commit. Endpoint
-`GET /api/cek-risiko/risk-profile` menyajikannya **hanya** bila env `RISK_PROFILE_PATH`
-menunjuk berkas yang ada. Sediakan di host:
+Grid Profil risiko adalah **IP strategi** dan **tidak** di-commit. Ada **satu berkas per pasar**
+(ZITN-TECH-047): `GET /api/cek-risiko/risk-profile?market=us|id` (default `us`) menyajikan
+artefak yang sesuai **hanya** bila env path-nya menunjuk berkas yang ada. Sediakan di host:
 
-1. Salin artefak dari ZITN: `db_us/study/risk_profile.json` -> `/opt/jurnal-zitn/risk_profile.json`.
-2. Overlay `docker-compose.auto.yml` memount-nya read-only: `./risk_profile.json:/app/risk_profile.json:ro`.
-3. Set `RISK_PROFILE_PATH=/app/risk_profile.json` di `.env`.
+1. Salin artefak dari ZITN ke direktori host:
+   - `db_us/study/risk_profile.json` (US) -> `/opt/jurnal-zitn/data/risk_profile_us.json`
+   - `db_idx/study/risk_profile_id.json` (IDX) -> `/opt/jurnal-zitn/data/risk_profile_id.json`
+2. Overlay `docker-compose.auto.yml` memount keduanya read-only:
+   `./data/risk_profile_us.json:/app/risk_profile_us.json:ro` dan
+   `./data/risk_profile_id.json:/app/risk_profile_id.json:ro`.
+3. Set di `.env`:
+   - `RISK_PROFILE_PATH_US=/app/risk_profile_us.json`
+   - `RISK_PROFILE_PATH_ID=/app/risk_profile_id.json`
 4. `$COMPOSE up -d --no-build api`.
 
-Tanpa berkas ini endpoint menjawab 503 dan segmen Profil risiko menampilkan keadaan "tanpa data".
+Tanpa berkas ini endpoint menjawab 503 untuk pasar itu dan segmen Profil risiko menampilkan
+keadaan "tanpa data". `RISK_PROFILE_PATH` lama (satu berkas US) masih dihormati sebagai fallback US.
 
 ## 8. Operasional (A11)
 

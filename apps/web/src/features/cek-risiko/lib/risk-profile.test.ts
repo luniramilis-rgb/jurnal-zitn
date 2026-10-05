@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+  DEFAULT_RISK_MARKET,
+  isRiskMarket,
   lookupRiskProfile,
   portfolioComponents,
   riskCellKey,
@@ -38,6 +40,7 @@ const profile: RiskProfileFile = {
 describe('risk-profile — pure lookup over the runtime grid (ZITN-TECH-043)', () => {
   it('resolves an existing cell exactly', () => {
     const { cell: got, approx } = lookupRiskProfile(profile, {
+      market: 'us',
       rule: 'R1',
       period: 'penuh',
       tp: 10,
@@ -50,12 +53,20 @@ describe('risk-profile — pure lookup over the runtime grid (ZITN-TECH-043)', (
 
   it('is null-safe when the grid is not loaded', () => {
     expect(
-      lookupRiskProfile(null, { rule: 'R1', period: 'penuh', tp: 10, sl: 10, h: 60 }).cell,
+      lookupRiskProfile(null, { market: 'us', rule: 'R1', period: 'penuh', tp: 10, sl: 10, h: 60 })
+        .cell,
     ).toBeNull();
   });
 
   it('rounds off-grid choices to the nearest cell and flags "approx"', () => {
-    const choice: RiskProfileChoice = { rule: 'R1', period: 'penuh', tp: 12, sl: 11, h: 100 };
+    const choice: RiskProfileChoice = {
+      market: 'us',
+      rule: 'R1',
+      period: 'penuh',
+      tp: 12,
+      sl: 11,
+      h: 100,
+    };
     const { approx, used } = lookupRiskProfile(profile, choice);
     expect(approx).toBe(true);
     expect(used.tp).toBe(10);
@@ -64,7 +75,14 @@ describe('risk-profile — pure lookup over the runtime grid (ZITN-TECH-043)', (
   });
 
   it('keeps an on-grid choice approx=false', () => {
-    const onGrid: RiskProfileChoice = { rule: 'R1', period: 'penuh', tp: 10, sl: 10, h: 60 };
+    const onGrid: RiskProfileChoice = {
+      market: 'us',
+      rule: 'R1',
+      period: 'penuh',
+      tp: 10,
+      sl: 10,
+      h: 60,
+    };
     expect(snapChoice(onGrid)).toEqual({ choice: onGrid, approx: false });
   });
 
@@ -72,6 +90,24 @@ describe('risk-profile — pure lookup over the runtime grid (ZITN-TECH-043)', (
     expect(riskCellKey({ period: 'penuh', tp: 10, sl: 'none', h: 504 })).toBe(
       'penuh|tp10_slnone_h504',
     );
+  });
+});
+
+describe('risk-profile — per-market (ZITN-TECH-047)', () => {
+  it('validates market ids and defaults an unknown one to us', () => {
+    expect(isRiskMarket('us')).toBe(true);
+    expect(isRiskMarket('id')).toBe(true);
+    expect(isRiskMarket('jp')).toBe(false);
+    const normalized = snapChoice({
+      // A pre-047 stored choice carried no market.
+      rule: 'R1',
+      period: 'penuh',
+      tp: 10,
+      sl: 10,
+      h: 60,
+    } as unknown as RiskProfileChoice);
+    expect(normalized.choice.market).toBe(DEFAULT_RISK_MARKET);
+    expect(normalized.approx).toBe(false);
   });
 });
 

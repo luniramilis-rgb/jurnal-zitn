@@ -1988,9 +1988,27 @@
     },
     "/api/cek-risiko/risk-profile": {
       "get": {
+        "parameters": [
+          {
+            "description": "Which market's grid to serve (us = S&P 500, id = IDX).",
+            "in": "query",
+            "name": "market",
+            "schema": {
+              "default": "us",
+              "enum": [
+                "us",
+                "id"
+              ],
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "200": {
-            "description": "The risk_profile.json grid."
+            "description": "The risk_profile_<market>.json grid."
+          },
+          "400": {
+            "description": "Unknown market."
           },
           "401": {
             "description": "No valid session."
@@ -1999,7 +2017,7 @@
             "description": "The grid is not provisioned on this instance."
           }
         },
-        "summary": "The risk-profile grid (private strategy artifact, runtime-served).",
+        "summary": "The per-market risk-profile grid (private strategy artifact, runtime-served).",
         "tags": [
           "Cek Risiko"
         ]

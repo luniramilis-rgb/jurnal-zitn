@@ -117,7 +117,7 @@ export function TradePlansPage() {
   // Saved risk profile (Cek Risiko → Profil risiko): surfaced here so the
   // pre-trade draft is written against the same setting (ZITN-TECH-043 §3.3).
   const { choice: riskProfile } = useRiskProfile();
-  const { data: riskProfileData } = useRiskProfileData();
+  const { data: riskProfileData } = useRiskProfileData(riskProfile.market);
   const positionById = new Map((positions.data ?? []).map((p) => [p.id, p]));
   const [form, setForm] = useState(EMPTY);
   // "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): SSO mengarahkan ke

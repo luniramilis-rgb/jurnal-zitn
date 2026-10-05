@@ -15,9 +15,15 @@ export const envSchema = z.object({
   // Baked into the api image at build time (docker build-arg → ENV) by the
   // staging deploy and release workflows — not an operator knob. Absent in dev.
   APP_VERSION: z.string().optional(),
-  // Path to the PRIVATE risk-profile grid artifact (ZITN-TECH-043). Deliberately
-  // NOT committed: the grid is strategy IP, provisioned on the host at deploy.
-  // Unset → GET /api/cek-risiko/risk-profile answers 503 (the simulator hides).
+  // Paths to the PRIVATE, PER-MARKET risk-profile grids (ZITN-TECH-043 / 047).
+  // Deliberately NOT committed: the grid is strategy IP, provisioned on the host
+  // at deploy. Unset → GET /api/cek-risiko/risk-profile for that market answers
+  // 503 (the simulator hides).
+  //   RISK_PROFILE_PATH_US → ?market=us (default)
+  //   RISK_PROFILE_PATH_ID → ?market=id
+  //   RISK_PROFILE_PATH     → legacy single US path, still honored as a US fallback
+  RISK_PROFILE_PATH_US: z.string().optional(),
+  RISK_PROFILE_PATH_ID: z.string().optional(),
   RISK_PROFILE_PATH: z.string().optional(),
   DB_POOL_SIZE: z.coerce.number().default(10),
   TRUSTED_PROXIES: z.string().optional(),
