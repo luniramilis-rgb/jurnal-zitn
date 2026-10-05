@@ -6,11 +6,13 @@ import type { MessageKey } from '@jurnal-zitn/shared';
 import { Numeric } from '@/components/Numeric';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useT } from '@/hooks/useLocale';
 import { cn } from '@/lib/utils';
 
+import { usePortfolioSizing } from '../hooks/usePortfolioSizing';
 import { useRiskProfile } from '../hooks/useRiskProfile';
 import { useRiskProfileData } from '../hooks/useRiskProfileData';
 import {
@@ -20,6 +22,7 @@ import {
   RISK_SL_CHOICES,
   RISK_TP_CHOICES,
   lookupRiskProfile,
+  portfolioComponents,
   type RiskProfileCell,
 } from '../lib/risk-profile';
 
@@ -167,7 +170,9 @@ export function ProfilRisikoPanel() {
   const t = useT();
   const { data: profile = null } = useRiskProfileData();
   const { choice, setChoice } = useRiskProfile();
+  const { sizing, setSizing } = usePortfolioSizing();
   const { cell, approx, used } = lookupRiskProfile(profile, choice);
+  const pc = cell ? portfolioComponents(cell, sizing.w, sizing.s) : null;
 
   // The grid carries the real rule ids; adopt its first rule when the stored or
   // default rule isn't present.
@@ -423,6 +428,64 @@ export function ProfilRisikoPanel() {
                   basis: profile?.label_basis ?? '',
                   date: (profile?.generated ?? '').slice(0, 10),
                 })}
+              </p>
+            </CardContent>
+          </Card>
+        )}
+
+        {cell !== null && pc !== null && (
+          <Card data-testid="cek-profile-portfolio">
+            <CardHeader className="pb-2">
+              <CardTitle className="text-sm">{t('cek.profile.portfolio.title')}</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="cek-profile-w">{t('cek.profile.portfolio.weight')}</Label>
+                  <Input
+                    id="cek-profile-w"
+                    data-testid="cek-profile-w"
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={String(sizing.w)}
+                    onChange={(e) => setSizing({ ...sizing, w: Number(e.target.value) })}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="cek-profile-s">{t('cek.profile.portfolio.slots')}</Label>
+                  <Input
+                    id="cek-profile-s"
+                    data-testid="cek-profile-s"
+                    type="number"
+                    min={1}
+                    max={100}
+                    value={String(sizing.s)}
+                    onChange={(e) => setSizing({ ...sizing, s: Number(e.target.value) })}
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <Stat label={t('cek.profile.portfolio.exposureMax')}>
+                  <PctMag value={pc.exposureMax} />
+                </Stat>
+                <Stat label={t('cek.profile.portfolio.worstOne')}>
+                  <PctSigned value={pc.worstOne} />
+                </Stat>
+                <Stat label={t('cek.profile.portfolio.p5One')}>
+                  <PctSigned value={pc.p5One} />
+                </Stat>
+                <Stat label={t('cek.profile.portfolio.perTrade')}>
+                  <PctSigned value={pc.perTrade} />
+                </Stat>
+                <Stat label={t('cek.profile.portfolio.simultaneous')}>
+                  <PctSigned value={pc.simultaneousP5} />
+                </Stat>
+              </div>
+
+              <p className="text-xs text-muted-foreground" data-testid="cek-profile-portfolio-note">
+                {t('cek.profile.portfolio.note', { w: sizing.w, s: sizing.s })}
               </p>
             </CardContent>
           </Card>

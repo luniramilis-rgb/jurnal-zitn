@@ -757,6 +757,16 @@ const ID_MESSAGES = {
   'cek.profile.insample':
     'In-sample · bukan nasihat/janji · tanpa proyeksi P/L. Basis: {basis}. Dibuat {date}.',
   'cek.profile.nodata': 'Sel tidak tersedia untuk kombinasi ini.',
+  'cek.profile.portfolio.title': 'Komponen portofolio (w×S)',
+  'cek.profile.portfolio.weight': 'Bobot per posisi (w) %',
+  'cek.profile.portfolio.slots': 'Slot (S)',
+  'cek.profile.portfolio.exposureMax': 'Eksposur maksimum',
+  'cek.profile.portfolio.worstOne': 'Dampak 1 posisi — terburuk',
+  'cek.profile.portfolio.p5One': 'Dampak 1 posisi — p5',
+  'cek.profile.portfolio.perTrade': 'Ekspektasi per transaksi',
+  'cek.profile.portfolio.simultaneous': 'Ilustrasi S slot serentak (p5)',
+  'cek.profile.portfolio.note':
+    'Skala in-sample (w {w}% · S {s}) · bukan prakiraan/janji · tanpa P/L uang.',
   'cek.profile.hint.rr':
     'Rasio imbal terhadap risiko. R:R 1,00 = potensi imbal setara risiko; makin tinggi, ambang menang makin longgar.',
   'cek.profile.hint.breakeven':
@@ -2289,6 +2299,16 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.profile.insample':
     'In-sample · not advice/promise · no P/L projection. Basis: {basis}. Generated {date}.',
   'cek.profile.nodata': 'No cell for this combination.',
+  'cek.profile.portfolio.title': 'Portfolio components (w×S)',
+  'cek.profile.portfolio.weight': 'Weight per position (w) %',
+  'cek.profile.portfolio.slots': 'Slots (S)',
+  'cek.profile.portfolio.exposureMax': 'Maximum exposure',
+  'cek.profile.portfolio.worstOne': '1-position impact — worst',
+  'cek.profile.portfolio.p5One': '1-position impact — p5',
+  'cek.profile.portfolio.perTrade': 'Expectation per trade',
+  'cek.profile.portfolio.simultaneous': 'Illustration: S slots at once (p5)',
+  'cek.profile.portfolio.note':
+    'In-sample scaling (w {w}% · S {s}) · not a forecast/promise · no money P/L.',
   'cek.profile.hint.rr':
     'Reward-to-risk ratio. R:R 1.00 = reward matches risk; higher loosens the win threshold.',
   'cek.profile.hint.breakeven':

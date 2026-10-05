@@ -106,4 +106,12 @@ describe('ProfilRisikoPanel — segmen "Profil risiko" (ZITN-TECH-043)', () => {
     expect(screen.getByTestId('cek-profile-warn-fragile')).toBeTruthy();
     expect(screen.getByTestId('cek-profile-gauge')).toBeTruthy();
   });
+
+  it('blok "Komponen portofolio (w×S)" tampil dengan default w=2% / S=20', () => {
+    render(<ProfilRisikoPanel />);
+    expect(screen.getByTestId('cek-profile-portfolio')).toBeTruthy();
+    expect((screen.getByTestId('cek-profile-w') as HTMLInputElement).value).toBe('2');
+    expect((screen.getByTestId('cek-profile-s') as HTMLInputElement).value).toBe('20');
+    expect(screen.getByTestId('cek-profile-portfolio-note').textContent).toContain('w 2%');
+  });
 });

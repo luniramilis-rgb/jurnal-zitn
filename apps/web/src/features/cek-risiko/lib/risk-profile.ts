@@ -50,6 +50,10 @@ export const DEFAULT_RISK_PROFILE_CHOICE: RiskProfileChoice = {
   h: 504,
 };
 
+/** Model sizing/slot US terkunci (`docs/analysis/us_sizing_slot_prereg.md`): w 2% · S 20. */
+export const RISK_WEIGHT_DEFAULT = 2;
+export const RISK_SLOTS_DEFAULT = 20;
+
 export const RISK_PRESETS = [
   { id: 'konservatif', tp: 5, sl: 10 },
   { id: 'seimbang', tp: 10, sl: 20 },
@@ -113,4 +117,37 @@ export function lookupRiskProfile(
   const rule = profile.rules[used.rule];
   const cell = rule ? (rule.grid[riskCellKey(used)] ?? null) : null;
   return { cell, approx, used };
+}
+
+/**
+ * Komponen portofolio dari sel in-sample (fraksi ekuitas). **Bukan proyeksi P/L
+ * uang** — hanya skala observasi `w × metrik`. Tampilkan sebagai komponen, bukan
+ * skor tunggal (ZITN-TECH-043 §4).
+ */
+export interface PortfolioComponents {
+  /** Eksposur maksimum = w × S (fraksi ekuitas). */
+  exposureMax: number;
+  /** Dampak 1 posisi bila rugi terburuk = w × min. */
+  worstOne: number;
+  /** Dampak 1 posisi pada p5 = w × p5. */
+  p5One: number;
+  /** Ekspektasi per transaksi = w × E net. */
+  perTrade: number;
+  /** Ilustrasi S slot serentak pada p5 = w × S × p5. */
+  simultaneousP5: number;
+}
+
+export function portfolioComponents(
+  cell: Pick<RiskProfileCell, 'min' | 'p5' | 'e_net'>,
+  weightPercent: number,
+  slots: number,
+): PortfolioComponents {
+  const w = weightPercent / 100;
+  return {
+    exposureMax: w * slots,
+    worstOne: w * cell.min,
+    p5One: w * cell.p5,
+    perTrade: w * cell.e_net,
+    simultaneousP5: w * slots * cell.p5,
+  };
 }

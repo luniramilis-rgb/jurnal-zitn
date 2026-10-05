@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import {
   lookupRiskProfile,
+  portfolioComponents,
   riskCellKey,
   snapChoice,
   type RiskProfileCell,
@@ -71,5 +72,16 @@ describe('risk-profile — pure lookup over the runtime grid (ZITN-TECH-043)', (
     expect(riskCellKey({ period: 'penuh', tp: 10, sl: 'none', h: 504 })).toBe(
       'penuh|tp10_slnone_h504',
     );
+  });
+});
+
+describe('portfolioComponents — skala in-sample w×S (ZITN-TECH-043)', () => {
+  it('default w=2% / S=20: eksposur 40%, w×min, w×E net', () => {
+    const pc = portfolioComponents(cell, 2, 20);
+    expect(pc.exposureMax).toBeCloseTo(0.4, 10); // 2% × 20
+    expect(pc.worstOne).toBeCloseTo(0.02 * cell.min, 10); // w × min
+    expect(pc.p5One).toBeCloseTo(0.02 * cell.p5, 10);
+    expect(pc.perTrade).toBeCloseTo(0.02 * cell.e_net, 10); // w × E net
+    expect(pc.simultaneousP5).toBeCloseTo(0.4 * cell.p5, 10); // w × S × p5
   });
 });
