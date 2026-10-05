@@ -18,12 +18,15 @@ import { useRiskProfile } from '../hooks/useRiskProfile';
 import { useRiskProfileData } from '../hooks/useRiskProfileData';
 import {
   RISK_H_OPTIONS,
+  RISK_MARKET_META,
+  RISK_MARKETS,
   RISK_PERIODS,
   RISK_PRESETS,
   RISK_SL_CHOICES,
   RISK_TP_CHOICES,
   lookupRiskProfile,
   portfolioComponents,
+  type RiskMarket,
   type RiskProfileCell,
 } from '../lib/risk-profile';
 
@@ -180,40 +183,42 @@ function BreakevenGauge({ cell }: { cell: RiskProfileCell }) {
   );
 }
 
-/** Segmen "Profil risiko" (ZITN-TECH-043) di dalam tab Cek Risiko. */
+/** Segmen "Profil risiko" (ZITN-TECH-043/047) di dalam tab Cek Risiko. */
 export function ProfilRisikoPanel() {
   const t = useT();
-  const { data: profile = null } = useRiskProfileData();
   const { choice, setChoice } = useRiskProfile();
+  const { data: profile = null, isLoading, isError } = useRiskProfileData(choice.market);
   const { sizing, setSizing } = usePortfolioSizing();
   const { cell, approx, used } = lookupRiskProfile(profile, choice);
   const pc = cell ? portfolioComponents(cell, sizing.w, sizing.s) : null;
 
-  // Profil risiko is S&P 500 (US) only — money is USD, regardless of the account
-  // currency. IDX is deliberately out of scope for now (its rules come later).
-  const currency = 'USD';
+  // Money and the grid follow the selected market: US = USD, IDX = IDR. The grid
+  // is fetched per market; the rule id comes from that market's artifact.
+  const market = choice.market;
+  const currency = RISK_MARKET_META[market].currency;
   const accounts = useAccounts();
   const accountList = accounts.data ?? [];
-  const usdAccount = accountList.find((a) => a.currency === 'USD');
 
-  // Prefill total modal from a USD account balance, ONCE (a deliberate clear
-  // persists); never from an IDR account. No USD account ⇒ blank.
-  const prefilled = useRef(false);
+  // Prefill total capital from an account in the market's currency, ONCE per
+  // market (a deliberate clear persists); switching market re-prefills that
+  // market's currency and never mixes USD/IDR.
+  const prefilled = useRef<Set<RiskMarket>>(new Set());
   useEffect(() => {
-    if (prefilled.current || accounts.isLoading) return;
-    prefilled.current = true;
-    const balance = usdAccount?.balance;
+    if (accounts.isLoading || prefilled.current.has(market)) return;
+    prefilled.current.add(market);
+    const balance = accountList.find((a) => a.currency === currency)?.balance;
     const n = balance === undefined ? NaN : Math.round(Number(balance));
     if (!Number.isFinite(n) || n <= 0) return;
-    setSizing({ ...sizing, capital: n, currency: 'USD' });
-  }, [accounts.isLoading, usdAccount, sizing, setSizing]);
+    setSizing({ ...sizing, capital: n, currency });
+  }, [accounts.isLoading, accountList, market, currency, sizing, setSizing]);
 
   const hasCapital = sizing.capital > 0;
   const money = (fraction: number) =>
     Math.min(Number.MAX_SAFE_INTEGER, Math.round(sizing.capital * fraction));
 
   // The grid carries the real rule ids; adopt its first rule when the stored or
-  // default rule isn't present.
+  // default rule isn't present — also on a market switch, so the default rule
+  // tracks the market.
   useEffect(() => {
     if (!profile) return;
     const keys = Object.keys(profile.rules);
@@ -225,6 +230,12 @@ export function ProfilRisikoPanel() {
   const patch = (next: Partial<typeof choice>) => setChoice({ ...choice, ...next });
   const applyPreset = (preset: (typeof RISK_PRESETS)[number]) =>
     setChoice({ ...choice, tp: preset.tp, sl: preset.sl });
+  // Switching market resets the exit selection to that market's defaults; the
+  // rule is adopted from the newly fetched artifact by the effect above.
+  const selectMarket = (next: RiskMarket) => {
+    const meta = RISK_MARKET_META[next];
+    setChoice({ ...choice, market: next, tp: meta.tp, sl: meta.sl, h: meta.h });
+  };
 
   const fragile = cell !== null && cell.breakeven !== null && cell.p_tp < cell.breakeven;
   const deepTail = cell !== null && (cell.p_loss40 > 0 || (cell.min ?? 0) <= -0.4);
@@ -232,9 +243,25 @@ export function ProfilRisikoPanel() {
   return (
     <TooltipProvider>
       <div className="space-y-4" data-testid="cek-profile">
-        <p className="text-xs text-muted-foreground" data-testid="cek-profile-market">
-          {t('cek.profile.marketNote')}
-        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <Label htmlFor="cek-profile-market-select">{t('cek.profile.market')}</Label>
+          <select
+            id="cek-profile-market-select"
+            data-testid="cek-profile-market-select"
+            value={market}
+            onChange={(e) => selectMarket(e.target.value as RiskMarket)}
+            className="cursor-pointer rounded-md border bg-background px-2 py-1 text-sm"
+          >
+            {RISK_MARKETS.map((m) => (
+              <option key={m} value={m}>
+                {t(`cek.profile.market.${m}`)}
+              </option>
+            ))}
+          </select>
+          <span className="text-xs text-muted-foreground" data-testid="cek-profile-market">
+            {t(`cek.profile.marketNote.${market}`)}
+          </span>
+        </div>
         {/* "Risiko saat ini": setelan yang sedang aktif. */}
         <Card>
           <CardHeader className="pb-2">
@@ -387,7 +414,15 @@ export function ProfilRisikoPanel() {
           </CardContent>
         </Card>
 
-        {cell === null ? (
+        {isLoading ? (
+          <p className="text-sm text-muted-foreground" data-testid="cek-profile-loading">
+            {t('cek.profile.loading')}
+          </p>
+        ) : isError ? (
+          <p className="text-sm text-muted-foreground" data-testid="cek-profile-error">
+            {t('cek.profile.unavailable')}
+          </p>
+        ) : cell === null ? (
           <p className="text-sm text-muted-foreground" data-testid="cek-profile-nodata">
             {t('cek.profile.nodata')}
           </p>

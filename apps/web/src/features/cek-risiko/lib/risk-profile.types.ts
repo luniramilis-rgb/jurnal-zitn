@@ -29,5 +29,8 @@ export interface RiskProfileFile {
   cost: number;
   cooldown: number;
   label_basis: string;
+  /** Per-market artifact markers (ZITN-TECH-047); absent on the legacy US file. */
+  market?: string;
+  currency?: string;
   rules: Record<string, RiskProfileRule>;
 }

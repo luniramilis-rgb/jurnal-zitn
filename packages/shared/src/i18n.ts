@@ -775,8 +775,13 @@ const ID_MESSAGES = {
     'Skala in-sample dari modal, w, dan S yang Anda isi · bukan prakiraan/janji · tanpa proyeksi untung.',
   'cek.profile.portfolio.fillCapital': 'Isi total modal untuk melihat komponen Rupiah.',
   'cek.field.symbolPlaceholder': 'mis. BBRI',
-  'cek.profile.marketNote':
-    'S&P 500 (Momentum/Absorpsi) · USD · IDX belum termasuk untuk sementara.',
+  'cek.profile.market': 'Pasar',
+  'cek.profile.market.us': 'S&P 500',
+  'cek.profile.market.id': 'IDX',
+  'cek.profile.marketNote.us': 'S&P 500: rule Momentum/Absorpsi · USD.',
+  'cek.profile.marketNote.id': 'IDX · IDR · rule berjalan IDX.',
+  'cek.profile.loading': 'Memuat…',
+  'cek.profile.unavailable': 'Data pasar ini belum tersedia.',
   'cek.profile.hint.rr':
     'Rasio imbal terhadap risiko. R:R 1,00 = potensi imbal setara risiko; makin tinggi, ambang menang makin longgar.',
   'cek.profile.hint.breakeven':
@@ -2327,7 +2332,13 @@ const EN_MESSAGES: Record<MessageKey, string> = {
     'In-sample scaling from your capital, w, and S · not a forecast/promise · no profit projection.',
   'cek.profile.portfolio.fillCapital': 'Enter total capital to see the money components.',
   'cek.field.symbolPlaceholder': 'e.g. BBRI',
-  'cek.profile.marketNote': 'S&P 500 (Momentum/Absorpsi) · USD · IDX not included for now.',
+  'cek.profile.market': 'Market',
+  'cek.profile.market.us': 'S&P 500',
+  'cek.profile.market.id': 'IDX',
+  'cek.profile.marketNote.us': 'S&P 500: Momentum/Absorption rules · USD.',
+  'cek.profile.marketNote.id': 'IDX · IDR · the running IDX rule.',
+  'cek.profile.loading': 'Loading…',
+  'cek.profile.unavailable': 'Data for this market is not available.',
   'cek.profile.hint.rr':
     'Reward-to-risk ratio. R:R 1.00 = reward matches risk; higher loosens the win threshold.',
   'cek.profile.hint.breakeven':

@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from 'react';
 
 import {
+  DEFAULT_RISK_MARKET,
   DEFAULT_RISK_PROFILE_CHOICE,
+  isRiskMarket,
   RISK_PERIODS,
   type RiskPeriod,
   type RiskProfileChoice,
@@ -43,7 +45,10 @@ export function parseRiskProfileChoice(raw: string | null): RiskProfileChoice {
     ) {
       return DEFAULT_RISK_PROFILE_CHOICE;
     }
-    return { rule: data.rule, period: data.period, tp: data.tp, sl, h: data.h };
+    // Missing/unknown market on pre-047 stored choices defaults to US without
+    // discarding the rest of the user's setting.
+    const market = isRiskMarket(data.market) ? data.market : DEFAULT_RISK_MARKET;
+    return { market, rule: data.rule, period: data.period, tp: data.tp, sl, h: data.h };
   } catch {
     return DEFAULT_RISK_PROFILE_CHOICE;
   }
