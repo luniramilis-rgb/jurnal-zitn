@@ -6,7 +6,6 @@ import type { MessageKey } from '@jurnal-zitn/shared';
 import { Numeric } from '@/components/Numeric';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useT } from '@/hooks/useLocale';
@@ -19,8 +18,8 @@ import {
   RISK_PRESETS,
   RISK_PROFILE,
   RISK_RULES,
-  RISK_SL_OPTIONS,
-  RISK_TP_OPTIONS,
+  RISK_SL_CHOICES,
+  RISK_TP_CHOICES,
   lookupRiskProfile,
   type RiskProfileCell,
 } from '../lib/risk-profile';
@@ -256,15 +255,19 @@ export function ProfilRisikoPanel() {
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="cek-profile-tp">{t('cek.profile.tp')}</Label>
-                <Input
+                <select
                   id="cek-profile-tp"
                   data-testid="cek-profile-tp"
-                  type="number"
-                  min={RISK_TP_OPTIONS[0]}
-                  max={50}
                   value={String(choice.tp)}
                   onChange={(e) => patch({ tp: Number(e.target.value) })}
-                />
+                  className="w-full cursor-pointer rounded-md border bg-background px-2 py-1 text-sm"
+                >
+                  {RISK_TP_CHOICES.map((tp) => (
+                    <option key={tp} value={tp}>
+                      {tp}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div className="space-y-2">
                 <Label htmlFor="cek-profile-h">{t('cek.profile.h')}</Label>
@@ -286,28 +289,22 @@ export function ProfilRisikoPanel() {
 
             <div className="space-y-2">
               <Label htmlFor="cek-profile-sl">{t('cek.profile.sl')}</Label>
-              <div className="flex items-center gap-3">
-                <input
-                  id="cek-profile-sl"
-                  type="number"
-                  data-testid="cek-profile-sl"
-                  min={RISK_SL_OPTIONS[0]}
-                  max={50}
-                  disabled={choice.sl === 'none'}
-                  value={choice.sl === 'none' ? '' : String(choice.sl)}
-                  onChange={(e) => patch({ sl: Number(e.target.value) })}
-                  className="w-24 rounded-md border bg-background px-2 py-1 text-sm disabled:opacity-50"
-                />
-                <label className="flex cursor-pointer items-center gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    data-testid="cek-profile-nosl"
-                    checked={choice.sl === 'none'}
-                    onChange={(e) => patch({ sl: e.target.checked ? 'none' : 15 })}
-                  />
-                  {t('cek.profile.noSl')}
-                </label>
-              </div>
+              <select
+                id="cek-profile-sl"
+                data-testid="cek-profile-sl"
+                value={choice.sl === 'none' ? 'none' : String(choice.sl)}
+                onChange={(e) =>
+                  patch({ sl: e.target.value === 'none' ? 'none' : Number(e.target.value) })
+                }
+                className="w-full cursor-pointer rounded-md border bg-background px-2 py-1 text-sm"
+              >
+                <option value="none">{t('cek.profile.noSl')}</option>
+                {RISK_SL_CHOICES.map((sl) => (
+                  <option key={sl} value={sl}>
+                    {sl}
+                  </option>
+                ))}
+              </select>
             </div>
 
             {approx && (

@@ -49,6 +49,14 @@ export const RISK_TP_OPTIONS = [5, 10, 15, 20, 30] as const;
 export const RISK_SL_OPTIONS = [10, 15, 20, 30] as const;
 export const RISK_H_OPTIONS = [60, 252, 504] as const;
 
+/**
+ * Dropdown choices shown in the UI. A superset of the grid — values the grid
+ * lacks (TP 25; SL 5/25/50) snap to the nearest cell and are labelled
+ * "pendekatan". Keep `RISK_TP_OPTIONS`/`RISK_SL_OPTIONS` (the grid) for snapping.
+ */
+export const RISK_TP_CHOICES = [5, 10, 15, 20, 25, 30] as const;
+export const RISK_SL_CHOICES = [5, 10, 15, 20, 25, 30, 50] as const;
+
 /** Off-grid bounds accepted by the UI (values are rounded to the nearest cell). */
 export const RISK_TP_RANGE = { min: 3, max: 50 } as const;
 export const RISK_SL_RANGE = { min: 5, max: 50 } as const;

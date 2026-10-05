@@ -33,6 +33,23 @@ describe('ProfilRisikoPanel — segmen "Profil risiko" (ZITN-TECH-043)', () => {
     expect(screen.getByTestId('cek-profile-warn-tail')).toBeTruthy();
   });
 
+  it('TP%/SL% berupa dropdown dengan opsi yang diminta', () => {
+    render(<ProfilRisikoPanel />);
+    const tp = screen.getByTestId('cek-profile-tp') as HTMLSelectElement;
+    expect(Array.from(tp.options).map((o) => o.value)).toEqual(['5', '10', '15', '20', '25', '30']);
+    const sl = screen.getByTestId('cek-profile-sl') as HTMLSelectElement;
+    expect(Array.from(sl.options).map((o) => o.value)).toEqual([
+      'none',
+      '5',
+      '10',
+      '15',
+      '20',
+      '25',
+      '30',
+      '50',
+    ]);
+  });
+
   it('config rapuh (P(TP) < impas) → peringatan rapuh + gauge', () => {
     seed({ rule: 'V4_MOMENTUM_BULL', period: 'penuh', tp: 5, sl: 10, h: 60 });
     render(<ProfilRisikoPanel />);
