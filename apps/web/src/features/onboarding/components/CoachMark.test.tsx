@@ -40,6 +40,9 @@ vi.mock('../hooks/useOnboarding', () => ({
   useOnboardingPatch: vi.fn(),
 }));
 vi.mock('../hooks/useWalkthrough', () => ({ useIsWalkthroughRunning: vi.fn() }));
+// The "read more" link renders only while the docs surface is enabled; this file
+// covers the enabled rendering. The hidden default is the app's live posture.
+vi.mock('@/lib/frontendFlags', () => ({ CHANGELOG_ENABLED: false, DOCS_LINKS_ENABLED: true }));
 
 // The device latch is keyed by the signed-in user's id; a static stub keeps
 // the component mountable without the auth stack. localStorage is cleared in

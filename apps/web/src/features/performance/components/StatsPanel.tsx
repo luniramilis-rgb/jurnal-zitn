@@ -6,7 +6,7 @@ import { Numeric } from '@/components/Numeric';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { formatProfitFactor } from '../utils/formatPerformance';
-import { statDocsUrl, type StatField } from '../utils/statAnchors';
+import { statDocsHref, type StatField } from '../utils/statAnchors';
 
 export interface StatsPanelProps {
   stats: PerformanceStats;
@@ -86,25 +86,33 @@ export function StatsPanel({ stats, currency }: StatsPanelProps) {
       </CardHeader>
       <CardContent>
         <dl className="grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-3">
-          {rows.map((row) => (
-            <div key={row.label} className="flex flex-col">
-              <dt className="text-sm text-muted-foreground">
-                {/* The label links to its Methodology definition. New tab: the
-                    reader is mid-analysis on this page. Host lives in docsUrl(). */}
-                <a
-                  href={statDocsUrl(row.field)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="cursor-pointer underline decoration-dotted underline-offset-2 hover:text-foreground"
-                >
-                  {row.label}
-                </a>
-              </dt>
-              <dd className="font-medium" data-testid={`stat-${row.label}`}>
-                {row.render()}
-              </dd>
-            </div>
-          ))}
+          {rows.map((row) => {
+            // The label links to its Methodology definition only while the docs
+            // host is enabled (frontendFlags.DOCS_LINKS_ENABLED); otherwise it is
+            // plain text. New tab: the reader is mid-analysis on this page.
+            const href = statDocsHref(row.field);
+            return (
+              <div key={row.label} className="flex flex-col">
+                <dt className="text-sm text-muted-foreground">
+                  {href ? (
+                    <a
+                      href={href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="cursor-pointer underline decoration-dotted underline-offset-2 hover:text-foreground"
+                    >
+                      {row.label}
+                    </a>
+                  ) : (
+                    row.label
+                  )}
+                </dt>
+                <dd className="font-medium" data-testid={`stat-${row.label}`}>
+                  {row.render()}
+                </dd>
+              </div>
+            );
+          })}
         </dl>
       </CardContent>
     </Card>

@@ -13,7 +13,7 @@ import { useTierState } from '@/features/billing/useTierState';
 import { CoachMark } from '@/features/onboarding/components/CoachMark';
 import { useT } from '@/hooks/useLocale';
 import { apiErrorCode } from '@/lib/api-error';
-import { docsUrl } from '@/lib/docs';
+import { docsHref } from '@/lib/docs';
 
 import { useCsvPreview } from '../hooks/useCsvPreview';
 import { isRequiredFieldSatisfied, targetFieldsForShape } from '../lib/fields';
@@ -53,6 +53,8 @@ const initialMapper = (): ColumnMapperValue => ({
  */
 export function ImportPage() {
   const t = useT();
+  // Hidden while frontendFlags.DOCS_LINKS_ENABLED is false (ZITN rebrand).
+  const importGuide = docsHref('importHistory');
   const [accountId, setAccountId] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
   const [columns, setColumns] = useState<string[]>([]);
@@ -156,18 +158,23 @@ export function ImportPage() {
           }
         />
         <p className="text-sm text-muted-foreground">
-          {t('import.intro')}{' '}
-          {/* Column mapping is the step people get stuck on, and the answer is
-              longer than a tooltip. Link out rather than grow this paragraph. */}
-          <a
-            href={docsUrl('importHistory')}
-            target="_blank"
-            rel="noreferrer"
-            className="cursor-pointer font-medium text-primary underline underline-offset-2"
-          >
-            {t('import.guideLink')}
-          </a>
-          .
+          {t('import.intro')}
+          {importGuide && (
+            <>
+              {' '}
+              {/* Column mapping is the step people get stuck on, and the answer
+                  is longer than a tooltip. Link out rather than grow this paragraph. */}
+              <a
+                href={importGuide}
+                target="_blank"
+                rel="noreferrer"
+                className="cursor-pointer font-medium text-primary underline underline-offset-2"
+              >
+                {t('import.guideLink')}
+              </a>
+              .
+            </>
+          )}
         </p>
         {csvRemaining !== null && csvCap !== null && (
           <p

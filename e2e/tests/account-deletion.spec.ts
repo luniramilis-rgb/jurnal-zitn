@@ -35,10 +35,6 @@ import { promoteToAdmin } from '../support/db';
 const PASSWORD = 'test-password-1234';
 const OPENED_AT = '2026-05-01T14:30:00.000Z';
 
-// docsUrl('accountDeletion') — apps/web/src/lib/docs.ts. The dialog's docs link
-// must point at the retention statement page.
-const ACCOUNT_DELETION_DOCS_URL = 'https://docs.tradr.cloud/user-guide/account-deletion/';
-
 function uniqueEmail(label: string): string {
   return `e2e-acct-del-${label}-${Date.now()}-${Math.floor(Math.random() * 1e6)}@example.com`;
 }
@@ -160,7 +156,8 @@ test.describe('account-deletion', () => {
     const dialog = page.getByTestId('delete-account-dialog');
     await expect(dialog).toBeVisible();
 
-    // Retention lines (RetentionSummary, task 16) and the docs link.
+    // Retention lines (RetentionSummary, task 16). The retention docs link is
+    // hidden during the ZITN rebrand (frontendFlags.DOCS_LINKS_ENABLED = false).
     const retention = dialog.getByTestId('retention-summary');
     await expect(retention.getByText('What deletion keeps')).toBeVisible();
     await expect(
@@ -175,7 +172,7 @@ test.describe('account-deletion', () => {
     await expect(retention.getByTestId('retention-credits')).toContainText('not refunded');
     await expect(
       retention.getByRole('link', { name: 'What deletion removes and what it keeps' }),
-    ).toHaveAttribute('href', ACCOUNT_DELETION_DOCS_URL);
+    ).toHaveCount(0);
 
     const passwordInput = dialog.getByLabel('Confirm your password');
 

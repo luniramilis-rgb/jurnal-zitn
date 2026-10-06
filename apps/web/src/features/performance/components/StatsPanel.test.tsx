@@ -1,10 +1,14 @@
 // @vitest-environment node
 import { renderToStaticMarkup } from 'react-dom/server';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import type { PerformanceStats } from '@jurnal-zitn/shared';
 
 import { docsUrl } from '@/lib/docs';
+
+// The label links render only while the docs surface is enabled; this file
+// covers the enabled rendering. The hidden default is the app's live posture.
+vi.mock('@/lib/frontendFlags', () => ({ CHANGELOG_ENABLED: false, DOCS_LINKS_ENABLED: true }));
 
 import { STAT_ANCHORS } from '../utils/statAnchors';
 
