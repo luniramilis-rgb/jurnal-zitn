@@ -14,7 +14,7 @@
 # dua baris `image:` saat naik versi; lihat §7.10 untuk update/rollback.
 services:
   api:
-    image: ghcr.io/luniramilis-rgb/jurnal-zitn-api:sha-9414a62a75d3308b67c911b37221f8f415e41011
+    image: ghcr.io/luniramilis-rgb/jurnal-zitn-api:sha-dd96d263ce353728ffe75e7decc884993dc18eb5
     volumes:
       # PRIVATE, PER-MARKET risk-profile grids (ZITN-TECH-043/047); see DEPLOY §7.12.
       # `risk_profile.json` is the legacy US file, kept as the RISK_PROFILE_PATH fallback.
@@ -22,4 +22,4 @@ services:
       - ./data/risk_profile_us.json:/app/risk_profile_us.json:ro
       - ./data/risk_profile_id.json:/app/risk_profile_id.json:ro
   web:
-    image: ghcr.io/luniramilis-rgb/jurnal-zitn-web:sha-9414a62a75d3308b67c911b37221f8f415e41011
+    image: ghcr.io/luniramilis-rgb/jurnal-zitn-web:sha-dd96d263ce353728ffe75e7decc884993dc18eb5
