@@ -104,13 +104,12 @@ test.describe('Performance page', () => {
     await expect(page.getByTestId('timeframe-selector')).toBeVisible();
     await expect(page.getByTestId('currency-selector')).toBeVisible();
     await expect(page.getByTestId('stats-panel')).toBeVisible();
-    // Each stat label deep-links to its Methodology definition (Task 4).
+    // The docs host is hidden during the ZITN rebrand (frontendFlags.
+    // DOCS_LINKS_ENABLED = false): a stat label is plain text, not a link.
     await expect(
       page.getByTestId('stats-panel').getByRole('link', { name: 'Win Rate' }),
-    ).toHaveAttribute(
-      'href',
-      'https://docs.tradr.cloud/user-guide/reference/metrics-glossary/#win-rate',
-    );
+    ).toHaveCount(0);
+    await expect(page.getByTestId('stats-panel').getByText('Win Rate')).toBeVisible();
     await expect(page.getByTestId('breakdown-table')).toBeVisible();
   });
 

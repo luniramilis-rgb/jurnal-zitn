@@ -1005,9 +1005,9 @@ test.describe('user onboarding', () => {
     ]) {
       await expect(page.getByText(label, { exact: false })).toBeVisible();
     }
-    const docsLink = page.getByTestId('zero-state-docs-link');
-    await expect(docsLink).toHaveAttribute('href', /docs\.tradr\.cloud/);
-    await expect(docsLink).toHaveAttribute('target', '_blank');
+    // The docs host is hidden during the ZITN rebrand (frontendFlags.
+    // DOCS_LINKS_ENABLED = false): the zero-state shows no docs link.
+    await expect(page.getByTestId('zero-state-docs-link')).toHaveCount(0);
 
     // Take the unguided fork: create the account directly, no tour anywhere.
     await page.getByTestId('zero-state-create-account').click();

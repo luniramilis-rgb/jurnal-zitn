@@ -31,7 +31,7 @@
 
 import { translate, type AppLocale, type MessageKey } from '@jurnal-zitn/shared';
 
-import { docsUrl, type DocsPage } from '@/lib/docs';
+import { docsHref, type DocsPage } from '@/lib/docs';
 import { getAppLocale } from '@/lib/locale';
 
 import type { ChecklistItemId } from '../derive-checklist';
@@ -96,7 +96,11 @@ export type WalkthroughStep = TourStep &
  * reader is mid-task and replacing the app loses their place.
  */
 export function readMore(page: DocsPage, locale: AppLocale = getAppLocale()): string {
-  return `<a href="${docsUrl(page)}" target="_blank" rel="noreferrer">${translate(locale, 'tour.readMore')}</a>`;
+  const href = docsHref(page);
+  // Hidden while frontendFlags.DOCS_LINKS_ENABLED is false (ZITN rebrand): the
+  // step body still renders, without the "read more" sentence.
+  if (!href) return '';
+  return `<a href="${href}" target="_blank" rel="noreferrer">${translate(locale, 'tour.readMore')}</a>`;
 }
 
 function compile(sources: readonly WalkthroughStepSource[], locale: AppLocale): WalkthroughStep[] {
@@ -106,7 +110,7 @@ function compile(sources: readonly WalkthroughStepSource[], locale: AppLocale): 
     title: translate(locale, titleKey),
     docs,
     route,
-    description: `${translate(locale, bodyKey)} ${readMore(docs, locale)}`,
+    description: `${translate(locale, bodyKey)} ${readMore(docs, locale)}`.trim(),
   }));
 }
 

@@ -1,9 +1,13 @@
 // @vitest-environment jsdom
 import { render, screen, cleanup } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { docsUrl } from '@/lib/docs';
 import { setAppLocale } from '@/lib/locale';
+
+// The docs link renders only while the docs surface is enabled; this file covers
+// the enabled rendering (the hidden default is guarded in Sidebar.docs-link.test).
+vi.mock('@/lib/frontendFlags', () => ({ CHANGELOG_ENABLED: false, DOCS_LINKS_ENABLED: true }));
 
 import { RetentionSummary } from './RetentionSummary';
 

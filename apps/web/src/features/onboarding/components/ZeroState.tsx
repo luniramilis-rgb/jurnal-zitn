@@ -102,7 +102,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader } from '@/components/ui/card';
 import { AccountDialog } from '@/features/accounts/components/AccountDialog';
 import { useT } from '@/hooks/useLocale';
-import { docsUrl } from '@/lib/docs';
+import { docsHref } from '@/lib/docs';
 
 import { useDemoAccount } from '../hooks/useDemoAccount';
 import { useOnboarding } from '../hooks/useOnboarding';
@@ -144,6 +144,8 @@ function guidanceGap(
 
 export function ZeroState() {
   const t = useT();
+  // Hidden while frontendFlags.DOCS_LINKS_ENABLED is false (ZITN rebrand).
+  const gettingStartedDocs = docsHref('gettingStarted');
   const { setStatus, dismiss, isSaving, checklist } = useOnboarding();
   const { start, canStart, isUnavailable } = useWalkthrough();
   const { seed, isPending: isSeeding } = useDemoAccount();
@@ -381,20 +383,22 @@ export function ZeroState() {
         canStartStep={canStart}
       />
 
-      <p className="text-sm text-muted-foreground">
-        {/* The docs live on their own host, so this is an <a>, not a router
-            Link, and it opens in a new tab — a reader following it is mid-task.
-            The host comes from docsUrl() and is never written down here. */}
-        <a
-          data-testid="zero-state-docs-link"
-          href={docsUrl('gettingStarted')}
-          target="_blank"
-          rel="noreferrer"
-          className="cursor-pointer underline underline-offset-2 hover:text-foreground"
-        >
-          {t('onboard.zero.docsLink')}
-        </a>
-      </p>
+      {gettingStartedDocs && (
+        <p className="text-sm text-muted-foreground">
+          {/* The docs live on their own host, so this is an <a>, not a router
+              Link, and it opens in a new tab — a reader following it is mid-task.
+              The host comes from docsUrl() and is never written down here. */}
+          <a
+            data-testid="zero-state-docs-link"
+            href={gettingStartedDocs}
+            target="_blank"
+            rel="noreferrer"
+            className="cursor-pointer underline underline-offset-2 hover:text-foreground"
+          >
+            {t('onboard.zero.docsLink')}
+          </a>
+        </p>
+      )}
 
       <AccountDialog open={accountDialogOpen} onOpenChange={setAccountDialogOpen} account={null} />
     </div>

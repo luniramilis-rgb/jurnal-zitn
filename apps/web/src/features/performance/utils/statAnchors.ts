@@ -9,6 +9,7 @@
 import type { PerformanceStats } from '@jurnal-zitn/shared';
 
 import { docsUrl } from '@/lib/docs';
+import { DOCS_LINKS_ENABLED } from '@/lib/frontendFlags';
 
 /** The `PerformanceStats` fields that render as a Statistics-panel row. */
 export type StatField = Exclude<keyof PerformanceStats, 'hasWins' | 'hasLosses'>;
@@ -30,4 +31,13 @@ export const STAT_ANCHORS: Record<StatField, string> = {
 /** Absolute URL to the Methodology heading that defines `field`. */
 export function statDocsUrl(field: StatField): string {
   return `${docsUrl('metricsGlossary')}#${STAT_ANCHORS[field]}`;
+}
+
+/**
+ * `statDocsUrl(field)` while the docs surface is enabled, else `null`. The
+ * Statistics panel renders the label as plain text (not a link) when null —
+ * hidden during the ZITN rebrand (frontendFlags.DOCS_LINKS_ENABLED).
+ */
+export function statDocsHref(field: StatField): string | null {
+  return DOCS_LINKS_ENABLED ? statDocsUrl(field) : null;
 }

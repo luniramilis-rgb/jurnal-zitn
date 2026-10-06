@@ -16,7 +16,11 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
 
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// The step "read more" link renders only while the docs surface is enabled; this
+// file covers the enabled rendering. The hidden default is the app's live posture.
+vi.mock('@/lib/frontendFlags', () => ({ CHANGELOG_ENABLED: false, DOCS_LINKS_ENABLED: true }));
 
 import { DOCS, DOCS_BASE_URL, docsUrl, type DocsPage } from '@/lib/docs';
 

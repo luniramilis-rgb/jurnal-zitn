@@ -13,7 +13,7 @@
 
 import { Numeric } from '@/components/Numeric';
 import { useT } from '@/hooks/useLocale';
-import { docsUrl } from '@/lib/docs';
+import { docsHref } from '@/lib/docs';
 
 export interface RetentionSummaryProps {
   /**
@@ -27,6 +27,9 @@ export interface RetentionSummaryProps {
 
 export function RetentionSummary({ creditBalance }: RetentionSummaryProps) {
   const t = useT();
+  // Hidden while frontendFlags.DOCS_LINKS_ENABLED is false (ZITN rebrand); the
+  // surrounding facts stay, only the external docs link drops.
+  const accountDeletionDocs = docsHref('accountDeletion');
   return (
     <div className="space-y-3 text-sm" data-testid="retention-summary">
       <div>
@@ -56,16 +59,18 @@ export function RetentionSummary({ creditBalance }: RetentionSummaryProps) {
         </ul>
       </div>
 
-      <p className="text-muted-foreground">
-        <a
-          href={docsUrl('accountDeletion')}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="underline"
-        >
-          {t('retention.docsLink')}
-        </a>
-      </p>
+      {accountDeletionDocs && (
+        <p className="text-muted-foreground">
+          <a
+            href={accountDeletionDocs}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="underline"
+          >
+            {t('retention.docsLink')}
+          </a>
+        </p>
+      )}
     </div>
   );
 }

@@ -38,6 +38,9 @@ import { deriveChecklist } from '../lib/derive-checklist';
 
 vi.mock('../hooks/useOnboarding', () => ({ useOnboarding: vi.fn() }));
 vi.mock('../hooks/useWalkthrough', () => ({ useWalkthrough: vi.fn() }));
+// The zero-state docs link renders only while the docs surface is enabled; this
+// file covers the enabled rendering. The hidden default is the app's live posture.
+vi.mock('@/lib/frontendFlags', () => ({ CHANGELOG_ENABLED: false, DOCS_LINKS_ENABLED: true }));
 // Faked for the same reason as the other two: it has its own tests, and the
 // real one issues an accounts read and two mutations that would need a
 // QueryClientProvider here. What belongs in THIS file is the wiring — that the

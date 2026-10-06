@@ -88,7 +88,7 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverAnchor, PopoverContent } from '@/components/ui/popover';
 import { useAuth } from '@/hooks/useAuth';
 import { useT } from '@/hooks/useLocale';
-import { docsUrl, type DocsPage } from '@/lib/docs';
+import { docsHref, type DocsPage } from '@/lib/docs';
 
 import { useOnboardingQuery, useOnboardingPatch } from '../hooks/useOnboarding';
 import { useIsWalkthroughRunning } from '../hooks/useWalkthrough';
@@ -204,6 +204,8 @@ export function CoachMark({ surface, available = true }: CoachMarkProps) {
   const [dismissed, setDismissed] = useState(false);
 
   const mark = COACH_MARKS[surface];
+  // The "read more" link is hidden while frontendFlags.DOCS_LINKS_ENABLED is false.
+  const coachDocsHref = mark.docs === undefined ? null : docsHref(mark.docs);
 
   // Unknown counts as seen. Until the preference read lands we cannot tell a
   // first arrival from a hundredth, and a mark that appears for one frame and
@@ -271,11 +273,11 @@ export function CoachMark({ surface, available = true }: CoachMarkProps) {
           <p className="text-sm text-muted-foreground">{t(mark.bodyKey)}</p>
         </div>
         <div className="flex items-center justify-end gap-3">
-          {mark.docs !== undefined && (
+          {coachDocsHref && (
             /* The host lives in docsUrl() and is written down nowhere here.
                New tab: the reader is mid-task on this very surface. */
             <a
-              href={docsUrl(mark.docs)}
+              href={coachDocsHref}
               target="_blank"
               rel="noreferrer"
               className="pointer-events-auto cursor-pointer text-sm font-medium text-primary underline underline-offset-2"

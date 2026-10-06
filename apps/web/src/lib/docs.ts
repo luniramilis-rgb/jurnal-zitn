@@ -10,6 +10,8 @@
  * this work" link is mid-task, and replacing the app they were working in loses
  * their place.
  */
+import { DOCS_LINKS_ENABLED } from './frontendFlags';
+
 export const DOCS_BASE_URL = 'https://docs.tradr.cloud';
 
 /** Named pages, so a rename is one edit rather than a grep. */
@@ -32,4 +34,16 @@ export type DocsPage = keyof typeof DOCS;
 /** Absolute URL for a named documentation page. */
 export function docsUrl(page: DocsPage): string {
   return `${DOCS_BASE_URL}${DOCS[page]}`;
+}
+
+/**
+ * `docsUrl(page)` while the documentation surface is enabled, else `null`.
+ *
+ * Callers render a link only when this is non-null. During the ZITN rebrand the
+ * external Tradr docs host is hidden (`frontendFlags.DOCS_LINKS_ENABLED = false`),
+ * so no in-app link points at it. The mapping is kept, not deleted — flipping the
+ * flag restores every link at once.
+ */
+export function docsHref(page: DocsPage): string | null {
+  return DOCS_LINKS_ENABLED ? docsUrl(page) : null;
 }
