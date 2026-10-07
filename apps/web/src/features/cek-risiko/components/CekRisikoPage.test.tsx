@@ -28,6 +28,15 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('sonner', () => ({ toast: { success: toastSuccess, error: toastError } }));
 
+// Surface-permission flags: this file covers the app WITH the "Hitung Lot" tab
+// enabled (frontendFlags.HITUNG_LOT_ENABLED = true). The hidden default is
+// guarded in CekRisikoPage.hitung-lot-hidden.test.tsx.
+vi.mock('@/lib/frontendFlags', () => ({
+  CHANGELOG_ENABLED: false,
+  DOCS_LINKS_ENABLED: false,
+  HITUNG_LOT_ENABLED: true,
+}));
+
 vi.mock('@/stores/event-bus.store', () => ({
   eventBus: { publish: vi.fn(), subscribe: vi.fn(() => () => undefined) },
   useEventBusSubscribe: () => undefined,
@@ -123,7 +132,7 @@ beforeEach(() => {
 });
 
 describe('CekRisikoPage — mode ringkas (H1)', () => {
-  it('menampilkan dua mode dan menggantinya', () => {
+  it('menampilkan mode dan menggantinya', () => {
     renderPage();
     expect(screen.getByTestId('cek-mode-lot')).toBeTruthy();
     expect(screen.getByTestId('cek-mode-biaya')).toBeTruthy();
@@ -132,6 +141,14 @@ describe('CekRisikoPage — mode ringkas (H1)', () => {
     fireEvent.click(screen.getByTestId('cek-mode-biaya'));
     expect(screen.queryByTestId('cek-modal')).toBeNull();
     expect(document.querySelector('select')).toBeTruthy();
+  });
+
+  it('menaruh "Profil risiko" sebelum "Biaya dan pajak"', () => {
+    renderPage();
+    const ids = Array.from(
+      screen.getByTestId('cek-modes').querySelectorAll('[data-testid^="cek-mode-"]'),
+    ).map((el) => el.getAttribute('data-testid'));
+    expect(ids.indexOf('cek-mode-profil')).toBeLessThan(ids.indexOf('cek-mode-biaya'));
   });
 
   it('menampilkan segmen "Profil risiko" di dalam tab Cek Risiko (bukan tab baru)', () => {

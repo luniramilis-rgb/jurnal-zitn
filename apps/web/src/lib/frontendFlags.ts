@@ -9,6 +9,10 @@
  *   new-updates badge, the release fetch behind it, and the `/changelog` route.
  * - `DOCS_LINKS_ENABLED` — the "Docs" nav entry that links out to the external
  *   Tradr documentation host (`docs.tradr.cloud`, see `lib/docs.ts`).
+ * - `HITUNG_LOT_ENABLED` — the "Hitung Lot" tab on Cek Risiko (see
+ *   `features/cek-risiko`). Hidden while its surface is reworked (ZITN-TECH-049);
+ *   when false the page leads with "Profil risiko".
  */
 export const CHANGELOG_ENABLED = false;
 export const DOCS_LINKS_ENABLED = false;
+export const HITUNG_LOT_ENABLED = false;
