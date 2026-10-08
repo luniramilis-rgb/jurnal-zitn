@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { describe, expect, it } from 'vitest';
 
-import { liveRR, linkablePositions } from './TradePlansPage';
+import { liveRR, linkablePositions, planLevelsPatch } from './TradePlansPage';
 
 describe('linkablePositions (F4 link honesty)', () => {
   const positions = [
@@ -24,6 +24,33 @@ describe('linkablePositions (F4 link honesty)', () => {
         { positionId: null },
       ]).map((p) => p.id),
     ).toEqual(['p3']);
+  });
+});
+
+describe('planLevelsPatch (F4 carry-over)', () => {
+  it('copies stop/target only where the position has none', () => {
+    expect(
+      planLevelsPatch(
+        { stopLoss: '3800', targetPrice: '4500' },
+        { stopLoss: null, targetPrice: null },
+      ),
+    ).toEqual({ stopLoss: '3800', targetPrice: '4500' });
+  });
+
+  it('never overwrites values already on the position', () => {
+    expect(
+      planLevelsPatch(
+        { stopLoss: '3800', targetPrice: '4500' },
+        { stopLoss: 3000, targetPrice: 5000 },
+      ),
+    ).toEqual({});
+  });
+
+  it('is empty when the position is unknown or the plan omits levels', () => {
+    expect(planLevelsPatch({ stopLoss: '3800', targetPrice: null }, undefined)).toEqual({});
+    expect(
+      planLevelsPatch({ stopLoss: null, targetPrice: null }, { stopLoss: null, targetPrice: null }),
+    ).toEqual({});
   });
 });
 
