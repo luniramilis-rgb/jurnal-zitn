@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { PageHeader } from '@/components/layout/PageHeader';
 import { Button } from '@/components/ui/button';
 import { useT } from '@/hooks/useLocale';
-import { HITUNG_LOT_ENABLED } from '@/lib/frontendFlags';
+import { POSITION_SIZING_ENABLED } from '@/lib/frontendFlags';
 
 import { BiayaPajakPanel } from './BiayaPajakPanel';
 import { HitungLotPanel } from './HitungLotPanel';
@@ -13,19 +13,20 @@ import { ProfilRisikoPanel } from './ProfilRisikoPanel';
 
 type Mode = 'lot' | 'biaya' | 'profil';
 
-/** Tab pembuka: "Hitung Lot" saat aktif, selain itu "Profil risiko". */
-const DEFAULT_MODE: Mode = HITUNG_LOT_ENABLED ? 'lot' : 'profil';
+/** Tab pembuka: tab sizing saat aktif, selain itu "Profil risiko". */
+const DEFAULT_MODE: Mode = POSITION_SIZING_ENABLED ? 'lot' : 'profil';
 
 /**
- * Permukaan **Cek Risiko** (ZITN-TECH-017 §12 / Fase H) — wajah baru jurnal.
+ * Permukaan **Cek Risiko** (ZITN-TECH-017 Â§12 / Fase H) â€” wajah baru jurnal.
  *
  * Satu layar, beberapa mode (segmented). Alat hitung dari angka pengguna: tidak
  * ada prediksi/sinyal/target. Pencatatan menjadi efek samping lewat mesin jurnal
  * ("Simpan ke Catatan"); fitur lanjutan tetap ada di **Mode lengkap**.
  *
- * Tab "Hitung Lot" disembunyikan sementara di balik `HITUNG_LOT_ENABLED`
- * (ZITN-TECH-049) — kode tetap; urutan tab: Hitung Lot (bila aktif) · Profil
- * risiko · Biaya dan pajak.
+ * Tab sizing (dulu "Hitung Lot") disembunyikan sementara di balik
+ * `POSITION_SIZING_ENABLED` (ZITN-TECH-049; opsi A â€” pakai ulang tab, nama
+ * netral) â€” kode tetap; urutan tab: sizing (bila aktif) Â· Profil risiko Â·
+ * Biaya dan pajak.
  */
 export function CekRisikoPage() {
   const t = useT();
@@ -44,7 +45,7 @@ export function CekRisikoPage() {
         className="flex gap-2"
         data-testid="cek-modes"
       >
-        {HITUNG_LOT_ENABLED && (
+        {POSITION_SIZING_ENABLED && (
           <Button
             type="button"
             role="tab"
@@ -81,7 +82,7 @@ export function CekRisikoPage() {
         </Button>
       </div>
 
-      {HITUNG_LOT_ENABLED && mode === 'lot' ? (
+      {POSITION_SIZING_ENABLED && mode === 'lot' ? (
         <HitungLotPanel />
       ) : mode === 'biaya' ? (
         <BiayaPajakPanel />

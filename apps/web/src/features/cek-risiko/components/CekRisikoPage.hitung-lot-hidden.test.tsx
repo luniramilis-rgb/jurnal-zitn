@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 //
-// The "Hitung Lot" tab on Cek Risiko is hidden while its surface is reworked
-// (frontendFlags.HITUNG_LOT_ENABLED = false, ZITN-TECH-049). This file guards the
-// hidden default: no lot tab/panel, the page opens on "Profil risiko", and the
-// tab order is Profil risiko → Biaya dan pajak. The enabled rendering (and the
-// lot behaviour) lives in CekRisikoPage.test.tsx.
+// The sizing tab on Cek Risiko (formerly "Hitung Lot") is hidden while its
+// surface is reworked (frontendFlags.POSITION_SIZING_ENABLED = false,
+// ZITN-TECH-049). This file guards the hidden default: no sizing tab/panel, the
+// page opens on "Profil risiko", and the tab order is Profil risiko → Biaya dan
+// pajak. The enabled rendering (and the sizing behaviour) lives in
+// CekRisikoPage.test.tsx.
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cleanup, render, screen } from '@testing-library/react';
 import { createElement, type ReactNode } from 'react';
@@ -15,7 +16,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 vi.mock('@/lib/frontendFlags', () => ({
   CHANGELOG_ENABLED: false,
   DOCS_LINKS_ENABLED: false,
-  HITUNG_LOT_ENABLED: false,
+  POSITION_SIZING_ENABLED: false,
 }));
 
 vi.mock('@/lib/api', () => ({
@@ -67,8 +68,8 @@ function renderPage() {
 
 afterEach(cleanup);
 
-describe('CekRisikoPage — "Hitung Lot" disembunyikan (ZITN-TECH-049)', () => {
-  it('tanpa tab Hitung Lot, membuka dengan Profil risiko, urut Profil lalu Biaya', () => {
+describe('CekRisikoPage — tab sizing disembunyikan (ZITN-TECH-049)', () => {
+  it('tanpa tab sizing, membuka dengan Profil risiko, urut Profil lalu Biaya', () => {
     renderPage();
 
     expect(screen.queryByTestId('cek-mode-lot')).toBeNull();

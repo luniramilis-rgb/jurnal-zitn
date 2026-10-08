@@ -28,13 +28,13 @@ vi.mock('@/lib/api', () => ({
 
 vi.mock('sonner', () => ({ toast: { success: toastSuccess, error: toastError } }));
 
-// Surface-permission flags: this file covers the app WITH the "Hitung Lot" tab
-// enabled (frontendFlags.HITUNG_LOT_ENABLED = true). The hidden default is
+// Surface-permission flags: this file covers the app WITH the sizing tab
+// enabled (frontendFlags.POSITION_SIZING_ENABLED = true). The hidden default is
 // guarded in CekRisikoPage.hitung-lot-hidden.test.tsx.
 vi.mock('@/lib/frontendFlags', () => ({
   CHANGELOG_ENABLED: false,
   DOCS_LINKS_ENABLED: false,
-  HITUNG_LOT_ENABLED: true,
+  POSITION_SIZING_ENABLED: true,
 }));
 
 vi.mock('@/stores/event-bus.store', () => ({
