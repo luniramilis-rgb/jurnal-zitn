@@ -1,7 +1,13 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import type { MessageKey, TradePlan, TradePlanStatus } from '@jurnal-zitn/shared';
+import type {
+  MessageKey,
+  TradePlan,
+  TradePlanStatus,
+  UpdatePositionInput,
+} from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import {
@@ -28,6 +34,7 @@ import { useRiskProfile } from '@/features/cek-risiko/hooks/useRiskProfile';
 import { useRiskProfileData } from '@/features/cek-risiko/hooks/useRiskProfileData';
 import { usePositions } from '@/features/positions/hooks/usePositions';
 import { useT } from '@/hooks/useLocale';
+import { api } from '@/lib/api';
 
 import {
   useCreateTradePlan,
@@ -35,6 +42,7 @@ import {
   useLinkTradePlan,
   useSetTradePlanStatus,
   useTradePlans,
+  useUpdateTradePlan,
 } from '../hooks/useTradePlans';
 
 const EMPTY = {
@@ -42,6 +50,7 @@ const EMPTY = {
   side: 'long' as 'long' | 'short',
   thesis: '',
   entryZoneLow: '',
+  entryZoneHigh: '',
   stopLoss: '',
   targetPrice: '',
 };
@@ -97,6 +106,22 @@ export function linkablePositions<T extends { id: string; symbol: string }>(
 }
 
 /**
+ * Levels a position inherits when a plan is linked to it (F4 correction): the
+ * plan's stop/target, but ONLY where the position has none — a value the trader
+ * already typed is never overwritten. Pure, so the copy rule is tested.
+ */
+export function planLevelsPatch(
+  plan: { stopLoss: string | null; targetPrice: string | null },
+  position: { stopLoss: number | null; targetPrice: number | null } | undefined,
+): Pick<UpdatePositionInput, 'stopLoss' | 'targetPrice'> {
+  if (!position) return {};
+  const patch: Pick<UpdatePositionInput, 'stopLoss' | 'targetPrice'> = {};
+  if (position.stopLoss == null && plan.stopLoss) patch.stopLoss = plan.stopLoss;
+  if (position.targetPrice == null && plan.targetPrice) patch.targetPrice = plan.targetPrice;
+  return patch;
+}
+
+/**
  * TradePlansPage — F4 (ZITN-TECH-017 §10.8). Pre-trade plans with a live R:R and
  * the forward-only lifecycle Pending → Executed / Missed / Cancelled.
  */
@@ -107,6 +132,15 @@ export function TradePlansPage() {
   const setStatus = useSetTradePlanStatus();
   const remove = useDeleteTradePlan();
   const linkPlan = useLinkTradePlan();
+  const update = useUpdateTradePlan();
+  const queryClient = useQueryClient();
+  // Linking copies the plan's levels onto the position (F4 correction) — see
+  // planLevelsPatch for the "never overwrite" rule.
+  const applyPlanLevels = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdatePositionInput }) =>
+      api.put(`/positions/${id}`, data),
+    onSuccess: () => void queryClient.invalidateQueries({ queryKey: ['positions'] }),
+  });
   // Show every position by default (a plan may attach to a closed/draft trade
   // too, and the linked one must resolve to its symbol). "Open only" narrows it.
   const [openOnly, setOpenOnly] = useState(false);
@@ -120,6 +154,9 @@ export function TradePlansPage() {
   const { data: riskProfileData } = useRiskProfileData(riskProfile.market);
   const positionById = new Map((positions.data ?? []).map((p) => [p.id, p]));
   const [form, setForm] = useState(EMPTY);
+  // The plan whose levels are being edited inline, or null. Carries the plan id
+  // alongside a form copy so Save can PATCH the right row.
+  const [editing, setEditing] = useState<(typeof EMPTY & { id: string }) | null>(null);
   // "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): SSO mengarahkan ke
   // `/trade-plans?focus=<id>`; sorot draf yang baru dibuat/difokuskan.
   const focusId =
@@ -133,10 +170,46 @@ export function TradePlansPage() {
         side: form.side,
         ...(form.thesis ? { thesis: form.thesis } : {}),
         ...(form.entryZoneLow ? { entryZoneLow: form.entryZoneLow } : {}),
+        ...(form.entryZoneHigh ? { entryZoneHigh: form.entryZoneHigh } : {}),
         ...(form.stopLoss ? { stopLoss: form.stopLoss } : {}),
         ...(form.targetPrice ? { targetPrice: form.targetPrice } : {}),
       },
       { onSuccess: () => setForm(EMPTY) },
+    );
+  };
+
+  const openEdit = (plan: TradePlan) =>
+    setEditing({
+      id: plan.id,
+      symbol: plan.symbol,
+      side: plan.side,
+      thesis: plan.thesis ?? '',
+      entryZoneLow: plan.entryZoneLow ?? '',
+      entryZoneHigh: plan.entryZoneHigh ?? '',
+      stopLoss: plan.stopLoss ?? '',
+      targetPrice: plan.targetPrice ?? '',
+    });
+
+  const saveEdit = () => {
+    if (!editing) return;
+    // Omit blank fields: the update schema rejects an empty decimal string.
+    update.mutate(
+      {
+        id: editing.id,
+        data: {
+          ...(editing.thesis ? { thesis: editing.thesis } : {}),
+          ...(editing.entryZoneLow ? { entryZoneLow: editing.entryZoneLow } : {}),
+          ...(editing.entryZoneHigh ? { entryZoneHigh: editing.entryZoneHigh } : {}),
+          ...(editing.stopLoss ? { stopLoss: editing.stopLoss } : {}),
+          ...(editing.targetPrice ? { targetPrice: editing.targetPrice } : {}),
+        },
+      },
+      {
+        onSuccess: () => {
+          setEditing(null);
+          toast.success(t('tp.updated'));
+        },
+      },
     );
   };
 
@@ -147,6 +220,20 @@ export function TradePlansPage() {
         type={type}
         value={form[key]}
         onChange={(event) => setForm((prev) => ({ ...prev, [key]: event.target.value }))}
+        className="rounded-md border bg-background px-2 py-1 text-sm"
+      />
+    </label>
+  );
+
+  const editField = (key: keyof typeof EMPTY, label: string, type: 'text' | 'number' = 'text') => (
+    <label className="flex flex-col gap-1 text-sm">
+      <span className="text-muted-foreground">{label}</span>
+      <input
+        type={type}
+        value={editing?.[key] ?? ''}
+        onChange={(event) =>
+          setEditing((prev) => (prev ? { ...prev, [key]: event.target.value } : prev))
+        }
         className="rounded-md border bg-background px-2 py-1 text-sm"
       />
     </label>
@@ -201,8 +288,9 @@ export function TradePlansPage() {
               </select>
             </label>
           </div>
-          <div className="grid gap-3 sm:grid-cols-3">
+          <div className="grid gap-3 sm:grid-cols-4">
             {input('entryZoneLow', t('tp.entryLow'), 'number')}
+            {input('entryZoneHigh', t('tp.entryHigh'), 'number')}
             {input('stopLoss', t('tp.stop'), 'number')}
             {input('targetPrice', t('tp.target'), 'number')}
           </div>
@@ -218,6 +306,43 @@ export function TradePlansPage() {
         </CardContent>
       </Card>
 
+      {editing && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-base">
+              {t('tp.editTitle')} · {editing.symbol}
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-4">
+              {editField('entryZoneLow', t('tp.entryLow'), 'number')}
+              {editField('entryZoneHigh', t('tp.entryHigh'), 'number')}
+              {editField('stopLoss', t('tp.stop'), 'number')}
+              {editField('targetPrice', t('tp.target'), 'number')}
+            </div>
+            {editField('thesis', t('tp.thesis'))}
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                className="cursor-pointer"
+                disabled={update.isPending}
+                onClick={saveEdit}
+              >
+                {t('tp.save')}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="cursor-pointer"
+                onClick={() => setEditing(null)}
+              >
+                {t('action.cancel')}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {list.isError && <p className="text-sm text-destructive">{t('tp.failed')}</p>}
 
       <Table>
@@ -226,22 +351,28 @@ export function TradePlansPage() {
             <TableHead>{t('tp.symbol')}</TableHead>
             <TableHead>{t('tp.side')}</TableHead>
             <TableHead>{t('tp.entryLow')}</TableHead>
+            <TableHead>{t('tp.entryHigh')}</TableHead>
             <TableHead>{t('tp.stop')}</TableHead>
             <TableHead>{t('tp.target')}</TableHead>
             <TableHead>{t('tp.rr')}</TableHead>
             <TableHead>{t('tp.status')}</TableHead>
             <TableHead>
-              <div className="flex items-center gap-2">
-                <span>{t('tp.link')}</span>
-                <label className="flex cursor-pointer items-center gap-1 text-xs font-normal text-muted-foreground">
-                  <input
-                    type="checkbox"
-                    className="cursor-pointer"
-                    checked={openOnly}
-                    onChange={(event) => setOpenOnly(event.target.checked)}
-                  />
-                  {t('tp.linkOpenOnly')}
-                </label>
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span>{t('tp.link')}</span>
+                  <label className="flex cursor-pointer items-center gap-1 text-xs font-normal text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      className="cursor-pointer"
+                      checked={openOnly}
+                      onChange={(event) => setOpenOnly(event.target.checked)}
+                    />
+                    {t('tp.linkOpenOnly')}
+                  </label>
+                </div>
+                <span className="text-xs font-normal text-muted-foreground">
+                  {t('tp.linkHint')}
+                </span>
               </div>
             </TableHead>
             <TableHead />
@@ -250,7 +381,7 @@ export function TradePlansPage() {
         <TableBody>
           {list.data?.items.length === 0 && (
             <TableRow>
-              <TableCell colSpan={9} className="text-muted-foreground">
+              <TableCell colSpan={10} className="text-muted-foreground">
                 {t('tp.empty')}
               </TableCell>
             </TableRow>
@@ -273,6 +404,9 @@ export function TradePlansPage() {
               <TableCell>{plan.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}</TableCell>
               <TableCell>
                 <Numeric value={plan.entryZoneLow} kind="decimal" direction="none" />
+              </TableCell>
+              <TableCell>
+                <Numeric value={plan.entryZoneHigh} kind="decimal" direction="none" />
               </TableCell>
               <TableCell>
                 <Numeric value={plan.stopLoss} kind="decimal" direction="none" />
@@ -307,10 +441,22 @@ export function TradePlansPage() {
                     value=""
                     disabled={linkPlan.isPending}
                     onChange={(event) => {
-                      if (event.target.value) {
+                      const positionId = event.target.value;
+                      if (positionId) {
                         linkPlan.mutate(
-                          { id: plan.id, positionId: event.target.value },
-                          { onError: () => toast.error(t('tp.linkErrGeneric')) },
+                          { id: plan.id, positionId },
+                          {
+                            // Carry the plan's levels onto the position so the
+                            // Posisi tab shows them without re-typing (never
+                            // overwriting a value already there).
+                            onSuccess: () => {
+                              const patch = planLevelsPatch(plan, positionById.get(positionId));
+                              if (Object.keys(patch).length > 0) {
+                                applyPlanLevels.mutate({ id: positionId, data: patch });
+                              }
+                            },
+                            onError: () => toast.error(t('tp.linkErrGeneric')),
+                          },
                         );
                       }
                     }}
@@ -337,6 +483,15 @@ export function TradePlansPage() {
                     {statusButton(plan, 'cancelled', t('tp.cancel'))}
                   </>
                 )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="cursor-pointer"
+                  onClick={() => openEdit(plan)}
+                >
+                  {t('tp.edit')}
+                </Button>
                 <Button
                   type="button"
                   variant="outline"

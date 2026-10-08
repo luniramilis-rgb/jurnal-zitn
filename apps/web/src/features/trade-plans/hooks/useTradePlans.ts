@@ -1,6 +1,11 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 
-import type { CreateTradePlanInput, TradePlan, TradePlanStatus } from '@jurnal-zitn/shared';
+import type {
+  CreateTradePlanInput,
+  TradePlan,
+  TradePlanStatus,
+  UpdateTradePlanInput,
+} from '@jurnal-zitn/shared';
 
 import { api } from '@/lib/api';
 
@@ -16,6 +21,17 @@ export function useCreateTradePlan() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (body: CreateTradePlanInput) => api.post<TradePlan>('/trade-plans', body),
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['trade-plans'] });
+    },
+  });
+}
+
+export function useUpdateTradePlan() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ id, data }: { id: string; data: UpdateTradePlanInput }) =>
+      api.patch<TradePlan>(`/trade-plans/${id}`, data),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['trade-plans'] });
     },
