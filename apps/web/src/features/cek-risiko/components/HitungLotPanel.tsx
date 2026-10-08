@@ -63,7 +63,7 @@ function BigAnswer({ lots, rugiMaksimal }: { lots: number; rugiMaksimal: string 
 }
 
 /**
- * Mode "Hitung Lot" (D-H1b): modal · risiko (tombol 1/2/3) · kode · harga beli ·
+ * Mode sizing (dulu "Hitung Lot", D-H1b): modal · risiko (tombol 1/2/3) · kode · harga beli ·
  * harga stop → jawaban besar (lot, rugi maksimal) → rincian → rumus dilipat.
  */
 export function HitungLotPanel() {
