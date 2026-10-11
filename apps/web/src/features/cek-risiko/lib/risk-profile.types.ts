@@ -17,6 +17,14 @@ export interface RiskProfileCell {
   p_loss10: number;
   p_loss20: number;
   p_loss40: number;
+  /** A/B/C split, aligned with Pemindai/Chart (ZITN-TECH-062). Optional for older artifacts. */
+  p_a?: number;
+  p_b?: number;
+  p_c?: number;
+  /** MAE (max adverse excursion, %) — median/p5/min; optional. */
+  mae_med?: number | null;
+  mae_p5?: number | null;
+  mae_min?: number | null;
 }
 
 export interface RiskProfileRule {

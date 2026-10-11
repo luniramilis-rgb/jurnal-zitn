@@ -453,6 +453,15 @@ export function ProfilRisikoPanel() {
                 <Stat label={t('cek.profile.pTp')} hint="cek.profile.hint.ptp">
                   <PctMag value={cell.p_tp} />
                 </Stat>
+                <Stat label={t('cek.profile.pA')} hint="cek.profile.hint.pA">
+                  <PctMag value={cell.p_a ?? null} />
+                </Stat>
+                <Stat label={t('cek.profile.pB')} hint="cek.profile.hint.pB">
+                  <PctMag value={cell.p_b ?? null} />
+                </Stat>
+                <Stat label={t('cek.profile.pC')} hint="cek.profile.hint.pC">
+                  <PctMag value={cell.p_c ?? null} />
+                </Stat>
                 <Stat label={t('cek.profile.delta')} hint="cek.profile.hint.delta">
                   <PctSigned value={cell.breakeven === null ? null : cell.p_tp - cell.breakeven} />
                 </Stat>
