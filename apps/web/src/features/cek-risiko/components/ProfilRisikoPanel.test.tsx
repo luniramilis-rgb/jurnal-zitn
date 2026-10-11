@@ -80,6 +80,8 @@ vi.mock('@/features/accounts/hooks/useAccounts', () => ({
   }),
 }));
 
+import { formatGroupedInt } from '@/lib/format';
+
 import { ProfilRisikoPanel } from './ProfilRisikoPanel';
 
 const STORAGE_KEY = 'zitn.cek-risiko.risk-profile.v1';
@@ -172,13 +174,15 @@ describe('ProfilRisikoPanel — segmen "Profil risiko" (ZITN-TECH-043/047)', () 
     expect(screen.getByTestId('cek-profile-portfolio')).toBeTruthy();
     expect((screen.getByTestId('cek-profile-w') as HTMLInputElement).value).toBe('2');
     expect((screen.getByTestId('cek-profile-s') as HTMLInputElement).value).toBe('20');
-    expect((screen.getByTestId('cek-profile-capital') as HTMLInputElement).value).toBe('50000');
+    expect((screen.getByTestId('cek-profile-capital') as HTMLInputElement).value).toBe(
+      formatGroupedInt(50_000),
+    );
   });
 
   it('modal yang dikosongkan pengguna tidak diisi ulang otomatis (prefill sekali per pasar)', () => {
     render(<ProfilRisikoPanel />);
     const capital = screen.getByTestId('cek-profile-capital') as HTMLInputElement;
-    expect(capital.value).toBe('50000');
+    expect(capital.value).toBe(formatGroupedInt(50_000));
     fireEvent.change(capital, { target: { value: '' } });
     expect(capital.value).toBe('');
   });

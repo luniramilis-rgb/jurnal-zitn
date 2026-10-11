@@ -50,6 +50,20 @@ export function formatMoney(decimalString: string, currencyCode: string): string
   return numberFormat({ style: 'currency', currency: currencyCode }).format(Number(decimalString));
 }
 
+/** Grouped integer (no decimals) in the app locale: `10.000` (id) / `1.000.000`. */
+export function formatGroupedInt(value: number): string {
+  return numberFormat({ maximumFractionDigits: 0 }).format(value);
+}
+
+/** The bare currency symbol for a code in the app locale: `US$`, `Rp`, `$`. */
+export function currencySymbol(code: string): string {
+  return (
+    numberFormat({ style: 'currency', currency: code })
+      .formatToParts(0)
+      .find((p) => p.type === 'currency')?.value ?? code
+  );
+}
+
 /**
  * Format a number with an always-on leading sign (`+`/`−`) for non-zero
  * values; zero gets no sign. This is the always-on, non-color signal channel
