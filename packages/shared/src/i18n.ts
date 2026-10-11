@@ -748,6 +748,9 @@ const ID_MESSAGES = {
   'cek.profile.rr': 'R:R',
   'cek.profile.breakeven': 'Impas P(TP)',
   'cek.profile.pTp': 'P(TP)',
+  'cek.profile.pA': 'A · TP langsung',
+  'cek.profile.pB': 'B · TP setelah pullback',
+  'cek.profile.pC': 'C · tidak TP',
   'cek.profile.delta': 'Delta vs impas',
   'cek.profile.pSl': 'P(SL)',
   'cek.profile.eNet': 'E net',
@@ -794,6 +797,11 @@ const ID_MESSAGES = {
     'Tingkat menang minimum agar tidak rugi pada R:R ini. Di bawah angka ini, jangka panjang cenderung rugi.',
   'cek.profile.hint.ptp':
     'Seberapa sering target tercapai lebih dulu (historis). Bandingkan dengan garis impas.',
+  'cek.profile.hint.pA':
+    'Proporsi sinyal yang mencapai TP tanpa menutup di bawah VAL30 lebih dulu (TP langsung).',
+  'cek.profile.hint.pB':
+    'Proporsi sinyal yang mencapai TP setelah sempat menutup di bawah VAL30 (pullback).',
+  'cek.profile.hint.pC': 'Proporsi sinyal yang tidak mencapai TP dalam horizon (timeout).',
   'cek.profile.hint.delta':
     'Selisih P(TP) terhadap impas. Positif = ada bantalan; negatif = rapuh.',
   'cek.profile.hint.psl': 'Seberapa sering stop tersentuh lebih dulu (historis).',
@@ -2311,6 +2319,9 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.profile.rr': 'R:R',
   'cek.profile.breakeven': 'Breakeven P(TP)',
   'cek.profile.pTp': 'P(TP)',
+  'cek.profile.pA': 'A · Direct TP',
+  'cek.profile.pB': 'B · TP after pullback',
+  'cek.profile.pC': 'C · No TP',
   'cek.profile.delta': 'Delta vs breakeven',
   'cek.profile.pSl': 'P(SL)',
   'cek.profile.eNet': 'E net',
@@ -2357,6 +2368,11 @@ const EN_MESSAGES: Record<MessageKey, string> = {
     'Minimum win rate to avoid a loss at this R:R. Below it, long-run results tend to lose.',
   'cek.profile.hint.ptp':
     'How often the target is hit first (historical). Compare with the breakeven line.',
+  'cek.profile.hint.pA':
+    'Share of signals that reached TP without first closing below VAL30 (direct TP).',
+  'cek.profile.hint.pB':
+    'Share of signals that reached TP after first closing below VAL30 (pullback).',
+  'cek.profile.hint.pC': 'Share of signals that did not reach TP within the horizon (timeout).',
   'cek.profile.hint.delta': 'P(TP) minus breakeven. Positive = a buffer; negative = fragile.',
   'cek.profile.hint.psl': 'How often the stop is hit first (historical).',
   'cek.profile.hint.enet':

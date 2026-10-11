@@ -11,6 +11,9 @@ const { PROFILES } = vi.hoisted(() => {
     breakeven: null,
     p_tp: 0.87,
     p_sl: null,
+    p_a: 0.5,
+    p_b: 0.37,
+    p_c: 0.13,
     e_net: 0.1,
     median: 0.05,
     p5: -0.05,
@@ -104,6 +107,9 @@ describe('ProfilRisikoPanel — segmen "Profil risiko" (ZITN-TECH-043/047)', () 
     expect(screen.getByText('R:R')).toBeTruthy();
     expect(screen.getByText('Breakeven P(TP)')).toBeTruthy();
     expect(screen.getByText('P(TP)')).toBeTruthy();
+    expect(screen.getByText('A · Direct TP')).toBeTruthy();
+    expect(screen.getByText('B · TP after pullback')).toBeTruthy();
+    expect(screen.getByText('C · No TP')).toBeTruthy();
     expect(screen.getByText('E net')).toBeTruthy();
   });
 
