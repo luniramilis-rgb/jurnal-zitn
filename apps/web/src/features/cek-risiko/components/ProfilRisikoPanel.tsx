@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAccounts } from '@/features/accounts/hooks/useAccounts';
 import { useT } from '@/hooks/useLocale';
+import { currencySymbol, formatGroupedInt } from '@/lib/format';
 import { cn } from '@/lib/utils';
 
 import { usePortfolioSizing } from '../hooks/usePortfolioSizing';
@@ -77,7 +78,13 @@ function Money({
   signed?: boolean;
 }) {
   return (
-    <Numeric value={value} kind="money" currency={currency} direction={signed ? 'auto' : 'none'} />
+    <Numeric
+      value={value}
+      kind="money"
+      currency={currency}
+      precision={0}
+      direction={signed ? 'auto' : 'none'}
+    />
   );
 }
 
@@ -517,21 +524,28 @@ export function ProfilRisikoPanel() {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                 <div className="space-y-2">
-                  <Label htmlFor="cek-profile-capital">
-                    {t('cek.profile.portfolio.capital')} ({currency})
-                  </Label>
-                  <Input
-                    id="cek-profile-capital"
-                    data-testid="cek-profile-capital"
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="off"
-                    value={sizing.capital === 0 ? '' : String(sizing.capital)}
-                    onChange={(e) => {
-                      const digits = e.target.value.replace(/[^0-9]/g, '');
-                      setSizing({ ...sizing, capital: digits === '' ? 0 : Number(digits) });
-                    }}
-                  />
+                  <Label htmlFor="cek-profile-capital">{t('cek.profile.portfolio.capital')}</Label>
+                  <div className="flex items-center gap-1.5">
+                    <span
+                      className="text-sm text-muted-foreground"
+                      data-testid="cek-profile-capital-currency"
+                    >
+                      {currencySymbol(currency)}
+                    </span>
+                    <Input
+                      id="cek-profile-capital"
+                      data-testid="cek-profile-capital"
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="off"
+                      className="flex-1"
+                      value={sizing.capital === 0 ? '' : formatGroupedInt(sizing.capital)}
+                      onChange={(e) => {
+                        const digits = e.target.value.replace(/[^0-9]/g, '');
+                        setSizing({ ...sizing, capital: digits === '' ? 0 : Number(digits) });
+                      }}
+                    />
+                  </div>
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="cek-profile-w">{t('cek.profile.portfolio.weight')}</Label>
