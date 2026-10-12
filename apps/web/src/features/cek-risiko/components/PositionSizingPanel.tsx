@@ -156,21 +156,19 @@ export function PositionSizingPanel() {
   const { data: profile } = useRiskProfileData(choice.market);
   const { cell } = lookupRiskProfile(profile ?? null, choice);
   const currency = RISK_MARKET_META[choice.market].currency;
-  const allowWithSl = choice.market === 'id';
 
   const auto: Mode = cell?.p_sl != null ? 'with-sl' : 'no-sl';
   const [override, setOverride] = useState<Mode | null>(null);
   const mode: Mode = override ?? auto;
-  const effective: Mode = allowWithSl ? mode : 'no-sl';
+  const effective: Mode = mode;
 
   const modeButton = (value: Mode, label: MessageKey) => (
     <button
       type="button"
       data-testid={`cek-sizing-${value}`}
       aria-pressed={effective === value}
-      disabled={value === 'with-sl' && !allowWithSl}
       onClick={() => setOverride(value)}
-      className={`cursor-pointer rounded-md border px-3 py-1 text-sm disabled:cursor-not-allowed disabled:opacity-50 ${
+      className={`cursor-pointer rounded-md border px-3 py-1 text-sm ${
         effective === value ? 'bg-primary text-primary-foreground' : 'bg-background'
       }`}
     >
@@ -185,19 +183,10 @@ export function PositionSizingPanel() {
         {modeButton('with-sl', 'cek.sizing.withSl')}
         {modeButton('no-sl', 'cek.sizing.noSl')}
       </div>
-      {allowWithSl ? (
-        effective === 'with-sl' ? (
-          <HitungLotPanel />
-        ) : (
-          <NoSlSizingCard cell={cell} currency={currency} />
-        )
+      {effective === 'with-sl' ? (
+        <HitungLotPanel market={choice.market === 'id' ? 'idx' : 'us'} />
       ) : (
-        <>
-          <p className="text-xs text-muted-foreground" data-testid="cek-sizing-us-note">
-            {t('cek.sizing.usWithSl')}
-          </p>
-          <NoSlSizingCard cell={cell} currency={currency} />
-        </>
+        <NoSlSizingCard cell={cell} currency={currency} />
       )}
     </div>
   );
