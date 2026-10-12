@@ -14,7 +14,6 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useExchangeRates } from '@/features/accounting/hooks/useExchangeRates';
 import { useT } from '@/hooks/useLocale';
 
 import { RumusDisclosure } from './RumusDisclosure';
@@ -32,6 +31,19 @@ function Row({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
+/** Money tanpa desimal (Cek Risiko); harga per-saham US boleh 2 desimal. */
+function Money({
+  value,
+  currency,
+  dp = 0,
+}: {
+  value: string | number;
+  currency: string;
+  dp?: number;
+}) {
+  return <Numeric value={value} kind="money" currency={currency} precision={dp} direction="none" />;
+}
+
 function dariQuery(key: string): string {
   if (typeof window === 'undefined') return '';
   try {
@@ -39,34 +51,6 @@ function dariQuery(key: string): string {
   } catch {
     return '';
   }
-}
-
-interface RateRow {
-  baseCurrency: string;
-  quoteCurrency: string;
-  rate: string;
-  effectiveDate: string;
-}
-
-/**
- * Kurs USD→IDR dari daftar jurnal (langsung, atau dibalik dari IDR→USD); pilih
- * `effectiveDate` terbaru. `null` bila tak ada (perangkat tidak mengarang kurs).
- */
-function usdIdrRate(rates: readonly RateRow[]): { rate: number; asof: string } | null {
-  const pick = (base: string, quote: string) => {
-    const rows = rates.filter((r) => r.baseCurrency === base && r.quoteCurrency === quote);
-    if (rows.length === 0) return null;
-    return rows.reduce((a, b) => (b.effectiveDate > a.effectiveDate ? b : a));
-  };
-  const direct = pick('USD', 'IDR');
-  if (direct && Number(direct.rate) > 0) {
-    return { rate: Number(direct.rate), asof: direct.effectiveDate };
-  }
-  const inv = pick('IDR', 'USD');
-  if (inv && Number(inv.rate) > 0) {
-    return { rate: 1 / Number(inv.rate), asof: inv.effectiveDate };
-  }
-  return null;
 }
 
 /**
@@ -122,10 +106,6 @@ export function HitungLotPanel({ market = 'idx' }: { market?: SizingMarket } = {
     }
   })();
 
-  // FX: konversi nilai ke mata uang lain (dari kurs jurnal).
-  const rates = useExchangeRates().data ?? [];
-  const fx = useMemo(() => usdIdrRate(rates), [rates]);
-
   const bridge = useMemo(() => {
     if (!result || !result.ok || !isIdx) return null;
     const modalNum = Number(modal);
@@ -134,14 +114,6 @@ export function HitungLotPanel({ market = 'idx' }: { market?: SizingMarket } = {
     if (!(modalNum > 0) || !(beli > 0) || !Number.isFinite(stop)) return null;
     return { wImplied: Number(result.nilaiPosisi) / modalNum, stopDist: (beli - stop) / beli };
   }, [result, modal, hargaBeli, hargaStop, isIdx]);
-
-  const conv = useMemo(() => {
-    if (!result || !result.ok || !fx) return null;
-    const value = Number(result.nilaiPosisi);
-    return isIdx
-      ? { other: 'USD' as const, value: value / fx.rate }
-      : { other: 'IDR' as const, value: value * fx.rate };
-  }, [result, fx, isIdx]);
 
   return (
     <div className="space-y-4">
@@ -280,12 +252,7 @@ export function HitungLotPanel({ market = 'idx' }: { market?: SizingMarket } = {
                   {t('cek.result.rugiMaksimal')}
                 </p>
                 <p className="mt-1 text-2xl font-semibold text-destructive">
-                  <Numeric
-                    value={result.rugiMaksimal}
-                    kind="money"
-                    currency={result.currency}
-                    direction="none"
-                  />
+                  <Money value={result.rugiMaksimal} currency={result.currency} />
                 </p>
               </div>
             </div>
@@ -294,46 +261,24 @@ export function HitungLotPanel({ market = 'idx' }: { market?: SizingMarket } = {
               <Row
                 label={t('cek.field.hargaBeli')}
                 value={
-                  <Numeric
-                    value={result.hargaBeli}
-                    kind="money"
-                    currency={result.currency}
-                    direction="none"
-                  />
+                  <Money value={result.hargaBeli} currency={result.currency} dp={isIdx ? 0 : 2} />
                 }
               />
               <Row
                 label={t('cek.field.hargaStop')}
                 value={
-                  <Numeric
-                    value={result.hargaStop}
-                    kind="money"
-                    currency={result.currency}
-                    direction="none"
-                  />
+                  <Money value={result.hargaStop} currency={result.currency} dp={isIdx ? 0 : 2} />
                 }
               />
               <Row
                 label={t('cek.sizing.hargaJual')}
                 value={
-                  <Numeric
-                    value={result.hargaJual}
-                    kind="money"
-                    currency={result.currency}
-                    direction="none"
-                  />
+                  <Money value={result.hargaJual} currency={result.currency} dp={isIdx ? 0 : 2} />
                 }
               />
               <Row
                 label={t('cek.result.nilaiPosisi')}
-                value={
-                  <Numeric
-                    value={result.nilaiPosisi}
-                    kind="money"
-                    currency={result.currency}
-                    direction="none"
-                  />
-                }
+                value={<Money value={result.nilaiPosisi} currency={result.currency} />}
               />
               <Row
                 label={t('cek.sizing.riskPctModal')}
@@ -352,11 +297,9 @@ export function HitungLotPanel({ market = 'idx' }: { market?: SizingMarket } = {
               <Row
                 label={isIdx ? t('cek.sizing.riskPerLot') : t('cek.sizing.riskPerShare')}
                 value={
-                  <Numeric
-                    value={isIdx ? result.risikoPerLot : result.risikoPerSaham}
-                    kind="money"
+                  <Money
+                    value={(isIdx ? result.risikoPerLot : result.risikoPerSaham) ?? '0'}
                     currency={result.currency}
-                    direction="none"
                   />
                 }
               />
@@ -375,33 +318,6 @@ export function HitungLotPanel({ market = 'idx' }: { market?: SizingMarket } = {
                 label={t('cek.sizing.sharesLabel')}
                 value={<Numeric value={result.shares} kind="integer" direction="none" />}
               />
-
-              <div className="flex items-center justify-between text-sm" data-testid="cek-fx">
-                <span className="text-muted-foreground">{t('cek.sizing.convUsdIdr')}</span>
-                <span className="text-right font-medium">
-                  {conv && fx ? (
-                    <>
-                      <Numeric
-                        value={conv.value}
-                        kind="money"
-                        currency={conv.other}
-                        direction="none"
-                      />
-                      <span className="block text-xs text-muted-foreground">
-                        {t('cek.sizing.fxRate', {
-                          rate: fx.rate.toFixed(2),
-                          source: 'jurnal',
-                          asof: fx.asof,
-                        })}
-                      </span>
-                    </>
-                  ) : (
-                    <span className="text-xs text-muted-foreground">
-                      {t('cek.sizing.fxMissing')}
-                    </span>
-                  )}
-                </span>
-              </div>
 
               {bridge && (
                 <>
