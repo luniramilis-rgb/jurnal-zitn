@@ -654,6 +654,15 @@ const ID_MESSAGES = {
   'cek.page.title': 'Cek Risiko',
   'cek.page.subtitle': 'Hitung lot, biaya, dan batas rugi',
   'cek.mode.lot': 'Hitung Posisi',
+  'cek.sizing.mode': 'Strategi sizing',
+  'cek.sizing.withSl': 'Dengan SL',
+  'cek.sizing.noSl': 'Tanpa SL',
+  'cek.sizing.tailBudget': 'Anggaran rugi simultan (P5)',
+  'cek.sizing.noSlTitle': 'Ukuran posisi tanpa SL (bobot × slot)',
+  'cek.sizing.noSlNote':
+    'Tanpa SL: ukuran dari bobot×slot (eksposur), bukan tahan-rugi per posisi — perhatikan anggaran ekor.',
+  'cek.sizing.usWithSl':
+    'Sizing "Dengan SL" (shares) untuk pasar US menyusul; pakai mode Tanpa SL dulu.',
   'cek.mode.biaya': 'Biaya & Pajak',
   'cek.field.modal': 'Modal',
   'cek.field.risk': 'Risiko per transaksi',
@@ -2225,6 +2234,15 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.page.title': 'Risk Check',
   'cek.page.subtitle': 'Work out lots, costs, and your loss limit',
   'cek.mode.lot': 'Position size',
+  'cek.sizing.mode': 'Sizing strategy',
+  'cek.sizing.withSl': 'With SL',
+  'cek.sizing.noSl': 'No SL',
+  'cek.sizing.tailBudget': 'Simultaneous loss budget (P5)',
+  'cek.sizing.noSlTitle': 'Position size without SL (weight × slots)',
+  'cek.sizing.noSlNote':
+    'No SL: size from weight×slots (exposure), not a per-position stop — watch the tail budget.',
+  'cek.sizing.usWithSl':
+    '"With SL" (shares) sizing for the US market is coming; use No SL for now.',
   'cek.mode.biaya': 'Costs & tax',
   'cek.field.modal': 'Capital',
   'cek.field.risk': 'Risk per trade',

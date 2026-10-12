@@ -7,8 +7,8 @@ import { useT } from '@/hooks/useLocale';
 import { POSITION_SIZING_ENABLED } from '@/lib/frontendFlags';
 
 import { BiayaPajakPanel } from './BiayaPajakPanel';
-import { HitungLotPanel } from './HitungLotPanel';
 import { PosisiSaya } from './PosisiSaya';
+import { PositionSizingPanel } from './PositionSizingPanel';
 import { ProfilRisikoPanel } from './ProfilRisikoPanel';
 
 type Mode = 'lot' | 'biaya' | 'profil';
@@ -83,7 +83,7 @@ export function CekRisikoPage() {
       </div>
 
       {POSITION_SIZING_ENABLED && mode === 'lot' ? (
-        <HitungLotPanel />
+        <PositionSizingPanel />
       ) : mode === 'biaya' ? (
         <BiayaPajakPanel />
       ) : (
