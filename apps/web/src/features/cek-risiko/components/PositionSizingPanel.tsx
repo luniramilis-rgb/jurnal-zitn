@@ -17,6 +17,7 @@ import {
   RISK_MARKET_META,
   lookupRiskProfile,
   portfolioComponents,
+  type RiskMarket,
   type RiskProfileCell,
 } from '../lib/risk-profile';
 
@@ -38,7 +39,17 @@ function Row({ label, children }: { label: string; children: ReactNode }) {
 }
 
 /** Mode **Tanpa SL**: ukuran dari bobot×slot (eksposur) + **anggaran ekor** (rugi simultan P5). */
-function NoSlSizingCard({ cell, currency }: { cell: RiskProfileCell | null; currency: string }) {
+function NoSlSizingCard({
+  cell,
+  currency,
+  market,
+  onMarket,
+}: {
+  cell: RiskProfileCell | null;
+  currency: string;
+  market: RiskMarket;
+  onMarket: (m: RiskMarket) => void;
+}) {
   const t = useT();
   const { sizing, setSizing } = usePortfolioSizing();
   const accounts = useAccounts();
@@ -65,6 +76,34 @@ function NoSlSizingCard({ cell, currency }: { cell: RiskProfileCell | null; curr
         <CardTitle className="text-sm">{t('cek.sizing.noSlTitle')}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label>{t('cek.sizing.currency')}</Label>
+          <div className="flex gap-2" data-testid="cek-sizing-market">
+            <button
+              type="button"
+              data-testid="cek-sizing-market-idr"
+              aria-pressed={market === 'id'}
+              onClick={() => onMarket('id')}
+              className={`flex-1 cursor-pointer rounded-md border px-3 py-1 text-sm ${
+                market === 'id' ? 'bg-primary text-primary-foreground' : 'bg-background'
+              }`}
+            >
+              {t('cek.sizing.currency.idr')}
+            </button>
+            <button
+              type="button"
+              data-testid="cek-sizing-market-usd"
+              aria-pressed={market === 'us'}
+              onClick={() => onMarket('us')}
+              className={`flex-1 cursor-pointer rounded-md border px-3 py-1 text-sm ${
+                market === 'us' ? 'bg-primary text-primary-foreground' : 'bg-background'
+              }`}
+            >
+              {t('cek.sizing.currency.usd')}
+            </button>
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="space-y-2">
             <Label htmlFor="cek-sizing-capital">{t('cek.profile.portfolio.capital')}</Label>
@@ -152,7 +191,7 @@ function NoSlSizingCard({ cell, currency }: { cell: RiskProfileCell | null; curr
  */
 export function PositionSizingPanel() {
   const t = useT();
-  const { choice } = useRiskProfile();
+  const { choice, setChoice } = useRiskProfile();
   const { data: profile } = useRiskProfileData(choice.market);
   const { cell } = lookupRiskProfile(profile ?? null, choice);
   const currency = RISK_MARKET_META[choice.market].currency;
@@ -186,7 +225,12 @@ export function PositionSizingPanel() {
       {effective === 'with-sl' ? (
         <HitungLotPanel market={choice.market === 'id' ? 'idx' : 'us'} />
       ) : (
-        <NoSlSizingCard cell={cell} currency={currency} />
+        <NoSlSizingCard
+          cell={cell}
+          currency={currency}
+          market={choice.market}
+          onMarket={(m) => setChoice({ ...choice, market: m })}
+        />
       )}
     </div>
   );
