@@ -130,9 +130,139 @@ export function hitungLot(input: HitungLotInput): HitungLotResult {
 }
 
 // ---------------------------------------------------------------------------
-// Mode "Biaya & Pajak"
+// Mode "Dengan SL" — sizing sadar-pasar (IDX lot · US fractional shares ≥ US$1)
 // ---------------------------------------------------------------------------
 
+export type SizingMarket = 'idx' | 'us';
+
+export interface HitungPosisiInput {
+  market: SizingMarket;
+  /** Total modal (ekuitas) dalam mata uang pasar (IDR/IDX, USD/US). */
+  modal: string | number;
+  /** Risiko per transaksi dalam persen. */
+  riskPercent: string | number;
+  /** Harga beli per saham. */
+  hargaBeli: string | number;
+  /** Harga stop per saham (di bawah beli untuk posisi beli). */
+  hargaStop: string | number;
+  /** Target opsional; bila kosong → RR 1:2 dari jarak stop. */
+  hargaJual?: string | number;
+}
+
+export type HitungPosisiErrorCode = HitungLotErrorCode | 'min-notional';
+
+export interface HitungPosisiSuccess {
+  ok: true;
+  market: SizingMarket;
+  currency: 'IDR' | 'USD';
+  /** Harga level (IDX dibulatkan ke tick). */
+  hargaBeli: string;
+  hargaStop: string;
+  hargaJual: string;
+  /** Anggaran risiko = modal × risiko%. */
+  anggaranRisiko: string;
+  risikoPerSaham: string;
+  /** IDX: risiko per lot (100 saham); US: null. */
+  risikoPerLot: string | null;
+  /** IDX: jumlah lot; US: null. */
+  lots: number | null;
+  /** IDX: lots×100; US: fractional (3 desimal). */
+  shares: number;
+  rugiMaksimal: string;
+  nilaiPosisi: string;
+  /** Rugi maksimal sebagai % dari total modal (≈ risiko%, sisa pembulatan). */
+  riskPctOfModal: string;
+  rr: string;
+  verdict: CekRisikoVerdict;
+}
+
+export type HitungPosisiResult = HitungPosisiSuccess | { ok: false; code: HitungPosisiErrorCode };
+
+/**
+ * Sizing risk-based sadar-pasar (mode "Dengan SL"). IDX memakai **lot 100** +
+ * pembulatan **tick** (modul kanonik `idx.ts`); US memakai **fractional shares**
+ * (3 desimal) dengan **notional minimal US$ 1**. Murni & Decimal-exact; alat
+ * hitung dari angka pengguna, bukan saran.
+ */
+export function hitungPosisi(input: HitungPosisiInput): HitungPosisiResult {
+  const modal = toDec(input.modal);
+  const riskPercent = toDec(input.riskPercent);
+  const beliRaw = toDec(input.hargaBeli);
+  const stopRaw = toDec(input.hargaStop);
+  const targetRaw =
+    input.hargaJual === undefined || input.hargaJual === '' ? null : toDec(input.hargaJual);
+
+  if (modal === null || modal.lte(0)) return { ok: false, code: 'modal-tidak-valid' };
+  if (riskPercent === null || riskPercent.lte(0) || riskPercent.gt(100)) {
+    return { ok: false, code: 'risiko-tidak-valid' };
+  }
+  if (beliRaw === null || beliRaw.lte(0)) return { ok: false, code: 'harga-tidak-valid' };
+  if (stopRaw === null || stopRaw.lte(0) || stopRaw.gte(beliRaw)) {
+    return { ok: false, code: 'stop-tidak-valid' };
+  }
+
+  const isIdx = input.market === 'idx';
+  const beli = isIdx ? new Decimal(roundToIdxTick(beliRaw)) : beliRaw;
+  const stop = isIdx ? new Decimal(roundToIdxTick(stopRaw)) : stopRaw;
+  if (stop.gte(beli)) return { ok: false, code: 'stop-tidak-valid' };
+
+  const anggaranRisiko = modal.times(riskPercent).div(100);
+  const risikoPerSaham = beli.minus(stop);
+
+  let lots: number | null = null;
+  let shares: number;
+  if (isIdx) {
+    const lotsD = anggaranRisiko
+      .div(risikoPerSaham)
+      .div(IDX_SHARES_PER_LOT)
+      .toDecimalPlaces(0, Decimal.ROUND_DOWN);
+    if (lotsD.lte(0)) return { ok: false, code: 'lot-nol' };
+    lots = lotsD.toNumber();
+    shares = lots * IDX_SHARES_PER_LOT;
+  } else {
+    const sharesD = anggaranRisiko.div(risikoPerSaham).toDecimalPlaces(3, Decimal.ROUND_DOWN);
+    shares = sharesD.toNumber();
+    if (shares <= 0 || sharesD.times(beli).lt(1)) return { ok: false, code: 'min-notional' };
+  }
+
+  const rugiMaksimal = risikoPerSaham.times(shares);
+  const nilaiPosisi = beli.times(shares);
+  const target =
+    targetRaw !== null && targetRaw.gt(0)
+      ? isIdx
+        ? new Decimal(roundToIdxTick(targetRaw))
+        : targetRaw
+      : null;
+  const hargaJual =
+    target ??
+    (isIdx
+      ? new Decimal(roundToIdxTick(beli.plus(risikoPerSaham.times(2))))
+      : beli.plus(risikoPerSaham.times(2)));
+  const rr = hargaJual.minus(beli).div(risikoPerSaham);
+
+  return {
+    ok: true,
+    market: input.market,
+    currency: isIdx ? 'IDR' : 'USD',
+    hargaBeli: isIdx ? beli.toString() : to2dp(beli),
+    hargaStop: isIdx ? stop.toString() : to2dp(stop),
+    hargaJual: isIdx ? hargaJual.toString() : to2dp(hargaJual),
+    anggaranRisiko: to2dp(anggaranRisiko),
+    risikoPerSaham: to2dp(risikoPerSaham),
+    risikoPerLot: isIdx ? to2dp(risikoPerSaham.times(IDX_SHARES_PER_LOT)) : null,
+    lots,
+    shares,
+    rugiMaksimal: to2dp(rugiMaksimal),
+    nilaiPosisi: to2dp(nilaiPosisi),
+    riskPctOfModal: to2dp(rugiMaksimal.div(modal).times(100)),
+    rr: to2dp(rr),
+    verdict: verdictRisiko(input.riskPercent),
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Mode "Biaya & Pajak"
+// ---------------------------------------------------------------------------
 export interface BiayaPajakInput {
   hargaBeli: string | number;
   lots: string | number;

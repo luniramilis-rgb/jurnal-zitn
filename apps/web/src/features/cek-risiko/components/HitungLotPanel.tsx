@@ -1,7 +1,12 @@
 import { useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
 
-import { CEK_RISIKO_RISK_PRESETS, hitungLot, verdictRisiko } from '@jurnal-zitn/shared';
+import {
+  CEK_RISIKO_RISK_PRESETS,
+  hitungPosisi,
+  verdictRisiko,
+  type SizingMarket,
+} from '@jurnal-zitn/shared';
 
 import { Numeric } from '@/components/Numeric';
 import { SymbolAutocomplete } from '@/components/SymbolAutocomplete';
@@ -9,11 +14,14 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useExchangeRates } from '@/features/accounting/hooks/useExchangeRates';
 import { useT } from '@/hooks/useLocale';
 
 import { RumusDisclosure } from './RumusDisclosure';
 import { SimpanCatatanCard } from './SimpanCatatanCard';
 import { VerdictBanner } from './VerdictBanner';
+
+type Currency = 'IDR' | 'USD';
 
 function Row({ label, value }: { label: string; value: ReactNode }) {
   return (
@@ -24,10 +32,6 @@ function Row({ label, value }: { label: string; value: ReactNode }) {
   );
 }
 
-/**
- * Prefill dari konteks Pemindai/Chart (P7): kode & harga dibaca dari query
- * (`?symbol=&harga=`) bila ada. Di luar browser atau tanpa parameter → kosong.
- */
 function dariQuery(key: string): string {
   if (typeof window === 'undefined') return '';
   try {
@@ -37,50 +41,67 @@ function dariQuery(key: string): string {
   }
 }
 
-/** Jawaban besar untuk hasil lot — angka pokok permukaan ini. */
-function BigAnswer({ lots, rugiMaksimal }: { lots: number; rugiMaksimal: string }) {
-  const t = useT();
-  return (
-    <div className="grid grid-cols-2 gap-4" data-testid="cek-hasil">
-      <div>
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">
-          {t('cek.result.heading')}
-        </p>
-        <p className="mt-1 text-3xl font-semibold" data-testid="cek-lots">
-          {t('cek.result.lots', { n: lots })}
-        </p>
-      </div>
-      <div>
-        <p className="text-xs uppercase tracking-wide text-muted-foreground">
-          {t('cek.result.rugiMaksimal')}
-        </p>
-        <p className="mt-1 text-2xl font-semibold text-destructive">
-          <Numeric value={rugiMaksimal} kind="money" currency="IDR" direction="none" />
-        </p>
-      </div>
-    </div>
-  );
+interface RateRow {
+  baseCurrency: string;
+  quoteCurrency: string;
+  rate: string;
+  effectiveDate: string;
 }
 
 /**
- * Mode sizing (dulu "Hitung Lot", D-H1b): modal · risiko (tombol 1/2/3) · kode · harga beli ·
- * harga stop → jawaban besar (lot, rugi maksimal) → rincian → rumus dilipat.
+ * Kurs USD→IDR dari daftar jurnal (langsung, atau dibalik dari IDR→USD); pilih
+ * `effectiveDate` terbaru. `null` bila tak ada (perangkat tidak mengarang kurs).
  */
-export function HitungLotPanel() {
+function usdIdrRate(rates: readonly RateRow[]): { rate: number; asof: string } | null {
+  const pick = (base: string, quote: string) => {
+    const rows = rates.filter((r) => r.baseCurrency === base && r.quoteCurrency === quote);
+    if (rows.length === 0) return null;
+    return rows.reduce((a, b) => (b.effectiveDate > a.effectiveDate ? b : a));
+  };
+  const direct = pick('USD', 'IDR');
+  if (direct && Number(direct.rate) > 0) {
+    return { rate: Number(direct.rate), asof: direct.effectiveDate };
+  }
+  const inv = pick('IDR', 'USD');
+  if (inv && Number(inv.rate) > 0) {
+    return { rate: 1 / Number(inv.rate), asof: inv.effectiveDate };
+  }
+  return null;
+}
+
+/**
+ * Mode "Dengan SL" sadar-pasar (ZITN-TECH-064): pilih **mata uang IDR (IDX lot) / USD (US saham
+ * fraksional ≥ US$1)** → kolom **hitung otomatis** (harga beli/stop/jual, total modal, %rugi modal,
+ * risk/lot, jumlah lot/saham) + **konversi USD↔IDR** dari kurs jurnal. Alat hitung dari angka
+ * pengguna, bukan saran.
+ */
+export function HitungLotPanel({ market = 'idx' }: { market?: SizingMarket } = {}) {
   const t = useT();
+  const [currency, setCurrency] = useState<Currency>(market === 'us' ? 'USD' : 'IDR');
   const [modal, setModal] = useState('');
   const [riskPercent, setRiskPercent] = useState('1');
   const [symbol, setSymbol] = useState(() => dariQuery('symbol').toUpperCase());
   const [hargaBeli, setHargaBeli] = useState(() => dariQuery('harga'));
   const [hargaStop, setHargaStop] = useState('');
+  const [hargaJual, setHargaJual] = useState('');
 
+  const isIdx = currency === 'IDR';
   const verdict = verdictRisiko(riskPercent);
+  const ready = modal.trim() !== '' && hargaBeli.trim() !== '' && hargaStop.trim() !== '';
 
-  const ready =
-    modal.trim() !== '' && hargaBeli.trim() !== '' && hargaStop.trim() !== '' && riskPercent !== '';
   const result = useMemo(
-    () => (ready ? hitungLot({ modal, riskPercent, hargaBeli, hargaStop }) : null),
-    [ready, modal, riskPercent, hargaBeli, hargaStop],
+    () =>
+      ready
+        ? hitungPosisi({
+            market: isIdx ? 'idx' : 'us',
+            modal,
+            riskPercent,
+            hargaBeli,
+            hargaStop,
+            hargaJual,
+          })
+        : null,
+    [ready, isIdx, modal, riskPercent, hargaBeli, hargaStop, hargaJual],
   );
 
   const errorKey = (() => {
@@ -96,32 +117,60 @@ export function HitungLotPanel() {
         return 'cek.error.stop' as const;
       case 'lot-nol':
         return 'cek.error.lotNol' as const;
+      case 'min-notional':
+        return 'cek.error.minNotional' as const;
     }
   })();
 
-  // Bridge to the portfolio layer: `risiko% = w × SL%` (alokasi × jarak stop).
-  // Read-only di sini; setelan w/S tinggal di blok Komponen Portofolio.
+  // FX: konversi nilai ke mata uang lain (dari kurs jurnal).
+  const rates = useExchangeRates().data ?? [];
+  const fx = useMemo(() => usdIdrRate(rates), [rates]);
+
   const bridge = useMemo(() => {
-    if (!result || !result.ok) return null;
+    if (!result || !result.ok || !isIdx) return null;
     const modalNum = Number(modal);
     const beli = Number(hargaBeli);
     const stop = Number(hargaStop);
-    if (
-      !Number.isFinite(modalNum) ||
-      modalNum <= 0 ||
-      !Number.isFinite(beli) ||
-      beli <= 0 ||
-      !Number.isFinite(stop)
-    ) {
-      return null;
-    }
+    if (!(modalNum > 0) || !(beli > 0) || !Number.isFinite(stop)) return null;
     return { wImplied: Number(result.nilaiPosisi) / modalNum, stopDist: (beli - stop) / beli };
-  }, [result, modal, hargaBeli, hargaStop]);
+  }, [result, modal, hargaBeli, hargaStop, isIdx]);
+
+  const conv = useMemo(() => {
+    if (!result || !result.ok || !fx) return null;
+    const value = Number(result.nilaiPosisi);
+    return isIdx
+      ? { other: 'USD' as const, value: value / fx.rate }
+      : { other: 'IDR' as const, value: value * fx.rate };
+  }, [result, fx, isIdx]);
 
   return (
     <div className="space-y-4">
       <Card>
         <CardContent className="space-y-4 pt-6">
+          <div className="space-y-2">
+            <Label>{t('cek.sizing.currency')}</Label>
+            <div className="flex gap-2" data-testid="cek-currency">
+              <Button
+                type="button"
+                variant={isIdx ? 'default' : 'outline'}
+                className="flex-1 cursor-pointer"
+                data-testid="cek-currency-idr"
+                onClick={() => setCurrency('IDR')}
+              >
+                {t('cek.sizing.currency.idr')}
+              </Button>
+              <Button
+                type="button"
+                variant={!isIdx ? 'default' : 'outline'}
+                className="flex-1 cursor-pointer"
+                data-testid="cek-currency-usd"
+                onClick={() => setCurrency('USD')}
+              >
+                {t('cek.sizing.currency.usd')}
+              </Button>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="cek-modal">{t('cek.field.modal')}</Label>{' '}
             <Input
@@ -163,7 +212,7 @@ export function HitungLotPanel() {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-2">
               <Label htmlFor="cek-harga-beli">{t('cek.field.hargaBeli')}</Label>
               <Input
@@ -186,6 +235,17 @@ export function HitungLotPanel() {
                 placeholder="0"
               />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="cek-harga-jual">{t('cek.sizing.hargaJual')}</Label>
+              <Input
+                id="cek-harga-jual"
+                data-testid="cek-harga-jual"
+                inputMode="decimal"
+                value={hargaJual}
+                onChange={(e) => setHargaJual(e.target.value)}
+                placeholder="0"
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -201,59 +261,148 @@ export function HitungLotPanel() {
       ) : (
         <Card>
           <CardHeader className="pb-4">
-            <CardTitle className="text-sm">{t('cek.result.heading')}</CardTitle>
+            <CardTitle className="text-sm">{t('cek.sizing.autoTitle')}</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-4">
-            <BigAnswer lots={result.lots} rugiMaksimal={result.rugiMaksimal} />
+          <CardContent className="space-y-3">
+            <div className="grid grid-cols-2 gap-4" data-testid="cek-hasil">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {isIdx ? t('cek.sizing.lotsLabel') : t('cek.sizing.sharesLabel')}
+                </p>
+                <p className="mt-1 text-3xl font-semibold" data-testid="cek-lots">
+                  {isIdx
+                    ? t('cek.result.lots', { n: result.lots ?? 0 })
+                    : result.shares.toLocaleString(undefined, { maximumFractionDigits: 3 })}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground">
+                  {t('cek.result.rugiMaksimal')}
+                </p>
+                <p className="mt-1 text-2xl font-semibold text-destructive">
+                  <Numeric
+                    value={result.rugiMaksimal}
+                    kind="money"
+                    currency={result.currency}
+                    direction="none"
+                  />
+                </p>
+              </div>
+            </div>
+
             <div className="space-y-2 border-t pt-3">
+              <Row
+                label={t('cek.field.hargaBeli')}
+                value={
+                  <Numeric
+                    value={result.hargaBeli}
+                    kind="money"
+                    currency={result.currency}
+                    direction="none"
+                  />
+                }
+              />
+              <Row
+                label={t('cek.field.hargaStop')}
+                value={
+                  <Numeric
+                    value={result.hargaStop}
+                    kind="money"
+                    currency={result.currency}
+                    direction="none"
+                  />
+                }
+              />
+              <Row
+                label={t('cek.sizing.hargaJual')}
+                value={
+                  <Numeric
+                    value={result.hargaJual}
+                    kind="money"
+                    currency={result.currency}
+                    direction="none"
+                  />
+                }
+              />
               <Row
                 label={t('cek.result.nilaiPosisi')}
                 value={
                   <Numeric
                     value={result.nilaiPosisi}
                     kind="money"
-                    currency="IDR"
+                    currency={result.currency}
                     direction="none"
                   />
                 }
               />
               <Row
-                label={t('cek.result.risikoPerSaham')}
+                label={t('cek.sizing.riskPctModal')}
+                value={
+                  <>
+                    <Numeric
+                      value={Number(result.riskPctOfModal)}
+                      kind="decimal"
+                      precision={2}
+                      direction="none"
+                    />
+                    %
+                  </>
+                }
+              />
+              <Row
+                label={isIdx ? t('cek.sizing.riskPerLot') : t('cek.sizing.riskPerShare')}
                 value={
                   <Numeric
-                    value={result.risikoPerSaham}
+                    value={isIdx ? result.risikoPerLot : result.risikoPerSaham}
                     kind="money"
-                    currency="IDR"
+                    currency={result.currency}
                     direction="none"
                   />
                 }
               />
               <Row
-                label={t('cek.result.anggaranRisiko')}
+                label={t('cek.profile.rr')}
                 value={
                   <Numeric
-                    value={result.anggaranRisiko}
-                    kind="money"
-                    currency="IDR"
+                    value={Number(result.rr)}
+                    kind="decimal"
+                    precision={2}
                     direction="none"
                   />
                 }
               />
               <Row
-                label={t('cek.result.shares')}
+                label={t('cek.sizing.sharesLabel')}
                 value={<Numeric value={result.shares} kind="integer" direction="none" />}
               />
-              <Row
-                label={t('cek.result.hargaJualRR2')}
-                value={
-                  <Numeric
-                    value={result.hargaJualRR2}
-                    kind="money"
-                    currency="IDR"
-                    direction="none"
-                  />
-                }
-              />
+
+              <div className="flex items-center justify-between text-sm" data-testid="cek-fx">
+                <span className="text-muted-foreground">{t('cek.sizing.convUsdIdr')}</span>
+                <span className="text-right font-medium">
+                  {conv && fx ? (
+                    <>
+                      <Numeric
+                        value={conv.value}
+                        kind="money"
+                        currency={conv.other}
+                        direction="none"
+                      />
+                      <span className="block text-xs text-muted-foreground">
+                        {t('cek.sizing.fxRate', {
+                          rate: fx.rate.toFixed(2),
+                          source: 'jurnal',
+                          asof: fx.asof,
+                        })}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-xs text-muted-foreground">
+                      {t('cek.sizing.fxMissing')}
+                    </span>
+                  )}
+                </span>
+              </div>
+
               {bridge && (
                 <>
                   <Row
@@ -292,7 +441,7 @@ export function HitungLotPanel() {
             <RumusDisclosure formulaKey="cek.formula.lot" />
 
             <div className="border-t pt-3">
-              <SimpanCatatanCard symbol={symbol} price={hargaBeli} shares={result.shares} />
+              <SimpanCatatanCard symbol={symbol} price={result.hargaBeli} shares={result.shares} />
             </div>
           </CardContent>
         </Card>

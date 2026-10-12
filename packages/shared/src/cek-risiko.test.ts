@@ -5,6 +5,7 @@ import {
   hitungBiayaPajak,
   hitungHargaRataRata,
   hitungLot,
+  hitungPosisi,
   verdictRisiko,
 } from './cek-risiko';
 
@@ -201,5 +202,72 @@ describe('masukan non-numerik ditolak, tidak melempar', () => {
 
   it('hitungAraArb menolak nilai non-numerik', () => {
     expect(hitungAraArb('seribu')).toBeNull();
+  });
+});
+
+describe('hitungPosisi — sizing sadar-pasar (ZITN-TECH-064)', () => {
+  it('IDX: lot 100 + tick; kolom otomatis terisi', () => {
+    const r = hitungPosisi({
+      market: 'idx',
+      modal: '10000000',
+      riskPercent: '2',
+      hargaBeli: '4520',
+      hargaStop: '4300',
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.currency).toBe('IDR');
+    expect(r.lots).toBe(9); // floor(200.000 / 220 / 100)
+    expect(r.shares).toBe(900);
+    expect(r.risikoPerLot).toBe('22000.00'); // 220 × 100
+    expect(r.rugiMaksimal).toBe('198000.00');
+    expect(r.nilaiPosisi).toBe('4068000.00');
+    expect(r.riskPctOfModal).toBe('1.98');
+    expect(r.hargaJual).toBe('4960'); // RR 1:2 dari tick
+    expect(r.rr).toBe('2.00');
+  });
+
+  it('IDX: lot-nol bila anggaran < 1 lot', () => {
+    expect(
+      hitungPosisi({
+        market: 'idx',
+        modal: '100000',
+        riskPercent: '1',
+        hargaBeli: '4520',
+        hargaStop: '4500',
+      }),
+    ).toEqual({ ok: false, code: 'lot-nol' });
+  });
+
+  it('US: fractional shares (3 desimal), target → R:R', () => {
+    const r = hitungPosisi({
+      market: 'us',
+      modal: '10000',
+      riskPercent: '2',
+      hargaBeli: '50',
+      hargaStop: '48',
+      hargaJual: '56',
+    });
+    expect(r.ok).toBe(true);
+    if (!r.ok) return;
+    expect(r.currency).toBe('USD');
+    expect(r.lots).toBeNull();
+    expect(r.shares).toBe(100); // 200 / 2
+    expect(r.risikoPerLot).toBeNull();
+    expect(r.rugiMaksimal).toBe('200.00');
+    expect(r.nilaiPosisi).toBe('5000.00');
+    expect(r.rr).toBe('3.00');
+  });
+
+  it('US: min-notional US$ 1 ditegakkan', () => {
+    expect(
+      hitungPosisi({
+        market: 'us',
+        modal: '10',
+        riskPercent: '1',
+        hargaBeli: '100',
+        hargaStop: '50',
+      }),
+    ).toEqual({ ok: false, code: 'min-notional' });
   });
 });
