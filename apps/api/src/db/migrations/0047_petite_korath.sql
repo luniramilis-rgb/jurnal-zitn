@@ -1,0 +1,1 @@
+ALTER TABLE "trade_plans" ADD COLUMN "checklist" jsonb;

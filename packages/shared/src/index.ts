@@ -387,6 +387,7 @@ export {
   UpdateTradePlanStatusSchema,
   LinkTradePlanInputSchema,
   TradePlanListResponseSchema,
+  TradePlanChecklistSchema,
 } from './schemas/trade-plan';
 export type {
   TradePlanStatus,
@@ -397,6 +398,7 @@ export type {
   UpdateTradePlanStatusInput,
   LinkTradePlanInput,
   TradePlanListResponse,
+  TradePlanChecklist,
 } from './schemas/trade-plan';
 export {
   OnboardingStatusSchema,

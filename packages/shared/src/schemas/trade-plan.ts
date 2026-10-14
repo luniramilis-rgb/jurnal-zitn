@@ -22,6 +22,19 @@ const priceString = z
 // Tanggal asal sinyal/lembar (YYYY-MM-DD).
 const dateString = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, 'Must be YYYY-MM-DD');
 
+// Ceklis pra-trade tersimpan (ZITN-TECH-069 Lapis 2): centang/jawaban + attestasi + catatan.
+// Angka `pra` sendiri TIDAK di sini — dibaca dari konteks lembar (D12=(ii)).
+export const TradePlanChecklistSchema = z
+  .object({
+    items: z.record(z.string(), z.union([z.boolean(), z.string()])),
+    attested: z.boolean(),
+    note: z.string().max(4000).optional(),
+    /** Tanggal konteks `pra` yang disetujui (jejak audit ringan). */
+    asOf: z.string().max(32).nullable().optional(),
+  })
+  .strict();
+export type TradePlanChecklist = z.infer<typeof TradePlanChecklistSchema>;
+
 export const TradePlanSchema = z.object({
   id: z.string().uuid(),
   symbol: z.string(),
@@ -36,6 +49,7 @@ export const TradePlanSchema = z.object({
   targetPrice: z.string().nullable(),
   status: TradePlanStatusSchema,
   positionId: z.string().uuid().nullable(),
+  checklist: TradePlanChecklistSchema.nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -53,6 +67,7 @@ export const CreateTradePlanInputSchema = z
     entryZoneHigh: priceString.optional(),
     stopLoss: priceString.optional(),
     targetPrice: priceString.optional(),
+    checklist: TradePlanChecklistSchema.optional(),
   })
   .strict();
 export type CreateTradePlanInput = z.infer<typeof CreateTradePlanInputSchema>;

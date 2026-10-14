@@ -13,6 +13,21 @@ export interface SheetContextEntry {
  * Baris lembar ber-harga (ZITN-TECH-029 Fase 3b, D-4(a)/(b)) — hanya muncul di **workspace
  * berbayar** dan hanya bila jembatan ZITN mengirimnya.
  */
+/** Ceklis pra-trade `pra` (ZITN-TECH-069 Lapis 2): angka observasi dari ZITN; jurnal hanya membaca. */
+export interface SheetPra {
+  va30_width_pct: number | null;
+  va30_q30_pct: number | null;
+  basis_poc_vah_pct: number | null;
+  res: { px: number | null; pct: number | null }[];
+  arrows_60: number;
+  volx: number | null;
+  pressure_20: number;
+  regime: string | null;
+  earnings: { date: string; bars: number | null } | null;
+  exec: { limit: number; sessions: number };
+  label: string;
+}
+
 export interface SheetRow {
   market: string;
   ticker: string;
@@ -31,6 +46,7 @@ export interface SheetRow {
   size_unit: string | null;
   data_status: string | null;
   evidence_status: string | null;
+  pra?: SheetPra | null;
 }
 
 export interface SheetContextView {
