@@ -201,6 +201,23 @@ describe('CekRisikoPage — mode ringkas (H1)', () => {
     expect(screen.getByText(/Risk% = w × SL%/)).toBeTruthy();
   });
 
+  it('rumus sadar-mata-uang: IDR menyebut lot, US menyebut saham fraksional (ZITN-TECH-065)', () => {
+    openWithSl();
+    fireEvent.click(screen.getByTestId('cek-risk-2'));
+    setValue('cek-modal', '10000000');
+    setValue('cek-harga-beli', '4520');
+    setValue('cek-harga-stop', '4300');
+
+    fireEvent.click(screen.getByTestId('cek-rumus-toggle'));
+    expect(screen.getByTestId('cek-rumus').textContent).toContain('whole lots');
+
+    // Switch to USD: the same disclosure stays open and now shows the US formula.
+    fireEvent.click(screen.getByTestId('cek-currency-usd'));
+    const usText = screen.getByTestId('cek-rumus').textContent ?? '';
+    expect(usText).toContain('fractional shares');
+    expect(usText).not.toContain('whole lots');
+  });
+
   it('prefill kode/harga dari konteks Pemindai/Chart (?symbol=&harga=)', () => {
     window.history.replaceState({}, '', '/cek-risiko?symbol=bbri&harga=4520');
     try {

@@ -304,6 +304,19 @@ describe('Sidebar — Changelog surface hidden (ZITN rebrand)', () => {
   });
 });
 
+describe('Sidebar — Brokerages surface hidden (ZITN-TECH-065 §4)', () => {
+  it('renders no Broker nav entry while frontendFlags.BROKERAGES_ENABLED is false', () => {
+    const { container, root } = mountWith(<Sidebar />);
+
+    const hrefs = Array.from(container.querySelectorAll('nav a')).map((a) =>
+      a.getAttribute('href'),
+    );
+    expect(hrefs).not.toContain('/brokerages');
+
+    unmount(container, root);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // The two chrome states (visual-redesign task 4): a 56px icon rail by default,
 // pinnable to the 208px labeled state, auto-collapsing while the drawer is

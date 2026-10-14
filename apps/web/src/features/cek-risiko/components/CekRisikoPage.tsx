@@ -17,15 +17,15 @@ type Mode = 'lot' | 'biaya' | 'profil';
 const DEFAULT_MODE: Mode = POSITION_SIZING_ENABLED ? 'lot' : 'profil';
 
 /**
- * Permukaan **Cek Risiko** (ZITN-TECH-017 Â§12 / Fase H) â€” wajah baru jurnal.
+ * Permukaan **Cek Risiko** (ZITN-TECH-017 §12 / Fase H) — wajah baru jurnal.
  *
  * Satu layar, beberapa mode (segmented). Alat hitung dari angka pengguna: tidak
  * ada prediksi/sinyal/target. Pencatatan menjadi efek samping lewat mesin jurnal
  * ("Simpan ke Catatan"); fitur lanjutan tetap ada di **Mode lengkap**.
  *
  * Tab sizing (dulu "Hitung Lot") disembunyikan sementara di balik
- * `POSITION_SIZING_ENABLED` (ZITN-TECH-049; opsi A â€” pakai ulang tab, nama
- * netral) â€” kode tetap; urutan tab: sizing (bila aktif) Â· Profil risiko Â·
+ * `POSITION_SIZING_ENABLED` (ZITN-TECH-049; opsi A — pakai ulang tab, nama
+ * netral) — kode tetap; urutan tab: sizing (bila aktif) · Profil risiko ·
  * Biaya dan pajak.
  */
 export function CekRisikoPage() {

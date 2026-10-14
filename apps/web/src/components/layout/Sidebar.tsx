@@ -31,7 +31,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useT } from '@/hooks/useLocale';
 import { useAdvisorEnabled } from '@/hooks/useRegistrationEnabled';
 import { docsUrl } from '@/lib/docs';
-import { CHANGELOG_ENABLED, DOCS_LINKS_ENABLED } from '@/lib/frontendFlags';
+import { BROKERAGES_ENABLED, CHANGELOG_ENABLED, DOCS_LINKS_ENABLED } from '@/lib/frontendFlags';
 import { cn } from '@/lib/utils';
 import { useDrawerStore } from '@/stores/drawer.store';
 
@@ -289,14 +289,16 @@ export function Sidebar() {
         >
           <ItemContent expanded={expanded} label={t('nav.accounts')} Icon={CreditCard} />
         </Link>
-        <Link
-          to="/brokerages"
-          aria-label={t('nav.brokerages')}
-          title={expanded ? undefined : t('nav.brokerages')}
-          className={itemClass(expanded)}
-        >
-          <ItemContent expanded={expanded} label={t('nav.brokerages')} Icon={Landmark} />
-        </Link>
+        {BROKERAGES_ENABLED && (
+          <Link
+            to="/brokerages"
+            aria-label={t('nav.brokerages')}
+            title={expanded ? undefined : t('nav.brokerages')}
+            className={itemClass(expanded)}
+          >
+            <ItemContent expanded={expanded} label={t('nav.brokerages')} Icon={Landmark} />
+          </Link>
+        )}
 
         <GroupLabel expanded={expanded} label={t('nav.group.system')} />
         <Link
