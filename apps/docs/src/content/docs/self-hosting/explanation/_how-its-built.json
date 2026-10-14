@@ -30,6 +30,7 @@
   "e2eSpecFiles": 33,
   "migrations": 48,
   "ciJobs": [
+    "changes",
     "checks",
     "test-api",
     "test-web",

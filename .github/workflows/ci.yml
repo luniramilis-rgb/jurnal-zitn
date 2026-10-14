@@ -32,6 +32,38 @@ env:
   TRUSTED_PROXIES: '127.0.0.1'
 
 jobs:
+  # Detect which surfaces a change can touch so the DB-bound and browser jobs can
+  # be skipped for PRs that cannot affect them (ZITN-TECH-070 Fase 0). A job whose
+  # `if` is false is reported `skipped`, which satisfies the required-check
+  # contract; `packages/**`, the lockfile and this workflow are treated as
+  # affecting BOTH api and web so a shared change never escapes coverage.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: read
+    outputs:
+      api: ${{ steps.filter.outputs.api }}
+      web: ${{ steps.filter.outputs.web }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3
+        id: filter
+        with:
+          filters: |
+            api:
+              - 'apps/api/**'
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+              - '.github/workflows/ci.yml'
+            web:
+              - 'apps/web/**'
+              - 'packages/**'
+              - 'pnpm-lock.yaml'
+              - '.github/workflows/ci.yml'
+
   # Lint, types, migration consistency and the frontend build gates —
   # everything that needs no DB or service containers.
   checks:
@@ -132,6 +164,10 @@ jobs:
 
   # The DB-bound half of the vitest workspace: the api + migrations projects.
   test-api:
+    needs: changes
+    # Skip only when the filter POSITIVELY reports no api-relevant change;
+    # a missing/empty output (dispatch, filter hiccup) keeps the job running.
+    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.api != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -208,6 +244,9 @@ jobs:
   # workspace project that is added to neither job silently escapes CI. An
   # unknown --project name fails loudly, so renames are caught.
   test-web:
+    needs: changes
+    # See test-api: skip only on a positive 'no web-relevant change' report.
+    if: github.event_name == 'workflow_dispatch' || needs.changes.outputs.web != 'false'
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -227,14 +266,17 @@ jobs:
         run: pnpm exec vitest run --project web --project shared --project web-scripts --project docs-scripts
 
   e2e:
-    # The two expensive jobs (e2e, docker-smoke) gate a PR but are skipped on a
-    # plain push to main: a direct push has already been verified locally
-    # (`pnpm --filter @jurnal-zitn/e2e test`). Run on demand with
-    # workflow_dispatch. Add the `skip-e2e` label for a small fix that cannot
-    # affect the browser flows (the job is then reported `skipped`).
+    # e2e is the long pole (~9 min across 2 shards). It runs on every push to
+    # main, on workflow_dispatch, and on a PR ONLY when the `run-e2e` label is
+    # added (ZITN-TECH-070 Fase 0 label-gate) — a UI PR opts in, everything else
+    # is reported `skipped` and merges without waiting the long pole. The
+    # `skip-e2e` label stays as an explicit override should both be present.
     if: >-
-      (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
-      && !contains(github.event.pull_request.labels.*.name, 'skip-e2e')
+      github.event_name == 'push'
+      || github.event_name == 'workflow_dispatch'
+      || (github.event_name == 'pull_request'
+          && contains(github.event.pull_request.labels.*.name, 'run-e2e')
+          && !contains(github.event.pull_request.labels.*.name, 'skip-e2e'))
     runs-on: ubuntu-latest
     timeout-minutes: 20
 
