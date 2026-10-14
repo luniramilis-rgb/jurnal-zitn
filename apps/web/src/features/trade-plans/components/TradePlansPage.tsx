@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { Fragment, useState } from 'react';
 import { toast } from 'sonner';
 
 import type {
@@ -112,7 +112,7 @@ export function linkablePositions<T extends { id: string; symbol: string }>(
 
 /**
  * Levels a position inherits when a plan is linked to it (F4 correction): the
- * plan's stop/target, but ONLY where the position has none â€” a value the trader
+ * plan's stop/target, but ONLY where the position has none — a value the trader
  * already typed is never overwritten. Pure, so the copy rule is tested.
  */
 export function planLevelsPatch(
@@ -127,8 +127,8 @@ export function planLevelsPatch(
 }
 
 /**
- * TradePlansPage â€” F4 (ZITN-TECH-017 Â§10.8). Pre-trade plans with a live R:R and
- * the forward-only lifecycle Pending â†’ Executed / Missed / Cancelled.
+ * TradePlansPage — F4 (ZITN-TECH-017 §10.8). Pre-trade plans with a live R:R and
+ * the forward-only lifecycle Pending → Executed / Missed / Cancelled.
  */
 export function TradePlansPage() {
   const t = useT();
@@ -139,7 +139,7 @@ export function TradePlansPage() {
   const linkPlan = useLinkTradePlan();
   const update = useUpdateTradePlan();
   const queryClient = useQueryClient();
-  // Linking copies the plan's levels onto the position (F4 correction) â€” see
+  // Linking copies the plan's levels onto the position (F4 correction) — see
   // planLevelsPatch for the "never overwrite" rule.
   const applyPlanLevels = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePositionInput }) =>
@@ -153,8 +153,8 @@ export function TradePlansPage() {
   // The lifecycle is forward-only (F4): a confirmation step guards a mis-click
   // without relaxing the rule.
   const [confirm, setConfirm] = useState<{ plan: TradePlan; status: TradePlanStatus } | null>(null);
-  // Saved risk profile (Cek Risiko â†’ Profil risiko): surfaced here so the
-  // pre-trade draft is written against the same setting (ZITN-TECH-043 Â§3.3).
+  // Saved risk profile (Cek Risiko → Profil risiko): surfaced here so the
+  // pre-trade draft is written against the same setting (ZITN-TECH-043 §3.3).
   const { choice: riskProfile } = useRiskProfile();
   const { data: riskProfileData } = useRiskProfileData(riskProfile.market);
   const positionById = new Map((positions.data ?? []).map((p) => [p.id, p]));
@@ -169,6 +169,10 @@ export function TradePlansPage() {
       })
     | null
   >(null);
+  // The row whose pre-trade checklist is expanded inline. Shown on demand so it
+  // is always reachable from the table (the "Ubah" card sits above the list and
+  // is easy to miss) — ZITN-TECH-069 Lapis 2 visibility fix.
+  const [expandedId, setExpandedId] = useState<string | null>(null);
   // "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): SSO mengarahkan ke
   // `/trade-plans?focus=<id>`; sorot draf yang baru dibuat/difokuskan.
   const focusId =
@@ -283,9 +287,9 @@ export function TradePlansPage() {
 
       <p className="text-sm text-muted-foreground" data-testid="tp-risk-profile">
         {t('cek.profile.current')}:{' '}
-        {riskProfileData?.rules[riskProfile.rule]?.label ?? riskProfile.rule} Â·{' '}
-        {t(`cek.profile.period.${riskProfile.period}`)} Â· TP {riskProfile.tp}% Â·{' '}
-        {riskProfile.sl === 'none' ? t('cek.profile.noSl') : `SL ${riskProfile.sl}%`} Â· H{' '}
+        {riskProfileData?.rules[riskProfile.rule]?.label ?? riskProfile.rule} ·{' '}
+        {t(`cek.profile.period.${riskProfile.period}`)} · TP {riskProfile.tp}% ·{' '}
+        {riskProfile.sl === 'none' ? t('cek.profile.noSl') : `SL ${riskProfile.sl}%`} · H{' '}
         {riskProfile.h}{' '}
         <a href="/cek-risiko" className="underline">
           {t('cek.profile.title')}
@@ -338,7 +342,7 @@ export function TradePlansPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              {t('tp.editTitle')} Â· {editing.symbol}
+              {t('tp.editTitle')} · {editing.symbol}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -428,122 +432,150 @@ export function TradePlansPage() {
             </TableRow>
           )}
           {list.data?.items.map((plan) => (
-            <TableRow
-              key={plan.id}
-              data-testid="trade-plan-row"
-              className={plan.id === focusId ? 'ring-2 ring-primary' : undefined}
-            >
-              <TableCell className="font-medium">
-                {plan.symbol}
-                {(plan.market !== 'id' || plan.signalDate) && (
-                  <span className="ml-2 text-xs font-normal text-muted-foreground">
-                    {plan.market === 'us' ? 'S&P 500' : 'IDX'}
-                    {plan.signalDate ? ` Â· ${plan.signalDate}` : ''}
-                  </span>
-                )}
-              </TableCell>
-              <TableCell>{plan.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}</TableCell>
-              <TableCell>
-                <Numeric value={plan.entryZoneLow} kind="decimal" direction="none" />
-              </TableCell>
-              <TableCell>
-                <Numeric value={plan.entryZoneHigh} kind="decimal" direction="none" />
-              </TableCell>
-              <TableCell>
-                <Numeric value={plan.stopLoss} kind="decimal" direction="none" />
-              </TableCell>
-              <TableCell>
-                <Numeric value={plan.targetPrice} kind="decimal" direction="none" />
-              </TableCell>
-              <TableCell>
-                <Numeric value={liveRR(plan)} kind="decimal" direction="none" />
-              </TableCell>
-              <TableCell>{t(STATUS_LABEL[plan.status])}</TableCell>
-              <TableCell>
-                {plan.positionId ? (
-                  <span className="flex items-center gap-2">
-                    <a href={`/positions/${plan.positionId}`} className="hover:underline">
-                      {positionById.get(plan.positionId)?.symbol ?? plan.positionId.slice(0, 8)}
-                    </a>
+            <Fragment key={plan.id}>
+              <TableRow
+                data-testid="trade-plan-row"
+                className={plan.id === focusId ? 'ring-2 ring-primary' : undefined}
+              >
+                <TableCell className="font-medium">
+                  {plan.symbol}
+                  {(plan.market !== 'id' || plan.signalDate) && (
+                    <span className="ml-2 text-xs font-normal text-muted-foreground">
+                      {plan.market === 'us' ? 'S&P 500' : 'IDX'}
+                      {plan.signalDate ? ` · ${plan.signalDate}` : ''}
+                    </span>
+                  )}
+                </TableCell>
+                <TableCell>{plan.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}</TableCell>
+                <TableCell>
+                  <Numeric value={plan.entryZoneLow} kind="decimal" direction="none" />
+                </TableCell>
+                <TableCell>
+                  <Numeric value={plan.entryZoneHigh} kind="decimal" direction="none" />
+                </TableCell>
+                <TableCell>
+                  <Numeric value={plan.stopLoss} kind="decimal" direction="none" />
+                </TableCell>
+                <TableCell>
+                  <Numeric value={plan.targetPrice} kind="decimal" direction="none" />
+                </TableCell>
+                <TableCell>
+                  <Numeric value={liveRR(plan)} kind="decimal" direction="none" />
+                </TableCell>
+                <TableCell>{t(STATUS_LABEL[plan.status])}</TableCell>
+                <TableCell>
+                  {plan.positionId ? (
+                    <span className="flex items-center gap-2">
+                      <a href={`/positions/${plan.positionId}`} className="hover:underline">
+                        {positionById.get(plan.positionId)?.symbol ?? plan.positionId.slice(0, 8)}
+                      </a>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="cursor-pointer"
+                        disabled={linkPlan.isPending}
+                        onClick={() => linkPlan.mutate({ id: plan.id, positionId: null })}
+                      >
+                        {t('tp.unlink')}
+                      </Button>
+                    </span>
+                  ) : (
+                    <select
+                      aria-label={t('tp.link')}
+                      value=""
+                      disabled={linkPlan.isPending}
+                      onChange={(event) => {
+                        const positionId = event.target.value;
+                        if (positionId) {
+                          linkPlan.mutate(
+                            { id: plan.id, positionId },
+                            {
+                              // Carry the plan's levels onto the position so the
+                              // Posisi tab shows them without re-typing (never
+                              // overwriting a value already there).
+                              onSuccess: () => {
+                                const patch = planLevelsPatch(plan, positionById.get(positionId));
+                                if (Object.keys(patch).length > 0) {
+                                  applyPlanLevels.mutate({ id: positionId, data: patch });
+                                }
+                              },
+                              onError: () => toast.error(t('tp.linkErrGeneric')),
+                            },
+                          );
+                        }
+                      }}
+                      className="cursor-pointer rounded-md border bg-background px-2 py-1 text-sm"
+                    >
+                      <option value="">{t('tp.linkNone')}</option>
+                      {linkablePositions(plan, positions.data ?? [], list.data?.items ?? []).map(
+                        (p) => (
+                          <option key={p.id} value={p.id}>
+                            {p.symbol} · {p.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}
+                            {p.openedAt ? ` · ${p.openedAt.slice(0, 10)}` : ''} ·{' '}
+                            {t(POSITION_STATUS_LABEL[p.status])}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  )}
+                </TableCell>
+                <TableCell className="space-x-2 whitespace-nowrap">
+                  {PRA_TRADE_CHECKLIST_ENABLED && (
                     <Button
                       type="button"
-                      variant="outline"
+                      variant={expandedId === plan.id ? 'default' : 'outline'}
                       size="sm"
                       className="cursor-pointer"
-                      disabled={linkPlan.isPending}
-                      onClick={() => linkPlan.mutate({ id: plan.id, positionId: null })}
+                      aria-expanded={expandedId === plan.id}
+                      data-testid="tp-checklist-toggle"
+                      onClick={() => setExpandedId((prev) => (prev === plan.id ? null : plan.id))}
                     >
-                      {t('tp.unlink')}
+                      {t('tp.checklist')}
                     </Button>
-                  </span>
-                ) : (
-                  <select
-                    aria-label={t('tp.link')}
-                    value=""
-                    disabled={linkPlan.isPending}
-                    onChange={(event) => {
-                      const positionId = event.target.value;
-                      if (positionId) {
-                        linkPlan.mutate(
-                          { id: plan.id, positionId },
-                          {
-                            // Carry the plan's levels onto the position so the
-                            // Posisi tab shows them without re-typing (never
-                            // overwriting a value already there).
-                            onSuccess: () => {
-                              const patch = planLevelsPatch(plan, positionById.get(positionId));
-                              if (Object.keys(patch).length > 0) {
-                                applyPlanLevels.mutate({ id: positionId, data: patch });
-                              }
-                            },
-                            onError: () => toast.error(t('tp.linkErrGeneric')),
-                          },
-                        );
-                      }
-                    }}
-                    className="cursor-pointer rounded-md border bg-background px-2 py-1 text-sm"
+                  )}
+                  {plan.status === 'pending' && (
+                    <>
+                      {statusButton(plan, 'executed', t('tp.execute'))}
+                      {statusButton(plan, 'missed', t('tp.miss'))}
+                      {statusButton(plan, 'cancelled', t('tp.cancel'))}
+                    </>
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="cursor-pointer"
+                    onClick={() => openEdit(plan)}
                   >
-                    <option value="">{t('tp.linkNone')}</option>
-                    {linkablePositions(plan, positions.data ?? [], list.data?.items ?? []).map(
-                      (p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.symbol} Â· {p.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}
-                          {p.openedAt ? ` Â· ${p.openedAt.slice(0, 10)}` : ''} Â·{' '}
-                          {t(POSITION_STATUS_LABEL[p.status])}
-                        </option>
-                      ),
-                    )}
-                  </select>
-                )}
-              </TableCell>
-              <TableCell className="space-x-2 whitespace-nowrap">
-                {plan.status === 'pending' && (
-                  <>
-                    {statusButton(plan, 'executed', t('tp.execute'))}
-                    {statusButton(plan, 'missed', t('tp.miss'))}
-                    {statusButton(plan, 'cancelled', t('tp.cancel'))}
-                  </>
-                )}
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="cursor-pointer"
-                  onClick={() => openEdit(plan)}
-                >
-                  {t('tp.edit')}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="cursor-pointer"
-                  onClick={() => remove.mutate(plan.id)}
-                >
-                  {t('tp.delete')}
-                </Button>
-              </TableCell>
-            </TableRow>
+                    {t('tp.edit')}
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="cursor-pointer"
+                    onClick={() => remove.mutate(plan.id)}
+                  >
+                    {t('tp.delete')}
+                  </Button>
+                </TableCell>
+              </TableRow>
+              {PRA_TRADE_CHECKLIST_ENABLED && expandedId === plan.id && (
+                <TableRow data-testid="trade-plan-detail">
+                  <TableCell colSpan={10} className="bg-muted/30">
+                    <PlanChecklistSection
+                      planId={plan.id}
+                      symbol={plan.symbol}
+                      market={plan.market}
+                      signalDate={plan.signalDate}
+                      value={plan.checklist}
+                      onSaved={() => undefined}
+                    />
+                  </TableCell>
+                </TableRow>
+              )}
+            </Fragment>
           ))}
         </TableBody>
       </Table>

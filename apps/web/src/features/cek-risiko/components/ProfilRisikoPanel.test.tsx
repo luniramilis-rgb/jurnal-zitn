@@ -22,6 +22,9 @@ const { PROFILES } = vi.hoisted(() => {
     p_loss10: 0,
     p_loss20: 0,
     p_loss40: 0.01,
+    mae_med: -3.2,
+    mae_p5: -7.5,
+    mae_min: -12.4,
     ...over,
   });
   return {
@@ -116,6 +119,13 @@ describe('ProfilRisikoPanel — segmen "Profil risiko" (ZITN-TECH-043/047)', () 
   it('grid default (tanpa SL) → peringatan ekor dalam', () => {
     render(<ProfilRisikoPanel />);
     expect(screen.getByTestId('cek-profile-warn-tail')).toBeTruthy();
+  });
+
+  it('menampilkan MAE (median / p5 / terburuk) apa adanya dalam persen', () => {
+    render(<ProfilRisikoPanel />);
+    expect(screen.getByText('MAE median')).toBeTruthy();
+    expect(screen.getByText('MAE p5')).toBeTruthy();
+    expect(screen.getByText('MAE worst')).toBeTruthy();
   });
 
   it('TP%/SL% berupa dropdown dengan opsi yang diminta + "Tanpa SL" checkbox', () => {

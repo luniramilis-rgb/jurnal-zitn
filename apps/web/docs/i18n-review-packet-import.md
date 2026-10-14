@@ -300,9 +300,9 @@ kelas "harga" tak punya dua mekanisme.
 
 ## (e) Baris ledger
 
-| Rute     | Kelas   | Keadaan diuji                                                                                                               | Peninjau                          | Tanggal    | Commit                       | Status   | Catatan                                                                                                                                                                   |
-| -------- | ------- | --------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ---------- | ---------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `import` | Lapis 1 | 38 uji web lingkup csv-import lulus; keadaan komponen sisanya **belum** (lihat §b); API/suite e2e tak dijalankan (tanpa DB) | â€” (menunggu ratifikasi pemilik) | 2026-09-29 | lihat commit F4 di `l10n-f4` | `sedang` | F4; paket ini + lampiran mesin `apps/web/docs/i18n-coverage-import.md` & `-scan.md`; D2 preset `generic-idx` provisional; galat mapper via peta kode (`lib/issueCopy.ts`) |
+| Rute     | Kelas   | Keadaan diuji                                                                                                               | Peninjau                        | Tanggal    | Commit                       | Status   | Catatan                                                                                                                                                                   |
+| -------- | ------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------- | ---------- | ---------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `import` | Lapis 1 | 38 uji web lingkup csv-import lulus; keadaan komponen sisanya **belum** (lihat §b); API/suite e2e tak dijalankan (tanpa DB) | — (menunggu ratifikasi pemilik) | 2026-09-29 | lihat commit F4 di `l10n-f4` | `sedang` | F4; paket ini + lampiran mesin `apps/web/docs/i18n-coverage-import.md` & `-scan.md`; D2 preset `generic-idx` provisional; galat mapper via peta kode (`lib/issueCopy.ts`) |
 
 ## Blocker & residual sebelum `sah`
 

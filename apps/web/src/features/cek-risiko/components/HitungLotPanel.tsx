@@ -354,7 +354,7 @@ export function HitungLotPanel({ market = 'idx' }: { market?: SizingMarket } = {
               )}
             </div>
 
-            <RumusDisclosure formulaKey="cek.formula.lot" />
+            <RumusDisclosure formulaKey={isIdx ? 'cek.formula.lot' : 'cek.formula.posisi.us'} />
 
             <div className="border-t pt-3">
               <SimpanCatatanCard symbol={symbol} price={result.hargaBeli} shares={result.shares} />

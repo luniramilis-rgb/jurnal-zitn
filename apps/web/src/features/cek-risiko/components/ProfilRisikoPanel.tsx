@@ -88,6 +88,16 @@ function Money({
   );
 }
 
+/** MAE sudah dalam satuan persen (mis. -12,3 = −12,3%) — JANGAN dikali 100 lagi. */
+function MaePct({ value }: { value: number | null | undefined }) {
+  if (value === null || value === undefined || !Number.isFinite(value)) return <span>—</span>;
+  return (
+    <>
+      <Numeric value={value} kind="decimal" precision={1} direction="auto" />%
+    </>
+  );
+}
+
 function Row({ label, hint, children }: { label: string; hint?: MessageKey; children: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-3 text-sm">
@@ -479,6 +489,15 @@ export function ProfilRisikoPanel() {
                 </Stat>
                 <Stat label={t('cek.profile.p1min')} hint="cek.profile.hint.p1min">
                   <PctSigned value={cell.p1} /> / <PctSigned value={cell.min} />
+                </Stat>
+                <Stat label={t('cek.profile.maeMed')} hint="cek.profile.hint.maeMed">
+                  <MaePct value={cell.mae_med} />
+                </Stat>
+                <Stat label={t('cek.profile.maeP5')} hint="cek.profile.hint.maeP5">
+                  <MaePct value={cell.mae_p5} />
+                </Stat>
+                <Stat label={t('cek.profile.maeMin')} hint="cek.profile.hint.maeMin">
+                  <MaePct value={cell.mae_min} />
                 </Stat>
                 <Stat label={t('cek.profile.loss10')} hint="cek.profile.hint.loss10">
                   <PctMag value={cell.p_loss10} />

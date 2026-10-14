@@ -623,6 +623,7 @@ const ID_MESSAGES = {
   'tp.unlink': 'Lepas',
   'tp.linkErrGeneric': 'Gagal menautkan posisi. Coba lagi.',
   'tp.edit': 'Ubah',
+  'tp.checklist': 'Ceklis pra-trade',
   'tp.editTitle': 'Ubah rencana',
   'tp.save': 'Simpan',
   'tp.updated': 'Rencana diperbarui.',
@@ -750,6 +751,8 @@ const ID_MESSAGES = {
   'cek.formula.hide': 'Sembunyikan rumus',
   'cek.formula.lot':
     'Anggaran risiko = modal × risiko%. Risiko per saham = harga beli − harga stop. Jumlah saham = anggaran risiko ÷ risiko per saham, lalu dibulatkan ke bawah ke lot utuh (1 lot = 100 saham). Rugi maksimal = jumlah saham × risiko per saham.',
+  'cek.formula.posisi.us':
+    'Agregat dari angka Anda: jumlah saham = anggaran risiko ÷ (harga beli − harga stop), dibulatkan ke bawah ke 3 desimal (saham fraksional). Notional minimal US$ 1 — tanpa lot. Rugi maksimal = jumlah saham × (harga beli − harga stop).',
   'cek.formula.biaya':
     'Biaya beli = nilai beli × fee beli platform. Biaya jual = nilai jual × fee jual platform. PPh final = 0,1% × nilai jual. Nilai bersih = nilai jual − biaya jual − PPh. Untung/rugi bersih = nilai bersih − nilai beli − biaya beli.',
   'cek.formula.ara':
@@ -810,6 +813,9 @@ const ID_MESSAGES = {
   'cek.profile.median': 'Median',
   'cek.profile.p5': 'p5',
   'cek.profile.p1min': 'p1/min',
+  'cek.profile.maeMed': 'MAE median',
+  'cek.profile.maeP5': 'MAE p5',
+  'cek.profile.maeMin': 'MAE terburuk',
   'cek.profile.loss10': 'Rugi > 10%',
   'cek.profile.loss20': 'Rugi > 20%',
   'cek.profile.loss40': 'Rugi > 40%',
@@ -864,6 +870,11 @@ const ID_MESSAGES = {
     'Nilai tengah hasil: separuh lebih baik, separuh lebih buruk; tahan terhadap pencilan.',
   'cek.profile.hint.p5': 'Persentil 5%: 5% transaksi terburuk lebih buruk dari ini (risiko ekor).',
   'cek.profile.hint.p1min': 'Persentil 1% dan hasil terburuk — gambaran skenario terburuk.',
+  'cek.profile.hint.maeMed':
+    'Penurunan maksimum khas dari harga masuk selama transaksi (MAE, historis).',
+  'cek.profile.hint.maeP5':
+    'MAE pada persentil 5%: 5% transaksi pernah turun lebih dalam dari ini (historis).',
+  'cek.profile.hint.maeMin': 'MAE terburuk yang tercatat (historis).',
   'cek.profile.hint.loss10': 'Peluang kerugian melebihi 10% (historis).',
   'cek.profile.hint.loss20': 'Peluang kerugian melebihi 20% (historis).',
   'cek.profile.hint.loss40': 'Peluang kerugian melebihi 40% (historis) — ekor dalam.',
@@ -2246,6 +2257,7 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'tp.unlink': 'Unlink',
   'tp.linkErrGeneric': 'Could not link the position. Try again.',
   'tp.edit': 'Edit',
+  'tp.checklist': 'Pre-trade checklist',
   'tp.editTitle': 'Edit plan',
   'tp.save': 'Save',
   'tp.updated': 'Plan updated.',
@@ -2374,6 +2386,8 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.formula.hide': 'Hide the formula',
   'cek.formula.lot':
     'Risk budget = capital × risk%. Risk per share = buy price − stop price. Shares = risk budget ÷ risk per share, then rounded down to whole lots (1 lot = 100 shares). Maximum loss = shares × risk per share.',
+  'cek.formula.posisi.us':
+    'Aggregate from your inputs: shares = risk budget ÷ (buy price − stop price), rounded down to 3 decimals (fractional shares). Minimum notional US$ 1 — no lots. Maximum loss = shares × (buy price − stop price).',
   'cek.formula.biaya':
     'Buy fee = buy value × platform buy fee. Sell fee = sell value × platform sell fee. Final tax = 0.1% × sell value. Net proceeds = sell value − sell fee − tax. Net profit/loss = net proceeds − buy value − buy fee.',
   'cek.formula.ara':
@@ -2434,6 +2448,9 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.profile.median': 'Median',
   'cek.profile.p5': 'p5',
   'cek.profile.p1min': 'p1/min',
+  'cek.profile.maeMed': 'MAE median',
+  'cek.profile.maeP5': 'MAE p5',
+  'cek.profile.maeMin': 'MAE worst',
   'cek.profile.loss10': 'Loss > 10%',
   'cek.profile.loss20': 'Loss > 20%',
   'cek.profile.loss40': 'Loss > 40%',
@@ -2486,6 +2503,10 @@ const EN_MESSAGES: Record<MessageKey, string> = {
   'cek.profile.hint.median': 'Middle outcome: half better, half worse; robust to outliers.',
   'cek.profile.hint.p5': '5th percentile: the worst 5% of trades are below this (tail risk).',
   'cek.profile.hint.p1min': '1st percentile and the worst outcome — the worst-case sketch.',
+  'cek.profile.hint.maeMed': 'Typical maximum drop from entry during the trade (MAE, historical).',
+  'cek.profile.hint.maeP5':
+    'MAE at the 5th percentile: 5% of trades dipped deeper than this (historical).',
+  'cek.profile.hint.maeMin': 'The worst MAE recorded (historical).',
   'cek.profile.hint.loss10': 'Chance of a loss larger than 10% (historical).',
   'cek.profile.hint.loss20': 'Chance of a loss larger than 20% (historical).',
   'cek.profile.hint.loss40': 'Chance of a loss larger than 40% (historical) — deep tail.',
