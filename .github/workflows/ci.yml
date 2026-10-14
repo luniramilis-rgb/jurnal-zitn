@@ -227,14 +227,24 @@ jobs:
         run: pnpm exec vitest run --project web --project shared --project web-scripts --project docs-scripts
 
   e2e:
-    # The two expensive jobs (~20m e2e, ~5m smoke) gate a PR but are skipped on a
-    # plain push to main: this is a PRIVATE repo, where Actions minutes are billed
-    # against a shared account quota, and a direct push has already been verified
-    # locally (`pnpm --filter @jurnal-zitn/e2e test`). Run on demand with
-    # workflow_dispatch.
-    if: github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch'
+    # The two expensive jobs (e2e, docker-smoke) gate a PR but are skipped on a
+    # plain push to main: a direct push has already been verified locally
+    # (`pnpm --filter @jurnal-zitn/e2e test`). Run on demand with
+    # workflow_dispatch. Add the `skip-e2e` label for a small fix that cannot
+    # affect the browser flows (the job is then reported `skipped`).
+    if: >-
+      (github.event_name == 'pull_request' || github.event_name == 'workflow_dispatch')
+      && !contains(github.event.pull_request.labels.*.name, 'skip-e2e')
     runs-on: ubuntu-latest
     timeout-minutes: 20
+
+    # Shard the suite across runners to cut wall-clock (workers=1, 3 device
+    # projects): each shard boots its own web+api+stub stack, so the runs do not
+    # contend. Kept at 2 shards to stay within the runner budget.
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2]
 
     # ENCRYPTION_KEY is e2e-only (the API requires a 64-hex key on boot). The
     # other secrets (DATABASE_URL, SESSION_SECRET, NODE_ENV) come from the
@@ -287,13 +297,13 @@ jobs:
         run: pnpm --filter @jurnal-zitn/e2e exec playwright install --with-deps chromium webkit
 
       - name: Run e2e suite (Playwright boots web + api + UW stub)
-        run: pnpm --filter @jurnal-zitn/e2e test
+        run: pnpm --filter @jurnal-zitn/e2e exec playwright test --shard=${{ matrix.shardIndex }}/2
 
       - name: Upload Playwright report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: playwright-report
+          name: playwright-report-${{ matrix.shardIndex }}
           path: e2e/playwright-report
           retention-days: 7
           if-no-files-found: ignore
