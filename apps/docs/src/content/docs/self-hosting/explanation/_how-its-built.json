@@ -28,7 +28,7 @@
   ],
   "testFilesTotal": 430,
   "e2eSpecFiles": 33,
-  "migrations": 47,
+  "migrations": 48,
   "ciJobs": [
     "checks",
     "test-api",
