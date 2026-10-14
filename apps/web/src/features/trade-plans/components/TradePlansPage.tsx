@@ -57,6 +57,7 @@ const EMPTY = {
   entryZoneHigh: '',
   stopLoss: '',
   targetPrice: '',
+  signalDate: '',
 };
 
 const STATUS_LABEL: Record<TradePlanStatus, MessageKey> = {
@@ -111,7 +112,7 @@ export function linkablePositions<T extends { id: string; symbol: string }>(
 
 /**
  * Levels a position inherits when a plan is linked to it (F4 correction): the
- * plan's stop/target, but ONLY where the position has none — a value the trader
+ * plan's stop/target, but ONLY where the position has none â€” a value the trader
  * already typed is never overwritten. Pure, so the copy rule is tested.
  */
 export function planLevelsPatch(
@@ -126,8 +127,8 @@ export function planLevelsPatch(
 }
 
 /**
- * TradePlansPage — F4 (ZITN-TECH-017 §10.8). Pre-trade plans with a live R:R and
- * the forward-only lifecycle Pending → Executed / Missed / Cancelled.
+ * TradePlansPage â€” F4 (ZITN-TECH-017 Â§10.8). Pre-trade plans with a live R:R and
+ * the forward-only lifecycle Pending â†’ Executed / Missed / Cancelled.
  */
 export function TradePlansPage() {
   const t = useT();
@@ -138,7 +139,7 @@ export function TradePlansPage() {
   const linkPlan = useLinkTradePlan();
   const update = useUpdateTradePlan();
   const queryClient = useQueryClient();
-  // Linking copies the plan's levels onto the position (F4 correction) — see
+  // Linking copies the plan's levels onto the position (F4 correction) â€” see
   // planLevelsPatch for the "never overwrite" rule.
   const applyPlanLevels = useMutation({
     mutationFn: ({ id, data }: { id: string; data: UpdatePositionInput }) =>
@@ -152,8 +153,8 @@ export function TradePlansPage() {
   // The lifecycle is forward-only (F4): a confirmation step guards a mis-click
   // without relaxing the rule.
   const [confirm, setConfirm] = useState<{ plan: TradePlan; status: TradePlanStatus } | null>(null);
-  // Saved risk profile (Cek Risiko → Profil risiko): surfaced here so the
-  // pre-trade draft is written against the same setting (ZITN-TECH-043 §3.3).
+  // Saved risk profile (Cek Risiko â†’ Profil risiko): surfaced here so the
+  // pre-trade draft is written against the same setting (ZITN-TECH-043 Â§3.3).
   const { choice: riskProfile } = useRiskProfile();
   const { data: riskProfileData } = useRiskProfileData(riskProfile.market);
   const positionById = new Map((positions.data ?? []).map((p) => [p.id, p]));
@@ -164,7 +165,6 @@ export function TradePlansPage() {
     | (typeof EMPTY & {
         id: string;
         market: string;
-        signalDate: string | null;
         checklist: TradePlanChecklist | null;
       })
     | null
@@ -185,6 +185,7 @@ export function TradePlansPage() {
         ...(form.entryZoneHigh ? { entryZoneHigh: form.entryZoneHigh } : {}),
         ...(form.stopLoss ? { stopLoss: form.stopLoss } : {}),
         ...(form.targetPrice ? { targetPrice: form.targetPrice } : {}),
+        ...(form.signalDate ? { signalDate: form.signalDate } : {}),
       },
       { onSuccess: () => setForm(EMPTY) },
     );
@@ -194,7 +195,6 @@ export function TradePlansPage() {
     setEditing({
       id: plan.id,
       market: plan.market,
-      signalDate: plan.signalDate,
       checklist: plan.checklist,
       symbol: plan.symbol,
       side: plan.side,
@@ -203,6 +203,7 @@ export function TradePlansPage() {
       entryZoneHigh: plan.entryZoneHigh ?? '',
       stopLoss: plan.stopLoss ?? '',
       targetPrice: plan.targetPrice ?? '',
+      signalDate: plan.signalDate ?? '',
     });
 
   const saveEdit = () => {
@@ -217,6 +218,7 @@ export function TradePlansPage() {
           ...(editing.entryZoneHigh ? { entryZoneHigh: editing.entryZoneHigh } : {}),
           ...(editing.stopLoss ? { stopLoss: editing.stopLoss } : {}),
           ...(editing.targetPrice ? { targetPrice: editing.targetPrice } : {}),
+          ...(editing.signalDate ? { signalDate: editing.signalDate } : {}),
         },
       },
       {
@@ -228,7 +230,11 @@ export function TradePlansPage() {
     );
   };
 
-  const input = (key: keyof typeof EMPTY, label: string, type: 'text' | 'number' = 'text') => (
+  const input = (
+    key: keyof typeof EMPTY,
+    label: string,
+    type: 'text' | 'number' | 'date' = 'text',
+  ) => (
     <label className="flex flex-col gap-1 text-sm">
       <span className="text-muted-foreground">{label}</span>
       <input
@@ -240,7 +246,11 @@ export function TradePlansPage() {
     </label>
   );
 
-  const editField = (key: keyof typeof EMPTY, label: string, type: 'text' | 'number' = 'text') => (
+  const editField = (
+    key: keyof typeof EMPTY,
+    label: string,
+    type: 'text' | 'number' | 'date' = 'text',
+  ) => (
     <label className="flex flex-col gap-1 text-sm">
       <span className="text-muted-foreground">{label}</span>
       <input
@@ -273,9 +283,9 @@ export function TradePlansPage() {
 
       <p className="text-sm text-muted-foreground" data-testid="tp-risk-profile">
         {t('cek.profile.current')}:{' '}
-        {riskProfileData?.rules[riskProfile.rule]?.label ?? riskProfile.rule} ·{' '}
-        {t(`cek.profile.period.${riskProfile.period}`)} · TP {riskProfile.tp}% ·{' '}
-        {riskProfile.sl === 'none' ? t('cek.profile.noSl') : `SL ${riskProfile.sl}%`} · H{' '}
+        {riskProfileData?.rules[riskProfile.rule]?.label ?? riskProfile.rule} Â·{' '}
+        {t(`cek.profile.period.${riskProfile.period}`)} Â· TP {riskProfile.tp}% Â·{' '}
+        {riskProfile.sl === 'none' ? t('cek.profile.noSl') : `SL ${riskProfile.sl}%`} Â· H{' '}
         {riskProfile.h}{' '}
         <a href="/cek-risiko" className="underline">
           {t('cek.profile.title')}
@@ -309,6 +319,9 @@ export function TradePlansPage() {
             {input('stopLoss', t('tp.stop'), 'number')}
             {input('targetPrice', t('tp.target'), 'number')}
           </div>
+          <div className="grid gap-3 sm:grid-cols-4">
+            {input('signalDate', t('tp.signalDate'), 'date')}
+          </div>
           {input('thesis', t('tp.thesis'))}
           <Button
             type="button"
@@ -325,7 +338,7 @@ export function TradePlansPage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-base">
-              {t('tp.editTitle')} · {editing.symbol}
+              {t('tp.editTitle')} Â· {editing.symbol}
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
@@ -335,14 +348,15 @@ export function TradePlansPage() {
               {editField('stopLoss', t('tp.stop'), 'number')}
               {editField('targetPrice', t('tp.target'), 'number')}
             </div>
+            {editField('signalDate', t('tp.signalDate'), 'date')}
             {editField('thesis', t('tp.thesis'))}
-            {PRA_TRADE_CHECKLIST_ENABLED && editing.signalDate && (
+            {PRA_TRADE_CHECKLIST_ENABLED && (
               <div className="border-t pt-3">
                 <PlanChecklistSection
                   planId={editing.id}
                   symbol={editing.symbol}
                   market={editing.market}
-                  signalDate={editing.signalDate}
+                  signalDate={editing.signalDate || null}
                   value={editing.checklist}
                   onSaved={(c) => setEditing((prev) => (prev ? { ...prev, checklist: c } : prev))}
                 />
@@ -424,7 +438,7 @@ export function TradePlansPage() {
                 {(plan.market !== 'id' || plan.signalDate) && (
                   <span className="ml-2 text-xs font-normal text-muted-foreground">
                     {plan.market === 'us' ? 'S&P 500' : 'IDX'}
-                    {plan.signalDate ? ` · ${plan.signalDate}` : ''}
+                    {plan.signalDate ? ` Â· ${plan.signalDate}` : ''}
                   </span>
                 )}
               </TableCell>
@@ -493,8 +507,8 @@ export function TradePlansPage() {
                     {linkablePositions(plan, positions.data ?? [], list.data?.items ?? []).map(
                       (p) => (
                         <option key={p.id} value={p.id}>
-                          {p.symbol} · {p.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}
-                          {p.openedAt ? ` · ${p.openedAt.slice(0, 10)}` : ''} ·{' '}
+                          {p.symbol} Â· {p.side === 'long' ? t('tp.sideLong') : t('tp.sideShort')}
+                          {p.openedAt ? ` Â· ${p.openedAt.slice(0, 10)}` : ''} Â·{' '}
                           {t(POSITION_STATUS_LABEL[p.status])}
                         </option>
                       ),
