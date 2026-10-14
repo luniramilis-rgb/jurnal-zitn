@@ -7,6 +7,7 @@ import {
   numeric,
   date,
   timestamp,
+  jsonb,
   index,
   check,
 } from 'drizzle-orm/pg-core';
@@ -40,6 +41,9 @@ export const tradePlans = pgTable(
     targetPrice: numeric('target_price', { precision: 18, scale: 8 }),
     status: varchar('status', { length: 12 }).notNull().default('pending'),
     positionId: uuid('position_id'),
+    // Ceklis pra-trade (ZITN-TECH-069 Lapis 2): jawaban centang + attestasi + catatan,
+    // disimpan apa adanya (JSON). Angka `pra` sendiri TIDAK di sini — dibaca dari konteks.
+    checklist: jsonb('checklist'),
     createdAt: timestamp('created_at', { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp('updated_at', { withTimezone: true }).notNull().defaultNow(),
   },

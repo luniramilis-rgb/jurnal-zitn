@@ -43,6 +43,7 @@ function toTradePlan(row: typeof tradePlans.$inferSelect): TradePlan {
     targetPrice: row.targetPrice,
     status: row.status as TradePlanStatus,
     positionId: row.positionId,
+    checklist: (row.checklist as TradePlan['checklist']) ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
   };
@@ -93,6 +94,7 @@ export async function createTradePlan(
         entryZoneHigh: input.entryZoneHigh ?? null,
         stopLoss: input.stopLoss ?? null,
         targetPrice: input.targetPrice ?? null,
+        checklist: input.checklist ?? null,
       })
       .returning();
     return toTradePlan(row!);
@@ -160,6 +162,7 @@ export async function updateTradePlan(
         ...(input.entryZoneHigh !== undefined ? { entryZoneHigh: input.entryZoneHigh } : {}),
         ...(input.stopLoss !== undefined ? { stopLoss: input.stopLoss } : {}),
         ...(input.targetPrice !== undefined ? { targetPrice: input.targetPrice } : {}),
+        ...(input.checklist !== undefined ? { checklist: input.checklist } : {}),
         updatedAt: new Date(),
       })
       .where(and(eq(tradePlans.userId, userId), eq(tradePlans.id, id)))

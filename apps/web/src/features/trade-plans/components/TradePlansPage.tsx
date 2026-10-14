@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import type {
   MessageKey,
   TradePlan,
+  TradePlanChecklist,
   TradePlanStatus,
   UpdatePositionInput,
 } from '@jurnal-zitn/shared';
@@ -35,6 +36,7 @@ import { useRiskProfileData } from '@/features/cek-risiko/hooks/useRiskProfileDa
 import { usePositions } from '@/features/positions/hooks/usePositions';
 import { useT } from '@/hooks/useLocale';
 import { api } from '@/lib/api';
+import { PRA_TRADE_CHECKLIST_ENABLED } from '@/lib/frontendFlags';
 
 import {
   useCreateTradePlan,
@@ -44,6 +46,8 @@ import {
   useTradePlans,
   useUpdateTradePlan,
 } from '../hooks/useTradePlans';
+
+import { PlanChecklistSection } from './PlanChecklistSection';
 
 const EMPTY = {
   symbol: '',
@@ -156,7 +160,15 @@ export function TradePlansPage() {
   const [form, setForm] = useState(EMPTY);
   // The plan whose levels are being edited inline, or null. Carries the plan id
   // alongside a form copy so Save can PATCH the right row.
-  const [editing, setEditing] = useState<(typeof EMPTY & { id: string }) | null>(null);
+  const [editing, setEditing] = useState<
+    | (typeof EMPTY & {
+        id: string;
+        market: string;
+        signalDate: string | null;
+        checklist: TradePlanChecklist | null;
+      })
+    | null
+  >(null);
   // "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): SSO mengarahkan ke
   // `/trade-plans?focus=<id>`; sorot draf yang baru dibuat/difokuskan.
   const focusId =
@@ -181,6 +193,9 @@ export function TradePlansPage() {
   const openEdit = (plan: TradePlan) =>
     setEditing({
       id: plan.id,
+      market: plan.market,
+      signalDate: plan.signalDate,
+      checklist: plan.checklist,
       symbol: plan.symbol,
       side: plan.side,
       thesis: plan.thesis ?? '',
@@ -321,6 +336,18 @@ export function TradePlansPage() {
               {editField('targetPrice', t('tp.target'), 'number')}
             </div>
             {editField('thesis', t('tp.thesis'))}
+            {PRA_TRADE_CHECKLIST_ENABLED && editing.signalDate && (
+              <div className="border-t pt-3">
+                <PlanChecklistSection
+                  planId={editing.id}
+                  symbol={editing.symbol}
+                  market={editing.market}
+                  signalDate={editing.signalDate}
+                  value={editing.checklist}
+                  onSaved={(c) => setEditing((prev) => (prev ? { ...prev, checklist: c } : prev))}
+                />
+              </div>
+            )}
             <div className="flex gap-2">
               <Button
                 type="button"

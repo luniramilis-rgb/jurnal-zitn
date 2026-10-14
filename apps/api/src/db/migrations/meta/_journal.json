@@ -330,6 +330,13 @@
       "when": 1791017564853,
       "tag": "0046_reference_rates_fx",
       "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1791979624730,
+      "tag": "0047_petite_korath",
+      "breakpoints": true
     }
   ]
 }

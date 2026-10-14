@@ -17,3 +17,8 @@
 export const CHANGELOG_ENABLED = false;
 export const DOCS_LINKS_ENABLED = false;
 export const POSITION_SIZING_ENABLED = true;
+/**
+ * Ceklis pra-trade tersimpan (ZITN-TECH-069 Lapis 2) di F4 "Rencana Pra-Trade": angka `pra`
+ * dibaca dari konteks ZITN (D12=(ii)), keputusan user disimpan di rencana. Reversibel.
+ */
+export const PRA_TRADE_CHECKLIST_ENABLED = true;

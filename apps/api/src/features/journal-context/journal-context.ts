@@ -36,6 +36,24 @@ export interface SheetContextEntry {
  * Baris lembar ber-harga (ZITN-TECH-029 Fase 3b, D-4(a)/(b)). Hanya untuk **workspace berbayar**;
  * bentuknya distabilkan oleh allowlist di kedua sisi (ZITN & jurnal). Angka boleh `null`.
  */
+/**
+ * Ceklis pra-trade `pra` (ZITN-TECH-069 Lapis 2, D12=(ii)): angka **observasi** yang
+ * diprakomputasi ZITN di barir sinyal. Jurnal **hanya membaca** (tidak menghitung).
+ */
+export interface PraChecks {
+  va30_width_pct: number | null;
+  va30_q30_pct: number | null;
+  basis_poc_vah_pct: number | null;
+  res: { px: number | null; pct: number | null }[];
+  arrows_60: number;
+  volx: number | null;
+  pressure_20: number;
+  regime: string | null;
+  earnings: { date: string; bars: number | null } | null;
+  exec: { limit: number; sessions: number };
+  label: string;
+}
+
 export interface SheetRow {
   market: string;
   ticker: string;
@@ -54,6 +72,7 @@ export interface SheetRow {
   size_unit: string | null;
   data_status: string | null;
   evidence_status: string | null;
+  pra: PraChecks | null;
 }
 
 export const SHEET_ROW_FIELDS: (keyof SheetRow)[] = [
@@ -74,6 +93,7 @@ export const SHEET_ROW_FIELDS: (keyof SheetRow)[] = [
   'size_unit',
   'data_status',
   'evidence_status',
+  'pra',
 ];
 
 export interface SheetContext {
