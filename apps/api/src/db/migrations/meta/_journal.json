@@ -337,6 +337,13 @@
       "when": 1791979624730,
       "tag": "0047_petite_korath",
       "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1792021451445,
+      "tag": "0048_rpt_standalone",
+      "breakpoints": true
     }
   ]
 }

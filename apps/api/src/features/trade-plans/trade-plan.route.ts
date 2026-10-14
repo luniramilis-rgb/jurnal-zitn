@@ -3,7 +3,6 @@ import { z } from 'zod';
 
 import {
   CreateTradePlanInputSchema,
-  LinkTradePlanInputSchema,
   TradePlanStatusSchema,
   UpdateTradePlanInputSchema,
   UpdateTradePlanStatusSchema,
@@ -16,7 +15,6 @@ import {
   createTradePlan,
   deleteTradePlan,
   getTradePlan,
-  linkTradePlan,
   listTradePlans,
   setTradePlanStatus,
   updateTradePlan,
@@ -134,34 +132,6 @@ tradePlanRouter.patch(
     const { id } = c.req.valid('param');
     const { status } = c.req.valid('json');
     return c.json(await setTradePlanStatus(c.get('userId'), id, status), 200);
-  },
-);
-
-/**
- * @swagger
- * /api/trade-plans/{id}/link:
- *   patch:
- *     summary: Attach a plan to the trade it produced (1:1), or detach.
- *     description: >
- *       Body `{ positionId: uuid | null }`. The position must be the caller's and
- *       must not already be linked to another plan. Attaching a Pending plan marks
- *       it Executed; detaching an Executed plan returns it to Pending. PATCH (never
- *       GET) per the CSRF posture. Soft link — deleting the trade leaves the plan.
- *     tags: [Trade Plans]
- *     responses:
- *       200: { description: The updated plan. }
- *       400: { description: VALIDATION_ERROR — bad body or an already-linked trade. }
- *       401: { description: No valid session. }
- *       404: { description: NOT_FOUND — no such plan or position. }
- */
-tradePlanRouter.patch(
-  '/:id/link',
-  validate('param', IdParamSchema),
-  validate('json', LinkTradePlanInputSchema),
-  async (c) => {
-    const { id } = c.req.valid('param');
-    const { positionId } = c.req.valid('json');
-    return c.json(await linkTradePlan(c.get('userId'), id, positionId), 200);
   },
 );
 

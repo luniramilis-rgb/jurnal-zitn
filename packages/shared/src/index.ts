@@ -385,9 +385,13 @@ export {
   CreateTradePlanInputSchema,
   UpdateTradePlanInputSchema,
   UpdateTradePlanStatusSchema,
-  LinkTradePlanInputSchema,
   TradePlanListResponseSchema,
   TradePlanChecklistSchema,
+  TradePlanDecisionSchema,
+  TradePlanSourceSchema,
+  TradePlanSizingSchema,
+  TradePlanPraSnapshotSchema,
+  TradePlanOutcomeSchema,
 } from './schemas/trade-plan';
 export type {
   TradePlanStatus,
@@ -396,9 +400,13 @@ export type {
   CreateTradePlanInput,
   UpdateTradePlanInput,
   UpdateTradePlanStatusInput,
-  LinkTradePlanInput,
   TradePlanListResponse,
   TradePlanChecklist,
+  TradePlanDecision,
+  TradePlanSource,
+  TradePlanSizing,
+  TradePlanPraSnapshot,
+  TradePlanOutcome,
 } from './schemas/trade-plan';
 export {
   OnboardingStatusSchema,

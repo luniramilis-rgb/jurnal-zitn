@@ -1,9 +1,16 @@
 import { z } from 'zod';
 
-// F4 — pre-trade plans (ZITN-TECH-017 §10.8).
+// F4 — pre-trade plans (ZITN-TECH-017 §10.8). ZITN-TECH-070 §3b reshaped the
+// record: RPT is now standalone (no position link), one entry price (no zone),
+// one note (no thesis), plus the decision/sizing/praSnapshot/outcome snapshots.
 export const TRADE_PLAN_STATUSES = ['pending', 'executed', 'missed', 'cancelled'] as const;
 export const TradePlanStatusSchema = z.enum(TRADE_PLAN_STATUSES);
 export type TradePlanStatus = z.infer<typeof TradePlanStatusSchema>;
+
+// Keputusan pengguna (ZITN-TECH-070 §3b), terpisah dari lifecycle `status`.
+export const TRADE_PLAN_DECISIONS = ['taken', 'skipped', 'no_action'] as const;
+export const TradePlanDecisionSchema = z.enum(TRADE_PLAN_DECISIONS);
+export type TradePlanDecision = z.infer<typeof TradePlanDecisionSchema>;
 
 export const TRADE_PLAN_SIDES = ['long', 'short'] as const;
 export const TradePlanSideSchema = z.enum(TRADE_PLAN_SIDES);
@@ -13,7 +20,12 @@ export const TRADE_PLAN_MARKETS = ['id', 'us'] as const;
 export const TradePlanMarketSchema = z.enum(TRADE_PLAN_MARKETS);
 export type TradePlanMarket = z.infer<typeof TradePlanMarketSchema>;
 
-// Prices/zone bounds cross the wire as decimal strings, like positions.
+// Asal draf (ZITN-TECH-070 §3b).
+export const TRADE_PLAN_SOURCES = ['pemindai', 'chart', 'manual'] as const;
+export const TradePlanSourceSchema = z.enum(TRADE_PLAN_SOURCES);
+export type TradePlanSource = z.infer<typeof TradePlanSourceSchema>;
+
+// Prices cross the wire as decimal strings, like positions.
 const priceString = z
   .string()
   .max(32)
@@ -35,20 +47,60 @@ export const TradePlanChecklistSchema = z
   .strict();
 export type TradePlanChecklist = z.infer<typeof TradePlanChecklistSchema>;
 
+// Snapshot sizing dari Hitung Posisi (ZITN-TECH-070 §3b): apa yang dipakai saat rencana dibuat.
+export const TradePlanSizingSchema = z
+  .object({
+    capital: z.number().optional(),
+    riskPct: z.number().optional(),
+    /** `lot` untuk IDX, `share` untuk US (fraksional). */
+    unit: z.enum(['lot', 'share']).optional(),
+    qty: z.number().optional(),
+    riskBudget: z.number().optional(),
+    maxLoss: z.number().optional(),
+    currency: z.string().max(8).optional(),
+  })
+  .strict();
+export type TradePlanSizing = z.infer<typeof TradePlanSizingSchema>;
+
+// Snapshot angka Lapis 1 + `asOf` (ZITN-TECH-070 §3b): artefak bisa berubah, jadi
+// angka yang dilihat saat menulis rencana disimpan. Bentuk bebas (kunci D1–D11).
+export const TradePlanPraSnapshotSchema = z
+  .object({ asOf: z.string().max(32).nullable().optional() })
+  .catchall(z.unknown());
+export type TradePlanPraSnapshot = z.infer<typeof TradePlanPraSnapshotSchema>;
+
+// Hasil (minimal) setelah rencana berjalan (ZITN-TECH-070 §3b).
+export const TradePlanOutcomeSchema = z
+  .object({
+    result: z.enum(['tp', 'no_tp', 'void']),
+    exitPrice: priceString.optional(),
+    exitDate: dateString.optional(),
+    sessions: z.number().int().nonnegative().optional(),
+    realizedR: z.number().optional(),
+    mae: z.number().optional(),
+    followedLimit: z.boolean().optional(),
+  })
+  .strict();
+export type TradePlanOutcome = z.infer<typeof TradePlanOutcomeSchema>;
+
 export const TradePlanSchema = z.object({
   id: z.string().uuid(),
   symbol: z.string(),
   side: TradePlanSideSchema,
   market: TradePlanMarketSchema,
   signalDate: z.string().nullable(),
-  thesis: z.string().nullable(),
-  playbookId: z.string().uuid().nullable(),
-  entryZoneLow: z.string().nullable(),
-  entryZoneHigh: z.string().nullable(),
+  rule: z.string().nullable(),
+  source: TradePlanSourceSchema.nullable(),
+  entryPrice: z.string().nullable(),
   stopLoss: z.string().nullable(),
   targetPrice: z.string().nullable(),
+  note: z.string().nullable(),
+  decision: TradePlanDecisionSchema.nullable(),
+  playbookId: z.string().uuid().nullable(),
   status: TradePlanStatusSchema,
-  positionId: z.string().uuid().nullable(),
+  sizing: TradePlanSizingSchema.nullable(),
+  praSnapshot: TradePlanPraSnapshotSchema.nullable(),
+  outcome: TradePlanOutcomeSchema.nullable(),
   checklist: TradePlanChecklistSchema.nullable(),
   createdAt: z.string(),
   updatedAt: z.string(),
@@ -61,12 +113,17 @@ export const CreateTradePlanInputSchema = z
     side: TradePlanSideSchema,
     market: TradePlanMarketSchema.optional(),
     signalDate: dateString.optional(),
-    thesis: z.string().max(4000).optional(),
-    playbookId: z.string().uuid().optional(),
-    entryZoneLow: priceString.optional(),
-    entryZoneHigh: priceString.optional(),
+    rule: z.string().max(32).optional(),
+    source: TradePlanSourceSchema.optional(),
+    entryPrice: priceString.optional(),
     stopLoss: priceString.optional(),
     targetPrice: priceString.optional(),
+    note: z.string().max(4000).optional(),
+    decision: TradePlanDecisionSchema.optional(),
+    playbookId: z.string().uuid().optional(),
+    sizing: TradePlanSizingSchema.optional(),
+    praSnapshot: TradePlanPraSnapshotSchema.optional(),
+    outcome: TradePlanOutcomeSchema.optional(),
     checklist: TradePlanChecklistSchema.optional(),
   })
   .strict();
@@ -78,12 +135,6 @@ export type UpdateTradePlanInput = z.infer<typeof UpdateTradePlanInputSchema>;
 /** The lifecycle write. Only these four states exist. */
 export const UpdateTradePlanStatusSchema = z.object({ status: TradePlanStatusSchema }).strict();
 export type UpdateTradePlanStatusInput = z.infer<typeof UpdateTradePlanStatusSchema>;
-
-/** F4 — attach a plan to a trade (1:1), or detach with `null`. */
-export const LinkTradePlanInputSchema = z
-  .object({ positionId: z.string().uuid().nullable() })
-  .strict();
-export type LinkTradePlanInput = z.infer<typeof LinkTradePlanInputSchema>;
 
 export const TradePlanListResponseSchema = z.object({ items: z.array(TradePlanSchema) });
 export type TradePlanListResponse = z.infer<typeof TradePlanListResponseSchema>;
