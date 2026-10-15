@@ -317,6 +317,19 @@ describe('Sidebar — Brokerages surface hidden (ZITN-TECH-065 §4)', () => {
   });
 });
 
+describe('Sidebar — Playbooks surface hidden (ZITN-TECH-070 Fase 3)', () => {
+  it('renders no Playbook nav entry while frontendFlags.PLAYBOOKS_ENABLED is false', () => {
+    const { container, root } = mountWith(<Sidebar />);
+
+    const hrefs = Array.from(container.querySelectorAll('nav a')).map((a) =>
+      a.getAttribute('href'),
+    );
+    expect(hrefs).not.toContain('/playbooks');
+
+    unmount(container, root);
+  });
+});
+
 // ---------------------------------------------------------------------------
 // The two chrome states (visual-redesign task 4): a 56px icon rail by default,
 // pinnable to the 208px labeled state, auto-collapsing while the drawer is
