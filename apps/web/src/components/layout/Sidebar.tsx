@@ -110,7 +110,7 @@ function GroupLabel({ expanded, label }: { expanded: boolean; label: string }) {
   );
 }
 
-export function Sidebar() {
+export function Sidebar({ mode = 'rail' }: { mode?: 'rail' | 'drawer' } = {}) {
   const advisorEnabled = useAdvisorEnabled();
   const { user, logout } = useAuth();
   // Badge data: error/loading mean no `data`, so the badge is simply absent
@@ -121,8 +121,9 @@ export function Sidebar() {
   const t = useT();
 
   // Auto-collapse while the drawer is open; the pin survives and the labeled
-  // state comes back on its own when the drawer closes.
-  const expanded = pinned && !drawerOpen;
+  // state comes back on its own when the drawer closes. In `drawer` mode (the
+  // mobile nav overlay) the rail is always expanded and the pin is meaningless.
+  const expanded = mode === 'drawer' ? true : pinned && !drawerOpen;
 
   const changelogBadge =
     CHANGELOG_ENABLED && hasNewReleases(changelogReleases.data) ? (
@@ -139,9 +140,14 @@ export function Sidebar() {
     // `align-items: stretch` from re-growing it.
     <aside
       className={cn(
-        'sticky top-0 flex h-dvh flex-col border-r border-hairline bg-card',
+        mode === 'drawer'
+          ? 'flex h-full flex-col border-r border-hairline bg-card'
+          : 'sticky top-0 flex h-dvh flex-col border-r border-hairline bg-card',
         'transition-[width] duration-200 motion-reduce:duration-0',
-        expanded ? EXPANDED_WIDTH : RAIL_WIDTH,
+        // Mobile: the rail yields to the overlay nav (`MobileNav`); `drawer`
+        // mode is that overlay's full-width, always-expanded rendering.
+        mode === 'rail' && 'max-md:hidden',
+        mode === 'drawer' ? 'w-full' : expanded ? EXPANDED_WIDTH : RAIL_WIDTH,
       )}
     >
       <div
@@ -162,19 +168,21 @@ export function Sidebar() {
             ▴
           </span>
         )}
-        <Button
-          variant="ghost"
-          size="icon-sm"
-          className="cursor-pointer text-muted-foreground max-md:size-11"
-          onClick={() => setPinned(!pinned)}
-          aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
-        >
-          {expanded ? (
-            <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
-          ) : (
-            <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
-          )}
-        </Button>
+        {mode === 'rail' && (
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="cursor-pointer text-muted-foreground max-md:size-11"
+            onClick={() => setPinned(!pinned)}
+            aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
+          >
+            {expanded ? (
+              <PanelLeftClose className="h-4 w-4" aria-hidden="true" />
+            ) : (
+              <PanelLeftOpen className="h-4 w-4" aria-hidden="true" />
+            )}
+          </Button>
+        )}
       </div>
 
       {/* `min-h-0` is what lets this shrink below its content height (a flex

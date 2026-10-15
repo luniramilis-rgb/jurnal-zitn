@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 
 import { DrawerToggleRefProvider } from '@/components/layout/DrawerToggleRefContext';
 import { GlobalShortcuts } from '@/components/layout/GlobalShortcuts';
+import { MobileNav } from '@/components/layout/MobileNav';
 import { Sidebar } from '@/components/layout/Sidebar';
 import { SideDrawer } from '@/components/layout/SideDrawer';
 import { ZitnAppBar } from '@/components/layout/ZitnAppBar';
@@ -66,6 +67,9 @@ function AuthLayout() {
             feedbackMainGutterClasses(drawerOpen),
           )}
         >
+          {/* ZITN-TECH-070 (nav mobile): di bawah `md` rail disembunyikan dan
+              navigasi dibuka dari tombol menu ini. */}
+          <MobileNav />
           {/* G2 (A1): the shared ZITN chrome — a top strip above the journal's
               own sidebar, so the feature navigation stays intact. */}
           <ZitnAppBar />
