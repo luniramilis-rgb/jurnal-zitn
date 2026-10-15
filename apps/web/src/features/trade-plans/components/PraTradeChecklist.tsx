@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 import type { MessageKey, TradePlanChecklist } from '@jurnal-zitn/shared';
 
@@ -125,6 +125,22 @@ export function PraTradeChecklist({
   const [attested, setAttested] = useState<boolean>(value?.attested ?? false);
   const [note, setNote] = useState<string>(value?.note ?? '');
 
+  // `pra` di-fetch setelah mount (lihat `PlanChecklistSection`), jadi inisialisasi `useState`
+  // di atas melihat `pra = null`. Terapkan auto-isi begitu `pra` tiba — TAPI jangan menimpa
+  // keputusan tersimpan (`value`) atau centang yang sudah disentuh pengguna.
+  const seededRef = useRef(false);
+  const dirtyRef = useRef(false);
+  useEffect(() => {
+    if (seededRef.current || !pra || value || dirtyRef.current) return;
+    setItems((prev) => ({ ...prev, ...auto }));
+    seededRef.current = true;
+  }, [pra, auto, value]);
+
+  const toggle = (key: string, v: boolean) => {
+    dirtyRef.current = true;
+    setItems((s) => ({ ...s, [key]: v }));
+  };
+
   if (!pra) {
     return (
       <div className="space-y-2" data-testid="pra-checklist">
@@ -160,7 +176,7 @@ export function PraTradeChecklist({
           hintKey="pra.hint.va30"
           checked={!!items.va30}
           detail={`${pra.va30_width_pct ?? '—'} % ≤ ${pra.va30_q30_pct ?? '—'} %`}
-          onToggle={(v) => setItems((s) => ({ ...s, va30: v }))}
+          onToggle={(v) => toggle('va30', v)}
         />
         <CheckRow
           id="basis"
@@ -168,7 +184,7 @@ export function PraTradeChecklist({
           hintKey="pra.hint.basis"
           checked={!!items.basis}
           detail={`POC↔VAH ${fmtPct(pra.basis_poc_vah_pct)}`}
-          onToggle={(v) => setItems((s) => ({ ...s, basis: v }))}
+          onToggle={(v) => toggle('basis', v)}
         />
         <CheckRow
           id="res"
@@ -176,7 +192,7 @@ export function PraTradeChecklist({
           hintKey="pra.hint.arrows"
           checked={!!items.res}
           detail={`${pra.arrows_60 ?? 0} panah / 60 sesi`}
-          onToggle={(v) => setItems((s) => ({ ...s, res: v }))}
+          onToggle={(v) => toggle('res', v)}
         />
         <CheckRow
           id="spike"
@@ -184,7 +200,7 @@ export function PraTradeChecklist({
           hintKey="pra.hint.spike"
           checked={!!items.spike}
           detail={`volx ${pra.volx ?? '—'} ×`}
-          onToggle={(v) => setItems((s) => ({ ...s, spike: v }))}
+          onToggle={(v) => toggle('spike', v)}
         />
         <CheckRow
           id="pressure"
@@ -192,7 +208,7 @@ export function PraTradeChecklist({
           hintKey="pra.hint.pressure"
           checked={!!items.pressure}
           detail={`${pra.pressure_20 ?? 0} / 20 bar`}
-          onToggle={(v) => setItems((s) => ({ ...s, pressure: v }))}
+          onToggle={(v) => toggle('pressure', v)}
         />
 
         <InfoRow labelKey="pra.res" hintKey="pra.hint.res" detail={res} />
