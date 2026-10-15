@@ -380,8 +380,11 @@ test.describe.serial('drawer', () => {
 
     await pageA.getByRole('button', { name: /log ?out/i }).click();
 
-    // Per v4-10: post-logout URL is /login (verified in useAuth.ts:40).
-    await expect(pageA).toHaveURL(/\/login$/);
+    // Per v4-10: post-logout URL is /login (verified in useAuth.ts:40). A
+    // concurrent tab's 401 (page B's auth/me refetch after the shared session
+    // dies) can race the logout and append `?expired=true`; accept either so
+    // this asserts "landed on login", not the losing side of a race.
+    await expect(pageA).toHaveURL(/\/login(\?expired=true)?$/);
     expect(await pageA.evaluate(() => localStorage.getItem('jurnal_zitn_drawer_state'))).toBeNull();
 
     // Page B should see at least one storage event from the localStorage
