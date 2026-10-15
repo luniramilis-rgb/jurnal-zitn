@@ -9,17 +9,27 @@ import type {
 } from '@jurnal-zitn/shared';
 
 import { db } from '@/db';
-import { positions, tradePlans } from '@/db/schema';
+import { tradePlans } from '@/db/schema';
 import { NotFoundError, ValidationError } from '@/lib/errors';
 import { withTransaction } from '@/lib/transaction';
 
 // ---------------------------------------------------------------------------
-// F4 pre-trade plans (ZITN-TECH-017 §10.8). User-scoped CRUD with a forward-only
-// lifecycle: Pending → Executed / Missed / Cancelled. Repeating a terminal state
-// is idempotent; moving BETWEEN terminal states (or back to pending) is refused.
-// `playbook_id` / `position_id` are SOFT links (no FK) — deleting a playbook or
-// a trade never cascades into the plan.
+// F4 pre-trade plans (ZITN-TECH-017 §10.8). ZITN-TECH-070 §3b: RPT is standalone
+// (no position link). User-scoped CRUD with a forward-only lifecycle:
+// Pending → Executed / Missed / Cancelled. Repeating a terminal state is
+// idempotent; moving BETWEEN terminal states (or back to pending) is refused.
+// `playbook_id` is a SOFT link (no FK) — deleting a playbook never cascades.
 // ---------------------------------------------------------------------------
+
+// A lifecycle write also records the user's `decision` (§3b), derived from the
+// terminal state reached: executed → taken, cancelled → skipped, missed →
+// no_action. `pending` leaves it null.
+const DECISION_FOR_STATUS: Record<TradePlanStatus, 'taken' | 'skipped' | 'no_action' | null> = {
+  pending: null,
+  executed: 'taken',
+  missed: 'no_action',
+  cancelled: 'skipped',
+};
 
 const ALLOWED_TRANSITIONS: Record<TradePlanStatus, readonly TradePlanStatus[]> = {
   pending: ['pending', 'executed', 'missed', 'cancelled'],
@@ -35,14 +45,18 @@ function toTradePlan(row: typeof tradePlans.$inferSelect): TradePlan {
     side: row.side as TradePlan['side'],
     market: row.market as TradePlan['market'],
     signalDate: row.signalDate ?? null,
-    thesis: row.thesis,
-    playbookId: row.playbookId,
-    entryZoneLow: row.entryZoneLow,
-    entryZoneHigh: row.entryZoneHigh,
+    rule: row.rule,
+    source: (row.source as TradePlan['source']) ?? null,
+    entryPrice: row.entryPrice,
     stopLoss: row.stopLoss,
     targetPrice: row.targetPrice,
+    note: row.note,
+    decision: (row.decision as TradePlan['decision']) ?? null,
+    playbookId: row.playbookId,
     status: row.status as TradePlanStatus,
-    positionId: row.positionId,
+    sizing: (row.sizing as TradePlan['sizing']) ?? null,
+    praSnapshot: (row.praSnapshot as TradePlan['praSnapshot']) ?? null,
+    outcome: (row.outcome as TradePlan['outcome']) ?? null,
     checklist: (row.checklist as TradePlan['checklist']) ?? null,
     createdAt: row.createdAt.toISOString(),
     updatedAt: row.updatedAt.toISOString(),
@@ -88,12 +102,17 @@ export async function createTradePlan(
         side: input.side,
         market: input.market ?? 'id',
         signalDate: input.signalDate ?? null,
-        thesis: input.thesis ?? null,
-        playbookId: input.playbookId ?? null,
-        entryZoneLow: input.entryZoneLow ?? null,
-        entryZoneHigh: input.entryZoneHigh ?? null,
+        rule: input.rule ?? null,
+        source: input.source ?? null,
+        entryPrice: input.entryPrice ?? null,
         stopLoss: input.stopLoss ?? null,
         targetPrice: input.targetPrice ?? null,
+        note: input.note ?? null,
+        decision: input.decision ?? null,
+        playbookId: input.playbookId ?? null,
+        sizing: input.sizing ?? null,
+        praSnapshot: input.praSnapshot ?? null,
+        outcome: input.outcome ?? null,
         checklist: input.checklist ?? null,
       })
       .returning();
@@ -156,12 +175,17 @@ export async function updateTradePlan(
         ...(input.side !== undefined ? { side: input.side } : {}),
         ...(input.market !== undefined ? { market: input.market } : {}),
         ...(input.signalDate !== undefined ? { signalDate: input.signalDate } : {}),
-        ...(input.thesis !== undefined ? { thesis: input.thesis } : {}),
-        ...(input.playbookId !== undefined ? { playbookId: input.playbookId } : {}),
-        ...(input.entryZoneLow !== undefined ? { entryZoneLow: input.entryZoneLow } : {}),
-        ...(input.entryZoneHigh !== undefined ? { entryZoneHigh: input.entryZoneHigh } : {}),
+        ...(input.rule !== undefined ? { rule: input.rule } : {}),
+        ...(input.source !== undefined ? { source: input.source } : {}),
+        ...(input.entryPrice !== undefined ? { entryPrice: input.entryPrice } : {}),
         ...(input.stopLoss !== undefined ? { stopLoss: input.stopLoss } : {}),
         ...(input.targetPrice !== undefined ? { targetPrice: input.targetPrice } : {}),
+        ...(input.note !== undefined ? { note: input.note } : {}),
+        ...(input.decision !== undefined ? { decision: input.decision } : {}),
+        ...(input.playbookId !== undefined ? { playbookId: input.playbookId } : {}),
+        ...(input.sizing !== undefined ? { sizing: input.sizing } : {}),
+        ...(input.praSnapshot !== undefined ? { praSnapshot: input.praSnapshot } : {}),
+        ...(input.outcome !== undefined ? { outcome: input.outcome } : {}),
         ...(input.checklist !== undefined ? { checklist: input.checklist } : {}),
         updatedAt: new Date(),
       })
@@ -195,7 +219,7 @@ export async function setTradePlanStatus(
 
     const [row] = await tx
       .update(tradePlans)
-      .set({ status, updatedAt: new Date() })
+      .set({ status, decision: DECISION_FOR_STATUS[status], updatedAt: new Date() })
       .where(eq(tradePlans.id, id))
       .returning();
     return toTradePlan(row!);
@@ -210,60 +234,4 @@ export async function deleteTradePlan(userId: string, id: string): Promise<void>
       .returning({ id: tradePlans.id }),
   );
   if (deleted.length === 0) throw new NotFoundError('TradePlan', id);
-}
-
-/**
- * F4 — link a plan to the trade it produced (1:1), or unlink with `null`. The
- * position must be the caller's AND the same symbol as the plan (a plan for one
- * emitter never attaches to another's trade), and no other plan may already link
- * that trade. Linking is a SOFT association only: the forward-only lifecycle is
- * MANUAL, so attaching/detaching never changes `status` (Executed comes only from
- * an explicit status write).
- */
-export async function linkTradePlan(
-  userId: string,
-  id: string,
-  positionId: string | null,
-): Promise<TradePlan> {
-  return withTransaction(db, async (tx) => {
-    const [existing] = await tx
-      .select()
-      .from(tradePlans)
-      .where(and(eq(tradePlans.userId, userId), eq(tradePlans.id, id)))
-      .limit(1);
-    if (!existing) throw new NotFoundError('TradePlan', id);
-
-    if (positionId !== null) {
-      const [position] = await tx
-        .select({ id: positions.id, symbol: positions.symbol })
-        .from(positions)
-        .where(and(eq(positions.userId, userId), eq(positions.id, positionId)))
-        .limit(1);
-      if (!position) throw new NotFoundError('Position', positionId);
-
-      if (position.symbol.toUpperCase() !== existing.symbol.toUpperCase()) {
-        throw new ValidationError('Position symbol does not match the plan', {
-          reason: 'position_symbol_mismatch',
-        });
-      }
-
-      const [clash] = await tx
-        .select({ id: tradePlans.id })
-        .from(tradePlans)
-        .where(and(eq(tradePlans.userId, userId), eq(tradePlans.positionId, positionId)))
-        .limit(1);
-      if (clash && clash.id !== id) {
-        throw new ValidationError('That position is already linked to another plan', {
-          reason: 'position_already_linked',
-        });
-      }
-    }
-
-    const [row] = await tx
-      .update(tradePlans)
-      .set({ positionId, updatedAt: new Date() })
-      .where(eq(tradePlans.id, id))
-      .returning();
-    return toTradePlan(row!);
-  });
 }

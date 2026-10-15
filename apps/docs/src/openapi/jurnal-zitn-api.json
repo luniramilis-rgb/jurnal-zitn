@@ -5102,29 +5102,6 @@
         ]
       }
     },
-    "/api/trade-plans/{id}/link": {
-      "patch": {
-        "description": "Body `{ positionId: uuid | null }`. The position must be the caller's and must not already be linked to another plan. Attaching a Pending plan marks it Executed; detaching an Executed plan returns it to Pending. PATCH (never GET) per the CSRF posture. Soft link — deleting the trade leaves the plan.\n",
-        "responses": {
-          "200": {
-            "description": "The updated plan."
-          },
-          "400": {
-            "description": "VALIDATION_ERROR — bad body or an already-linked trade."
-          },
-          "401": {
-            "description": "No valid session."
-          },
-          "404": {
-            "description": "NOT_FOUND — no such plan or position."
-          }
-        },
-        "summary": "Attach a plan to the trade it produced (1:1), or detach.",
-        "tags": [
-          "Trade Plans"
-        ]
-      }
-    },
     "/api/trade-plans/{id}/status": {
       "patch": {
         "description": "Pending → executed / missed / cancelled. Repeating a terminal state is idempotent; moving between terminal states is a 400.",

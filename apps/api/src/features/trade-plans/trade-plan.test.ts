@@ -67,20 +67,26 @@ describe('trade plans CRUD + lifecycle', () => {
     const created = await authed('POST', '/api/trade-plans', cookie, {
       symbol: 'bbri',
       side: 'long',
-      entryZoneLow: '4000',
+      entryPrice: '4000',
       stopLoss: '3800',
       targetPrice: '4500',
     });
     expect(created.status).toBe(201);
-    const plan = (await created.json()) as { id: string; status: string; symbol: string };
+    const plan = (await created.json()) as {
+      id: string;
+      status: string;
+      symbol: string;
+      entryPrice: string | null;
+    };
     expect(plan.status).toBe('pending');
     expect(plan.symbol).toBe('bbri');
+    expect(plan.entryPrice).toBe('4000.00000000');
 
     const patched = await authed('PATCH', `/api/trade-plans/${plan.id}`, cookie, {
-      thesis: 'Gap and go',
+      note: 'Gap and go',
     });
     expect(patched.status).toBe(200);
-    expect(((await patched.json()) as { thesis: string }).thesis).toBe('Gap and go');
+    expect(((await patched.json()) as { note: string }).note).toBe('Gap and go');
 
     const list = await authed('GET', '/api/trade-plans', cookie);
     expect(((await list.json()) as { items: unknown[] }).items).toHaveLength(1);
@@ -96,7 +102,10 @@ describe('trade plans CRUD + lifecycle', () => {
       status: 'executed',
     });
     expect(executed.status).toBe(200);
-    expect(((await executed.json()) as { status: string }).status).toBe('executed');
+    const executedPlan = (await executed.json()) as { status: string; decision: string | null };
+    expect(executedPlan.status).toBe('executed');
+    // The lifecycle write records the user's decision (§3b): executed → taken.
+    expect(executedPlan.decision).toBe('taken');
 
     const illegal = await authed('PATCH', `/api/trade-plans/${plan.id}/status`, cookie, {
       status: 'missed',

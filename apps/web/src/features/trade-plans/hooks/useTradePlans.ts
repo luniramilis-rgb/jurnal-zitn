@@ -49,18 +49,6 @@ export function useSetTradePlanStatus() {
   });
 }
 
-/** F4 — attach a plan to a trade (1:1), or detach with `positionId: null`. */
-export function useLinkTradePlan() {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: ({ id, positionId }: { id: string; positionId: string | null }) =>
-      api.patch<TradePlan>(`/trade-plans/${id}/link`, { positionId }),
-    onSuccess: () => {
-      void queryClient.invalidateQueries({ queryKey: ['trade-plans'] });
-    },
-  });
-}
-
 export function useDeleteTradePlan() {
   const queryClient = useQueryClient();
   return useMutation({
