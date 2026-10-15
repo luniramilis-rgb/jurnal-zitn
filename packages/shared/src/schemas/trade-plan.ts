@@ -3,7 +3,11 @@ import { z } from 'zod';
 // F4 — pre-trade plans (ZITN-TECH-017 §10.8). ZITN-TECH-070 §3b reshaped the
 // record: RPT is now standalone (no position link), one entry price (no zone),
 // one note (no thesis), plus the decision/sizing/praSnapshot/outcome snapshots.
-export const TRADE_PLAN_STATUSES = ['pending', 'executed', 'missed', 'cancelled'] as const;
+// Lifecycle (ZITN-TECH-070 §3b): a plan is a `draft` until the user records a
+// `decision` (which closes it) — `closed` is final. The old
+// pending/executed/missed/cancelled enum mixed lifecycle with the decision and
+// assumed a linked position; RPT is now standalone.
+export const TRADE_PLAN_STATUSES = ['draft', 'closed'] as const;
 export const TradePlanStatusSchema = z.enum(TRADE_PLAN_STATUSES);
 export type TradePlanStatus = z.infer<typeof TradePlanStatusSchema>;
 
@@ -119,7 +123,6 @@ export const CreateTradePlanInputSchema = z
     stopLoss: priceString.optional(),
     targetPrice: priceString.optional(),
     note: z.string().max(4000).optional(),
-    decision: TradePlanDecisionSchema.optional(),
     playbookId: z.string().uuid().optional(),
     sizing: TradePlanSizingSchema.optional(),
     praSnapshot: TradePlanPraSnapshotSchema.optional(),
@@ -132,9 +135,11 @@ export type CreateTradePlanInput = z.infer<typeof CreateTradePlanInputSchema>;
 export const UpdateTradePlanInputSchema = CreateTradePlanInputSchema.partial();
 export type UpdateTradePlanInput = z.infer<typeof UpdateTradePlanInputSchema>;
 
-/** The lifecycle write. Only these four states exist. */
-export const UpdateTradePlanStatusSchema = z.object({ status: TradePlanStatusSchema }).strict();
-export type UpdateTradePlanStatusInput = z.infer<typeof UpdateTradePlanStatusSchema>;
+/** The terminal write: record the user's decision, which closes the plan (§3b). */
+export const UpdateTradePlanDecisionSchema = z
+  .object({ decision: TradePlanDecisionSchema })
+  .strict();
+export type UpdateTradePlanDecisionInput = z.infer<typeof UpdateTradePlanDecisionSchema>;
 
 export const TradePlanListResponseSchema = z.object({ items: z.array(TradePlanSchema) });
 export type TradePlanListResponse = z.infer<typeof TradePlanListResponseSchema>;

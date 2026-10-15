@@ -4,8 +4,8 @@ import { z } from 'zod';
 import {
   CreateTradePlanInputSchema,
   TradePlanStatusSchema,
+  UpdateTradePlanDecisionSchema,
   UpdateTradePlanInputSchema,
-  UpdateTradePlanStatusSchema,
 } from '@jurnal-zitn/shared';
 
 import { validate } from '@/lib/validation';
@@ -16,7 +16,7 @@ import {
   deleteTradePlan,
   getTradePlan,
   listTradePlans,
-  setTradePlanStatus,
+  setTradePlanDecision,
   updateTradePlan,
 } from './trade-plan.service';
 
@@ -41,7 +41,7 @@ tradePlanRouter.use(authMiddleware);
  *     parameters:
  *       - in: query
  *         name: status
- *         schema: { type: string, enum: [pending, executed, missed, cancelled] }
+ *         schema: { type: string, enum: [draft, closed] }
  *     responses:
  *       200: { description: '{ items: TradePlan[] }.' }
  *       401: { description: No valid session. }
@@ -55,7 +55,7 @@ tradePlanRouter.get('/', validate('query', ListQuerySchema), async (c) => {
  * @swagger
  * /api/trade-plans:
  *   post:
- *     summary: Create a pre-trade plan (Pending).
+ *     summary: Create a pre-trade plan (draft).
  *     tags: [Trade Plans]
  *     responses:
  *       201: { description: The created plan. }
@@ -112,26 +112,27 @@ tradePlanRouter.patch(
 
 /**
  * @swagger
- * /api/trade-plans/{id}/status:
+ * /api/trade-plans/{id}/decision:
  *   patch:
- *     summary: Move a plan through its lifecycle.
- *     description: Pending → executed / missed / cancelled. Repeating a terminal
- *       state is idempotent; moving between terminal states is a 400.
+ *     summary: Record the plan's decision, closing it (draft to closed).
+ *     description: >
+ *       Body `{ decision: taken | skipped | no_action }`. A closed plan is final
+ *       and refuses another decision.
  *     tags: [Trade Plans]
  *     responses:
  *       200: { description: The updated plan. }
- *       400: { description: VALIDATION_ERROR — illegal transition. }
+ *       400: { description: VALIDATION_ERROR — plan already closed. }
  *       401: { description: No valid session. }
  *       404: { description: NOT_FOUND. }
  */
 tradePlanRouter.patch(
-  '/:id/status',
+  '/:id/decision',
   validate('param', IdParamSchema),
-  validate('json', UpdateTradePlanStatusSchema),
+  validate('json', UpdateTradePlanDecisionSchema),
   async (c) => {
     const { id } = c.req.valid('param');
-    const { status } = c.req.valid('json');
-    return c.json(await setTradePlanStatus(c.get('userId'), id, status), 200);
+    const { decision } = c.req.valid('json');
+    return c.json(await setTradePlanDecision(c.get('userId'), id, decision), 200);
   },
 );
 

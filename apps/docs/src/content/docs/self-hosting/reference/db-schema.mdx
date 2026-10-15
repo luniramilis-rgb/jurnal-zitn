@@ -6,9 +6,9 @@ description: Every table Jurnal ZITN creates, its columns, and how they referenc
 {/* GENERATED FILE — do not edit.
     Source: apps/api/src/db/migrations/meta/ (latest snapshot) · Generator: apps/docs/scripts/gen-db-schema.mjs */}
 
-Jurnal ZITN's schema is **42 tables**, created by **49 migrations** that run
+Jurnal ZITN's schema is **42 tables**, created by **50 migrations** that run
 automatically when the api boots. This page is generated from the Drizzle snapshot
-for the latest schema-changing migration (`0048_rpt_standalone`), so it describes the schema the migrations
+for the latest schema-changing migration (`0049_draft_closed_status`), so it describes the schema the migrations
 actually produce.
 
 You do not need any of this to run Jurnal ZITN. It is here for writing queries against
@@ -554,7 +554,7 @@ a query you write against these tables may need updating on any release.
 | `target_price` | `numeric(18, 8)` | — |
 | `note` | `text` | — |
 | `decision` | `varchar(12)` | — |
-| `status` | `varchar(12)` | not null, default `'pending'` |
+| `status` | `varchar(12)` | not null, default `'draft'` |
 | `playbook_id` | `uuid` | — |
 | `sizing` | `jsonb` | — |
 | `pra_snapshot` | `jsonb` | — |

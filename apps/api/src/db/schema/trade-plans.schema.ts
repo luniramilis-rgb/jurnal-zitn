@@ -45,7 +45,8 @@ export const tradePlans = pgTable(
     note: text('note'),
     // Keputusan pengguna (taken/skipped/no_action), terpisah dari lifecycle `status`.
     decision: varchar('decision', { length: 12 }),
-    status: varchar('status', { length: 12 }).notNull().default('pending'),
+    // Lifecycle (§3b): a plan is a `draft` until a `decision` closes it.
+    status: varchar('status', { length: 12 }).notNull().default('draft'),
     playbookId: uuid('playbook_id'),
     // Snapshot (ZITN-TECH-070 §3b): sizing dari Hitung Posisi, angka `pra` (Lapis 1) + asOf,
     // dan hasil minimal. Disimpan sebagai JSON apa adanya.
@@ -63,10 +64,7 @@ export const tradePlans = pgTable(
     index('trade_plans_user_id_status_idx').on(table.userId, table.status),
     check('trade_plans_side_chk', sql`${table.side} IN ('long','short')`),
     check('trade_plans_market_chk', sql`${table.market} IN ('id','us')`),
-    check(
-      'trade_plans_status_chk',
-      sql`${table.status} IN ('pending','executed','missed','cancelled')`,
-    ),
+    check('trade_plans_status_chk', sql`${table.status} IN ('draft','closed')`),
     check(
       'trade_plans_source_chk',
       sql`${table.source} IS NULL OR ${table.source} IN ('pemindai','chart','manual')`,

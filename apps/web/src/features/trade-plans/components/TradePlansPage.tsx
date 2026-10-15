@@ -5,6 +5,7 @@ import type {
   MessageKey,
   TradePlan,
   TradePlanChecklist,
+  TradePlanDecision,
   TradePlanStatus,
 } from '@jurnal-zitn/shared';
 
@@ -37,7 +38,7 @@ import { PRA_TRADE_CHECKLIST_ENABLED } from '@/lib/frontendFlags';
 import {
   useCreateTradePlan,
   useDeleteTradePlan,
-  useSetTradePlanStatus,
+  useSetTradePlanDecision,
   useTradePlans,
   useUpdateTradePlan,
 } from '../hooks/useTradePlans';
@@ -55,10 +56,14 @@ const EMPTY = {
 };
 
 const STATUS_LABEL: Record<TradePlanStatus, MessageKey> = {
-  pending: 'tp.stPending',
-  executed: 'tp.stExecuted',
-  missed: 'tp.stMissed',
-  cancelled: 'tp.stCancelled',
+  draft: 'tp.stDraft',
+  closed: 'tp.stClosed',
+};
+
+const DECISION_LABEL: Record<TradePlanDecision, MessageKey> = {
+  taken: 'tp.decTaken',
+  skipped: 'tp.decSkipped',
+  no_action: 'tp.decNoAction',
 };
 
 /** Live reward:risk from the plan's own levels; null when it cannot be computed. */
@@ -94,12 +99,13 @@ export function TradePlansPage() {
   const t = useT();
   const list = useTradePlans();
   const create = useCreateTradePlan();
-  const setStatus = useSetTradePlanStatus();
+  const setDecision = useSetTradePlanDecision();
   const remove = useDeleteTradePlan();
   const update = useUpdateTradePlan();
-  // The lifecycle is forward-only (F4): a confirmation step guards a mis-click
-  // without relaxing the rule.
-  const [confirm, setConfirm] = useState<{ plan: TradePlan; status: TradePlanStatus } | null>(null);
+  // Recording a decision closes the plan (§3b); a confirmation guards a mis-click.
+  const [confirm, setConfirm] = useState<{ plan: TradePlan; decision: TradePlanDecision } | null>(
+    null,
+  );
   // Saved risk profile (Cek Risiko → Profil risiko): surfaced here so the
   // pre-trade draft is written against the same setting (ZITN-TECH-043 §3.3).
   const { choice: riskProfile } = useRiskProfile();
@@ -211,14 +217,14 @@ export function TradePlansPage() {
     </label>
   );
 
-  const statusButton = (plan: TradePlan, status: TradePlanStatus, label: string) => (
+  const decisionButton = (plan: TradePlan, decision: TradePlanDecision, label: string) => (
     <Button
       type="button"
       variant="outline"
       size="sm"
       className="cursor-pointer"
-      disabled={setStatus.isPending}
-      onClick={() => setConfirm({ plan, status })}
+      disabled={setDecision.isPending}
+      onClick={() => setConfirm({ plan, decision })}
     >
       {label}
     </Button>
@@ -379,7 +385,10 @@ export function TradePlansPage() {
                 <TableCell>
                   <Numeric value={liveRR(plan)} kind="decimal" direction="none" />
                 </TableCell>
-                <TableCell>{t(STATUS_LABEL[plan.status])}</TableCell>
+                <TableCell>
+                  {t(STATUS_LABEL[plan.status])}
+                  {plan.decision ? ` · ${t(DECISION_LABEL[plan.decision])}` : ''}
+                </TableCell>
                 <TableCell className="space-x-2 whitespace-nowrap">
                   {PRA_TRADE_CHECKLIST_ENABLED && (
                     <Button
@@ -394,11 +403,11 @@ export function TradePlansPage() {
                       {t('tp.checklist')}
                     </Button>
                   )}
-                  {plan.status === 'pending' && (
+                  {plan.status === 'draft' && (
                     <>
-                      {statusButton(plan, 'executed', t('tp.execute'))}
-                      {statusButton(plan, 'missed', t('tp.miss'))}
-                      {statusButton(plan, 'cancelled', t('tp.cancel'))}
+                      {decisionButton(plan, 'taken', t('tp.decTaken'))}
+                      {decisionButton(plan, 'skipped', t('tp.decSkipped'))}
+                      {decisionButton(plan, 'no_action', t('tp.decNoAction'))}
                     </>
                   )}
                   <Button
@@ -448,7 +457,7 @@ export function TradePlansPage() {
               {confirm
                 ? t('tp.confirm.body', {
                     symbol: confirm.plan.symbol,
-                    status: t(STATUS_LABEL[confirm.status]),
+                    status: t(DECISION_LABEL[confirm.decision]),
                   })
                 : ''}
             </AlertDialogDescription>
@@ -460,7 +469,8 @@ export function TradePlansPage() {
             <AlertDialogAction
               className="cursor-pointer"
               onClick={() => {
-                if (confirm) setStatus.mutate({ id: confirm.plan.id, status: confirm.status });
+                if (confirm)
+                  setDecision.mutate({ id: confirm.plan.id, decision: confirm.decision });
                 setConfirm(null);
               }}
             >
