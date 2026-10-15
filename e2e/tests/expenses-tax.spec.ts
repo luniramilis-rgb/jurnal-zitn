@@ -1,4 +1,11 @@
-import { expect, test, type APIRequestContext } from '@playwright/test';
+import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+
+/** Klik tautan nav rail; di viewport mobile rail disembunyikan — buka overlay menu dulu. */
+async function clickNav(page: Page, name: string) {
+  const toggle = page.getByTestId('mobile-nav-toggle');
+  if (await toggle.isVisible().catch(() => false)) await toggle.click();
+  await page.getByRole('link', { name }).click();
+}
 
 /**
  * Expenses-tax e2e suite (Task 27).
@@ -256,7 +263,7 @@ test.describe('Expenses-tax — expense CRUD', () => {
 
     // Navigate via sidebar — Accounting redirects to /accounting/expenses.
     await page.goto('/dashboard');
-    await page.getByRole('link', { name: 'Accounting' }).click();
+    await clickNav(page, 'Accounting');
     await expect(page).toHaveURL(/\/accounting\/expenses/);
     await expect(page.getByRole('heading', { name: 'Expenses', exact: true })).toBeVisible();
 

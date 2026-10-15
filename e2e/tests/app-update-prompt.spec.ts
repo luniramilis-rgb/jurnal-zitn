@@ -2,6 +2,13 @@ import { expect, type Page, type Response } from '@playwright/test';
 
 import { mockAppShell, SESSION_RESPONSE, test } from './fixtures/performance-fixtures';
 
+/** Klik tautan nav rail; di viewport mobile rail disembunyikan — buka overlay menu dulu. */
+async function clickNav(page: Page, name: string) {
+  const toggle = page.getByTestId('mobile-nav-toggle');
+  if (await toggle.isVisible().catch(() => false)) await toggle.click();
+  await page.getByRole('link', { name }).click();
+}
+
 /**
  * App-update-prompt e2e suite (REQ-11.3).
  *
@@ -153,7 +160,7 @@ async function route404Chunk(page: Page, glob: string): Promise<void> {
  * the monitor", which must be true before the clock is fast-forwarded.
  */
 async function waitForAuthShell(page: Page): Promise<void> {
-  await expect(page.getByRole('link', { name: 'Dashboard' })).toBeVisible();
+  await expect(page.getByTestId('zitn-app-bar')).toBeVisible();
 }
 
 test.describe('app update prompt', () => {
@@ -308,7 +315,7 @@ test.describe('app update prompt', () => {
     await waitForAuthShell(page);
 
     await page.clock.fastForward(5 * 60_000);
-    await page.getByRole('link', { name: 'Positions' }).click();
+    await clickNav(page, 'Positions');
     await expect(page).toHaveURL(/\/positions/);
     await page.clock.fastForward(10 * 60_000);
 
@@ -345,7 +352,7 @@ test.describe('app update prompt', () => {
     // Navigate to /cek-risiko: the chunk 404s, the boundary spends its one
     // automatic reload (one extra document load), the reload's chunk 404s again,
     // the guard is spent, and the fallback renders.
-    await page.getByRole('link', { name: 'Risk Check' }).click();
+    await clickNav(page, 'Risk Check');
     await expect(page.getByTestId('chunk-load-fallback')).toBeVisible();
     expect(loadCount).toBe(loadsAfterInitial + 1);
 
