@@ -44,6 +44,30 @@ describe('PraTradeChecklist — Lapis 2 (ZITN-TECH-069)', () => {
     expect(screen.getByTestId('pra-label').textContent).toContain('in-sample');
   });
 
+  it('auto-isi menyusul setelah `pra` tiba (fetch async) — regresi', () => {
+    const { rerender } = render(
+      <PraTradeChecklist pra={null} value={null} asOf={null} onSave={() => {}} />,
+    );
+    // Sebelum data tiba: belum ada angka (pesan "belum terbit").
+    expect(screen.getByTestId('pra-empty')).toBeTruthy();
+
+    // `pra` tiba setelah mount → auto-isi ambang tegas harus masuk (bug lama: tidak).
+    rerender(<PraTradeChecklist pra={PRA} value={null} asOf="2026-10-14" onSave={() => {}} />);
+    expect((screen.getByTestId('pra-check-va30') as HTMLInputElement).checked).toBe(true);
+    expect((screen.getByTestId('pra-check-res') as HTMLInputElement).checked).toBe(true);
+    expect((screen.getByTestId('pra-check-spike') as HTMLInputElement).checked).toBe(false);
+  });
+
+  it('keputusan tersimpan menang atas auto-isi', () => {
+    const saved: TradePlanChecklist = {
+      items: { va30: false, basis: false, res: false, spike: false, pressure: false },
+      attested: false,
+    };
+    render(<PraTradeChecklist pra={PRA} value={saved} asOf="2026-10-14" onSave={() => {}} />);
+    expect((screen.getByTestId('pra-check-va30') as HTMLInputElement).checked).toBe(false);
+    expect((screen.getByTestId('pra-check-res') as HTMLInputElement).checked).toBe(false);
+  });
+
   it('menyimpan centang + attestasi + catatan ke rencana', () => {
     const onSave = vi.fn<(c: TradePlanChecklist) => void>();
     render(<PraTradeChecklist pra={PRA} value={null} asOf="2026-10-14" onSave={onSave} />);
