@@ -1265,7 +1265,7 @@
             }
           },
           {
-            "description": "Optional ticker from Pemindai ZITN's \"Tambah ke Jurnal\" (ZITN-TECH-043). On success the journal creates (or focuses) an idempotent Pending F4 draft for this symbol+market and redirects to `/trade-plans?focus=<id>`. Identity only — no levels.\n",
+            "description": "Optional ticker from Pemindai ZITN's \"Tambah ke Jurnal\" (ZITN-TECH-043). On success the journal creates (or focuses) an idempotent F4 draft for this symbol+market and redirects to `/trade-plans?focus=<id>`. Identity only — no levels.\n",
             "in": "query",
             "name": "add",
             "required": false,
@@ -4995,10 +4995,8 @@
             "name": "status",
             "schema": {
               "enum": [
-                "pending",
-                "executed",
-                "missed",
-                "cancelled"
+                "draft",
+                "closed"
               ],
               "type": "string"
             }
@@ -5029,7 +5027,7 @@
             "description": "No valid session."
           }
         },
-        "summary": "Create a pre-trade plan (Pending).",
+        "summary": "Create a pre-trade plan (draft).",
         "tags": [
           "Trade Plans"
         ]
@@ -5102,15 +5100,15 @@
         ]
       }
     },
-    "/api/trade-plans/{id}/status": {
+    "/api/trade-plans/{id}/decision": {
       "patch": {
-        "description": "Pending → executed / missed / cancelled. Repeating a terminal state is idempotent; moving between terminal states is a 400.",
+        "description": "Body `{ decision: taken | skipped | no_action }`. A closed plan is final and refuses another decision.\n",
         "responses": {
           "200": {
             "description": "The updated plan."
           },
           "400": {
-            "description": "VALIDATION_ERROR — illegal transition."
+            "description": "VALIDATION_ERROR — plan already closed."
           },
           "401": {
             "description": "No valid session."
@@ -5119,7 +5117,7 @@
             "description": "NOT_FOUND."
           }
         },
-        "summary": "Move a plan through its lifecycle.",
+        "summary": "Record the plan's decision, closing it (draft to closed).",
         "tags": [
           "Trade Plans"
         ]

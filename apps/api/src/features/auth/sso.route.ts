@@ -55,7 +55,7 @@ const TICKER_RE = /^[A-Z0-9.\-]{1,12}$/;
  *         schema: { type: string }
  *         description: >
  *           Optional ticker from Pemindai ZITN's "Tambah ke Jurnal" (ZITN-TECH-043). On success the
- *           journal creates (or focuses) an idempotent Pending F4 draft for this symbol+market and
+ *           journal creates (or focuses) an idempotent F4 draft for this symbol+market and
  *           redirects to `/trade-plans?focus=<id>`. Identity only — no levels.
  *       - in: query
  *         name: pasar

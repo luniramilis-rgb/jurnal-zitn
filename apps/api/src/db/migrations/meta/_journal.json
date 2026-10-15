@@ -344,6 +344,13 @@
       "when": 1792021451445,
       "tag": "0048_rpt_standalone",
       "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1792029696032,
+      "tag": "0049_draft_closed_status",
+      "breakpoints": true
     }
   ]
 }

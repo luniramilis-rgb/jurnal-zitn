@@ -3,7 +3,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type {
   CreateTradePlanInput,
   TradePlan,
-  TradePlanStatus,
+  TradePlanDecision,
   UpdateTradePlanInput,
 } from '@jurnal-zitn/shared';
 
@@ -38,11 +38,11 @@ export function useUpdateTradePlan() {
   });
 }
 
-export function useSetTradePlanStatus() {
+export function useSetTradePlanDecision() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: ({ id, status }: { id: string; status: TradePlanStatus }) =>
-      api.patch<TradePlan>(`/trade-plans/${id}/status`, { status }),
+    mutationFn: ({ id, decision }: { id: string; decision: TradePlanDecision }) =>
+      api.patch<TradePlan>(`/trade-plans/${id}/decision`, { decision }),
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ['trade-plans'] });
     },

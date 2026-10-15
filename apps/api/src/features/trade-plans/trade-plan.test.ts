@@ -5,7 +5,7 @@ import app from '@/app';
 import { db } from '@/db';
 import { tradePlans, users } from '@/db/schema';
 
-import { createOrFocusPendingPlan, setTradePlanStatus } from './trade-plan.service';
+import { createOrFocusPendingPlan, setTradePlanDecision } from './trade-plan.service';
 
 // F4 pre-trade plans (ZITN-TECH-017 §10.8): CRUD + the forward-only lifecycle.
 
@@ -78,7 +78,7 @@ describe('trade plans CRUD + lifecycle', () => {
       symbol: string;
       entryPrice: string | null;
     };
-    expect(plan.status).toBe('pending');
+    expect(plan.status).toBe('draft');
     expect(plan.symbol).toBe('bbri');
     expect(plan.entryPrice).toBe('4000.00000000');
 
@@ -92,31 +92,27 @@ describe('trade plans CRUD + lifecycle', () => {
     expect(((await list.json()) as { items: unknown[] }).items).toHaveLength(1);
   });
 
-  it('walks Pending → Executed, then refuses a move between terminal states', async () => {
+  it('walks draft → closed via a decision, then refuses a second decision', async () => {
     const { cookie } = await register();
     const plan = (await (
       await authed('POST', '/api/trade-plans', cookie, { symbol: 'AAPL', side: 'short' })
-    ).json()) as { id: string };
+    ).json()) as { id: string; status: string };
+    expect(plan.status).toBe('draft');
 
-    const executed = await authed('PATCH', `/api/trade-plans/${plan.id}/status`, cookie, {
-      status: 'executed',
+    const decided = await authed('PATCH', `/api/trade-plans/${plan.id}/decision`, cookie, {
+      decision: 'taken',
     });
-    expect(executed.status).toBe(200);
-    const executedPlan = (await executed.json()) as { status: string; decision: string | null };
-    expect(executedPlan.status).toBe('executed');
-    // The lifecycle write records the user's decision (§3b): executed → taken.
-    expect(executedPlan.decision).toBe('taken');
+    expect(decided.status).toBe(200);
+    const decidedPlan = (await decided.json()) as { status: string; decision: string | null };
+    // The decision closes the plan (§3b); the choice lives in `decision`.
+    expect(decidedPlan.status).toBe('closed');
+    expect(decidedPlan.decision).toBe('taken');
 
-    const illegal = await authed('PATCH', `/api/trade-plans/${plan.id}/status`, cookie, {
-      status: 'missed',
+    // A closed plan refuses another decision.
+    const illegal = await authed('PATCH', `/api/trade-plans/${plan.id}/decision`, cookie, {
+      decision: 'skipped',
     });
     expect(illegal.status).toBe(400);
-
-    // Repeating the terminal state is idempotent.
-    const repeat = await authed('PATCH', `/api/trade-plans/${plan.id}/status`, cookie, {
-      status: 'executed',
-    });
-    expect(repeat.status).toBe(200);
   });
 
   it('deletes a plan and 404s an unknown id', async () => {
@@ -180,8 +176,8 @@ describe('create-or-focus (Tambah ke Jurnal, ZITN-TECH-043)', () => {
     expect(c.focused).toBe(false);
     expect(c.plan.id).not.toBe(a.plan.id);
 
-    // Terminal plan is not re-focused; a fresh Pending draft is made.
-    await setTradePlanStatus(id, a.plan.id, 'executed');
+    // Closed plan is not re-focused; a fresh draft is made.
+    await setTradePlanDecision(id, a.plan.id, 'taken');
     const d = await createOrFocusPendingPlan(id, { symbol: 'BBCA', market: 'id' });
     expect(d.focused).toBe(false);
     expect(d.plan.id).not.toBe(a.plan.id);

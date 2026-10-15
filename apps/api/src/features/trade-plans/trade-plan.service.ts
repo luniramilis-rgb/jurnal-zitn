@@ -3,6 +3,7 @@ import { and, eq } from 'drizzle-orm';
 import type {
   CreateTradePlanInput,
   TradePlan,
+  TradePlanDecision,
   TradePlanMarket,
   TradePlanStatus,
   UpdateTradePlanInput,
@@ -15,28 +16,11 @@ import { withTransaction } from '@/lib/transaction';
 
 // ---------------------------------------------------------------------------
 // F4 pre-trade plans (ZITN-TECH-017 §10.8). ZITN-TECH-070 §3b: RPT is standalone
-// (no position link). User-scoped CRUD with a forward-only lifecycle:
-// Pending → Executed / Missed / Cancelled. Repeating a terminal state is
-// idempotent; moving BETWEEN terminal states (or back to pending) is refused.
+// (no position link). A plan is a `draft` until the user records a `decision`
+// (taken / skipped / no_action), which closes it — `closed` is final. The user's
+// choice lives in `decision`, NOT in the lifecycle `status`.
 // `playbook_id` is a SOFT link (no FK) — deleting a playbook never cascades.
 // ---------------------------------------------------------------------------
-
-// A lifecycle write also records the user's `decision` (§3b), derived from the
-// terminal state reached: executed → taken, cancelled → skipped, missed →
-// no_action. `pending` leaves it null.
-const DECISION_FOR_STATUS: Record<TradePlanStatus, 'taken' | 'skipped' | 'no_action' | null> = {
-  pending: null,
-  executed: 'taken',
-  missed: 'no_action',
-  cancelled: 'skipped',
-};
-
-const ALLOWED_TRANSITIONS: Record<TradePlanStatus, readonly TradePlanStatus[]> = {
-  pending: ['pending', 'executed', 'missed', 'cancelled'],
-  executed: ['executed'],
-  missed: ['missed'],
-  cancelled: ['cancelled'],
-};
 
 function toTradePlan(row: typeof tradePlans.$inferSelect): TradePlan {
   return {
@@ -108,7 +92,6 @@ export async function createTradePlan(
         stopLoss: input.stopLoss ?? null,
         targetPrice: input.targetPrice ?? null,
         note: input.note ?? null,
-        decision: input.decision ?? null,
         playbookId: input.playbookId ?? null,
         sizing: input.sizing ?? null,
         praSnapshot: input.praSnapshot ?? null,
@@ -123,10 +106,10 @@ export async function createTradePlan(
 /**
  * "Tambah ke Jurnal" dari Pemindai ZITN (ZITN-TECH-043): buat draf pra-trade **idempoten**.
  *
- * Bila sudah ada draf **Pending** untuk (user, symbol, market) yang sama, kembalikan yang itu
- * (fokuskan) alih-alih membuat duplikat. Draf terminal (executed/missed/cancelled) TIDAK
- * difokuskan — dibuat draf baru. Prefill hanya identitas: symbol + market + signalDate; sisi
- * default `long` (dapat diubah pengguna), **tanpa** zona/stop/target.
+ * Bila sudah ada draf **`draft`** untuk (user, symbol, market) yang sama, kembalikan yang itu
+ * (fokuskan) alih-alih membuat duplikat. Draf `closed` TIDAK difokuskan — dibuat draf baru.
+ * Prefill hanya identitas: symbol + market + signalDate; sisi default `long` (dapat diubah
+ * pengguna), **tanpa** stop/target.
  */
 export async function createOrFocusPendingPlan(
   userId: string,
@@ -142,7 +125,7 @@ export async function createOrFocusPendingPlan(
           eq(tradePlans.userId, userId),
           eq(tradePlans.symbol, input.symbol),
           eq(tradePlans.market, market),
-          eq(tradePlans.status, 'pending'),
+          eq(tradePlans.status, 'draft'),
         ),
       )
       .limit(1);
@@ -181,7 +164,6 @@ export async function updateTradePlan(
         ...(input.stopLoss !== undefined ? { stopLoss: input.stopLoss } : {}),
         ...(input.targetPrice !== undefined ? { targetPrice: input.targetPrice } : {}),
         ...(input.note !== undefined ? { note: input.note } : {}),
-        ...(input.decision !== undefined ? { decision: input.decision } : {}),
         ...(input.playbookId !== undefined ? { playbookId: input.playbookId } : {}),
         ...(input.sizing !== undefined ? { sizing: input.sizing } : {}),
         ...(input.praSnapshot !== undefined ? { praSnapshot: input.praSnapshot } : {}),
@@ -197,12 +179,13 @@ export async function updateTradePlan(
 }
 
 /**
- * Lifecycle write. Refuses a transition between terminal states.
+ * Terminal write (§3b): record the user's `decision`, which closes the plan.
+ * Refuses when the plan is already closed (a reopen is a separate concern).
  */
-export async function setTradePlanStatus(
+export async function setTradePlanDecision(
   userId: string,
   id: string,
-  status: TradePlanStatus,
+  decision: TradePlanDecision,
 ): Promise<TradePlan> {
   return withTransaction(db, async (tx) => {
     const [existing] = await tx
@@ -211,15 +194,13 @@ export async function setTradePlanStatus(
       .where(and(eq(tradePlans.userId, userId), eq(tradePlans.id, id)))
       .limit(1);
     if (!existing) throw new NotFoundError('TradePlan', id);
-
-    const from = existing.status as TradePlanStatus;
-    if (!ALLOWED_TRANSITIONS[from].includes(status)) {
-      throw new ValidationError(`Cannot move a trade plan from '${from}' to '${status}'`);
+    if (existing.status === 'closed') {
+      throw new ValidationError('Trade plan is already closed');
     }
 
     const [row] = await tx
       .update(tradePlans)
-      .set({ status, decision: DECISION_FOR_STATUS[status], updatedAt: new Date() })
+      .set({ decision, status: 'closed', updatedAt: new Date() })
       .where(eq(tradePlans.id, id))
       .returning();
     return toTradePlan(row!);
