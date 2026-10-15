@@ -328,12 +328,17 @@
   border: 1px solid var(--z-line);
   border-radius: 0.375rem;
   background: var(--z-bg);
-  padding: 0.5rem 1rem;
+  padding: 0.25rem 0.75rem;
   font-size: 0.875rem;
 }
 .zitn-appbar a {
   color: var(--z-muted);
   text-decoration: none;
+  /* ZITN-TECH-070: tautan app-bar memakai tinggi sentuh >=44px (mobile). */
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding-inline: 0.5rem;
 }
 .zitn-appbar a:hover {
   color: var(--z-accent);
@@ -341,4 +346,9 @@
 .zitn-appbar a[aria-current='page'] {
   color: var(--z-accent);
   font-weight: 500;
+}
+
+/* Mobile shell: beri ruang untuk home indicator iOS (butuh `viewport-fit=cover`). */
+.app-main-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
 }

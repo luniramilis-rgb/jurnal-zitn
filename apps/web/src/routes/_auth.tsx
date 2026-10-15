@@ -43,7 +43,7 @@ function AuthLayout() {
 
   if (isLoading) {
     return (
-      <div className="flex min-h-screen items-center justify-center">
+      <div className="flex min-h-dvh items-center justify-center">
         <div className="text-muted-foreground">Loading...</div>
       </div>
     );
@@ -55,12 +55,13 @@ function AuthLayout() {
 
   return (
     <DrawerToggleRefProvider>
-      <div className="flex min-h-screen">
+      <div className="flex min-h-dvh">
         <EventBusBridge />
         <Sidebar />
         <main
           className={cn(
-            'flex-1 p-6 transition-[padding] duration-200 ease-out motion-reduce:duration-0',
+            'flex-1 p-4 transition-[padding] duration-200 ease-out motion-reduce:duration-0 sm:p-6',
+            'app-main-safe',
             drawerOpen && 'lg:pr-[384px]',
             feedbackMainGutterClasses(drawerOpen),
           )}

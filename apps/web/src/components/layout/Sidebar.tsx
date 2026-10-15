@@ -58,6 +58,8 @@ const ITEM_EXPANDED = cn(
 );
 const ITEM_RAIL = cn(
   'cursor-pointer relative grid h-[34px] w-[38px] place-items-center rounded-md',
+  // Mobile: rail adalah nav utama — beri target sentuh >=44px (ZITN-TECH-070).
+  'max-md:h-11 max-md:w-11',
   'text-muted-foreground hover:bg-accent hover:text-foreground',
   '[&.active]:bg-secondary [&.active]:text-foreground',
   // The amber active tick, drawn just off the item's left edge (mock: 2px bar).
@@ -137,7 +139,7 @@ export function Sidebar() {
     // `align-items: stretch` from re-growing it.
     <aside
       className={cn(
-        'sticky top-0 flex h-screen flex-col border-r border-hairline bg-card',
+        'sticky top-0 flex h-dvh flex-col border-r border-hairline bg-card',
         'transition-[width] duration-200 motion-reduce:duration-0',
         expanded ? EXPANDED_WIDTH : RAIL_WIDTH,
       )}
@@ -163,7 +165,7 @@ export function Sidebar() {
         <Button
           variant="ghost"
           size="icon-sm"
-          className="cursor-pointer text-muted-foreground"
+          className="cursor-pointer text-muted-foreground max-md:size-11"
           onClick={() => setPinned(!pinned)}
           aria-label={expanded ? 'Collapse sidebar' : 'Expand sidebar'}
         >

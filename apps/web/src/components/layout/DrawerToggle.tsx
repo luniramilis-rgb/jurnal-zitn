@@ -33,7 +33,7 @@ export function DrawerToggle() {
           }}
           variant="ghost"
           size="icon-sm"
-          className="cursor-pointer text-muted-foreground"
+          className="cursor-pointer text-muted-foreground max-md:size-11"
           onClick={open}
           aria-label="Open side drawer"
           aria-expanded={false}

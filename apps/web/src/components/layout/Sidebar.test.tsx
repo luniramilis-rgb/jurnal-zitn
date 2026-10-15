@@ -420,7 +420,8 @@ describe('Sidebar — pinned to the viewport, not the page', () => {
     const aside = container.querySelector('aside');
     expect(aside?.className).toContain('sticky');
     expect(aside?.className).toContain('top-0');
-    expect(aside?.className).toContain('h-screen');
+    // `h-dvh` (bukan `h-screen`): di mobile address-bar browser mengubah 100vh.
+    expect(aside?.className).toContain('h-dvh');
 
     unmount(container, root);
   });

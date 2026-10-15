@@ -70,7 +70,7 @@ export function ThemeToggle() {
           <Button
             variant="ghost"
             size="icon-sm"
-            className="cursor-pointer"
+            className="cursor-pointer max-md:size-11"
             aria-label="Toggle theme"
           >
             <CurrentIcon className="h-4 w-4" aria-hidden="true" />
