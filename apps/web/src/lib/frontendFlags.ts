@@ -16,11 +16,15 @@
  * - `BROKERAGES_ENABLED` — the "Broker" nav entry and its `/brokerages` route.
  *   Hidden on request (ZITN-TECH-065 §4); the code is kept and can be restored by
  *   flipping this flag and redeploying.
+ * - `PLAYBOOKS_ENABLED` — the "Playbook" nav entry and its `/playbooks` route
+ *   (ZITN-TECH-070 §6, "sembunyikan dulu/reversibel"). Hidden first; the code
+ *   stays so it can be restored by flipping the flag.
  */
 export const CHANGELOG_ENABLED = false;
 export const DOCS_LINKS_ENABLED = false;
 export const POSITION_SIZING_ENABLED = true;
 export const BROKERAGES_ENABLED = false;
+export const PLAYBOOKS_ENABLED = false;
 /**
  * Ceklis pra-trade tersimpan (ZITN-TECH-069 Lapis 2) di F4 "Rencana Pra-Trade": angka `pra`
  * dibaca dari konteks ZITN (D12=(ii)), keputusan user disimpan di rencana. Reversibel.

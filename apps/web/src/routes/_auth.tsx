@@ -1,4 +1,4 @@
-import { createFileRoute, Outlet } from '@tanstack/react-router';
+import { createFileRoute, Outlet, redirect } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
 import { DrawerToggleRefProvider } from '@/components/layout/DrawerToggleRefContext';
@@ -15,6 +15,7 @@ import { ContextStrip } from '@/features/workspace/components/ContextStrip';
 import { useAuth } from '@/hooks/useAuth';
 import { useReportingTimezoneBackfill } from '@/hooks/useUserTimezone';
 import { hardRedirectToLogin } from '@/lib/auth-redirect';
+import { isPrunedPath } from '@/lib/prunedSurfaces';
 import { cn } from '@/lib/utils';
 import { useDrawerStore } from '@/stores/drawer.store';
 import { EventBusBridge } from '@/stores/EventBusBridge';
@@ -86,5 +87,10 @@ function AuthLayout() {
 }
 
 export const Route = createFileRoute('/_auth')({
+  // ZITN-TECH-070 Fase 3 (hide): permukaan yang dipangkas tidak dapat dibuka lewat URL
+  // langsung/bookmark; redirect terpusat di sini (reversibel lewat `frontendFlags`).
+  beforeLoad: ({ location }) => {
+    if (isPrunedPath(location.pathname)) throw redirect({ to: '/dashboard' });
+  },
   component: AuthLayout,
 });

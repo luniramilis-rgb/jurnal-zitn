@@ -31,7 +31,12 @@ import { useAuth } from '@/hooks/useAuth';
 import { useT } from '@/hooks/useLocale';
 import { useAdvisorEnabled } from '@/hooks/useRegistrationEnabled';
 import { docsUrl } from '@/lib/docs';
-import { BROKERAGES_ENABLED, CHANGELOG_ENABLED, DOCS_LINKS_ENABLED } from '@/lib/frontendFlags';
+import {
+  BROKERAGES_ENABLED,
+  CHANGELOG_ENABLED,
+  DOCS_LINKS_ENABLED,
+  PLAYBOOKS_ENABLED,
+} from '@/lib/frontendFlags';
 import { cn } from '@/lib/utils';
 import { useDrawerStore } from '@/stores/drawer.store';
 
@@ -190,14 +195,16 @@ export function Sidebar() {
         >
           <ItemContent expanded={expanded} label={t('nav.dashboard')} Icon={LayoutDashboard} />
         </Link>
-        <Link
-          to="/playbooks"
-          aria-label={t('nav.playbooks')}
-          title={expanded ? undefined : t('nav.playbooks')}
-          className={itemClass(expanded)}
-        >
-          <ItemContent expanded={expanded} label={t('nav.playbooks')} Icon={BookOpen} />
-        </Link>
+        {PLAYBOOKS_ENABLED && (
+          <Link
+            to="/playbooks"
+            aria-label={t('nav.playbooks')}
+            title={expanded ? undefined : t('nav.playbooks')}
+            className={itemClass(expanded)}
+          >
+            <ItemContent expanded={expanded} label={t('nav.playbooks')} Icon={BookOpen} />
+          </Link>
+        )}
         <Link
           to="/trade-plans"
           aria-label={t('nav.tradePlans')}
