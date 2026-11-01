@@ -27,7 +27,7 @@
     "drizzle-orm": "^0.38",
     "hono": "^4",
     "ioredis": "^5.11.1",
-    "nodemailer": "^9.0.3",
+    "nodemailer": "^10.1.4",
     "openai": "^4",
     "postgres": "^3.4",
     "posthog-node": "^5.38.0",
